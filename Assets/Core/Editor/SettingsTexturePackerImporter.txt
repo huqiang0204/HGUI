@@ -1,0 +1,18 @@
+version: 2
+importPivots: 1
+tpsheetFileNames:
+- Assets/AssetsBundle/pic/classic.tpsheet
+- Assets/AssetsBundle/pic/Wicon.tpsheet
+- Assets/AssetsBundle/pic/Wpepole.tpsheet
+- Assets/AssetsBundle/picture/ui/pcvrUI.tpsheet
+textureFileNames:
+- Assets/AssetsBundle/pic/classic.png
+- Assets/AssetsBundle/pic/Wicon.png
+- Assets/AssetsBundle/pic/Wpepole.png
+- Assets/AssetsBundle/picture/ui/pcvrUI.png
+normalmapFileNames:
+- 
+- 
+- 
+- 
+enableDebugOutput: 0

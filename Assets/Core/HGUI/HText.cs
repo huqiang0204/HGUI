@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Assets.Core.HGUI
 {
-    public class HQMask:AsyncScript
+    public class HText:AsyncScript
     {
     }
 }

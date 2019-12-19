@@ -14,8 +14,9 @@ namespace Assets.Core.HQGUI
         /// 信息采集
         /// </summary>
         /// <param name="trans"></param>
-        void Collection(Transform trans)
+        void Collection(Transform trans, int parent)
         {
+            PipeLine[point].parentIndex = parent;
             PipeLine[point].localPos = trans.localPosition;
             PipeLine[point].localRot = trans.localRotation;
             PipeLine[point].localScale = trans.localScale;
@@ -29,15 +30,16 @@ namespace Assets.Core.HQGUI
             PipeLine[point].script = script;
             int c = trans.childCount;
             PipeLine[point].childCount = c;
+            int p = point;
             point++;
             for (int i = 0; i < c; i++)
-                Collection(trans.GetChild(i));
+                Collection(trans.GetChild(i), p);
         }
         private void Update()
         {
             point = 0;
             max = 0;
-            Collection(transform);
+            Collection(transform, -1);
             for (int i = 0; i < scripts.Length; i++)
                 scripts[i].MainUpdate();
             thread.AddSubMission((o) => {

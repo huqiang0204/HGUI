@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Assets.Core.HQGUI
+namespace Assets.Core.HGUI
 {
-    public class HQMask:AsyncScript
+    public class HQGraphics:AsyncScript
     {
+
     }
 }

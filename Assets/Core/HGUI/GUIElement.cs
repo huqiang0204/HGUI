@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Assets.Core.HQGUI
+namespace Assets.Core.HGUI
 {
     public struct GUIElement
     {

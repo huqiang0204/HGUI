@@ -2,7 +2,7 @@
 using huqiang;
 using UnityEngine;
 
-namespace Assets.Core.HQGUI
+namespace Assets.Core.HGUI
 {
     public sealed class Canvas:AsyncScript
     {

@@ -1,7 +1,7 @@
 ﻿using huqiang.UIEvent;
 using System;
 
-namespace Assets.Core.HQGUI
+namespace Assets.Core.HGUI
 {
     public class UserEvent
     {

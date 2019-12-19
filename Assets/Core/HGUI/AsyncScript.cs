@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Assets.Core.HQGUI
+namespace Assets.Core.HGUI
 {
     public class AsyncScript:MonoBehaviour
     {

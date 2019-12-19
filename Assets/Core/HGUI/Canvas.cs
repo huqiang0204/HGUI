@@ -31,7 +31,7 @@ namespace Assets.Core.HGUI
             }
             PipeLine[index].script = script;
             int c = trans.childCount;
-            PipeLine[point].childCount = c;
+            PipeLine[index].childCount = c;
             int s = point;
             point += c;
             PipeLine[index].childOffset = s;
@@ -43,13 +43,14 @@ namespace Assets.Core.HGUI
         }
         private void Update()
         {
-            point = 0;
+            point = 1;
             max = 0;
-            Collection(transform, -1,1);
+            Collection(transform, -1, 1);
             CheckSize();
             for (int i = 0; i < scripts.Length; i++)
                 scripts[i].MainUpdate();
-            thread.AddSubMission((o) => {
+            thread.AddSubMission((o) =>
+            {
                 int len = max;
                 if (scripts != null)
                     for (int i = 0; i < len; i++)

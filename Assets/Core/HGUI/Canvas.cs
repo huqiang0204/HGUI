@@ -19,8 +19,8 @@ namespace Assets.Core.HGUI
         void Collection(Transform trans, int parent)
         {
             PipeLine[point].parentIndex = parent;
-            PipeLine[point].localPos = trans.localPosition;
-            PipeLine[point].localRot = trans.localRotation;
+            PipeLine[point].localPosition = trans.localPosition;
+            PipeLine[point].localRotation = trans.localRotation;
             PipeLine[point].localScale = trans.localScale;
             PipeLine[point].trans = trans;
             var script= trans.GetComponent<AsyncScript>();

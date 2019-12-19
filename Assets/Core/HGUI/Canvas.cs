@@ -1,5 +1,6 @@
 ﻿using System;
 using huqiang;
+using huqiang.UIEvent;
 using UnityEngine;
 
 namespace Assets.Core.HGUI
@@ -45,10 +46,12 @@ namespace Assets.Core.HGUI
         {
             point = 1;
             max = 0;
-            Collection(transform, -1, 1);
+            Collection(transform, -1, 0);
             CheckSize();
             for (int i = 0; i < max; i++)
                 scripts[i].MainUpdate();
+            UserAction.Update();
+            
             thread.AddSubMission((o) =>
             {
                 int len = max;

@@ -45,7 +45,7 @@ namespace Assets.Core.HGUI
                 var ue = script.userEvent;
                 if (ue == null)
                 {
-                    int c= pipeLine[index].childCount;
+                    int c = pipeLine[index].childCount;
                     if(c > 0)
                     {
                         int os = pipeLine[index].childOffset + c;

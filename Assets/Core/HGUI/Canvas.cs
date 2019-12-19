@@ -47,7 +47,7 @@ namespace Assets.Core.HGUI
             max = 0;
             Collection(transform, -1, 1);
             CheckSize();
-            for (int i = 0; i < scripts.Length; i++)
+            for (int i = 0; i < max; i++)
                 scripts[i].MainUpdate();
             thread.AddSubMission((o) =>
             {

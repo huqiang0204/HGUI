@@ -8,10 +8,6 @@ namespace Assets.Core.HGUI
     public class AsyncScript:MonoBehaviour
     {
         protected static ThreadMission thread = new ThreadMission("async");
-        public virtual void CalculMesh(Vector3[] vertex,Vector2[] uv0,Vector2[] uv1,int[] tris)
-        {
-
-        }
         public virtual void MainUpdate()
         {
 

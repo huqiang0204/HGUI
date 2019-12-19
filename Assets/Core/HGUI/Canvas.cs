@@ -16,32 +16,36 @@ namespace Assets.Core.HGUI
         /// 信息采集
         /// </summary>
         /// <param name="trans"></param>
-        void Collection(Transform trans, int parent)
+        void Collection(Transform trans, int parent, int index)
         {
-            PipeLine[point].parentIndex = parent;
-            PipeLine[point].localPosition = trans.localPosition;
-            PipeLine[point].localRotation = trans.localRotation;
-            PipeLine[point].localScale = trans.localScale;
-            PipeLine[point].trans = trans;
+            PipeLine[index].parentIndex = parent;
+            PipeLine[index].localPosition = trans.localPosition;
+            PipeLine[index].localRotation = trans.localRotation;
+            PipeLine[index].localScale = trans.localScale;
+            PipeLine[index].trans = trans;
             var script= trans.GetComponent<AsyncScript>();
             if(script!=null)
             {
                 scripts[max] = script;
                 max++;
             }
-            PipeLine[point].script = script;
+            PipeLine[index].script = script;
             int c = trans.childCount;
             PipeLine[point].childCount = c;
-            int p = point;
-            point++;
+            int s = point;
+            point += c;
+            PipeLine[index].childOffset = s;
             for (int i = 0; i < c; i++)
-                Collection(trans.GetChild(i), p);
+            {
+                Collection(trans.GetChild(i), index, s);
+                s++;
+            }
         }
         private void Update()
         {
             point = 0;
             max = 0;
-            Collection(transform, -1);
+            Collection(transform, -1,1);
             CheckSize();
             for (int i = 0; i < scripts.Length; i++)
                 scripts[i].MainUpdate();

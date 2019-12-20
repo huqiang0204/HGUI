@@ -10,9 +10,10 @@ namespace Assets.Core.HGUI
     {
         Color _color;
         public Color color { get; set; }
+        protected Vector3[] vertex;
+        protected int[] tris;
         public virtual void UpdateMesh()
         {
-
         }
     }
 }

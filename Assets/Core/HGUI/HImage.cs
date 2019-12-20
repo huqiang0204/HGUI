@@ -1,4 +1,5 @@
-﻿using System;
+﻿using huqiang.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -56,6 +57,8 @@ namespace Assets.Core.HGUI
     {
         Sprite _sprite;
         Rect _rect;
+        Vector4 _border;
+        Vector2 _pivot;
         public Sprite sprite
         {
             get
@@ -66,18 +69,20 @@ namespace Assets.Core.HGUI
             {
                 _sprite = value;
                 _rect = value.rect;
+                _border = value.border;
+                _pivot = value.pivot;
             }
         }
         public SpriteType type { get; set; }
         public FillMethod fillMethod { get; set; }
         public int fillOrigin { get; set; }
         public bool preserveAspect { get; set; }
-  
+       
         public void SetNativeSize()
         {
             if(_sprite!=null)
             {
-                SizeDelta.x= _sprite.rect.width;
+                SizeDelta.x = _sprite.rect.width;
                 SizeDelta.y = _sprite.rect.height;
             }
         }
@@ -86,14 +91,45 @@ namespace Assets.Core.HGUI
             switch(type)
             {
                 case SpriteType.Simple://单一类型
+                    CreateSimpleMesh();
                     break;
-                case SpriteType.Sliced://九宫格类型
+                case SpriteType.Sliced://9宫格,中间部分为拉伸
+                    CreateSlicedMesh();
                     break;
                 case SpriteType.Filled://填充类型
+                    CreateFilledMesh();
                     break;
-                case SpriteType.Tiled://磁贴类型
+                case SpriteType.Tiled://9宫格,中间部分为平铺
+                    CreateTiledMesh();
                     break;
             }
+        }
+        void CreateSimpleMesh()
+        {
+            vertex = new Vector3[4];
+            float x = SizeDelta.x * 0.5f;
+            float y = SizeDelta.y * 0.5f;
+            vertex[0].x = -x;
+            vertex[0].y = -y;
+            vertex[1].x = -x;
+            vertex[1].y = y;
+            vertex[2].x = x;
+            vertex[2].y = y;
+            vertex[3].x = x;
+            vertex[3].y = -y;
+            tris = Triangle.Rectangle;
+        }
+        void CreateSlicedMesh()
+        {
+
+        }
+        void CreateFilledMesh()
+        {
+
+        }
+        void CreateTiledMesh()
+        {
+
         }
         public override void SubUpdate()
         {

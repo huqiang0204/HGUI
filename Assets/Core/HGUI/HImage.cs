@@ -55,10 +55,14 @@ namespace Assets.Core.HGUI
     }
     public class HImage:HGraphics
     {
-        Sprite _sprite;
-        Rect _rect;
-        Vector4 _border;
-        Vector2 _pivot;
+        internal Sprite _sprite;
+        internal Rect _rect;
+        internal Vector4 _border;
+        internal Vector2 _pivot;
+        //网格待处理
+        bool _vertexPending;
+        //三角形待处理
+        bool _trisPending;
         public Sprite sprite
         {
             get
@@ -77,7 +81,20 @@ namespace Assets.Core.HGUI
         public FillMethod fillMethod { get; set; }
         public int fillOrigin { get; set; }
         public bool preserveAspect { get; set; }
-       
+        internal float _pixelsPerUnit = 1;
+        internal bool _fillCenter = true;
+        public bool fillCenter {
+            get { return _fillCenter; }
+            set { if (_fillCenter != value)
+                    _vertexPending = true;
+                _fillCenter = value; }
+        }
+        public float pixelsPerUnitMultiplier { get => _pixelsPerUnit;
+            set {
+                if (_pixelsPerUnit != value)
+                    _vertexPending = true;
+                _pixelsPerUnit = value;
+            } }
         public void SetNativeSize()
         {
             if(_sprite!=null)
@@ -88,48 +105,39 @@ namespace Assets.Core.HGUI
         }
         public override void UpdateMesh()
         {
-            switch(type)
+            if(_vertexPending)
             {
-                case SpriteType.Simple://单一类型
-                    CreateSimpleMesh();
-                    break;
-                case SpriteType.Sliced://9宫格,中间部分为拉伸
-                    CreateSlicedMesh();
-                    break;
-                case SpriteType.Filled://填充类型
-                    CreateFilledMesh();
-                    break;
-                case SpriteType.Tiled://9宫格,中间部分为平铺
-                    CreateTiledMesh();
-                    break;
+                HGUIMesh.CreateMesh(this);
+                _vertexPending = false;
             }
-        }
-        void CreateSimpleMesh()
-        {
-            vertex = new Vector3[4];
-            float x = SizeDelta.x * 0.5f;
-            float y = SizeDelta.y * 0.5f;
-            vertex[0].x = -x;
-            vertex[0].y = -y;
-            vertex[1].x = -x;
-            vertex[1].y = y;
-            vertex[2].x = x;
-            vertex[2].y = y;
-            vertex[3].x = x;
-            vertex[3].y = -y;
-            tris = Triangle.Rectangle;
-        }
-        void CreateSlicedMesh()
-        {
-
-        }
-        void CreateFilledMesh()
-        {
-
-        }
-        void CreateTiledMesh()
-        {
-
+            if(_trisPending)
+            {
+                switch (type)
+                {
+                    case SpriteType.Simple://单一类型
+                        tris = HGUIMesh.Rectangle;
+                        break;
+                    case SpriteType.Sliced://9宫格,中间部分为拉伸
+                        if (_pixelsPerUnit == 0)
+                        {
+                            tris = HGUIMesh.FourRectangle;
+                        }
+                        else
+                        {
+                            if (_fillCenter)
+                                tris = HGUIMesh.TwelveRectangle;
+                            else tris = HGUIMesh.ElevenRectangle;
+                        }
+                        break;
+                    case SpriteType.Filled://填充类型
+                        
+                        break;
+                    case SpriteType.Tiled://平铺
+                        
+                        break;
+                }
+                _trisPending = false;
+            }
         }
         public override void SubUpdate()
         {

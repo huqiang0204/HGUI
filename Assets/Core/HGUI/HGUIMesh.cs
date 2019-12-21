@@ -81,6 +81,23 @@ namespace Assets.Core.HGUI
             vertex[3].x = rx;
             vertex[3].y = dy;
             image.vertex = vertex;
+            Vector2[] uv = new Vector2[4];
+            float w = image._textureRect.width;
+            float h = image._textureRect.height;
+            lx = image._rect.x / w;
+            rx = lx + image._rect.width / w;
+            dy = image._rect.y / h;
+            ty = dy + image._rect.height / h;
+            uv[0].x = lx;
+            uv[0].y = dy;
+            uv[1].x = lx;
+            uv[1].y = ty;
+            uv[2].x = rx;
+            uv[2].y = ty;
+            uv[3].x = rx;
+            uv[3].y = dy;
+            image.uv = uv;
+            image.tris = Rectangle;
         }
         static void CreateSlicedMesh(HImage image)
         {
@@ -90,75 +107,58 @@ namespace Assets.Core.HGUI
             float y = image.SizeDelta.y;
             float dy = -image._pivot.y * y;
             float ty = (1 - image._pivot.y) * y;
-            if (image._pixelsPerUnit == 0)
-            {
-                var vertex = new Vector3[9];
-                float cx = lx + 0.5f * x;
-                float cy = dy + 0.5f * y;
-                vertex[0].x = lx;
-                vertex[0].y = dy;
-                vertex[1].x = cx;
-                vertex[1].y = dy;
-                vertex[2].x = rx;
-                vertex[2].y = dy;
-                vertex[3].x = lx;
-                vertex[3].y = cy;
-                vertex[4].x = cx;
-                vertex[4].y = cy;
-                vertex[5].x = rx;
-                vertex[5].y = cy;
-                vertex[6].x = lx;
-                vertex[6].y = ty;
-                vertex[7].x = cx;
-                vertex[7].y = ty;
-                vertex[8].x = rx;
-                vertex[8].y = ty;
-                image.vertex = vertex;
-            }
-            else
-            {
-                float slx = lx + x *image. _border.x /image. _pixelsPerUnit;
-                float sdy = dy + y * image._border.y / image._pixelsPerUnit;
-                float srx = rx - x * image._border.z / image._pixelsPerUnit;
-                float sty = ty - y * image._border.w / image._pixelsPerUnit;
-                var vertex = new Vector3[16];
-                vertex[0].x = lx;
-                vertex[0].y = dy;
-                vertex[1].x = slx;
-                vertex[1].y = dy;
-                vertex[2].x = srx;
-                vertex[2].y = dy;
-                vertex[3].x = rx;
-                vertex[3].y = dy;
+            float p = image._pixelsPerUnit;
+            if (p < 0.01f)
+                p = 0.01f;
+            float slx = lx + x * image._border.x / image._pixelsPerUnit;
+            float sdy = dy + y * image._border.y / image._pixelsPerUnit;
+            float srx = rx - x * image._border.z / image._pixelsPerUnit;
+            float sty = ty - y * image._border.w / image._pixelsPerUnit;
+            var vertex = new Vector3[16];
+            vertex[0].x = lx;
+            vertex[0].y = dy;
+            vertex[1].x = slx;
+            vertex[1].y = dy;
+            vertex[2].x = srx;
+            vertex[2].y = dy;
+            vertex[3].x = rx;
+            vertex[3].y = dy;
 
-                vertex[4].x = lx;
-                vertex[4].y = sdy;
-                vertex[5].x = slx;
-                vertex[5].y = sdy;
-                vertex[6].x = srx;
-                vertex[6].y = sdy;
-                vertex[7].x = rx;
-                vertex[7].y = sdy;
+            vertex[4].x = lx;
+            vertex[4].y = sdy;
+            vertex[5].x = slx;
+            vertex[5].y = sdy;
+            vertex[6].x = srx;
+            vertex[6].y = sdy;
+            vertex[7].x = rx;
+            vertex[7].y = sdy;
 
-                vertex[8].x = lx;
-                vertex[8].y = sty;
-                vertex[9].x = slx;
-                vertex[9].y = sty;
-                vertex[10].x = srx;
-                vertex[10].y = sty;
-                vertex[11].x = rx;
-                vertex[11].y = sty;
+            vertex[8].x = lx;
+            vertex[8].y = sty;
+            vertex[9].x = slx;
+            vertex[9].y = sty;
+            vertex[10].x = srx;
+            vertex[10].y = sty;
+            vertex[11].x = rx;
+            vertex[11].y = sty;
 
-                vertex[12].x = lx;
-                vertex[12].y = ty;
-                vertex[13].x = slx;
-                vertex[13].y = ty;
-                vertex[14].x = srx;
-                vertex[14].y = ty;
-                vertex[15].x = rx;
-                vertex[15].y = ty;
-                image.vertex = vertex;
-            }
+            vertex[12].x = lx;
+            vertex[12].y = ty;
+            vertex[13].x = slx;
+            vertex[13].y = ty;
+            vertex[14].x = srx;
+            vertex[14].y = ty;
+            vertex[15].x = rx;
+            vertex[15].y = ty;
+            image.vertex = vertex;
+            Vector2[] uv = new Vector2[16];
+            float w = image._textureRect.width;
+            float h = image._textureRect.height;
+            lx = image._rect.x / w;
+            rx = lx + image._rect.width / w;
+            dy = image._rect.y / h;
+            ty = dy + image._rect.height / h;
+
         }
         static void CreateFilledMesh(HImage image)
         {

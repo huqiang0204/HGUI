@@ -11,6 +11,7 @@ namespace Assets.Core.HGUI
         Color _color;
         public Color color { get; set; }
         internal Vector3[] vertex;
+        internal Vector2[] uv;
         internal int[] tris;
         public virtual void UpdateMesh()
         {

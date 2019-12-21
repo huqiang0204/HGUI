@@ -57,6 +57,7 @@ namespace Assets.Core.HGUI
     {
         internal Sprite _sprite;
         internal Rect _rect;
+        internal Rect _textureRect;
         internal Vector4 _border;
         internal Vector2 _pivot;
         //网格待处理
@@ -73,6 +74,7 @@ namespace Assets.Core.HGUI
             {
                 _sprite = value;
                 _rect = value.rect;
+                _textureRect = value.textureRect;
                 _border = value.border;
                 _pivot = value.pivot;
             }

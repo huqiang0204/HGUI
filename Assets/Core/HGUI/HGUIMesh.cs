@@ -8,18 +8,23 @@ namespace Assets.Core.HGUI
 {
     public class HGUIMesh
     {
-        public static int[] Rectangle = new int[] { 0, 1, 2, 1, 2, 3 };
+        public static int[] Rectangle = new int[] { 0, 1, 3, 1, 2, 3 };
         public static int[] FourRectangle = new int[] { 0, 3, 1, 3, 4, 1, 1, 4, 2, 4, 5, 2, 3, 6, 4, 6, 7, 4, 4, 7, 5, 7, 8, 5 };
         public static int[] ElevenRectangle = new int[] {
-        0, 4, 1, 4, 5, 1, 1, 5, 6, 5, 6, 2, 2, 6, 7, 6, 7, 3,
-            4, 8, 5, 8, 9, 5, 6, 10, 11, 10, 11, 7,
-            8, 12, 9, 12, 13, 9, 9, 13, 10, 13, 14, 10, 10, 14, 11, 14, 15, 11};
+        0, 4, 5, 0, 5, 1, 1, 5, 6, 1, 6, 2, 2, 6, 7, 2, 7, 3,
+            4, 8, 9, 4, 9, 5, 6, 10, 11, 6, 11, 7,
+            8, 12, 13, 8, 13, 9, 9, 13, 14, 9, 14, 10, 10, 14, 15, 10, 15, 11};
         public static int[] TwelveRectangle = new int[] {
-            0, 4, 1, 4, 5, 1, 1, 5, 6, 5, 6, 2, 2, 6, 7, 6, 7, 3,
-            4, 8, 5, 8, 9, 5, 5, 9, 10, 9, 10, 6, 6, 10, 11, 10, 11, 7,
-            8, 12, 9, 12, 13, 9, 9, 13, 10, 13, 14, 10, 10, 14, 11, 14, 15, 11 };
+            0, 4, 5, 0, 5, 1, 1, 5, 6, 1, 6, 2, 2, 6, 7, 2, 7, 3,
+            4, 8, 9, 4, 9, 5,5,9,10,5,10,6, 6, 10, 11, 6, 11, 7,
+            8, 12, 13, 8, 13, 9, 9, 13, 14, 9, 14, 10, 10, 14, 15, 10, 15, 11 };
         public static void CreateMesh(HImage image)
         {
+            if (image._sprite == null)
+            {
+                CreateSimpleMesh(image);
+                return;
+            }
             switch (image.type)
             {
                 case SpriteType.Simple://单一类型
@@ -110,10 +115,10 @@ namespace Assets.Core.HGUI
             float p = image._pixelsPerUnit;
             if (p < 0.01f)
                 p = 0.01f;
-            float slx = lx + x * image._border.x / image._pixelsPerUnit;
-            float sdy = dy + y * image._border.y / image._pixelsPerUnit;
-            float srx = rx - x * image._border.z / image._pixelsPerUnit;
-            float sty = ty - y * image._border.w / image._pixelsPerUnit;
+            float slx = lx +  image._border.x / image._pixelsPerUnit;
+            float sdy = dy +  image._border.y / image._pixelsPerUnit;
+            float srx = rx -  image._border.z / image._pixelsPerUnit;
+            float sty = ty - image._border.w / image._pixelsPerUnit;
             var vertex = new Vector3[16];
             vertex[0].x = lx;
             vertex[0].y = dy;

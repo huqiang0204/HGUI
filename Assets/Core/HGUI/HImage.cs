@@ -55,7 +55,7 @@ namespace Assets.Core.HGUI
     }
     public class HImage:HGraphics
     {
-        internal Sprite _sprite;
+        internal Sprite _sprite=null;
         internal Rect _rect;
         internal Rect _textureRect;
         internal Vector4 _border;
@@ -73,15 +73,23 @@ namespace Assets.Core.HGUI
             set
             {
                 _sprite = value;
-                _rect = value.rect;
-                _textureRect = value.textureRect;
-                _border = value.border;
-                _pivot = value.pivot;
+                if (value != null)
+                {
+                    _rect = value.rect;
+                    _textureRect = value.textureRect;
+                    _border = value.border;
+                    _pivot = value.pivot;
+                }
             }
         }
         public SpriteType type { get; set; }
         public FillMethod fillMethod { get; set; }
         public int fillOrigin { get; set; }
+        internal float _fillAmount=1;
+        public float fillAmount { get => _fillAmount;
+            set {
+                _fillAmount = value;
+            } }
         public bool preserveAspect { get; set; }
         internal float _pixelsPerUnit = 1;
         internal bool _fillCenter = true;
@@ -112,38 +120,22 @@ namespace Assets.Core.HGUI
                 HGUIMesh.CreateMesh(this);
                 _vertexPending = false;
             }
-            if(_trisPending)
-            {
-                switch (type)
-                {
-                    case SpriteType.Simple://单一类型
-                        tris = HGUIMesh.Rectangle;
-                        break;
-                    case SpriteType.Sliced://9宫格,中间部分为拉伸
-                        if (_pixelsPerUnit == 0)
-                        {
-                            tris = HGUIMesh.FourRectangle;
-                        }
-                        else
-                        {
-                            if (_fillCenter)
-                                tris = HGUIMesh.TwelveRectangle;
-                            else tris = HGUIMesh.ElevenRectangle;
-                        }
-                        break;
-                    case SpriteType.Filled://填充类型
-                        
-                        break;
-                    case SpriteType.Tiled://平铺
-                        
-                        break;
-                }
-                _trisPending = false;
-            }
         }
         public override void SubUpdate()
         {
 
         }
+#if UNITY_EDITOR
+        public void Test()
+        {
+            HGUIMesh.CreateMesh(this);
+            var mesh = GetComponent<MeshFilter>();
+            if(mesh!=null)
+            {
+                mesh.sharedMesh.vertices = vertex;
+                mesh.sharedMesh.triangles = tris;
+            }
+        }
+#endif
     }
 }

@@ -36,6 +36,33 @@ namespace Assets.Core.HGUI
                     break;
             }
         }
+        public static void CreateTriangle(HImage image)
+        {
+            switch (image.type)
+            {
+                case SpriteType.Simple://单一类型
+                    image.tris = Rectangle;
+                    break;
+                case SpriteType.Sliced://9宫格,中间部分为拉伸
+                    if (image._pixelsPerUnit == 0)
+                    {
+                        image.tris = FourRectangle;
+                    }
+                    else
+                    {
+                        if (image._fillCenter)
+                            image.tris = TwelveRectangle;
+                        else image.tris = ElevenRectangle;
+                    }
+                    break;
+                case SpriteType.Filled://填充类型
+
+                    break;
+                case SpriteType.Tiled://平铺
+
+                    break;
+            }
+        }
         static void CreateSimpleMesh(HImage image)
         {
             var vertex = new Vector3[4];
@@ -135,7 +162,52 @@ namespace Assets.Core.HGUI
         }
         static void CreateFilledMesh(HImage image)
         {
+            float x = image.SizeDelta.x;
+            float lx = -image._pivot.x * x;
+            float rx = (1 - image._pivot.x) * x;
+            float y = image.SizeDelta.y;
+            float dy = -image._pivot.y * y;
+            float ty = (1 - image._pivot.y) * y;
+            if (image._pixelsPerUnit == 0)
+            {
+                var vertex = new Vector3[9];
+                float cx = lx + 0.5f * x;
+                float cy = dy + 0.5f * y;
+                vertex[0].x = lx;
+                vertex[0].y = dy;
+                vertex[1].x = cx;
+                vertex[1].y = dy;
+                vertex[2].x = rx;
+                vertex[2].y = dy;
+                vertex[3].x = lx;
+                vertex[3].y = cy;
+                vertex[4].x = cx;
+                vertex[4].y = cy;
+                vertex[5].x = rx;
+                vertex[5].y = cy;
+                vertex[6].x = lx;
+                vertex[6].y = ty;
+                vertex[7].x = cx;
+                vertex[7].y = ty;
+                vertex[8].x = rx;
+                vertex[8].y = ty;
+                image.vertex = vertex;
+            }
+            else
+            {
+                float p = image._pixelsPerUnit;
+                float slx = lx + x * image._border.x / p;
+                float sdy = dy + y * image._border.y / p;
+                float srx = rx - x * image._border.z / p;
+                float sty = ty - y * image._border.w / p;
+                float w = image._rect.width;
+                float cw = x * (1 - image._border.x - image._border.z) / p;
+                float h = image._rect.height;
+                float ch = y * (1 - image._border.y - image._border.w) / p;
+                int col = (int)((srx - slx) / cw);//列
+                int row = (int)((sty - sdy) / ch);//行
 
+            }
         }
         static void CreateTiledMesh(HImage image)
         {

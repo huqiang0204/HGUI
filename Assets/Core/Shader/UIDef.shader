@@ -2,7 +2,7 @@
 {
 	Properties
 	{
-		[PerRendererData] _MainTex("Sprite Texture", 2D) = "white" {}
+		 _MainTex("Sprite Texture", 2D) = "white" {}
 		_Color("Tint", Color) = (1,1,1,1)
 
 		_StencilComp("Stencil Comparison", Float) = 8
@@ -94,9 +94,9 @@
 				fixed4 frag(v2f IN) : SV_Target
 				{
 					half4 color = tex2D(_MainTex, IN.texcoord);
-					color.a *= UnityGet2DClipping(IN.worldPosition.xy, _ClipRect);
+					//color.a *= UnityGet2DClipping(IN.worldPosition.xy, _ClipRect);
 					#ifdef UNITY_UI_ALPHACLIP
-					clip(color.a - 0.001);
+					//clip(color.a - 0.001);
 					#endif
 					return color;
 				}

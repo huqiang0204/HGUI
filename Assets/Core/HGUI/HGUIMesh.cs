@@ -8,7 +8,7 @@ namespace Assets.Core.HGUI
 {
     public class HGUIMesh
     {
-        public static int[] Rectangle = new int[] { 0, 1, 3, 1, 2, 3 };
+        public static int[] Rectangle = new int[] { 0, 1, 2, 0, 2, 3 };
         public static int[] FourRectangle = new int[] { 0, 3, 1, 3, 4, 1, 1, 4, 2, 4, 5, 2, 3, 6, 4, 6, 7, 4, 4, 7, 5, 7, 8, 5 };
         public static int[] ElevenRectangle = new int[] {
         0, 4, 5, 0, 5, 1, 1, 5, 6, 1, 6, 2, 2, 6, 7, 2, 7, 3,
@@ -70,13 +70,15 @@ namespace Assets.Core.HGUI
         }
         static void CreateSimpleMesh(HImage image)
         {
+            float px = image._pivot.x / image._rect.width;
+            float py = image._pivot.y / image._rect.height;
             var vertex = new Vector3[4];
             float x = image.SizeDelta.x;
-            float lx = -image._pivot.x * x;
-            float rx = (1 - image._pivot.x) * x;
+            float lx = -px * x;
+            float rx = (1 - px) * x;
             float y = image.SizeDelta.y;
-            float dy = -image. _pivot.y * y;
-            float ty = (1 - image._pivot.y) * y;
+            float dy = -py * y;
+            float ty = (1 - py) * y;
             vertex[0].x = lx;
             vertex[0].y = dy;
             vertex[1].x = lx;
@@ -87,8 +89,8 @@ namespace Assets.Core.HGUI
             vertex[3].y = dy;
             image.vertex = vertex;
             Vector2[] uv = new Vector2[4];
-            float w = image._textureRect.width;
-            float h = image._textureRect.height;
+            float w = image._textureSize.x;
+            float h = image._textureSize.y;
             lx = image._rect.x / w;
             rx = lx + image._rect.width / w;
             dy = image._rect.y / h;
@@ -106,12 +108,14 @@ namespace Assets.Core.HGUI
         }
         static void CreateSlicedMesh(HImage image)
         {
+            float px = image._pivot.x / image._rect.width;
+            float py = image._pivot.y / image._rect.height;
             float x = image.SizeDelta.x;
-            float lx = -image._pivot.x * x;
-            float rx = (1 - image._pivot.x) * x;
+            float lx = -px * x;
+            float rx = (1 - px) * x;
             float y = image.SizeDelta.y;
-            float dy = -image._pivot.y * y;
-            float ty = (1 - image._pivot.y) * y;
+            float dy = -py * y;
+            float ty = (1 - py) * y;
             float p = image._pixelsPerUnit;
             if (p < 0.01f)
                 p = 0.01f;
@@ -158,8 +162,8 @@ namespace Assets.Core.HGUI
             image.vertex = vertex;
 
             Vector2[] uv = new Vector2[16];
-            float w = image._textureRect.width;
-            float h = image._textureRect.height;
+            float w = image._textureSize.x;
+            float h = image._textureSize.y;
             lx = image._rect.x / w;
             rx = lx + image._rect.width / w;
             dy = image._rect.y / h;
@@ -233,8 +237,8 @@ namespace Assets.Core.HGUI
             int col = (int)((srx - slx) / cw);//列
             int row = (int)((sty - sdy) / ch);//行
 
-            float tw = image._textureRect.width;
-            float th = image._textureRect.height;
+            float tw = image._textureSize.x;
+            float th = image._textureSize.y;
             float ulx = image._rect.x / tw;
             float urx = ulx + w / tw;
             float udy = image._rect.y / th;

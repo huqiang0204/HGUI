@@ -57,7 +57,7 @@ namespace Assets.Core.HGUI
     {
         internal Sprite _sprite=null;
         internal Rect _rect;
-        internal Rect _textureRect;
+        internal Vector2 _textureSize;
         internal Vector4 _border;
         internal Vector2 _pivot;
         //网格待处理
@@ -76,9 +76,11 @@ namespace Assets.Core.HGUI
                 if (value != null)
                 {
                     _rect = value.rect;
-                    _textureRect = value.textureRect;
+                    _textureSize.x = value.texture.width;
+                    _textureSize.y = value.texture.height;
                     _border = value.border;
                     _pivot = value.pivot;
+                    material.SetTexture("_MainTex", value.texture);
                 }
             }
         }
@@ -133,8 +135,15 @@ namespace Assets.Core.HGUI
             if(mesh!=null)
             {
                 mesh.sharedMesh.vertices = vertex;
+                if (_sprite != null)
+                    mesh.sharedMesh.uv = uv;
                 mesh.sharedMesh.triangles = tris;
             }
+            //var mr = GetComponent<MeshRenderer>();
+            //if(mr!=null)
+            //{
+            //    mr.material = material;
+            //}
         }
 #endif
     }

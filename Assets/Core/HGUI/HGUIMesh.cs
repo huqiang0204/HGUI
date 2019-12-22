@@ -8,8 +8,8 @@ namespace Assets.Core.HGUI
 {
     public class HGUIMesh
     {
-        public static int[] Rectangle = new int[] { 0, 1, 2, 0, 2, 3 };
-        public static int[] FourRectangle = new int[] { 0, 3, 1, 3, 4, 1, 1, 4, 2, 4, 5, 2, 3, 6, 4, 6, 7, 4, 4, 7, 5, 7, 8, 5 };
+        public static int[] Rectangle = new int[] { 0, 2, 3, 0, 3, 1 };
+        public static int[] FourRectangle = new int[] { 0,3,4,0,4,1,1,4,5,1,5,2,3,6,7,3,7,4,4,7,8,4,8,5 };
         public static int[] ElevenRectangle = new int[] {
         0, 4, 5, 0, 5, 1, 1, 5, 6, 1, 6, 2, 2, 6, 7, 2, 7, 3,
             4, 8, 9, 4, 9, 5, 6, 10, 11, 6, 11, 7,
@@ -22,7 +22,7 @@ namespace Assets.Core.HGUI
         {
             if (image._sprite == null)
             {
-                CreateSimpleMesh(image);
+                CreateSimpleVertex(image);
                 return;
             }
             switch (image.type)
@@ -68,6 +68,26 @@ namespace Assets.Core.HGUI
                     break;
             }
         }
+        static void CreateSimpleVertex(HImage image)
+        {
+            var vertex = new Vector3[4];
+            float x = image.SizeDelta.x;
+            float lx = -0.5f * x;
+            float rx = 0.5f * x;
+            float y = image.SizeDelta.y;
+            float dy = -0.5f * y;
+            float ty = 0.5f * y;
+            vertex[0].x = lx;
+            vertex[0].y = dy;
+            vertex[1].x = rx;
+            vertex[1].y = dy;
+            vertex[2].x = lx;
+            vertex[2].y = ty;
+            vertex[3].x = rx;
+            vertex[3].y = ty;
+            image.vertex = vertex;
+            image.tris = Rectangle;
+        }
         static void CreateSimpleMesh(HImage image)
         {
             float px = image._pivot.x / image._rect.width;
@@ -81,12 +101,13 @@ namespace Assets.Core.HGUI
             float ty = (1 - py) * y;
             vertex[0].x = lx;
             vertex[0].y = dy;
-            vertex[1].x = lx;
-            vertex[1].y = ty;
-            vertex[2].x = rx;
+            vertex[1].x = rx;
+            vertex[1].y = dy;
+            vertex[2].x = lx;
             vertex[2].y = ty;
             vertex[3].x = rx;
-            vertex[3].y = dy;
+            vertex[3].y = ty;
+        
             image.vertex = vertex;
             Vector2[] uv = new Vector2[4];
             float w = image._textureSize.x;
@@ -97,12 +118,13 @@ namespace Assets.Core.HGUI
             ty = dy + image._rect.height / h;
             uv[0].x = lx;
             uv[0].y = dy;
-            uv[1].x = lx;
-            uv[1].y = ty;
-            uv[2].x = rx;
+            uv[1].x = rx;
+            uv[1].y = dy;
+            uv[2].x = lx;
             uv[2].y = ty;
             uv[3].x = rx;
-            uv[3].y = dy;
+            uv[3].y = ty;
+    
             image.uv = uv;
             image.tris = Rectangle;
         }
@@ -123,6 +145,18 @@ namespace Assets.Core.HGUI
             float sdy = dy +  image._border.y / image._pixelsPerUnit;
             float srx = rx -  image._border.z / image._pixelsPerUnit;
             float sty = ty - image._border.w / image._pixelsPerUnit;
+            if (srx <= slx )
+            {
+                float cx = image._border.x / (image._border.x + image._border.z) * x + lx;
+                slx = cx;
+                srx = cx;
+            }
+            if (sty < sdy)
+            {
+                float cy = image._border.y / (image._border.y + image._border.w) * y + dy;
+                sdy = cy;
+                sty = cy;
+            }
             var vertex = new Vector3[16];
             vertex[0].x = lx;
             vertex[0].y = dy;
@@ -217,19 +251,22 @@ namespace Assets.Core.HGUI
         }
         static void CreateFilledMesh(HImage image)
         {
+            float px = image._pivot.x / image._rect.width;
+            float py = image._pivot.y / image._rect.height;
             float x = image.SizeDelta.x;
-            float lx = -image._pivot.x * x;
-            float rx = (1 - image._pivot.x) * x;
+            float lx = -px * x;
+            float rx = (1 - px) * x;
             float y = image.SizeDelta.y;
-            float dy = -image._pivot.y * y;
-            float ty = (1 - image._pivot.y) * y;
+            float dy = -py * y;
+            float ty = (1 - py) * y;
             float p = image._pixelsPerUnit;
             if (p < 0.01f)
                 p = 0.01f;
-            float slx = lx + x * image._border.x / p;
-            float sdy = dy + y * image._border.y / p;
-            float srx = rx - x * image._border.z / p;
-            float sty = ty - y * image._border.w / p;
+            float slx = lx + image._border.x / image._pixelsPerUnit;
+            float sdy = dy + image._border.y / image._pixelsPerUnit;
+            float srx = rx - image._border.z / image._pixelsPerUnit;
+            float sty = ty - image._border.w / image._pixelsPerUnit;
+
             float w = image._rect.width;
             float cw = x * (1 - image._border.x - image._border.z) / p;
             float h = image._rect.height;
@@ -294,41 +331,41 @@ namespace Assets.Core.HGUI
                 vertex[15].y = ty;
                 ///填充左边的顶点
                 int index = 16;
-                float py = udy;
-                for(int i=0;i<row;i++)
-                {
-                    py += ch;
-                    vertex[index].x=lx;
-                    vertex[index].y = py;
-                    index++;
-                    vertex[index].x = slx;
-                    vertex[index].y = py;
-                    index++;
-                }
-                ///填充右边的顶点
-                py = udy;
-                for (int i = 0; i < row; i++)
-                {
-                    py += ch;
-                    vertex[index].x = srx;
-                    vertex[index].y = py;
-                    index++;
-                    vertex[index].x = rx;
-                    vertex[index].y = py;
-                    index++;
-                }
-                ///填充下边的顶点
-                float px = ulx;
-                for (int i=0;i<col;i++)
-                {
-                    px += cw;
-                    vertex[index].x = px;
-                    vertex[index].y = dy;
-                    index++;
-                    vertex[index].x = px;
-                    vertex[index].y = sdy;
-                    index++;
-                }
+                //float py = udy;
+                //for(int i=0;i<row;i++)
+                //{
+                //    py += ch;
+                //    vertex[index].x=lx;
+                //    vertex[index].y = py;
+                //    index++;
+                //    vertex[index].x = slx;
+                //    vertex[index].y = py;
+                //    index++;
+                //}
+                /////填充右边的顶点
+                //py = udy;
+                //for (int i = 0; i < row; i++)
+                //{
+                //    py += ch;
+                //    vertex[index].x = srx;
+                //    vertex[index].y = py;
+                //    index++;
+                //    vertex[index].x = rx;
+                //    vertex[index].y = py;
+                //    index++;
+                //}
+                /////填充下边的顶点
+                //float px = ulx;
+                //for (int i=0;i<col;i++)
+                //{
+                //    px += cw;
+                //    vertex[index].x = px;
+                //    vertex[index].y = dy;
+                //    index++;
+                //    vertex[index].x = px;
+                //    vertex[index].y = sdy;
+                //    index++;
+                //}
                 ///填充上边的顶点
                 px = ulx;
                 for (int i = 0; i < col; i++)

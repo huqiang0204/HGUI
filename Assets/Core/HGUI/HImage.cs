@@ -85,8 +85,15 @@ namespace Assets.Core.HGUI
             }
         }
         public SpriteType type { get; set; }
-        public FillMethod fillMethod { get; set; }
-        public int fillOrigin { get; set; }
+        internal FillMethod _fillMethod;
+        public FillMethod fillMethod { get => _fillMethod;
+            set {
+                _fillMethod = value;
+            } }
+        internal int _fillOrigin;
+        public int fillOrigin { get => _fillOrigin; set {
+                _fillOrigin = value;
+            } }
         internal float _fillAmount=1;
         public float fillAmount { get => _fillAmount;
             set {

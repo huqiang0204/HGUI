@@ -10,6 +10,7 @@ namespace Assets.Core.HGUI
     {
         public static int[] Rectangle = new int[] { 0, 2, 3, 0, 3, 1 };
         public static int[] FourRectangle = new int[] { 0,3,4,0,4,1,1,4,5,1,5,2,3,6,7,3,7,4,4,7,8,4,8,5 };
+        public static int[] FourCorners = new int[] { 0,2,3,0,3,1,4,6,7,4,7,5,8,10,11,8,11,9,12,14,15,12,15,13};
         public static int[] ElevenRectangle = new int[] {
         0, 4, 5, 0, 5, 1, 1, 5, 6, 1, 6, 2, 2, 6, 7, 2, 7, 3,
             4, 8, 9, 4, 9, 5, 6, 10, 11, 6, 11, 7,
@@ -37,7 +38,7 @@ namespace Assets.Core.HGUI
                     CreateFilledMesh(image);
                     break;
                 case SpriteType.Tiled://平铺
-                    CreateTiledMesh(image);
+                    //CreateFilledMesh(image);
                     break;
             }
         }
@@ -249,7 +250,11 @@ namespace Assets.Core.HGUI
                 image.tris = TwelveRectangle;
             else image.tris = ElevenRectangle;
         }
-        static void CreateFilledMesh(HImage image)
+        /// <summary>
+        /// 此模式使用较少,后面有空再补
+        /// </summary>
+        /// <param name="image"></param>
+        static void CreateTiledMesh(HImage image)
         {
             float px = image._pivot.x / image._rect.width;
             float py = image._pivot.y / image._rect.height;
@@ -329,55 +334,62 @@ namespace Assets.Core.HGUI
                 vertex[14].y = ty;
                 vertex[15].x = rx;
                 vertex[15].y = ty;
-                ///填充左边的顶点
+
+                for (int i = 0; i < 24; i++)//四个角的三角形
+                    tris[i] = FourCorners[i];
+
                 int index = 16;
-                //float py = udy;
-                //for(int i=0;i<row;i++)
-                //{
-                //    py += ch;
-                //    vertex[index].x=lx;
-                //    vertex[index].y = py;
-                //    index++;
-                //    vertex[index].x = slx;
-                //    vertex[index].y = py;
-                //    index++;
-                //}
-                /////填充右边的顶点
-                //py = udy;
-                //for (int i = 0; i < row; i++)
-                //{
-                //    py += ch;
-                //    vertex[index].x = srx;
-                //    vertex[index].y = py;
-                //    index++;
-                //    vertex[index].x = rx;
-                //    vertex[index].y = py;
-                //    index++;
-                //}
-                /////填充下边的顶点
-                //float px = ulx;
-                //for (int i=0;i<col;i++)
-                //{
-                //    px += cw;
-                //    vertex[index].x = px;
-                //    vertex[index].y = dy;
-                //    index++;
-                //    vertex[index].x = px;
-                //    vertex[index].y = sdy;
-                //    index++;
-                //}
-                ///填充上边的顶点
-                px = ulx;
+                int ti = 24;
+                ///填充左边的顶点
+                float ys = udy;
+                for (int i = 0; i < row; i++)
+                {
+                    ys += ch;
+                    vertex[index].x = lx;
+                    vertex[index].y = ys;
+                    index++;
+                    vertex[index].x = slx;
+                    vertex[index].y = ys;
+                    index++;
+                }
+
+                ///填充右边的顶点
+                ys = udy;
+                for (int i = 0; i < row; i++)
+                {
+                    ys += ch;
+                    vertex[index].x = srx;
+                    vertex[index].y = ys;
+                    index++;
+                    vertex[index].x = rx;
+                    vertex[index].y = ys;
+                    index++;
+                }
+                ///填充下边的顶点
+                float xs = ulx;
                 for (int i = 0; i < col; i++)
                 {
-                    px += cw;
-                    vertex[index].x = px;
+                    xs += cw;
+                    vertex[index].x = xs;
+                    vertex[index].y = dy;
+                    index++;
+                    vertex[index].x = xs;
+                    vertex[index].y = sdy;
+                    index++;
+                }
+                ///填充上边的顶点
+                xs = ulx;
+                for (int i = 0; i < col; i++)
+                {
+                    xs += cw;
+                    vertex[index].x = xs;
                     vertex[index].y = sty;
                     index++;
-                    vertex[index].x = px;
+                    vertex[index].x = xs;
                     vertex[index].y = ty;
                     index++;
                 }
+
             }
             else
             {
@@ -385,7 +397,93 @@ namespace Assets.Core.HGUI
                 Vector3[] vertex = new Vector3[all];
             }
         }
-        static void CreateTiledMesh(HImage image)
+        static void CreateFilledMesh(HImage image)
+        {
+            switch(image._fillMethod)
+            {
+                case FillMethod.Horizontal:
+                    FillHorizontal(image);
+                    break;
+                case FillMethod.Vertical:
+                    FillVertical(image);
+                    break;
+                case FillMethod.Radial90:
+                    FillRadial90(image);
+                    break;
+                case FillMethod.Radial180:
+                    FillRadial180(image);
+                    break;
+                case FillMethod.Radial360:
+                    FillRadial360(image);
+                    break;
+            }
+        }
+        static void FillHorizontal(HImage image)
+        {
+            float px = image._pivot.x / image._rect.width;
+            float py = image._pivot.y / image._rect.height;
+          
+            float x = image.SizeDelta.x;
+            float y = image.SizeDelta.y;
+            float dy = -py * y;
+            float ty = (1 - py) * y;
+
+            float w = image._textureSize.x;
+            float h = image._textureSize.y;
+            float udy = image._rect.y / h;
+            float uty = dy + image._rect.height / h;
+            float lx, rx, ulx, urx;
+            if(image._fillOrigin==1)
+            {
+                rx = (1 - px) * x;
+                lx = rx - image._fillAmount * x;
+                ulx = image._rect.x / w;
+                urx = lx + image._rect.width / w;
+                ulx = urx - image._fillAmount * image._rect.width / w;
+            }
+            else
+            {
+                lx = -px * x;
+                rx = lx + image._fillAmount * x;
+                ulx = image._rect.x / w;
+                urx = lx + image._fillAmount * image._rect.width / w;
+            }
+            var vertex = new Vector3[4];
+            vertex[0].x = lx;
+            vertex[0].y = dy;
+            vertex[1].x = rx;
+            vertex[1].y = dy;
+            vertex[2].x = lx;
+            vertex[2].y = ty;
+            vertex[3].x = rx;
+            vertex[3].y = ty;
+            Vector2[] uv = new Vector2[4];
+            uv[0].x = ulx;
+            uv[0].y = udy;
+            uv[1].x = urx;
+            uv[1].y = udy;
+            uv[2].x = ulx;
+            uv[2].y = uty;
+            uv[3].x = urx;
+            uv[3].y = uty;
+
+            image.vertex = vertex;
+            image.uv = uv;
+            image.tris = Rectangle;
+        }
+        static void FillVertical(HImage image)
+        {
+
+        }
+        static void FillRadial90(HImage image)
+        {
+
+        }
+        static void FillRadial180(HImage image)
+        {
+
+        }
+        static void FillRadial360(HImage image)
         {
 
         }

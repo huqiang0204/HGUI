@@ -10,6 +10,7 @@ namespace Assets.Core.HGUI
     {
         public static int[] Triangle = new int[] { 0,1,2};
         public static int[] Rectangle = new int[] { 0, 2, 3, 0, 3, 1 };
+        public static int[] TowRectangle = new int[] { 0, 3, 4, 0, 4, 1, 1, 4, 5, 1, 5, 2 };
         public static int[] FourRectangle = new int[] { 0,3,4,0,4,1,1,4,5,1,5,2,3,6,7,3,7,4,4,7,8,4,8,5 };
         public static int[] FourCorners = new int[] { 0,2,3,0,3,1,4,6,7,4,7,5,8,10,11,8,11,9,12,14,15,12,15,13};
         public static int[] ElevenRectangle = new int[] {
@@ -656,12 +657,158 @@ namespace Assets.Core.HGUI
                 image.uv = uv;
                 image.tris = Triangle;
             }
-           
         }
-   
         static void FillRadial180(HImage image)
         {
-
+            if(image._fillAmount==1)
+            {
+                CreateSimpleMesh(image);
+                return;
+            }
+            switch(image._fillOrigin)
+            {
+                case 0:
+                    FillRadial180Bottom(image);
+                    break;
+                case 1:
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    break;
+            }
+        }
+        static int[] ThreeTriangleB = new int[] { 0, 2, 3, 0, 3, 1, 1, 3, 4, };
+        static void FillRadial180Bottom(HImage image)
+        {
+            float px = image._pivot.x / image._rect.width;
+            float py = image._pivot.y / image._rect.height;
+            float x = image.SizeDelta.x;
+            float lx = -px * x;
+            float rx = (1 - px) * x;
+            float y = image.SizeDelta.y;
+            float dy = -py * y;
+            float ty = (1 - py) * y;
+            float w = image._textureSize.x;
+            float h = image._textureSize.y;
+            float ulx = image._rect.x / w;
+            float urx = ulx + image._rect.width / w;
+            float udy = image._rect.y / h;
+            float uty = udy + image._rect.height / h;
+            float cx = lx + (rx - lx) * 0.5f;
+            float ucx = ulx + (urx - ulx) * 0.5f;
+            float a = image._fillAmount;
+            if (a > 0.75f)
+            {
+                a -= 0.75f;
+                a *= 4;
+                Vector3[] vertex = new Vector3[6];
+                vertex[0].x = lx;
+                vertex[0].y = dy;
+                vertex[1].x = cx;
+                vertex[1].y = dy;
+                vertex[2].x = rx;
+                vertex[2].y = ty - (ty - dy) * a;
+                vertex[3].x = lx;
+                vertex[3].y = ty;
+                vertex[4].x = cx;
+                vertex[4].y = ty;
+                vertex[5].x = rx;
+                vertex[5].y = ty;
+                Vector2[] uv = new Vector2[6];
+                uv[0].x = ulx;
+                uv[0].y = udy;
+                uv[1].x = ucx;
+                uv[1].y = udy;
+                uv[2].x = urx;
+                uv[2].y = uty - (uty - udy) * a;
+                uv[3].x = ulx;
+                uv[3].y = uty;
+                uv[4].x = ucx;
+                uv[4].y = uty;
+                uv[5].x = urx;
+                uv[5].y = uty;
+                image.vertex = vertex;
+                image.uv = uv;
+                image.tris = TowRectangle;
+            }
+            else if (a > 0.5f)
+            {
+                a -= 0.5f;
+                a *= 4;
+                Vector3[] vertex = new Vector3[5];
+                vertex[0].x = lx;
+                vertex[0].y = dy;
+                vertex[1].x = cx;
+                vertex[1].y = dy;
+                vertex[2].x = lx;
+                vertex[2].y = ty;
+                vertex[3].x = cx;
+                vertex[3].y = ty;
+                vertex[4].x = cx + (rx - cx) * a;
+                vertex[4].y = ty;
+                Vector2[] uv = new Vector2[5];
+                uv[0].x = ulx;
+                uv[0].y = udy;
+                uv[1].x = ucx;
+                uv[1].y = udy;
+                uv[2].x = ulx;
+                uv[2].y = uty;
+                uv[3].x = ucx;
+                uv[3].y = uty;
+                uv[4].x = ucx + (urx - ucx) * a;
+                uv[4].y = uty;
+                image.vertex = vertex;
+                image.uv = uv;
+                image.tris = ThreeTriangleB;
+            }
+            else if (a > 0.25f)
+            {
+                a -= 0.25f;
+                a *= 4;
+                Vector3[] vertex = new Vector3[4];
+                vertex[0].x = lx;
+                vertex[0].y = dy;
+                vertex[1].x = cx;
+                vertex[1].y = dy;
+                vertex[2].x = lx;
+                vertex[2].y = ty;
+                vertex[3].x = lx + (cx - lx) * a;
+                vertex[3].y = ty;
+                Vector2[] uv = new Vector2[4];
+                uv[0].x = ulx;
+                uv[0].y = udy;
+                uv[1].x = ucx;
+                uv[1].y = udy;
+                uv[2].x = ulx;
+                uv[2].y = uty;
+                uv[3].x = ulx + (ucx - ulx) * a;
+                uv[3].y = uty;
+                image.vertex = vertex;
+                image.uv = uv;
+                image.tris = Rectangle;
+            }
+            else
+            {
+                a *= 4;
+                Vector3[] vertex = new Vector3[3];
+                vertex[0].x = lx;
+                vertex[0].y = dy;
+                vertex[1].x = cx;
+                vertex[1].y = dy;
+                vertex[2].x = lx;
+                vertex[2].y = dy + (ty - dy) * a;
+                Vector2[] uv = new Vector2[3];
+                uv[0].x = ulx;
+                uv[0].y = udy;
+                uv[1].x = ucx;
+                uv[1].y = udy;
+                uv[2].x = ulx;
+                uv[2].y = udy + (uty - udy) * a;
+                image.vertex = vertex;
+                image.uv = uv;
+                image.tris = Triangle;
+            }
         }
         static void FillRadial360(HImage image)
         {

@@ -141,6 +141,7 @@ namespace Assets.Core.HGUI
             var mesh = GetComponent<MeshFilter>();
             if(mesh!=null)
             {
+                mesh.sharedMesh.uv = null;
                 mesh.sharedMesh.vertices = vertex;
                 if (_sprite != null)
                     mesh.sharedMesh.uv = uv;

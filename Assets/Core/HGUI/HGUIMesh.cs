@@ -1215,7 +1215,6 @@ namespace Assets.Core.HGUI
         static int[] Triangle360B7 = new int[] { 0, 3, 4, 1, 4, 5, 1, 5, 2, 3, 6, 7, 3, 7, 4, 4, 7, 8, 4, 8, 5 };
         static int[] Triangle360B6 = new int[] { 0, 3, 4, 0, 4, 1, 2, 5, 6, 2, 6, 3, 3, 6, 7, 3, 7, 4 };
         static int[] Triangle360B5 = new int[] { 0, 2, 3, 0, 3, 1, 2, 4, 5, 2, 5, 6, 2, 6, 3 };
-        //static int[] Triangle360B4 = new int[] { 0, 2, 3, 0, 3, 1, 2, 4, 5, 2, 5, 3 };
         static void FillRadial360Bottom(HImage image)
         {
             float px = image._pivot.x / image._rect.width;

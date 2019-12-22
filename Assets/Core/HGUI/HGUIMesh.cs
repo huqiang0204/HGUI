@@ -431,14 +431,14 @@ namespace Assets.Core.HGUI
             float w = image._textureSize.x;
             float h = image._textureSize.y;
             float udy = image._rect.y / h;
-            float uty = dy + image._rect.height / h;
+            float uty = udy + image._rect.height / h;
             float lx, rx, ulx, urx;
             if(image._fillOrigin==1)
             {
                 rx = (1 - px) * x;
                 lx = rx - image._fillAmount * x;
                 ulx = image._rect.x / w;
-                urx = lx + image._rect.width / w;
+                urx = ulx + image._rect.width / w;
                 ulx = urx - image._fillAmount * image._rect.width / w;
             }
             else
@@ -446,7 +446,7 @@ namespace Assets.Core.HGUI
                 lx = -px * x;
                 rx = lx + image._fillAmount * x;
                 ulx = image._rect.x / w;
-                urx = lx + image._fillAmount * image._rect.width / w;
+                urx = ulx + image._fillAmount * image._rect.width / w;
             }
             var vertex = new Vector3[4];
             vertex[0].x = lx;

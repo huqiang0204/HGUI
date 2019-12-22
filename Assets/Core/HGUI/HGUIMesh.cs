@@ -44,33 +44,6 @@ namespace Assets.Core.HGUI
                     break;
             }
         }
-        public static void CreateTriangle(HImage image)
-        {
-            switch (image.type)
-            {
-                case SpriteType.Simple://单一类型
-                    image.tris = Rectangle;
-                    break;
-                case SpriteType.Sliced://9宫格,中间部分为拉伸
-                    if (image._pixelsPerUnit == 0)
-                    {
-                        image.tris = FourRectangle;
-                    }
-                    else
-                    {
-                        if (image._fillCenter)
-                            image.tris = TwelveRectangle;
-                        else image.tris = ElevenRectangle;
-                    }
-                    break;
-                case SpriteType.Filled://填充类型
-
-                    break;
-                case SpriteType.Tiled://平铺
-
-                    break;
-            }
-        }
         static void CreateSimpleVertex(HImage image)
         {
             var vertex = new Vector3[4];
@@ -1225,7 +1198,7 @@ namespace Assets.Core.HGUI
             switch (image._fillOrigin)
             {
                 case 0:
-                    FillRadial180Bottom(image);
+                    FillRadial360Bottom(image);
                     break;
                 case 1:
                     //FillRadial180Left(image);
@@ -1370,7 +1343,7 @@ namespace Assets.Core.HGUI
                 vertex[1].x = rx;
                 vertex[1].y = dy;
                 vertex[2].x = lx;
-                vertex[2].y = cy + (ty - cy) * a;
+                vertex[2].y = ty - (ty - cy) * a;
                 vertex[3].x = cx;
                 vertex[3].y = cy;
                 vertex[4].x = rx;
@@ -1387,7 +1360,7 @@ namespace Assets.Core.HGUI
                 uv[1].x = urx;
                 uv[1].y = udy;
                 uv[2].x = ulx;
-                uv[2].y = ucy + (uty - ucy) * a;
+                uv[2].y = uty - (uty - ucy) * a;
                 uv[3].x = ucx;
                 uv[3].y = ucy;
                 uv[4].x = urx;
@@ -1421,7 +1394,7 @@ namespace Assets.Core.HGUI
                 vertex[5].y = ty;
                 vertex[6].x = rx;
                 vertex[6].y = ty;
-                Vector2[] uv = new Vector2[6];
+                Vector2[] uv = new Vector2[7];
                 uv[0].x = ucx;
                 uv[0].y = udy;
                 uv[1].x = urx;
@@ -1472,7 +1445,7 @@ namespace Assets.Core.HGUI
                 uv[5].y = uty;
                 image.vertex = vertex;
                 image.uv = uv;
-                image.tris = Triangle360B5;
+                image.tris = TriangleL4;
             }
             else if(a>0.25f)
             {
@@ -1502,7 +1475,7 @@ namespace Assets.Core.HGUI
                 uv[4].y = ucy + (uty - ucy) * a;
                 image.vertex = vertex;
                 image.uv = uv;
-                image.tris = TriangleL4;
+                image.tris = TriangleL3;
             }
             else if(a>0.125f)
             {
@@ -1532,20 +1505,25 @@ namespace Assets.Core.HGUI
             }
             else
             {
+                a *= 8;
                 Vector3[] vertex = new Vector3[4];
                 vertex[0].x = cx;
                 vertex[0].y = dy;
-                vertex[1].x = cx + (rx - cx) * a;
-                vertex[1].y = dy;
-                vertex[2].x = cx;
-                vertex[2].y = cy;
+                vertex[1].x = cx;
+                vertex[1].y = cy;
+                vertex[2].x = cx + (rx - cx) * a;
+                vertex[2].y = dy;
+             
                 Vector2[] uv = new Vector2[4];
                 uv[0].x = ucx;
                 uv[0].y = udy;
-                uv[1].x = ucx + (urx - ucx) * a;
-                uv[1].y = udy;
-                uv[2].x = ucx;
-                uv[2].y = ucy;
+                uv[1].x = ucx;
+                uv[1].y = ucy;
+                uv[2].x = ucx + (urx - ucx) * a;
+                uv[2].y = udy;
+                image.vertex = vertex;
+                image.uv = uv;
+                image.tris = Triangle;
             }
         }
     }

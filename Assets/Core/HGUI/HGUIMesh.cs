@@ -473,7 +473,56 @@ namespace Assets.Core.HGUI
         }
         static void FillVertical(HImage image)
         {
+            float px = image._pivot.x / image._rect.width;
+            float py = image._pivot.y / image._rect.height;
 
+            float x = image.SizeDelta.x;
+            float y = image.SizeDelta.y;
+            float lx = -px * x;
+            float rx = (1 - px) * x;
+
+            float w = image._textureSize.x;
+            float h = image._textureSize.y;
+            float ulx = image._rect.x / w;
+            float urx = ulx + image._rect.width / w;
+            float dy, ty, udy, uty;
+            if (image._fillOrigin == 1)
+            {
+                ty = (1 - py) * y;
+                dy = ty - image._fillAmount * y;
+                udy = image._rect.y / h;
+                uty = udy + image._rect.height / h;
+                udy = uty - image._fillAmount * image._rect.height / h;
+            }
+            else
+            {
+                dy = -py * y;
+                ty = dy + image._fillAmount * y;
+                udy = image._rect.y / h;
+                uty = udy + image._fillAmount * image._rect.height / h;
+            }
+            var vertex = new Vector3[4];
+            vertex[0].x = lx;
+            vertex[0].y = dy;
+            vertex[1].x = rx;
+            vertex[1].y = dy;
+            vertex[2].x = lx;
+            vertex[2].y = ty;
+            vertex[3].x = rx;
+            vertex[3].y = ty;
+            Vector2[] uv = new Vector2[4];
+            uv[0].x = ulx;
+            uv[0].y = udy;
+            uv[1].x = urx;
+            uv[1].y = udy;
+            uv[2].x = ulx;
+            uv[2].y = uty;
+            uv[3].x = urx;
+            uv[3].y = uty;
+
+            image.vertex = vertex;
+            image.uv = uv;
+            image.tris = Rectangle;
         }
         static void FillRadial90(HImage image)
         {

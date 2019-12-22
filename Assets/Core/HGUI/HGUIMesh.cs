@@ -8,6 +8,7 @@ namespace Assets.Core.HGUI
 {
     public class HGUIMesh
     {
+        public static int[] Triangle = new int[] { 0,1,2};
         public static int[] Rectangle = new int[] { 0, 2, 3, 0, 3, 1 };
         public static int[] FourRectangle = new int[] { 0,3,4,0,4,1,1,4,5,1,5,2,3,6,7,3,7,4,4,7,8,4,8,5 };
         public static int[] FourCorners = new int[] { 0,2,3,0,3,1,4,6,7,4,7,5,8,10,11,8,11,9,12,14,15,12,15,13};
@@ -526,8 +527,138 @@ namespace Assets.Core.HGUI
         }
         static void FillRadial90(HImage image)
         {
-
+            float px = image._pivot.x / image._rect.width;
+            float py = image._pivot.y / image._rect.height;
+            float x = image.SizeDelta.x;
+            float lx = -px * x;
+            float rx = (1 - px) * x;
+            float y = image.SizeDelta.y;
+            float dy = -py * y;
+            float ty = (1 - py) * y;
+            float w = image._textureSize.x;
+            float h = image._textureSize.y;
+            float ulx = image._rect.x / w;
+            float urx = ulx + image._rect.width / w;
+            float udy = image._rect.y / h;
+            float uty = udy + image._rect.height / h;
+            float a = image._fillAmount;
+            if(a>0.5f)
+            {
+                var vertex = new Vector3[4];
+                vertex[0].x = lx;
+                vertex[0].y = dy;
+                vertex[1].x = rx;
+                vertex[1].y = dy;
+                vertex[2].x = lx;
+                vertex[2].y = ty;
+                vertex[3].x = rx;
+                vertex[3].y = ty;
+                Vector2[] uv = new Vector2[4];
+                uv[0].x = ulx;
+                uv[0].y = udy;
+                uv[1].x = urx;
+                uv[1].y = udy;
+                uv[2].x = ulx;
+                uv[2].y = uty;
+                uv[3].x = urx;
+                uv[3].y = uty;
+               
+                a -= 0.5f;
+                a *= 2;
+                switch(image._fillOrigin)
+                {
+                    case 0:
+                        vertex[1].y = ty - (ty - dy) * a;
+                        uv[1].y = uty - (uty - udy) * a;
+                        break;
+                    case 1:
+                        vertex[0].x = rx - (rx - lx) * a;
+                        uv[0].x = urx - (urx - ulx) * a;
+                        break;
+                    case 2:
+                        vertex[2].y = dy + (ty - dy) * a;
+                        uv[2].y = udy + (uty - udy) * a;
+                        break;
+                    default:
+                        vertex[3].x = lx + (rx - lx) * a;
+                        uv[3].x = ulx + (urx - ulx) * a;
+                        break;
+                }
+                image.vertex = vertex;
+                image.uv = uv;
+                image.tris = Rectangle;
+            }
+            else
+            {
+                var vertex = new Vector3[3];
+                Vector2[] uv = new Vector2[3];
+                a *= 2;
+                switch (image._fillOrigin)
+                {
+                    case 0:
+                        vertex[0].x = lx;
+                        vertex[0].y = dy;
+                        vertex[1].x = lx;
+                        vertex[1].y = ty;
+                        vertex[2].y = ty;
+                        vertex[2].x = lx + (rx - lx) * a;
+                        uv[0].x = ulx;
+                        uv[0].y = udy;
+                        uv[1].x = ulx;
+                        uv[1].y = uty;
+                        uv[2].y = uty;
+                        uv[2].x = ulx + (urx - ulx) * a;
+                        break;
+                    case 1:
+                        vertex[0].x = lx;
+                        vertex[0].y = ty;
+                        vertex[1].x = rx;
+                        vertex[1].y = ty;
+                        vertex[2].x = rx;
+                        vertex[2].y = ty - (ty - dy) * a;
+                        uv[0].x = ulx;
+                        uv[0].y = uty;
+                        uv[1].x = urx;
+                        uv[1].y = uty;
+                        uv[2].x = urx;
+                        uv[2].y = uty - (uty - udy) * a;
+                        break;
+                    case 2:
+                        vertex[0].x = rx - (rx - lx) * a;
+                        vertex[0].y = dy;
+                        vertex[1].x = rx;
+                        vertex[1].y = ty;
+                        vertex[2].x = rx;
+                        vertex[2].y = dy;
+                        uv[0].x = urx - (urx - ulx) * a;
+                        uv[0].y = udy;
+                        uv[1].x = urx;
+                        uv[1].y = uty;
+                        uv[2].x = urx;
+                        uv[2].y = udy;
+                        break;
+                    default:
+                        vertex[0].x = lx;
+                        vertex[0].y = dy;
+                        vertex[1].x = lx;
+                        vertex[1].y = dy + (ty - dy) * a;
+                        vertex[2].x = rx;
+                        vertex[2].y = dy;
+                        uv[0].x = ulx;
+                        uv[0].y = udy;
+                        uv[1].x = ulx;
+                        uv[1].y = udy + (uty - udy) * a;
+                        uv[2].x = urx;
+                        uv[2].y = udy;
+                        break;
+                }
+                image.vertex = vertex;
+                image.uv = uv;
+                image.tris = Triangle;
+            }
+           
         }
+   
         static void FillRadial180(HImage image)
         {
 

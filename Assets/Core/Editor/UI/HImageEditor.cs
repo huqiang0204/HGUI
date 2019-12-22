@@ -54,6 +54,8 @@ public class HImageEditor:Editor
                 img.SetNativeSize();
             if (GUILayout.Button("Refresh"))
                 img.Test();
+            else if(GUI.changed)
+                img.Test();
         }
     }
 }

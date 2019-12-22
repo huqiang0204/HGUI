@@ -1217,6 +1217,29 @@ namespace Assets.Core.HGUI
         }
         static void FillRadial360(HImage image)
         {
+            if (image._fillAmount == 1)
+            {
+                CreateSimpleMesh(image);
+                return;
+            }
+            switch (image._fillOrigin)
+            {
+                case 0:
+                    FillRadial180Bottom(image);
+                    break;
+                case 1:
+                    //FillRadial180Left(image);
+                    break;
+                case 2:
+                    //FillRadial180Top(image);
+                    break;
+                case 3:
+                    //FillRadial180Right(image);
+                    break;
+            }
+        }
+        static void FillRadial360Bottom(HImage image)
+        {
 
         }
     }

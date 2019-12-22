@@ -90,6 +90,8 @@ namespace Assets.Core.HGUI
             set {
                 _fillMethod = value;
             } }
+        internal bool _fillClockwise;
+        public bool fillClockwise { get; set; }
         internal int _fillOrigin;
         public int fillOrigin { get => _fillOrigin; set {
                 _fillOrigin = value;

@@ -250,7 +250,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2312e0734288d14b9ca518afd43ee0e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SizeDelta: {x: 200, y: 200}
+  SizeDelta: {x: 300, y: 200}
   material: {fileID: 181105935}
 --- !u!1 &613720346
 GameObject:
@@ -510,7 +510,7 @@ Mesh:
     vertexCount: 4
     localAABB:
       m_Center: {x: 0, y: 0, z: 0}
-      m_Extent: {x: 100, y: 100, z: 0}
+      m_Extent: {x: 150, y: 100, z: 0}
   m_Shapes:
     vertices: []
     shapes: []
@@ -589,7 +589,7 @@ Mesh:
       format: 0
       dimension: 0
     m_DataSize: 80
-    _typelessdata: 0000c8c20000c8c2000000000040143f0080303f0000c8420000c8c20000000000802b3f0080303f0000c8c20000c842000000000040143f00c03b3f0000c8420000c8420000000000802b3f00c03b3f
+    _typelessdata: 000016c30000c8c2000000000040143f0080303f000016430000c8c20000000000802b3f0080303f000016c30000c842000000000040143f00c03b3f000016430000c8420000000000802b3f00c03b3f
   m_CompressedMesh:
     m_Vertices:
       m_NumItems: 0
@@ -644,7 +644,7 @@ Mesh:
     m_UVInfo: 0
   m_LocalAABB:
     m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 100, y: 100, z: 0}
+    m_Extent: {x: 150, y: 100, z: 0}
   m_MeshUsageFlags: 0
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
@@ -919,9 +919,9 @@ MonoBehaviour:
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
-  m_FillAmount: 0.204
+  m_FillAmount: 0.059
   m_FillClockwise: 0
-  m_FillOrigin: 0
+  m_FillOrigin: 3
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
 --- !u!222 &1822767372

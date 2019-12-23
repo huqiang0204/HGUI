@@ -82,6 +82,13 @@ namespace Assets.Core.HGUI
                 int h = cam.pixelHeight;
                 SizeDelta.x = w;
                 SizeDelta.y = h;
+                float near = cam.nearClipPlane;
+                float s = 0.5f / (float)h;
+                float o = MathH.Tan(cam.fieldOfView);
+                s /= o;
+                transform.localScale = new Vector3(s, s, s);
+                transform.position = cam.transform.position + cam.transform.forward*near;
+                transform.forward = cam.transform.forward;
             }
         }
     }

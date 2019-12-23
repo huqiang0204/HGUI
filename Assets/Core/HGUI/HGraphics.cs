@@ -10,7 +10,7 @@ namespace Assets.Core.HGUI
     {
         static Shader Shader { get {
                 if(shader==null)
-                    shader = Shader.Find("Shader Graphs/UI");
+                    shader = Shader.Find("Custom/UIDef");
                 return shader;
             } }
         public static Shader shader;

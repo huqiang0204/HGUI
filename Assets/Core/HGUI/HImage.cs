@@ -101,6 +101,9 @@ namespace Assets.Core.HGUI
         public float fillAmount {
             get => _fillAmount;
             set { _fillAmount = value;} }
+        /// <summary>
+        /// 开启此项,按弧度填充,否则按矩形四个角填充
+        /// </summary>
         public bool preserveAspect { get; set; }
         internal float _pixelsPerUnit = 1;
         internal bool _fillCenter = true;

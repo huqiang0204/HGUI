@@ -1840,6 +1840,8 @@ namespace Assets.Core.HGUI
                 image.tris = Triangle;
             }
         }
+        static int[] Triangle360T8 = new int[] { 0, 3, 4, 0, 4, 1, 1, 4, 5, 1, 5, 2, 3, 6, 7, 3, 7, 4, 4, 8, 9, 4, 9, 5 };
+
         static void FillRadial360Top(HImage image)
         {
             float px = image._pivot.x / image._rect.width;
@@ -1865,7 +1867,53 @@ namespace Assets.Core.HGUI
             {
                 a -= 0.875f;
                 a *= 8;
-            }else if(a>0.75f)
+                Vector3[] v = new Vector3[10];
+                v[0].x = lx;
+                v[0].y = dy;
+                v[1].x = cx;
+                v[1].y = dy;
+                v[2].x = rx;
+                v[2].y = dy;
+                v[3].x = lx;
+                v[3].y = cy;
+                v[4].x = cx;
+                v[4].y = cy;
+                v[5].x = rx;
+                v[5].y = cy;
+                v[6].x = lx;
+                v[6].y = ty;
+                v[7].x = cx;
+                v[7].y = ty;
+                v[8].x = rx - (rx - cx) * a;
+                v[8].y = ty;
+                v[9].x = rx;
+                v[9].y = ty;
+                Vector2[] uv = new Vector2[10];
+                uv[0].x = ulx;
+                uv[0].y = udy;
+                uv[1].x = ucx;
+                uv[1].y = udy;
+                uv[2].x = urx;
+                uv[2].y = udy;
+                uv[3].x = ulx;
+                uv[3].y = ucy;
+                uv[4].x = ucx;
+                uv[4].y = ucy;
+                uv[5].x = urx;
+                uv[5].y = ucy;
+                uv[6].x = ulx;
+                uv[6].y = uty;
+                uv[7].x = ucx;
+                uv[7].y = uty;
+                uv[8].x = urx - (urx - ucx) * a;
+                uv[8].y = uty;
+                uv[9].x = urx;
+                uv[9].y = uty;
+                image.vertex = v;
+                image.uv = uv;
+                image.tris = Triangle360T8;
+            }
+            else if(a>0.75f)
             {
                 a -= 0.75f;
                 a *= 8;

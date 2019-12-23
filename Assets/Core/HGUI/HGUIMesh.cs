@@ -1840,5 +1840,65 @@ namespace Assets.Core.HGUI
                 image.tris = Triangle;
             }
         }
+        static void FillRadial360Top(HImage image)
+        {
+            float px = image._pivot.x / image._rect.width;
+            float py = image._pivot.y / image._rect.height;
+            float x = image.SizeDelta.x;
+            float lx = -px * x;
+            float rx = (1 - px) * x;
+            float y = image.SizeDelta.y;
+            float dy = -py * y;
+            float ty = (1 - py) * y;
+            float w = image._textureSize.x;
+            float h = image._textureSize.y;
+            float ulx = image._rect.x / w;
+            float urx = ulx + image._rect.width / w;
+            float udy = image._rect.y / h;
+            float uty = udy + image._rect.height / h;
+            float cx = lx + x * 0.5f;
+            float ucx = ulx + (urx - ulx) * 0.5f;
+            float cy = dy + y * 0.5f;
+            float ucy = udy + (uty - udy) * 0.5f;
+            float a = image._fillAmount;
+            if(a>0.875f)
+            {
+                a -= 0.875f;
+                a *= 8;
+            }else if(a>0.75f)
+            {
+                a -= 0.75f;
+                a *= 8;
+            }
+            else if(a>0.625f)
+            {
+                a -= 0.625f;
+                a *= 8;
+            }
+            else if(a>0.5f)
+            {
+                a -= 0.5f;
+                a *= 8;
+            }
+            else if(a>0.375f)
+            {
+                a -= 0.375f;
+                a *= 8;
+            }
+            else if(a>0.25f)
+            {
+                a -= 0.25f;
+                a *= 8;
+            }
+            else if(a>0.125f)
+            {
+                a -= 0.125f;
+                a *= 8;
+            }
+            else
+            {
+                a *= 8;
+            }
+        }
     }
 }

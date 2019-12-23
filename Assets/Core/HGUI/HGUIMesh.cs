@@ -1,4 +1,5 @@
-﻿using System;
+﻿using huqiang;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -1846,12 +1847,44 @@ namespace Assets.Core.HGUI
         static int[] Triangle360T5 = new int[] { 0, 3, 4, 0, 4, 1, 1, 4, 2, 3, 5, 6, 3, 6, 4 };
         static void FillRadial360Top(HImage image)
         {
+            float a = image._fillAmount;
+            float x = image.SizeDelta.x;
+            float y = image.SizeDelta.y;
+            if(image.preserveAspect & a>0)
+            {
+                float ocx = x * 0.5f;
+                float ocy = y * 0.5f;
+                Vector2 d = MathH.Tan2(360 - a * 360);//方向
+                Vector2[] lines = new Vector2[9];
+                lines[0].x = ocx;
+                lines[0].y = y;
+                lines[1].x = x;
+                lines[1].y = y;
+                lines[2].x = x;
+                lines[2].y = ocy;
+                lines[3].x = x;
+                lines[4].x = ocx;
+                lines[6].y = ocy;
+                lines[7].y = y;
+                lines[8].x = ocx;
+                lines[8].y = y;
+                Vector2 oc = new Vector2(ocx, ocy);
+                Vector2 ot = oc + d * 10000;
+                Vector2 cross = Vector2.zero;
+                for (int i = 0; i < 8; i++)
+                {
+                    if (huqiang.Physics2D.LineToLine(ref lines[i], ref lines[i + 1], ref oc, ref ot, ref cross))
+                    {
+                        float r = (cross - lines[i + 1]).magnitude / (lines[i + 1] - lines[i]).magnitude;
+                        a = (7 - i+r) * 0.125f ;
+                        break;
+                    }
+                }
+            }
             float px = image._pivot.x / image._rect.width;
             float py = image._pivot.y / image._rect.height;
-            float x = image.SizeDelta.x;
             float lx = -px * x;
             float rx = (1 - px) * x;
-            float y = image.SizeDelta.y;
             float dy = -py * y;
             float ty = (1 - py) * y;
             float w = image._textureSize.x;
@@ -1864,7 +1897,6 @@ namespace Assets.Core.HGUI
             float ucx = ulx + (urx - ulx) * 0.5f;
             float cy = dy + y * 0.5f;
             float ucy = udy + (uty - udy) * 0.5f;
-            float a = image._fillAmount;
             if(a>0.875f)
             {
                 a -= 0.875f;

@@ -1,4 +1,5 @@
-﻿using huqiang.Data;
+﻿using huqiang;
+using huqiang.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -61,7 +62,7 @@ namespace Assets.Core.HGUI
         internal Vector4 _border;
         internal Vector2 _pivot;
         //网格待处理
-        bool _vertexPending;
+        bool _vertexChange;
         //三角形待处理
         bool _trisPending;
         public Sprite sprite
@@ -96,24 +97,23 @@ namespace Assets.Core.HGUI
         public int fillOrigin { get => _fillOrigin; set {
                 _fillOrigin = value;
             } }
-        internal float _fillAmount=1;
-        public float fillAmount { get => _fillAmount;
-            set {
-                _fillAmount = value;
-            } }
+        internal float _fillAmount = 1;
+        public float fillAmount {
+            get => _fillAmount;
+            set { _fillAmount = value;} }
         public bool preserveAspect { get; set; }
         internal float _pixelsPerUnit = 1;
         internal bool _fillCenter = true;
         public bool fillCenter {
             get { return _fillCenter; }
             set { if (_fillCenter != value)
-                    _vertexPending = true;
+                    _vertexChange = true;
                 _fillCenter = value; }
         }
         public float pixelsPerUnitMultiplier { get => _pixelsPerUnit;
             set {
                 if (_pixelsPerUnit != value)
-                    _vertexPending = true;
+                    _vertexChange = true;
                 _pixelsPerUnit = value;
             } }
         public void SetNativeSize()
@@ -126,10 +126,10 @@ namespace Assets.Core.HGUI
         }
         public override void UpdateMesh()
         {
-            if(_vertexPending)
+            if(_vertexChange)
             {
                 HGUIMesh.CreateMesh(this);
-                _vertexPending = false;
+                _vertexChange = false;
             }
         }
         public override void SubUpdate()

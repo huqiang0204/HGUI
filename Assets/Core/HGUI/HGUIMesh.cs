@@ -2153,7 +2153,11 @@ namespace Assets.Core.HGUI
                 image.tris = Triangle;
             }
         }
-        static int[] Triangle360L8 = new int[] { 0, 3, 4, 0, 4, 1, 1, 4, 5, 1, 5, 2, 6, 7, 8, 6, 8, 4, 4, 8, 9, 4, 9, 5 };
+        static int[] Triangle360L8 = new int[] { 0, 3, 4, 0, 4, 1, 1, 4, 5, 1, 5, 2, 6, 7, 4, 4, 7, 8, 4, 8, 9, 4, 9, 5 };
+        static int[] Triangle360L7 = new int[] { 0, 3, 4, 0, 4, 1, 1, 4, 5, 1, 5, 2, 4, 6, 7, 4, 7, 8, 4, 8, 5 };
+        static int[] Triangle360L6 = new int[] { 0, 3, 4, 0, 4, 1, 1, 4, 5, 1, 5, 2, 4, 6, 7, 4, 7, 5 };
+        static int[] Triangle360L5 = new int[] { 0, 3, 4, 0, 4, 1, 1, 4, 5, 1, 5, 2, 4, 6, 5 };
+        static int[] Triangle360L3 = new int[] { 0, 3, 4, 0, 4, 1, 1, 4, 2 };
         static void FillRadial360Left(HImage image)
         {
             float px = image._pivot.x / image._rect.width;
@@ -2179,39 +2183,288 @@ namespace Assets.Core.HGUI
             {
                 a -= 0.875f;
                 a *= 8;
-            }else if(a>0.75f)
+                Vector3[] v = new Vector3[10];
+                v[0].x = lx;
+                v[0].y = dy;
+                v[1].x = cx;
+                v[1].y = dy;
+                v[2].x = rx;
+                v[2].y = dy;
+                v[3].x = lx;
+                v[3].y = cy;
+                v[4].x = cx;
+                v[4].y = cy;
+                v[5].x = rx;
+                v[5].y = cy;
+                v[6].x = lx;
+                v[6].y = ty - (ty - cy) * a;
+                v[7].x = lx;
+                v[7].y = ty;
+                v[8].x = cx;
+                v[8].y = ty;
+                v[9].x = rx;
+                v[9].y = ty;
+                Vector2[] uv = new Vector2[10];
+                uv[0].x = ulx;
+                uv[0].y = udy;
+                uv[1].x = ucx;
+                uv[1].y = udy;
+                uv[2].x = urx;
+                uv[2].y = udy;
+                uv[3].x = ulx;
+                uv[3].y = ucy;
+                uv[4].x = ucx;
+                uv[4].y = ucy;
+                uv[5].x = urx;
+                uv[5].y = ucy;
+                uv[6].x = ulx;
+                uv[6].y = uty - (uty - ucy) * a;
+                uv[7].x = ulx;
+                uv[7].y = uty;
+                uv[8].x = ucx;
+                uv[8].y = uty;
+                uv[9].x = urx;
+                uv[9].y = uty;
+                image.vertex = v;
+                image.uv = uv;
+                image.tris = Triangle360L8;
+            }
+            else if(a>0.75f)
             {
                 a -= 0.75f;
                 a *= 8;
+                Vector3[] v = new Vector3[9];
+                v[0].x = lx;
+                v[0].y = dy;
+                v[1].x = cx;
+                v[1].y = dy;
+                v[2].x = rx;
+                v[2].y = dy;
+                v[3].x = lx;
+                v[3].y = cy;
+                v[4].x = cx;
+                v[4].y = cy;
+                v[5].x = rx;
+                v[5].y = cy;
+                v[6].x = cx - (cx - lx) * a;
+                v[6].y = ty;
+                v[7].x = cx;
+                v[7].y = ty;
+                v[8].x = rx;
+                v[8].y = ty;
+                Vector2[] uv = new Vector2[9];
+                uv[0].x = ulx;
+                uv[0].y = udy;
+                uv[1].x = ucx;
+                uv[1].y = udy;
+                uv[2].x = urx;
+                uv[2].y = udy;
+                uv[3].x = ulx;
+                uv[3].y = ucy;
+                uv[4].x = ucx;
+                uv[4].y = ucy;
+                uv[5].x = urx;
+                uv[5].y = ucy;
+                uv[6].x = ucx - (ucx - ulx) * a;
+                uv[6].y = uty;
+                uv[7].x = ucx;
+                uv[7].y = uty;
+                uv[8].x = urx;
+                uv[8].y = uty;
+                image.vertex = v;
+                image.uv = uv;
+                image.tris = Triangle360L7;
             }
             else if(a>0.625f)
             {
                 a -= 0.625f;
                 a *= 8;
+                Vector3[] v = new Vector3[8];
+                v[0].x = lx;
+                v[0].y = dy;
+                v[1].x = cx;
+                v[1].y = dy;
+                v[2].x = rx;
+                v[2].y = dy;
+                v[3].x = lx;
+                v[3].y = cy;
+                v[4].x = cx;
+                v[4].y = cy;
+                v[5].x = rx;
+                v[5].y = cy;
+                v[6].x = rx - (rx - cx) * a;
+                v[6].y = ty;
+                v[7].x = rx;
+                v[7].y = ty;
+                Vector2[] uv = new Vector2[8];
+                uv[0].x = ulx;
+                uv[0].y = udy;
+                uv[1].x = ucx;
+                uv[1].y = udy;
+                uv[2].x = urx;
+                uv[2].y = udy;
+                uv[3].x = ulx;
+                uv[3].y = ucy;
+                uv[4].x = ucx;
+                uv[4].y = ucy;
+                uv[5].x = urx;
+                uv[5].y = ucy;
+                uv[6].x = urx - (urx - ucx) * a;
+                uv[6].y = uty;
+                uv[7].x = urx;
+                uv[7].y = uty;
+                image.vertex = v;
+                image.uv = uv;
+                image.tris = Triangle360L6;
             }
             else if(a>0.5f)
             {
                 a -= 0.5f;
                 a *= 8;
+                Vector3[] v = new Vector3[7];
+                v[0].x = lx;
+                v[0].y = dy;
+                v[1].x = cx;
+                v[1].y = dy;
+                v[2].x = rx;
+                v[2].y = dy;
+                v[3].x = lx;
+                v[3].y = cy;
+                v[4].x = cx;
+                v[4].y = cy;
+                v[5].x = rx;
+                v[5].y = cy;
+                v[6].x = rx;
+                v[6].y = cy + (ty - cy) * a;
+                Vector2[] uv = new Vector2[7];
+                uv[0].x = ulx;
+                uv[0].y = udy;
+                uv[1].x = ucx;
+                uv[1].y = udy;
+                uv[2].x = urx;
+                uv[2].y = udy;
+                uv[3].x = ulx;
+                uv[3].y = ucy;
+                uv[4].x = ucx;
+                uv[4].y = ucy;
+                uv[5].x = urx;
+                uv[5].y = ucy;
+                uv[6].x = urx;
+                uv[6].y = ucy + (uty - ucy) * a;
+                image.vertex = v;
+                image.uv = uv;
+                image.tris = Triangle360L5;
             }
             else if(a>0.375f)
             {
                 a -= 0.375f;
                 a *= 8;
+                Vector3[] v = new Vector3[6];
+                v[0].x = lx;
+                v[0].y = dy;
+                v[1].x = cx;
+                v[1].y = dy;
+                v[2].x = rx;
+                v[2].y = dy;
+                v[3].x = lx;
+                v[3].y = cy;
+                v[4].x = cx;
+                v[4].y = cy;
+                v[5].x = rx;
+                v[5].y = dy + (cy - dy) * a;
+                Vector2[] uv = new Vector2[6];
+                uv[0].x = ulx;
+                uv[0].y = udy;
+                uv[1].x = ucx;
+                uv[1].y = udy;
+                uv[2].x = urx;
+                uv[2].y = udy;
+                uv[3].x = ulx;
+                uv[3].y = ucy;
+                uv[4].x = ucx;
+                uv[4].y = ucy;
+                uv[5].x = urx;
+                uv[5].y = udy + (ucy - udy) * a;
+                image.vertex = v;
+                image.uv = uv;
+                image.tris = TriangleT4;
             }
             else if(a>0.25f)
             {
                 a -= 0.25f;
                 a *= 8;
+                Vector3[] v = new Vector3[5];
+                v[0].x = lx;
+                v[0].y = dy;
+                v[1].x = cx;
+                v[1].y = dy;
+                v[2].x = cx + (rx - cx) * a;
+                v[2].y = dy;
+                v[3].x = lx;
+                v[3].y = cy;
+                v[4].x = cx;
+                v[4].y = cy;
+                Vector2[] uv = new Vector2[5];
+                uv[0].x = ulx;
+                uv[0].y = udy;
+                uv[1].x = ucx;
+                uv[1].y = udy;
+                uv[2].x = ucx + (urx - ucx) * a;
+                uv[2].y = udy;
+                uv[3].x = ulx;
+                uv[3].y = ucy;
+                uv[4].x = ucx;
+                uv[4].y = ucy;
+                image.vertex = v;
+                image.uv = uv;
+                image.tris = Triangle360L3;
             }
             else if(a>0.125f)
             {
                 a -= 0.125f;
                 a *= 8;
+                Vector3[] v = new Vector3[4];
+                v[0].x = lx;
+                v[0].y = dy;
+                v[1].x = lx + (cx - lx) * a;
+                v[1].y = dy;
+                v[2].x = lx;
+                v[2].y = cy;
+                v[3].x = cx;
+                v[3].y = cy;
+                Vector2[] uv = new Vector2[4];
+                uv[0].x = ulx;
+                uv[0].y = udy;
+                uv[1].x = ulx + (ucx - ulx) * a;
+                uv[1].y = udy;
+                uv[2].x = ulx;
+                uv[2].y = ucy;
+                uv[3].x = ucx;
+                uv[3].y = ucy;
+                image.vertex = v;
+                image.uv = uv;
+                image.tris = Rectangle;
             }
             else
             {
                 a *= 8;
+                Vector3[] v = new Vector3[3];
+                v[0].x = lx;
+                v[0].y = cy - (cy - dy) * a;
+                v[1].x = lx;
+                v[1].y = cy;
+                v[2].x = cx;
+                v[2].y = cy;
+                Vector2[] uv = new Vector2[3];
+                uv[0].x = ulx;
+                uv[0].y = ucy - (ucy - udy) * a;
+                uv[1].x = ulx;
+                uv[1].y = ucy;
+                uv[2].x = ucx;
+                uv[2].y = ucy;
+                image.vertex = v;
+                image.uv = uv;
+                image.tris = Triangle;
             }
         }
     }

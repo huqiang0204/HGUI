@@ -1240,27 +1240,27 @@ namespace Assets.Core.HGUI
             {
                 a -= 0.875f;
                 a *= 8;
-                Vector3[] vertex = new Vector3[10];
-                vertex[0].x = lx;
-                vertex[0].y = dy;
-                vertex[1].x = lx + (cx - lx) * a;
-                vertex[1].y = dy;
-                vertex[2].x = cx;
-                vertex[2].y = dy;
-                vertex[3].x = rx;
-                vertex[3].y = dy;
-                vertex[4].x = lx;
-                vertex[4].y = cy;
-                vertex[5].x = cx;
-                vertex[5].y = cy;
-                vertex[6].x = rx;
-                vertex[6].y = cy;
-                vertex[7].x = lx;
-                vertex[7].y = ty;
-                vertex[8].x = cx;
-                vertex[8].y = ty;
-                vertex[9].x = rx;
-                vertex[9].y = ty;
+                Vector3[] v = new Vector3[10];
+                v[0].x = lx;
+                v[0].y = dy;
+                v[1].x = lx + (cx - lx) * a;
+                v[1].y = dy;
+                v[2].x = cx;
+                v[2].y = dy;
+                v[3].x = rx;
+                v[3].y = dy;
+                v[4].x = lx;
+                v[4].y = cy;
+                v[5].x = cx;
+                v[5].y = cy;
+                v[6].x = rx;
+                v[6].y = cy;
+                v[7].x = lx;
+                v[7].y = ty;
+                v[8].x = cx;
+                v[8].y = ty;
+                v[9].x = rx;
+                v[9].y = ty;
                 Vector2[] uv = new Vector2[10];
                 uv[0].x = ulx;
                 uv[0].y = udy;
@@ -1282,7 +1282,7 @@ namespace Assets.Core.HGUI
                 uv[8].y = uty;
                 uv[9].x = urx;
                 uv[9].y = uty;
-                image.vertex = vertex;
+                image.vertex = v;
                 image.uv = uv;
                 image.tris = Triangle360B8;
             }
@@ -1290,25 +1290,25 @@ namespace Assets.Core.HGUI
             {
                 a -= 0.75f;
                 a *= 8;
-                Vector3[] vertex = new Vector3[9];
-                vertex[0].x = lx;
-                vertex[0].y = cy - (cy - dy) * a;
-                vertex[1].x = cx;
-                vertex[1].y = dy;
-                vertex[2].x = rx;
-                vertex[2].y = dy;
-                vertex[3].x = lx;
-                vertex[3].y = cy;
-                vertex[4].x = cx;
-                vertex[4].y = cy;
-                vertex[5].x = rx;
-                vertex[5].y = cy;
-                vertex[6].x = lx;
-                vertex[6].y = ty;
-                vertex[7].x = cx;
-                vertex[7].y = ty;
-                vertex[8].x = rx;
-                vertex[8].y = ty;
+                Vector3[] v = new Vector3[9];
+                v[0].x = lx;
+                v[0].y = cy - (cy - dy) * a;
+                v[1].x = cx;
+                v[1].y = dy;
+                v[2].x = rx;
+                v[2].y = dy;
+                v[3].x = lx;
+                v[3].y = cy;
+                v[4].x = cx;
+                v[4].y = cy;
+                v[5].x = rx;
+                v[5].y = cy;
+                v[6].x = lx;
+                v[6].y = ty;
+                v[7].x = cx;
+                v[7].y = ty;
+                v[8].x = rx;
+                v[8].y = ty;
                 Vector2[] uv = new Vector2[9];
                 uv[0].x = ulx;
                 uv[0].y = ucy - (ucy - udy) * a;
@@ -1328,7 +1328,7 @@ namespace Assets.Core.HGUI
                 uv[7].y = uty;
                 uv[8].x = urx;
                 uv[8].y = uty;
-                image.vertex = vertex;
+                image.vertex = v;
                 image.uv = uv;
                 image.tris = Triangle360B7;
             }
@@ -1336,23 +1336,23 @@ namespace Assets.Core.HGUI
             {
                 a -= 0.625f;
                 a *= 8;
-                Vector3[] vertex = new Vector3[8];
-                vertex[0].x = cx;
-                vertex[0].y = dy;
-                vertex[1].x = rx;
-                vertex[1].y = dy;
-                vertex[2].x = lx;
-                vertex[2].y = ty - (ty - cy) * a;
-                vertex[3].x = cx;
-                vertex[3].y = cy;
-                vertex[4].x = rx;
-                vertex[4].y = cy;
-                vertex[5].x = lx;
-                vertex[5].y = ty;
-                vertex[6].x = cx;
-                vertex[6].y = ty;
-                vertex[7].x = rx;
-                vertex[7].y = ty;
+                Vector3[] v = new Vector3[8];
+                v[0].x = cx;
+                v[0].y = dy;
+                v[1].x = rx;
+                v[1].y = dy;
+                v[2].x = lx;
+                v[2].y = ty - (ty - cy) * a;
+                v[3].x = cx;
+                v[3].y = cy;
+                v[4].x = rx;
+                v[4].y = cy;
+                v[5].x = lx;
+                v[5].y = ty;
+                v[6].x = cx;
+                v[6].y = ty;
+                v[7].x = rx;
+                v[7].y = ty;
                 Vector2[] uv = new Vector2[8];
                 uv[0].x = ucx;
                 uv[0].y = udy;
@@ -1370,7 +1370,7 @@ namespace Assets.Core.HGUI
                 uv[6].y = uty;
                 uv[7].x = urx;
                 uv[7].y = uty;
-                image.vertex = vertex;
+                image.vertex = v;
                 image.uv = uv;
                 image.tris = Triangle360B6;
             }
@@ -1378,21 +1378,21 @@ namespace Assets.Core.HGUI
             {
                 a -= 0.5f;
                 a *= 8;
-                Vector3[] vertex = new Vector3[7];
-                vertex[0].x = cx;
-                vertex[0].y = dy;
-                vertex[1].x = rx;
-                vertex[1].y = dy;
-                vertex[2].x = cx;
-                vertex[2].y = cy;
-                vertex[3].x = rx;
-                vertex[3].y = cy;
-                vertex[4].x = cx - (cx - lx) * a;
-                vertex[4].y = ty;
-                vertex[5].x = cx;
-                vertex[5].y = ty;
-                vertex[6].x = rx;
-                vertex[6].y = ty;
+                Vector3[] v = new Vector3[7];
+                v[0].x = cx;
+                v[0].y = dy;
+                v[1].x = rx;
+                v[1].y = dy;
+                v[2].x = cx;
+                v[2].y = cy;
+                v[3].x = rx;
+                v[3].y = cy;
+                v[4].x = cx - (cx - lx) * a;
+                v[4].y = ty;
+                v[5].x = cx;
+                v[5].y = ty;
+                v[6].x = rx;
+                v[6].y = ty;
                 Vector2[] uv = new Vector2[7];
                 uv[0].x = ucx;
                 uv[0].y = udy;
@@ -1408,7 +1408,7 @@ namespace Assets.Core.HGUI
                 uv[5].y = uty;
                 uv[6].x = urx;
                 uv[6].y = uty;
-                image.vertex = vertex;
+                image.vertex = v;
                 image.uv = uv;
                 image.tris = Triangle360B5;
             }
@@ -1416,19 +1416,19 @@ namespace Assets.Core.HGUI
             {
                 a -= 0.375f;
                 a *= 8;
-                Vector3[] vertex = new Vector3[6];
-                vertex[0].x = cx;
-                vertex[0].y = dy;
-                vertex[1].x = rx;
-                vertex[1].y = dy;
-                vertex[2].x = cx;
-                vertex[2].y = cy;
-                vertex[3].x = rx;
-                vertex[3].y = cy;
-                vertex[4].x = rx - (rx - cx) * a;
-                vertex[4].y = ty;
-                vertex[5].x = rx;
-                vertex[5].y = ty;
+                Vector3[] v = new Vector3[6];
+                v[0].x = cx;
+                v[0].y = dy;
+                v[1].x = rx;
+                v[1].y = dy;
+                v[2].x = cx;
+                v[2].y = cy;
+                v[3].x = rx;
+                v[3].y = cy;
+                v[4].x = rx - (rx - cx) * a;
+                v[4].y = ty;
+                v[5].x = rx;
+                v[5].y = ty;
                 Vector2[] uv = new Vector2[6];
                 uv[0].x = ucx;
                 uv[0].y = udy;
@@ -1442,7 +1442,7 @@ namespace Assets.Core.HGUI
                 uv[4].y = uty;
                 uv[5].x = urx;
                 uv[5].y = uty;
-                image.vertex = vertex;
+                image.vertex = v;
                 image.uv = uv;
                 image.tris = TriangleL4;
             }
@@ -1450,17 +1450,17 @@ namespace Assets.Core.HGUI
             {
                 a -= 0.25f;
                 a *= 8;
-                Vector3[] vertex = new Vector3[5];
-                vertex[0].x = cx;
-                vertex[0].y = dy;
-                vertex[1].x = rx;
-                vertex[1].y = dy;
-                vertex[2].x = cx;
-                vertex[2].y = cy;
-                vertex[3].x = rx;
-                vertex[3].y = cy;
-                vertex[4].x = rx;
-                vertex[4].y = cy + (ty - cy) * a;
+                Vector3[] v = new Vector3[5];
+                v[0].x = cx;
+                v[0].y = dy;
+                v[1].x = rx;
+                v[1].y = dy;
+                v[2].x = cx;
+                v[2].y = cy;
+                v[3].x = rx;
+                v[3].y = cy;
+                v[4].x = rx;
+                v[4].y = cy + (ty - cy) * a;
                 Vector2[] uv = new Vector2[5];
                 uv[0].x = ucx;
                 uv[0].y = udy;
@@ -1472,7 +1472,7 @@ namespace Assets.Core.HGUI
                 uv[3].y = ucy;
                 uv[4].x = urx;
                 uv[4].y = ucy + (uty - ucy) * a;
-                image.vertex = vertex;
+                image.vertex = v;
                 image.uv = uv;
                 image.tris = TriangleL3;
             }
@@ -1480,15 +1480,15 @@ namespace Assets.Core.HGUI
             {
                 a -= 0.125f;
                 a *= 8;
-                Vector3[] vertex = new Vector3[4];
-                vertex[0].x = cx;
-                vertex[0].y = dy;
-                vertex[1].x = rx;
-                vertex[1].y = dy;
-                vertex[2].x = cx;
-                vertex[2].y = cy;
-                vertex[3].x = rx;
-                vertex[3].y = dy+(cy-dy)*a;
+                Vector3[] v = new Vector3[4];
+                v[0].x = cx;
+                v[0].y = dy;
+                v[1].x = rx;
+                v[1].y = dy;
+                v[2].x = cx;
+                v[2].y = cy;
+                v[3].x = rx;
+                v[3].y = dy+(cy-dy)*a;
                 Vector2[] uv = new Vector2[4];
                 uv[0].x = ucx;
                 uv[0].y = udy;
@@ -1498,20 +1498,20 @@ namespace Assets.Core.HGUI
                 uv[2].y = ucy;
                 uv[3].x = urx;
                 uv[3].y = udy + (ucy - udy) * a;
-                image.vertex = vertex;
+                image.vertex = v;
                 image.uv = uv;
                 image.tris = Rectangle;
             }
             else
             {
                 a *= 8;
-                Vector3[] vertex = new Vector3[4];
-                vertex[0].x = cx;
-                vertex[0].y = dy;
-                vertex[1].x = cx;
-                vertex[1].y = cy;
-                vertex[2].x = cx + (rx - cx) * a;
-                vertex[2].y = dy;
+                Vector3[] v = new Vector3[4];
+                v[0].x = cx;
+                v[0].y = dy;
+                v[1].x = cx;
+                v[1].y = cy;
+                v[2].x = cx + (rx - cx) * a;
+                v[2].y = dy;
              
                 Vector2[] uv = new Vector2[4];
                 uv[0].x = ucx;
@@ -1520,7 +1520,7 @@ namespace Assets.Core.HGUI
                 uv[1].y = ucy;
                 uv[2].x = ucx + (urx - ucx) * a;
                 uv[2].y = udy;
-                image.vertex = vertex;
+                image.vertex = v;
                 image.uv = uv;
                 image.tris = Triangle;
             }
@@ -1556,27 +1556,27 @@ namespace Assets.Core.HGUI
             {
                 a -= 0.875f;
                 a *= 8;
-                Vector3[] vertex = new Vector3[10];
-                vertex[0].x = lx;
-                vertex[0].y = dy;
-                vertex[1].x = cx;
-                vertex[1].y = dy;
-                vertex[2].x = rx;
-                vertex[2].y = dy;
-                vertex[3].x = rx;
-                vertex[3].y = dy + (cy - dy) * a;
-                vertex[4].x = lx;
-                vertex[4].y = cy;
-                vertex[5].x = cx;
-                vertex[5].y = cy;
-                vertex[6].x = rx;
-                vertex[6].y = cy;
-                vertex[7].x = lx;
-                vertex[7].y = ty;
-                vertex[8].x = cx;
-                vertex[8].y = ty;
-                vertex[9].x = rx;
-                vertex[9].y = ty;
+                Vector3[] v = new Vector3[10];
+                v[0].x = lx;
+                v[0].y = dy;
+                v[1].x = cx;
+                v[1].y = dy;
+                v[2].x = rx;
+                v[2].y = dy;
+                v[3].x = rx;
+                v[3].y = dy + (cy - dy) * a;
+                v[4].x = lx;
+                v[4].y = cy;
+                v[5].x = cx;
+                v[5].y = cy;
+                v[6].x = rx;
+                v[6].y = cy;
+                v[7].x = lx;
+                v[7].y = ty;
+                v[8].x = cx;
+                v[8].y = ty;
+                v[9].x = rx;
+                v[9].y = ty;
                 Vector2[] uv = new Vector2[10];
                 uv[0].x = ulx;
                 uv[0].y = udy;
@@ -1598,7 +1598,7 @@ namespace Assets.Core.HGUI
                 uv[8].y = uty;
                 uv[9].x = urx;
                 uv[9].y = uty;
-                image.vertex = vertex;
+                image.vertex = v;
                 image.uv = uv;
                 image.tris = Triangle360R8;
             }
@@ -1606,25 +1606,25 @@ namespace Assets.Core.HGUI
             {
                 a -= 0.75f;
                 a *= 8;
-                Vector3[] vertex = new Vector3[9];
-                vertex[0].x = lx;
-                vertex[0].y = dy;
-                vertex[1].x = cx;
-                vertex[1].y = dy;
-                vertex[2].x = cx + (rx - cx) * a;
-                vertex[2].y = dy;
-                vertex[3].x = lx;
-                vertex[3].y = cy;
-                vertex[4].x = cx;
-                vertex[4].y = cy;
-                vertex[5].x = rx;
-                vertex[5].y = cy;
-                vertex[6].x = lx;
-                vertex[6].y = ty;
-                vertex[7].x = cx;
-                vertex[7].y = ty;
-                vertex[8].x = rx;
-                vertex[8].y = ty;
+                Vector3[] v = new Vector3[9];
+                v[0].x = lx;
+                v[0].y = dy;
+                v[1].x = cx;
+                v[1].y = dy;
+                v[2].x = cx + (rx - cx) * a;
+                v[2].y = dy;
+                v[3].x = lx;
+                v[3].y = cy;
+                v[4].x = cx;
+                v[4].y = cy;
+                v[5].x = rx;
+                v[5].y = cy;
+                v[6].x = lx;
+                v[6].y = ty;
+                v[7].x = cx;
+                v[7].y = ty;
+                v[8].x = rx;
+                v[8].y = ty;
                 Vector2[] uv = new Vector2[9];
                 uv[0].x = ulx;
                 uv[0].y = udy;
@@ -1644,7 +1644,7 @@ namespace Assets.Core.HGUI
                 uv[7].y = uty;
                 uv[8].x = urx;
                 uv[8].y = uty;
-                image.vertex = vertex;
+                image.vertex = v;
                 image.uv = uv;
                 image.tris = Triangle360R7;
             }
@@ -1652,23 +1652,23 @@ namespace Assets.Core.HGUI
             {
                 a -= 0.625f;
                 a *= 8;
-                Vector3[] vertex = new Vector3[8];
-                vertex[0].x = lx;
-                vertex[0].y = dy;
-                vertex[1].x = lx + (cx - lx) * a;
-                vertex[1].y = dy;
-                vertex[2].x = lx;
-                vertex[2].y = cy;
-                vertex[3].x = cx;
-                vertex[3].y = cy;
-                vertex[4].x = rx;
-                vertex[4].y = cy;
-                vertex[5].x = lx;
-                vertex[5].y = ty;
-                vertex[6].x = cx;
-                vertex[6].y = ty;
-                vertex[7].x = rx;
-                vertex[7].y = ty;
+                Vector3[] v = new Vector3[8];
+                v[0].x = lx;
+                v[0].y = dy;
+                v[1].x = lx + (cx - lx) * a;
+                v[1].y = dy;
+                v[2].x = lx;
+                v[2].y = cy;
+                v[3].x = cx;
+                v[3].y = cy;
+                v[4].x = rx;
+                v[4].y = cy;
+                v[5].x = lx;
+                v[5].y = ty;
+                v[6].x = cx;
+                v[6].y = ty;
+                v[7].x = rx;
+                v[7].y = ty;
                 Vector2[] uv = new Vector2[8];
                 uv[0].x = ulx;
                 uv[0].y = udy;
@@ -1686,7 +1686,7 @@ namespace Assets.Core.HGUI
                 uv[6].y = uty;
                 uv[7].x = urx;
                 uv[7].y = uty;
-                image.vertex = vertex;
+                image.vertex = v;
                 image.uv = uv;
                 image.tris = Triangle360R6;
             }
@@ -1694,21 +1694,21 @@ namespace Assets.Core.HGUI
             {
                 a -= 0.5f;
                 a *= 8;
-                Vector3[] vertex = new Vector3[7];
-                vertex[0].x = lx;
-                vertex[0].y = cy - (cy - dy) * a;
-                vertex[1].x = lx;
-                vertex[1].y = cy;
-                vertex[2].x = cx;
-                vertex[2].y = cy;
-                vertex[3].x = rx;
-                vertex[3].y = cy;
-                vertex[4].x = lx;
-                vertex[4].y = ty;
-                vertex[5].x = cx;
-                vertex[5].y = ty;
-                vertex[6].x = rx;
-                vertex[6].y = ty;
+                Vector3[] v = new Vector3[7];
+                v[0].x = lx;
+                v[0].y = cy - (cy - dy) * a;
+                v[1].x = lx;
+                v[1].y = cy;
+                v[2].x = cx;
+                v[2].y = cy;
+                v[3].x = rx;
+                v[3].y = cy;
+                v[4].x = lx;
+                v[4].y = ty;
+                v[5].x = cx;
+                v[5].y = ty;
+                v[6].x = rx;
+                v[6].y = ty;
                 Vector2[] uv = new Vector2[7];
                 uv[0].x = ulx;
                 uv[0].y = ucy - (ucy - udy) * a;
@@ -1724,7 +1724,7 @@ namespace Assets.Core.HGUI
                 uv[5].y = uty;
                 uv[6].x = urx;
                 uv[6].y = uty;
-                image.vertex = vertex;
+                image.vertex = v;
                 image.uv = uv;
                 image.tris = Triangle360R5;
             }
@@ -1732,19 +1732,19 @@ namespace Assets.Core.HGUI
             {
                 a -= 0.375f;
                 a *= 8;
-                Vector3[] vertex = new Vector3[6];
-                vertex[0].x = lx;
-                vertex[0].y = ty - (ty - cy) * a;
-                vertex[1].x = cx;
-                vertex[1].y = cy;
-                vertex[2].x = rx;
-                vertex[2].y = cy;
-                vertex[3].x = lx;
-                vertex[3].y = ty;
-                vertex[4].x = cx;
-                vertex[4].y = ty;
-                vertex[5].x = rx;
-                vertex[5].y = ty;
+                Vector3[] v = new Vector3[6];
+                v[0].x = lx;
+                v[0].y = ty - (ty - cy) * a;
+                v[1].x = cx;
+                v[1].y = cy;
+                v[2].x = rx;
+                v[2].y = cy;
+                v[3].x = lx;
+                v[3].y = ty;
+                v[4].x = cx;
+                v[4].y = ty;
+                v[5].x = rx;
+                v[5].y = ty;
                 Vector2[] uv = new Vector2[6];
                 uv[0].x = ulx;
                 uv[0].y = uty - (uty - ucy) * a;
@@ -1758,7 +1758,7 @@ namespace Assets.Core.HGUI
                 uv[4].y = uty;
                 uv[5].x = urx;
                 uv[5].y = uty;
-                image.vertex = vertex;
+                image.vertex = v;
                 image.uv = uv;
                 image.tris = Triangle360R4;
             }
@@ -1766,17 +1766,17 @@ namespace Assets.Core.HGUI
             {
                 a -= 0.25f;
                 a *= 8;
-                Vector3[] vertex = new Vector3[5];
-                vertex[0].x = cx;
-                vertex[0].y = cy;
-                vertex[1].x = rx;
-                vertex[1].y = cy;
-                vertex[2].x = cx - (cx - lx) * a;
-                vertex[2].y = ty;
-                vertex[3].x = cx;
-                vertex[3].y = ty;
-                vertex[4].x = rx;
-                vertex[4].y = ty;
+                Vector3[] v = new Vector3[5];
+                v[0].x = cx;
+                v[0].y = cy;
+                v[1].x = rx;
+                v[1].y = cy;
+                v[2].x = cx - (cx - lx) * a;
+                v[2].y = ty;
+                v[3].x = cx;
+                v[3].y = ty;
+                v[4].x = rx;
+                v[4].y = ty;
                 Vector2[] uv = new Vector2[5];
                 uv[0].x = ucx;
                 uv[0].y = ucy;
@@ -1788,7 +1788,7 @@ namespace Assets.Core.HGUI
                 uv[3].y = uty;
                 uv[4].x = urx;
                 uv[4].y = uty;
-                image.vertex = vertex;
+                image.vertex = v;
                 image.uv = uv;
                 image.tris = Triangle360R3;
             }
@@ -1796,15 +1796,15 @@ namespace Assets.Core.HGUI
             {
                 a -= 0.125f;
                 a *= 8;
-                Vector3[] vertex = new Vector3[4];
-                vertex[0].x = cx;
-                vertex[0].y = cy;
-                vertex[1].x = rx;
-                vertex[1].y = cy;
-                vertex[2].x = rx - (rx - cx) * a;
-                vertex[2].y = ty;
-                vertex[3].x = rx;
-                vertex[3].y = ty;
+                Vector3[] v = new Vector3[4];
+                v[0].x = cx;
+                v[0].y = cy;
+                v[1].x = rx;
+                v[1].y = cy;
+                v[2].x = rx - (rx - cx) * a;
+                v[2].y = ty;
+                v[3].x = rx;
+                v[3].y = ty;
                 Vector2[] uv = new Vector2[4];
                 uv[0].x = ucx;
                 uv[0].y = ucy;
@@ -1814,20 +1814,20 @@ namespace Assets.Core.HGUI
                 uv[2].y = uty;
                 uv[3].x = urx;
                 uv[3].y = uty;
-                image.vertex = vertex;
+                image.vertex = v;
                 image.uv = uv;
                 image.tris = Rectangle;
             }
             else
             {
                 a *= 8;
-                Vector3[] vertex = new Vector3[3];
-                vertex[0].x = cx;
-                vertex[0].y = cy;
-                vertex[1].x = rx;
-                vertex[1].y = cy + (ty - cy) * a;
-                vertex[2].x = rx;
-                vertex[2].y = cy;
+                Vector3[] v = new Vector3[3];
+                v[0].x = cx;
+                v[0].y = cy;
+                v[1].x = rx;
+                v[1].y = cy + (ty - cy) * a;
+                v[2].x = rx;
+                v[2].y = cy;
                 Vector2[] uv = new Vector2[3];
                 uv[0].x = ucx;
                 uv[0].y = ucy;
@@ -1835,7 +1835,7 @@ namespace Assets.Core.HGUI
                 uv[1].y = ucy + (uty - ucy) * a;
                 uv[2].x = urx;
                 uv[2].y = ucy;
-                image.vertex = vertex;
+                image.vertex = v;
                 image.uv = uv;
                 image.tris = Triangle;
             }
@@ -2153,7 +2153,7 @@ namespace Assets.Core.HGUI
                 image.tris = Triangle;
             }
         }
-
+        static int[] Triangle360L8 = new int[] { 0, 3, 4, 0, 4, 1, 1, 4, 5, 1, 5, 2, 6, 7, 8, 6, 8, 4, 4, 8, 9, 4, 9, 5 };
         static void FillRadial360Left(HImage image)
         {
             float px = image._pivot.x / image._rect.width;

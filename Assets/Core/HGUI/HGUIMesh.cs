@@ -1218,12 +1218,46 @@ namespace Assets.Core.HGUI
         static int[] Triangle360B5 = new int[] { 0, 2, 3, 0, 3, 1, 2, 4, 5, 2, 5, 6, 2, 6, 3 };
         static void FillRadial360Bottom(HImage image)
         {
+            float a = image._fillAmount;
+            float x = image.SizeDelta.x;
+            float y = image.SizeDelta.y;
+            if (image.preserveAspect & a > 0)
+            {
+                float ocx = x * 0.5f;
+                float ocy = y * 0.5f;
+                a -= 0.5f;
+                if (a < 0)
+                    a += 1;
+                Vector2 d = MathH.Tan2(360 - a * 360);//方向
+                Vector2[] lines = new Vector2[9];
+                lines[0].x = ocx;
+                lines[2].y = ocy;
+                lines[3].y = y;
+                lines[4].x = ocx;
+                lines[4].y = y;
+                lines[5].x = x;
+                lines[5].y = y;
+                lines[6].x = x;
+                lines[6].y = ocy;
+                lines[7].x = x;
+                lines[8].x = ocx;
+                Vector2 oc = new Vector2(ocx, ocy);
+                Vector2 ot = oc + d * 10000;
+                Vector2 cross = Vector2.zero;
+                for (int i = 0; i < 8; i++)
+                {
+                    if (huqiang.Physics2D.LineToLine(ref lines[i], ref lines[i + 1], ref oc, ref ot, ref cross))
+                    {
+                        float r = (cross - lines[i + 1]).magnitude / (lines[i + 1] - lines[i]).magnitude;
+                        a = (7 - i + r) * 0.125f;
+                        break;
+                    }
+                }
+            }
             float px = image._pivot.x / image._rect.width;
             float py = image._pivot.y / image._rect.height;
-            float x = image.SizeDelta.x;
             float lx = -px * x;
             float rx = (1 - px) * x;
-            float y = image.SizeDelta.y;
             float dy = -py * y;
             float ty = (1 - py) * y;
             float w = image._textureSize.x;
@@ -1236,7 +1270,6 @@ namespace Assets.Core.HGUI
             float ucx = ulx + (urx - ulx) * 0.5f;
             float cy = dy + y * 0.5f;
             float ucy = udy + (uty - udy) * 0.5f;
-            float a = image._fillAmount;
             if(a>0.875f)
             {
                 a -= 0.875f;
@@ -1534,12 +1567,47 @@ namespace Assets.Core.HGUI
         static int[] Triangle360R3 = new int[] { 0, 2, 3, 0, 3, 4, 0, 4, 1 };
         static void FillRadial360Right(HImage image)
         {
+            float a = image._fillAmount;
+            float x = image.SizeDelta.x;
+            float y = image.SizeDelta.y;
+            if (image.preserveAspect & a > 0)
+            {
+                float ocx = x * 0.5f;
+                float ocy = y * 0.5f;
+                a -= 0.25f;
+                if (a < 0)
+                    a += 1;
+                Vector2 d = MathH.Tan2(360 - a * 360);//方向
+                Vector2[] lines = new Vector2[9];
+                lines[0].x = x;
+                lines[0].y = ocy;
+                lines[1].x = x;
+                lines[2].x = ocx;
+                lines[4].y = ocy;
+                lines[5].y = y;
+                lines[6].x = ocx;
+                lines[6].y = y;
+                lines[7].x = x;
+                lines[7].y = y;
+                lines[8].x = x;
+                lines[8].y = ocy;
+                Vector2 oc = new Vector2(ocx, ocy);
+                Vector2 ot = oc + d * 10000;
+                Vector2 cross = Vector2.zero;
+                for (int i = 0; i < 8; i++)
+                {
+                    if (huqiang.Physics2D.LineToLine(ref lines[i], ref lines[i + 1], ref oc, ref ot, ref cross))
+                    {
+                        float r = (cross - lines[i + 1]).magnitude / (lines[i + 1] - lines[i]).magnitude;
+                        a = (7 - i + r) * 0.125f;
+                        break;
+                    }
+                }
+            }
             float px = image._pivot.x / image._rect.width;
             float py = image._pivot.y / image._rect.height;
-            float x = image.SizeDelta.x;
             float lx = -px * x;
             float rx = (1 - px) * x;
-            float y = image.SizeDelta.y;
             float dy = -py * y;
             float ty = (1 - py) * y;
             float w = image._textureSize.x;
@@ -1552,7 +1620,6 @@ namespace Assets.Core.HGUI
             float ucx = ulx + (urx - ulx) * 0.5f;
             float cy = dy + y * 0.5f;
             float ucy = udy + (uty - udy) * 0.5f;
-            float a = image._fillAmount;
             if (a > 0.875f)
             {
                 a -= 0.875f;
@@ -2192,12 +2259,46 @@ namespace Assets.Core.HGUI
         static int[] Triangle360L3 = new int[] { 0, 3, 4, 0, 4, 1, 1, 4, 2 };
         static void FillRadial360Left(HImage image)
         {
+            float a = image._fillAmount;
+            float x = image.SizeDelta.x;
+            float y = image.SizeDelta.y;
+            if (image.preserveAspect & a > 0)
+            {
+                float ocx = x * 0.5f;
+                float ocy = y * 0.5f;
+                a -= 0.75f;
+                if (a < 0)
+                    a += 1;
+                Vector2 d = MathH.Tan2(360 - a * 360);//方向
+                Vector2[] lines = new Vector2[9];
+                lines[0].y = ocy;
+                lines[1].y = y;
+                lines[2].x = ocx;
+                lines[2].y = y;
+                lines[3].x = x;
+                lines[3].y = y;
+                lines[4].x = x;
+                lines[4].y = ocy;
+                lines[5].x = x;
+                lines[6].x = ocx;
+                lines[8].y = ocy;
+                Vector2 oc = new Vector2(ocx, ocy);
+                Vector2 ot = oc + d * 10000;
+                Vector2 cross = Vector2.zero;
+                for (int i = 0; i < 8; i++)
+                {
+                    if (huqiang.Physics2D.LineToLine(ref lines[i], ref lines[i + 1], ref oc, ref ot, ref cross))
+                    {
+                        float r = (cross - lines[i + 1]).magnitude / (lines[i + 1] - lines[i]).magnitude;
+                        a = (7 - i + r) * 0.125f;
+                        break;
+                    }
+                }
+            }
             float px = image._pivot.x / image._rect.width;
             float py = image._pivot.y / image._rect.height;
-            float x = image.SizeDelta.x;
             float lx = -px * x;
             float rx = (1 - px) * x;
-            float y = image.SizeDelta.y;
             float dy = -py * y;
             float ty = (1 - py) * y;
             float w = image._textureSize.x;
@@ -2210,7 +2311,6 @@ namespace Assets.Core.HGUI
             float ucx = ulx + (urx - ulx) * 0.5f;
             float cy = dy + y * 0.5f;
             float ucy = udy + (uty - udy) * 0.5f;
-            float a = image._fillAmount;
             if(a>0.875f)
             {
                 a -= 0.875f;

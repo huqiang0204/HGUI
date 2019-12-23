@@ -20,6 +20,7 @@ namespace Assets.Core.HGUI
         internal Vector2[] uv;
         internal int[] tris;
         public Material material;
+        internal bool _vertexChange;
         public override void Initial()
         {
             material = new Material(Shader);

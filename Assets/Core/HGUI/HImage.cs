@@ -61,10 +61,6 @@ namespace Assets.Core.HGUI
         internal Vector2 _textureSize;
         internal Vector4 _border;
         internal Vector2 _pivot;
-        //网格待处理
-        bool _vertexChange;
-        //三角形待处理
-        bool _trisPending;
         public Sprite sprite
         {
             get

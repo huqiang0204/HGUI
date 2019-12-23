@@ -10,7 +10,7 @@ namespace Assets.Core.HGUI
     {
         static Shader Shader { get {
                 if(shader==null)
-                    shader = Shader.Find("Shader Graphs/UI");
+                    shader = Shader.Find("Custom/UIDef");
                 return shader;
             } }
         public static Shader shader;
@@ -20,6 +20,7 @@ namespace Assets.Core.HGUI
         internal Vector2[] uv;
         internal int[] tris;
         public Material material;
+        internal bool _vertexChange;
         public override void Initial()
         {
             material = new Material(Shader);

@@ -55,7 +55,7 @@ namespace Assets.Core.HGUI
     }
     public class HImage:HGraphics
     {
-        internal Sprite _sprite=null;
+        internal Sprite _sprite = null;
         internal Rect _rect;
         internal Vector2 _textureSize;
         internal Vector4 _border;

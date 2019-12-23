@@ -1204,7 +1204,7 @@ namespace Assets.Core.HGUI
                     FillRadial360Right(image);
                     break;
                 case 2:
-                    //FillRadial180Top(image);
+                    FillRadial360Top(image);
                     break;
                 case 3:
                     //FillRadial180Right(image);
@@ -2081,25 +2081,76 @@ namespace Assets.Core.HGUI
                 a *= 8;
                 Vector3[] v = new Vector3[5];
                 v[0].x = lx;
-                v[0].y = dy;
-                v[1].x = lx + (cx - lx) * a;
-                v[1].y = dy;
-                v[2].x = lx;
+                v[0].y = cy - (cy - dy) * a;
+                v[1].x = lx;
+                v[1].y = cy;
+                v[2].x = cx;
                 v[2].y = cy;
-                v[3].x = cx;
-                v[3].y = cy;
-                v[4].x = lx;
+                v[3].x = lx;
+                v[3].y = ty;
+                v[4].x = cx;
                 v[4].y = ty;
-
+                Vector2[] uv = new Vector2[5];
+                uv[0].x = ulx;
+                uv[0].y = ucy - (ucy - udy) * a;
+                uv[1].x = ulx;
+                uv[1].y = ucy;
+                uv[2].x = ucx;
+                uv[2].y = ucy;
+                uv[3].x = ulx;
+                uv[3].y = uty;
+                uv[4].x = ucx;
+                uv[4].y = uty;
+                image.vertex = v;
+                image.uv = uv;
+                image.tris = TriangleL3;
             }
             else if(a>0.125f)
             {
                 a -= 0.125f;
                 a *= 8;
+                Vector3[] v = new Vector3[4];
+                v[0].x = lx;
+                v[0].y = ty - (ty - cy) * a;
+                v[1].x = cx;
+                v[1].y = cy;
+                v[2].x = lx;
+                v[2].y = ty;
+                v[3].x = cx;
+                v[3].y = ty;
+                Vector2[] uv = new Vector2[4];
+                uv[0].x = ulx;
+                uv[0].y = uty - (uty - ucy) * a;
+                uv[1].x = ucx;
+                uv[1].y = ucy;
+                uv[2].x = ulx;
+                uv[2].y = uty;
+                uv[3].x = ucx;
+                uv[3].y = uty;
+                image.vertex = v;
+                image.uv = uv;
+                image.tris = Rectangle;
             }
             else
             {
                 a *= 8;
+                Vector3[] v = new Vector3[3];
+                v[0].x = cx;
+                v[0].y = cy;
+                v[1].x = cx - (cx - lx) * a;
+                v[1].y = ty;
+                v[2].x = cx;
+                v[2].y = ty;
+                Vector2[] uv = new Vector2[3];
+                uv[0].x = ucx;
+                uv[0].y = ucy;
+                uv[1].x = ucx - (ucx - ulx) * a;
+                uv[1].y = uty;
+                uv[2].x = ucx;
+                uv[2].y = uty;
+                image.vertex = v;
+                image.uv = uv;
+                image.tris = Triangle;
             }
         }
     }

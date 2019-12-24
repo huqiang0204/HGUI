@@ -16,7 +16,7 @@ public class HTextEditor:Editor
         HText txt = target as HText;
         if (txt != null)
         {
-            txt.Text = EditorGUILayout.TextArea("Text",txt.Text);
+            txt.Text = EditorGUILayout.TextField("Text",txt.Text);
             txt.font = EditorGUILayout.ObjectField("Sprite", txt.font, typeof(Font), true) as Font;
         }
     }

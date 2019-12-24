@@ -34,7 +34,7 @@ namespace Assets.Core.HGUI
         public int resizeTextMaxSize;
         public int resizeTextMinSize;
         public bool generateOutOfBounds;
-        public bool resizeTextForBestFit=false;
+        public bool resizeTextForBestFit = false;
         public TextAnchor textAnchor;
         public FontStyle fontStyle;
         public float scaleFactor = 1;

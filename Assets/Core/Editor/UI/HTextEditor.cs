@@ -16,8 +16,11 @@ public class HTextEditor:Editor
         HText txt = target as HText;
         if (txt != null)
         {
-            txt.Text = EditorGUILayout.TextField("Text",txt.Text);
-            txt.font = EditorGUILayout.ObjectField("Sprite", txt.font, typeof(Font), true) as Font;
+            EditorGUILayout.LabelField("Text");
+            var style = GUI.skin.textArea;
+            style.wordWrap = true;
+            txt.Text = EditorGUILayout.TextArea(txt.Text,style);
+            txt.font = EditorGUILayout.ObjectField("Font", txt.font, typeof(Font), true) as Font;
         }
     }
 }

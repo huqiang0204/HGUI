@@ -71,10 +71,10 @@ namespace Assets.Core.HGUI
         public HorizontalWrapMode horizontalOverflow;
         public VerticalWrapMode verticalOverflow;
         public bool updateBounds;
-        public int resizeTextMaxSize;
-        public int resizeTextMinSize;
-        public bool generateOutOfBounds;
-        public bool resizeTextForBestFit = false;
+        private int resizeTextMaxSize = 40;
+        private int resizeTextMinSize = 10;
+        private bool generateOutOfBounds;
+        public bool resizeForBestFit = false;
         public TextAnchor textAnchor;
         public FontStyle fontStyle;
         public float scaleFactor = 1;
@@ -103,7 +103,7 @@ namespace Assets.Core.HGUI
                 settings.resizeTextMaxSize = fontSize;
                 settings.resizeTextMinSize = fontSize;
                 settings.generateOutOfBounds = generateOutOfBounds;
-                settings.resizeTextForBestFit = resizeTextForBestFit;
+                settings.resizeTextForBestFit = resizeForBestFit;
                 settings.textAnchor = textAnchor;
                 settings.fontStyle = fontStyle;
                 settings.scaleFactor = scaleFactor;

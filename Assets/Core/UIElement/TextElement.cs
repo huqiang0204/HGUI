@@ -159,7 +159,7 @@ namespace huqiang.UI
         bool textChanged;
         public string fontName;
         protected string mtext;
-        public string text { set {
+        public string Text { set {
                 if (mtext != null)
                     IsChanged = true;
                  mtext = value;
@@ -170,7 +170,7 @@ namespace huqiang.UI
             data = *(TextData*)fake.ip;
             color = data.color;
             shader = fake.buffer.GetData(data.shader) as string;
-            text= fake.buffer.GetData(data.text) as string;
+            Text= fake.buffer.GetData(data.text) as string;
             fontName = fake.buffer.GetData(data.font) as string;
         }
         public override void LoadToObject(Component game)
@@ -201,7 +201,7 @@ namespace huqiang.UI
             a.raycastTarget = false;
             a.material = txt.material;
             a.font = FindFont(txt.fontName);
-            a.text = txt.text;
+            a.text = txt.Text;
             txt.Context = a;
         }
         public static unsafe FakeStruct LoadFromObject(Component com, DataBuffer buffer)

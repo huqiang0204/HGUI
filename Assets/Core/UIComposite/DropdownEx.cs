@@ -54,7 +54,7 @@ namespace huqiang.UIComposite
                 {
                     s_index = -1;
                     if (ShowLabel != null)
-                        ShowLabel.text = "";
+                        ShowLabel.Text = "";
                     return;
                 }
                 if (value >= DataList.Count)
@@ -64,8 +64,8 @@ namespace huqiang.UIComposite
                 {
                     var dat = DataList[s_index];
                     if (dat is string)
-                        ShowLabel.text = dat as string;
-                    else ShowLabel.text = dat.ToString();
+                        ShowLabel.Text = dat as string;
+                    else ShowLabel.Text = dat.ToString();
                 }
             }
         }
@@ -161,8 +161,8 @@ namespace huqiang.UIComposite
             if (button.Label != null)
             {
                 if (o is string)
-                    button.Label.text = o as string;
-                else button.Label.text = o.ToString();
+                    button.Label.Text = o as string;
+                else button.Label.Text = o.ToString();
             }
             if (button.Checked != null)
             {
@@ -187,8 +187,8 @@ namespace huqiang.UIComposite
             if (ShowLabel != null)
             {
                 if (mod.data is string)
-                    ShowLabel.text = mod.data as string;
-                else ShowLabel.text = mod.data.ToString();
+                    ShowLabel.Text = mod.data as string;
+                else ShowLabel.Text = mod.data.ToString();
             }
             if (OnSelectChanged != null)
                 OnSelectChanged(this, mod.data);

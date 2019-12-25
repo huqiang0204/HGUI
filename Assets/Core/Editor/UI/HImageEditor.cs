@@ -15,40 +15,40 @@ public class HImageEditor:Editor
         HImage img = target as HImage;
         if(img!=null)
         {
-            img.sprite = EditorGUILayout.ObjectField("Sprite",img.sprite,typeof(Sprite),true) as Sprite;
-            img.type = (SpriteType)EditorGUILayout.EnumPopup("SpriteType",img.type);
-            if(img.type==SpriteType.Filled)
+            img.Sprite = EditorGUILayout.ObjectField("Sprite",img.Sprite,typeof(Sprite),true) as Sprite;
+            img.SprType = (SpriteType)EditorGUILayout.EnumPopup("SpriteType",img.SprType);
+            if(img.SprType==SpriteType.Filled)
             {
-                var ori = img.fillMethod;
-                img.fillMethod = (FillMethod)EditorGUILayout.EnumPopup("FillMethod", img.fillMethod);
-                if (img.fillMethod != ori)
-                    img.fillOrigin = 0;
-                switch(img.fillMethod)
+                var ori = img.FillMethod;
+                img.FillMethod = (FillMethod)EditorGUILayout.EnumPopup("FillMethod", img.FillMethod);
+                if (img.FillMethod != ori)
+                    img.FillOrigin = 0;
+                switch(img.FillMethod)
                 {
                     case FillMethod.Horizontal:
-                         img.fillOrigin = (int)(OriginHorizontal)EditorGUILayout.EnumPopup("FillOrigin", (OriginHorizontal)img.fillOrigin);
+                         img.FillOrigin = (int)(OriginHorizontal)EditorGUILayout.EnumPopup("FillOrigin", (OriginHorizontal)img.FillOrigin);
                         break;
                     case FillMethod.Vertical:
-                        img.fillOrigin = (int)(OriginVertical)EditorGUILayout.EnumPopup("FillOrigin", (OriginVertical)img.fillOrigin);
+                        img.FillOrigin = (int)(OriginVertical)EditorGUILayout.EnumPopup("FillOrigin", (OriginVertical)img.FillOrigin);
                         break;
                     case FillMethod.Radial90:
-                        img.fillOrigin = (int)(Origin90)EditorGUILayout.EnumPopup("FillOrigin", (Origin90)img.fillOrigin);
+                        img.FillOrigin = (int)(Origin90)EditorGUILayout.EnumPopup("FillOrigin", (Origin90)img.FillOrigin);
                         break;
                     case FillMethod.Radial180:
-                        img.fillOrigin = (int)(Origin90)EditorGUILayout.EnumPopup("FillOrigin", (Origin180)img.fillOrigin);
+                        img.FillOrigin = (int)(Origin90)EditorGUILayout.EnumPopup("FillOrigin", (Origin180)img.FillOrigin);
                         break;
                     case FillMethod.Radial360:
-                        img.fillOrigin = (int)(Origin90)EditorGUILayout.EnumPopup("FillOrigin", (Origin360)img.fillOrigin);
+                        img.FillOrigin = (int)(Origin90)EditorGUILayout.EnumPopup("FillOrigin", (Origin360)img.FillOrigin);
                         break;
                 }
-                img.fillAmount = EditorGUILayout.Slider("FillAmount",img.fillAmount,0,1);
+                img.FillAmount = EditorGUILayout.Slider("FillAmount",img.FillAmount,0,1);
             }
-            if (img.type == SpriteType.Simple | img.type == SpriteType.Filled)
-                img.preserveAspect = EditorGUILayout.Toggle("PreserveAspect", img.preserveAspect);
+            if (img.SprType == SpriteType.Simple | img.SprType == SpriteType.Filled)
+                img.PreserveAspect = EditorGUILayout.Toggle("PreserveAspect", img.PreserveAspect);
             else
             {
-                img.fillCenter = EditorGUILayout.Toggle("FillCenter", img.fillCenter);
-                img.pixelsPerUnitMultiplier = EditorGUILayout.FloatField("PixelsPerUnitMultiplier", img.pixelsPerUnitMultiplier);
+                img.FillCenter = EditorGUILayout.Toggle("FillCenter", img.FillCenter);
+                img.PixelsPerUnitMultiplier = EditorGUILayout.FloatField("PixelsPerUnitMultiplier", img.PixelsPerUnitMultiplier);
             }
             if (GUILayout.Button("Set Native Size"))
                 img.SetNativeSize();

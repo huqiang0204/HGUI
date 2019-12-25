@@ -31,7 +31,7 @@ namespace Assets.Core.HGUI
             }
         }
         static Texture _emoji;
-        public static Texture emojiTexture
+        public static Texture EmojiTexture
         {
             get
             {
@@ -45,7 +45,7 @@ namespace Assets.Core.HGUI
             }
         }
         static TextGenerator shareGenerator;
-        static TextGenerator generator { get {
+        static TextGenerator Generator { get {
                 if (shareGenerator == null)
                     shareGenerator = new TextGenerator();
                 return shareGenerator;
@@ -62,92 +62,92 @@ namespace Assets.Core.HGUI
         IList<UIVertex> verts;
         internal int[] secondTris;
         internal Font _font;
-        public Font font { get => _font;
+        public Font Font { get => _font;
             set {
                 _font = value;
             } }
         internal Vector2 _pivot = new Vector2(0.5f,0.5f);
-        public Vector2 pivot {
+        public Vector2 Pivot {
             get => _pivot;
             set {
                 _pivot = value;
-                _vertexChange = true;
+                _textChanged = true;
             }
         }
         HorizontalWrapMode _hof;
-        public HorizontalWrapMode horizontalOverflow {
+        public HorizontalWrapMode HorizontalOverflow {
             get => _hof;
             set {
                 _hof = value;
-                _vertexChange = true;
+                _textChanged = true;
             } }
         VerticalWrapMode _vof;
-        public VerticalWrapMode verticalOverflow {
+        public VerticalWrapMode VerticalOverflow {
             get => _vof;
             set {
                 _vof = value;
-                _vertexChange = true;
+                _textChanged = true;
             } }
         public bool updateBounds;
         private int resizeTextMaxSize = 40;
         private int resizeTextMinSize = 10;
         private bool generateOutOfBounds;
         bool _resizeBestFit;
-        public bool resizeForBestFit {
+        public bool ResizeForBestFit {
             get => _resizeBestFit;
             set {
                 _resizeBestFit = true;
-                _vertexChange = true;
+                _textChanged = true;
             } }
         TextAnchor anchor;
-        public TextAnchor textAnchor {
+        public TextAnchor TextAnchor {
             get => anchor;
             set {
                 anchor = value;
-                _vertexChange = true;
+                _textChanged = true;
             } }
         FontStyle _fontStyle;
-        public FontStyle fontStyle {
+        public FontStyle FontStyle {
             get => _fontStyle;
             set {
                 _fontStyle = value;
-                _vertexChange = true;
+                _textChanged = true;
             } }
         float scaleFactor = 1;
         bool _richText;
-        public bool richText {
+        public bool RichText {
             get => _richText;
             set {
                 _richText = value;
-                _vertexChange = true;
+                _textChanged = true;
             } }
         float _lineSpace;
-        public float lineSpacing {
+        public float LineSpacing {
             get => _lineSpace;
             set {
                 _lineSpace = value;
-                _vertexChange = true;
+                _textChanged = true;
             } }
         int _fontSize = 14;
-        public int fontSize {
+        public int FontSize {
             get => _fontSize;
             set {
                 _fontSize = value;
-                _vertexChange = true;
+                _textChanged = true;
             } }
         bool _align;
-        public bool alignByGeometry {
+        public bool AlignByGeometry {
             get => _align;
             set {
                 _align = value;
-                _vertexChange = true;
+                _textChanged = true;
             } }
         public Material emojiMaterial;
         public override void Initial()
         {
-            font = DefaultFont;
-            emojiMaterial = new Material(defShader);
-            emojiMaterial.SetTexture("_MainTex",emojiTexture);
+            Font = DefaultFont;
+            emojiMaterial = new Material(DefShader);
+            emojiMaterial.SetTexture("_MainTex",EmojiTexture);
         }
         public override void MainUpdate()
         {
@@ -155,8 +155,8 @@ namespace Assets.Core.HGUI
             {
                 emojiString.FullString = _text;
                 TextGenerationSettings settings = new TextGenerationSettings();
-                settings.font = font;
-                settings.pivot = pivot;
+                settings.font = Font;
+                settings.pivot = Pivot;
                 settings.generationExtents = SizeDelta;
                 settings.horizontalOverflow = _hof;
                 settings.verticalOverflow = _vof;
@@ -170,9 +170,9 @@ namespace Assets.Core.HGUI
                 settings.richText = _richText;
                 settings.lineSpacing = _lineSpace;
                 settings.fontSize = _fontSize;
-                settings.color = color;
+                settings.color = Color;
                 settings.alignByGeometry = _align;
-                var g = generator;
+                var g = Generator;
                 g.Populate(emojiString.FilterString,settings);
                 lines = g.lines;
                 verts = g.verts;
@@ -328,7 +328,7 @@ namespace Assets.Core.HGUI
             if (mr != null)
             {
                 //material.SetTexture("_MainTex",_font.material);
-                mr.materials = new Material[] { font.material,emojiMaterial};
+                mr.materials = new Material[] { Font.material,emojiMaterial};
             }
         }
 #endif

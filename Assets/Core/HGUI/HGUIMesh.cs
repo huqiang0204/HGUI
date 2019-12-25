@@ -29,7 +29,7 @@ namespace Assets.Core.HGUI
                 CreateSimpleVertex(image);
                 return;
             }
-            switch (image.type)
+            switch (image.SprType)
             {
                 case SpriteType.Simple://单一类型
                     CreateSimpleMesh(image);
@@ -1221,7 +1221,7 @@ namespace Assets.Core.HGUI
             float a = image._fillAmount;
             float x = image.SizeDelta.x;
             float y = image.SizeDelta.y;
-            if (image.preserveAspect & a > 0)
+            if (image.PreserveAspect & a > 0)
             {
                 float ocx = x * 0.5f;
                 float ocy = y * 0.5f;
@@ -1570,7 +1570,7 @@ namespace Assets.Core.HGUI
             float a = image._fillAmount;
             float x = image.SizeDelta.x;
             float y = image.SizeDelta.y;
-            if (image.preserveAspect & a > 0)
+            if (image.PreserveAspect & a > 0)
             {
                 float ocx = x * 0.5f;
                 float ocy = y * 0.5f;
@@ -1917,7 +1917,7 @@ namespace Assets.Core.HGUI
             float a = image._fillAmount;
             float x = image.SizeDelta.x;
             float y = image.SizeDelta.y;
-            if(image.preserveAspect & a>0)
+            if(image.PreserveAspect & a>0)
             {
                 float ocx = x * 0.5f;
                 float ocy = y * 0.5f;
@@ -2262,7 +2262,7 @@ namespace Assets.Core.HGUI
             float a = image._fillAmount;
             float x = image.SizeDelta.x;
             float y = image.SizeDelta.y;
-            if (image.preserveAspect & a > 0)
+            if (image.PreserveAspect & a > 0)
             {
                 float ocx = x * 0.5f;
                 float ocy = y * 0.5f;

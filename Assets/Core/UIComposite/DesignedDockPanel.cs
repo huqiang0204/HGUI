@@ -283,7 +283,7 @@ namespace huqiang.UIComposite
 
             con.Label = item.Find("Label");
             var txt = con.Label.GetComponent<TextElement>();
-            txt.text = name;
+            txt.Text = name;
             txt.AsyncGetTextSizeX((o,e)=> {
                 o.model.data.sizeDelta = e;
                 OrderHeadLabel(con);

@@ -1,10 +1,4 @@
-﻿using huqiang;
-using huqiang.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Assets.Core.HGUI
 {
@@ -61,7 +55,7 @@ namespace Assets.Core.HGUI
         internal Vector2 _textureSize;
         internal Vector4 _border;
         internal Vector2 _pivot;
-        public Sprite sprite
+        public Sprite Sprite
         {
             get
             {
@@ -81,35 +75,35 @@ namespace Assets.Core.HGUI
                 }
             }
         }
-        public SpriteType type { get; set; }
+        public SpriteType SprType { get; set; }
         internal FillMethod _fillMethod;
-        public FillMethod fillMethod { get => _fillMethod;
+        public FillMethod FillMethod { get => _fillMethod;
             set {
                 _fillMethod = value;
             } }
         internal bool _fillClockwise;
-        public bool fillClockwise { get; set; }
+        public bool FillClockwise { get; set; }
         internal int _fillOrigin;
-        public int fillOrigin { get => _fillOrigin; set {
+        public int FillOrigin { get => _fillOrigin; set {
                 _fillOrigin = value;
             } }
         internal float _fillAmount = 1;
-        public float fillAmount {
+        public float FillAmount {
             get => _fillAmount;
             set { _fillAmount = value;} }
         /// <summary>
         /// 开启此项,按弧度填充,否则按矩形四个角填充
         /// </summary>
-        public bool preserveAspect { get; set; }
+        public bool PreserveAspect { get; set; }
         internal float _pixelsPerUnit = 1;
         internal bool _fillCenter = true;
-        public bool fillCenter {
+        public bool FillCenter {
             get { return _fillCenter; }
             set { if (_fillCenter != value)
                     _vertexChange = true;
                 _fillCenter = value; }
         }
-        public float pixelsPerUnitMultiplier { get => _pixelsPerUnit;
+        public float PixelsPerUnitMultiplier { get => _pixelsPerUnit;
             set {
                 if (_pixelsPerUnit != value)
                     _vertexChange = true;

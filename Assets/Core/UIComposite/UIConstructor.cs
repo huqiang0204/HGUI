@@ -266,7 +266,7 @@ namespace huqiang.UIComposite
             Item.SetParent(Year);
             var txt = Item.AddComponent<TextElement>();
             txt.data.alignment = TextAnchor.MiddleCenter;
-            txt.text = now.Year + " Year";
+            txt.Text = now.Year + " Year";
             txt.data.fontSize = 24;
 
             var Month = ModelElement.CreateNew("Month");
@@ -279,7 +279,7 @@ namespace huqiang.UIComposite
             Item.SetParent(Month);
             txt = Item.AddComponent<TextElement>();
             txt.data.alignment = TextAnchor.MiddleCenter;
-            txt.text = now.Month + " Month";
+            txt.Text = now.Month + " Month";
             txt.data.fontSize = 24;
 
             var Day = ModelElement.CreateNew("Day");
@@ -293,7 +293,7 @@ namespace huqiang.UIComposite
             Item.SetParent(Day);
             txt = Item.AddComponent<TextElement>();
             txt.data.alignment = TextAnchor.MiddleCenter;
-            txt.text = now.Day + " Day";
+            txt.Text = now.Day + " Day";
             txt.data.fontSize = 24;
 
             UIDate date = new UIDate();
@@ -409,7 +409,7 @@ namespace huqiang.UIComposite
             var txt = Label.AddComponent<TextElement>();
             txt.color = txt.data.color = Color.white;
             txt.data.fontSize = 32;
-            txt.text = "Label";
+            txt.Text = "Label";
             txt.data.alignment = TextAnchor.MiddleLeft;
 
             var Close = ModelElement.CreateNew("Close");
@@ -444,7 +444,7 @@ namespace huqiang.UIComposite
             var txt = Label.AddComponent<TextElement>();
             txt.color = txt.data.color = Color.white;
             txt.data.fontSize = 32;
-            txt.text = "Label";
+            txt.Text = "Label";
             txt.data.alignment = TextAnchor.MiddleCenter;
 
             var Close = ModelElement.CreateNew("Menu");
@@ -472,7 +472,7 @@ namespace huqiang.UIComposite
             txt = Label.AddComponent<TextElement>();
             txt.color =txt.data.color = Color.white;
             txt.data.fontSize = 32;
-            txt.text = "Label";
+            txt.Text = "Label";
             txt.data.alignment = TextAnchor.MiddleCenter;
 
             DropdownEx drop = new DropdownEx();

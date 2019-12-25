@@ -73,7 +73,7 @@ namespace huqiang.UIComposite
             eve.DragEnd = HeadDragEnd;
             eve.DataContext = this;
             var txt = label.GetComponent<TextElement>();
-            txt.text = name;
+            txt.Text = name;
             txt.UseTextSize = true;
 
             close = Head.Find("Close");

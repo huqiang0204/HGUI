@@ -85,12 +85,12 @@ namespace huqiang.UIEvent
             if (textInfo.text == ""|textInfo.text==null)
             {
                 TextCom.color = TipColor;
-                TextCom.text = m_TipString;
+                TextCom.Text = m_TipString;
             }
             else
             {
                 TextCom.color = textColor;
-                TextCom.text = textInfo.ShowString.FullString;
+                TextCom.Text = textInfo.ShowString.FullString;
             }
         }
         public bool ReadOnly;
@@ -217,7 +217,7 @@ namespace huqiang.UIEvent
         protected override void Initial()
         {
             var txt = TextCom = Context.GetComponent<TextElement>();
-            InputString = txt.text;
+            InputString = txt.Text;
             textColor = txt.data.color;
             var fake = txt.model.GetExtand() as FakeStruct;
             if(fake!=null)
@@ -664,7 +664,7 @@ namespace huqiang.UIEvent
                 {
                     lineChanged = false;
                     FilterPopulate(TextCom, textInfo);
-                    TextCom.text =
+                    TextCom.Text =
                     TextCom.Context.text = textInfo.ShowString.FullString;
                 }
                 if(selectChanged)

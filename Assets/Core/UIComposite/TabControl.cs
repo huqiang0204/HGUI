@@ -113,7 +113,7 @@ namespace huqiang.UIComposite
             var txt = mod.Find("Label").GetComponent<TextElement>();
             if (txt != null)
             {
-                txt.text = label;
+                txt.Text = label;
                 txt.AsyncApplyTextSizeY((o)=> {
                     panel.IsChanged = true;
                 });

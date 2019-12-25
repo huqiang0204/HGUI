@@ -8,14 +8,14 @@ namespace Assets.Core.HGUI
 {
     public class HGraphics:AsyncScript
     {
-        internal static Shader defShader { get {
+        internal static Shader DefShader { get {
                 if(shader==null)
                     shader = Shader.Find("Custom/UIDef");
                 return shader;
             } }
         public static Shader shader;
         Color _color;
-        public Color color { get; set; }
+        public Color Color { get; set; }
         internal Vector3[] vertex;
         internal Vector2[] uv;
         internal int[] tris;
@@ -23,7 +23,7 @@ namespace Assets.Core.HGUI
         internal bool _vertexChange;
         public override void Initial()
         {
-            material = new Material(defShader);
+            material = new Material(DefShader);
         }
         public virtual void UpdateMesh()
         {

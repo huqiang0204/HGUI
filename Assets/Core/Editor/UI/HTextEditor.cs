@@ -20,7 +20,7 @@ public class HTextEditor:Editor
             var style = GUI.skin.textArea;
             style.wordWrap = true;
             txt.Text = EditorGUILayout.TextArea(txt.Text,style);
-            txt.font = EditorGUILayout.ObjectField("Font", txt.font, typeof(Font), true) as Font;
+            txt.Font = EditorGUILayout.ObjectField("Font", txt.Font, typeof(Font), true) as Font;
             if (GUI.changed)
                 txt.Test();
         }

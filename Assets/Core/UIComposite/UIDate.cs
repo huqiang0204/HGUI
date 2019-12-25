@@ -35,7 +35,7 @@ namespace huqiang.UIComposite
                     var ele = Year.Items[i].obj as TextElement;
                     if(ele!=null)
                     {
-                        ele.text = it.datacontext.ToString() + value;
+                        ele.Text = it.datacontext.ToString() + value;
                         ele.IsChanged = true;
                     }
                 }
@@ -49,7 +49,7 @@ namespace huqiang.UIComposite
                     var ele = Year.Items[i].obj as TextElement;
                     if (ele != null)
                     {
-                        ele.text = it.datacontext.ToString() + value;
+                        ele.Text = it.datacontext.ToString() + value;
                         ele.IsChanged = true;
                     }
                 }
@@ -63,7 +63,7 @@ namespace huqiang.UIComposite
                     var ele = Year.Items[i].obj as TextElement;
                     if (ele != null)
                     {
-                        ele.text = it.datacontext as string + value;
+                        ele.Text = it.datacontext as string + value;
                         ele.IsChanged = true;
                     }
                 }

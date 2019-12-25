@@ -31,7 +31,7 @@ namespace Assets.Core.HGUI
         public virtual void UpdateMesh()
         {
         }
-        internal virtual Material GetMaterial(int index,HBatch.MeshCollector collector)
+        internal virtual Material GetMaterial(int index,HCanvas canvas)
         {
             return null;
         }

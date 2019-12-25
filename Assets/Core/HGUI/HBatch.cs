@@ -9,33 +9,8 @@ namespace Assets.Core.HGUI
 {
     internal class HBatch
     {
-        internal class MeshCollector
-        {
-            public List<Vector3> vertex = new List<Vector3>();
-            public List<Vector2> uv = new List<Vector2>();
-            List<Material> materials = new List<Material>();
-            List<int> ids = new List<int>();
-            public List<int[]> submesh = new List<int[]>();
-            public void AddMaterial(Material material, int id)
-            {
-                materials.Add(material);
-                ids.Add(id);
-            }
-            public Material FindMaterial(int id)
-            {
-                for (int i = 0; i < ids.Count; i++)
-                {
-                    if (ids[i] == id)
-                    {
-                        return materials[i];
-                    }
-                }
-                return null;
-            }
-        }
         public static void Batch(HCanvas canvas, GUIElement[] pipeLine)
         {
-            MeshCollector collector = new MeshCollector();
             GUIElement root = pipeLine[0];
             if (root.script != null)
             {
@@ -43,12 +18,12 @@ namespace Assets.Core.HGUI
                 int os = root.childOffset;
                 for (int i = 0; i < c; i++)
                 {
-                    Batch(pipeLine, os, collector, Vector3.zero, Vector3.one, Quaternion.identity);
+                    Batch(pipeLine, os, canvas, Vector3.zero, Vector3.one, Quaternion.identity);
                     os++;
                 }
             }
         }
-        static void Batch(GUIElement[] pipeLine,int index,MeshCollector collector, Vector3 pos, Vector3 scale, Quaternion quate)
+        static void Batch(GUIElement[] pipeLine,int index,HCanvas canvas, Vector3 pos, Vector3 scale, Quaternion quate)
         {
             GUIElement root = pipeLine[index];
             Vector3 p = quate * pipeLine[index].localPosition;
@@ -65,7 +40,7 @@ namespace Assets.Core.HGUI
                 if (root.script != null)
                 {
                     var graphics = root.script as HGraphics;
-                    var vs = collector.vertex;
+                    var vs = canvas.vertex;
                     var vc = vs.Count;
                     var vert = graphics.vertex;
                     for (int j = 0; j < vert.Length; j++)
@@ -75,7 +50,7 @@ namespace Assets.Core.HGUI
                         t.y *= s.y;
                         vs.Add(pos + t);
                     }
-                    collector.uv.AddRange(graphics.uv);
+                    canvas.uv.AddRange(graphics.uv);
                     var ms = graphics.SubMesh;
                     if (ms != null)
                     {
@@ -91,8 +66,8 @@ namespace Assets.Core.HGUI
                                     {
                                         tmp[k] = src[k] + vc;
                                     }
-                                    collector.submesh.Add(tmp);
-                                    collector.AddMaterial(graphics.GetMaterial(j,collector),graphics.InstanceID);
+                                    canvas.submesh.Add(tmp);
+                                    canvas.AddMaterial(graphics.GetMaterial(j,canvas),graphics.InstanceID);
                                 }
                             }
                         }
@@ -104,7 +79,7 @@ namespace Assets.Core.HGUI
                 int os = root.childOffset;
                 for (int i = 0; i < c; i++)
                 {
-                    Batch(pipeLine, os, collector, o, s, q);
+                    Batch(pipeLine, os, canvas, o, s, q);
                     os++;
                 }
             }

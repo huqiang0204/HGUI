@@ -68,6 +68,7 @@ namespace Assets.Core.HGUI
                 if (scripts != null)
                     for (int i = 0; i < len; i++)
                         scripts[i].SubUpdate();
+                ClearMesh();
                 HBatch.Batch(this, PipeLine);
             }, null);
         }
@@ -112,13 +113,6 @@ namespace Assets.Core.HGUI
             }
         }
 
-        /// <summary>
-        /// 分线程UpDate
-        /// </summary>
-        public override void SubUpdate()
-        {
-            
-        }
         /// <summary>
         /// 派发用户输入指令信息
         /// </summary>
@@ -256,6 +250,36 @@ namespace Assets.Core.HGUI
             if (inputs != null)
                 for (int i = 0; i < inputs.Length; i++)
                     inputs[i].Clear();
+        }
+
+        public List<Vector3> vertex = new List<Vector3>();
+        public List<Vector2> uv = new List<Vector2>();
+        List<Material> materials = new List<Material>();
+        List<int> ids = new List<int>();
+        public List<int[]> submesh = new List<int[]>();
+        void ClearMesh()
+        {
+            vertex.Clear();
+            uv.Clear();
+            materials.Clear();
+            ids.Clear();
+            submesh.Clear();
+        }
+        public void AddMaterial(Material material, int id)
+        {
+            materials.Add(material);
+            ids.Add(id);
+        }
+        public Material FindMaterial(int id)
+        {
+            for (int i = 0; i < ids.Count; i++)
+            {
+                if (ids[i] == id)
+                {
+                    return materials[i];
+                }
+            }
+            return null;
         }
     }
 }

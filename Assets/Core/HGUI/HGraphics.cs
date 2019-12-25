@@ -31,5 +31,9 @@ namespace Assets.Core.HGUI
         public virtual void UpdateMesh()
         {
         }
+        internal virtual Material GetMaterial(int index,HBatch.MeshCollector collector)
+        {
+            return null;
+        }
     }
 }

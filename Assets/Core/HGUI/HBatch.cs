@@ -9,14 +9,27 @@ namespace Assets.Core.HGUI
 {
     internal class HBatch
     {
-        class MeshCollector
+       internal class MeshCollector
         {
             public List<Vector3> vertex = new List<Vector3>();
             public List<Vector2> uv = new List<Vector2>();
-            public List<Material> materials = new List<Material>();
+            List<Material> materials = new List<Material>();
+            List<int> ids = new List<int>();
             public List<int[]> submesh = new List<int[]>();
+            public void AddMaterial(Material material, int id)
+            {
+                materials.Add(material);
+                ids.Add(id);
+            }
             public Material FindMaterial(int id)
             {
+                for (int i = 0; i < ids.Count; i++)
+                {
+                    if (ids[i] == id)
+                    {
+                        return materials[i];
+                    }
+                }
                 return null;
             }
         }
@@ -46,15 +59,22 @@ namespace Assets.Core.HGUI
             o += pos;
             Vector3 s = pipeLine[index].localScale;
             Quaternion q = quate * pipeLine[index].localRotation;
-            s.x *= scale.x;
-            s.y *= scale.y;
+     
             if (root.active)
             {
                 if (root.script != null)
                 {
                     var graphics = root.script as HGraphics;
-                    var vs = collector.vertex.Count;
-                    collector.vertex.AddRange(graphics.vertex);
+                    var vs = collector.vertex;
+                    var vc = vs.Count;
+                    var vert = graphics.vertex;
+                    for (int j = 0; j < vert.Length; j++)
+                    {
+                        var t = q * vert[j];
+                        t.x *= s.x;
+                        t.y *= s.y;
+                        vs.Add(pos + t);
+                    }
                     collector.uv.AddRange(graphics.uv);
                     var ms = graphics.SubMesh;
                     if (ms != null)
@@ -69,15 +89,17 @@ namespace Assets.Core.HGUI
                                     int[] tmp = new int[src.Length];
                                     for (int k = 0; k < tmp.Length; k++)
                                     {
-                                        tmp[k] = src[k] + vs;
+                                        tmp[k] = src[k] + vc;
                                     }
                                     collector.submesh.Add(tmp);
-                                    collector.materials.Add(collector.FindMaterial(graphics.InstanceID));
+                                    collector.AddMaterial(graphics.GetMaterial(j,collector),graphics.InstanceID);
                                 }
                             }
                         }
                     }
                 }
+                s.x *= scale.x;
+                s.y *= scale.y;
                 int c = root.childCount;
                 int os = root.childOffset;
                 for (int i = 0; i < c; i++)

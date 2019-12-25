@@ -8,6 +8,10 @@ using UnityEngine;
 [CanEditMultipleObjects]
 public class HCanvasEditor:Editor
 {
+    private void OnEnable()
+    {
+        Refresh(target as HCanvas);
+    }
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
@@ -23,6 +27,11 @@ public class HCanvasEditor:Editor
         if (mf != null)
         {
             var mesh = mf.sharedMesh;
+            if (mesh == null)
+            {
+                mesh = new Mesh();
+                mf.mesh = mesh;
+            }
             mesh.triangles = null;
             mesh.vertices = null;
             mesh.uv = null;

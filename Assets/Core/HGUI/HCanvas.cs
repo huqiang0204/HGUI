@@ -292,8 +292,17 @@ namespace Assets.Core.HGUI
                 scripts[i].MainUpdate();
             int len = max;
             if (scripts != null)
+            {
                 for (int i = 0; i < len; i++)
                     scripts[i].SubUpdate();
+                for (int i = 0; i < len; i++)
+                {
+                   var grap =  scripts[i] as HGraphics;
+                    if (grap != null)
+                        grap.UpdateMesh();
+                }
+            }
+               
             ClearMesh();
             HBatch.Batch(this, PipeLine);
         }

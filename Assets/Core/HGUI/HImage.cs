@@ -80,17 +80,22 @@ namespace Assets.Core.HGUI
         public FillMethod FillMethod { get => _fillMethod;
             set {
                 _fillMethod = value;
+                _vertexChange = true;
             } }
         internal bool _fillClockwise;
         public bool FillClockwise { get; set; }
         internal int _fillOrigin;
         public int FillOrigin { get => _fillOrigin; set {
                 _fillOrigin = value;
+                _vertexChange = true;
             } }
         internal float _fillAmount = 1;
         public float FillAmount {
             get => _fillAmount;
-            set { _fillAmount = value;} }
+            set {
+                _fillAmount = value;
+                _vertexChange = true;
+            } }
         /// <summary>
         /// 开启此项,按弧度填充,否则按矩形四个角填充
         /// </summary>

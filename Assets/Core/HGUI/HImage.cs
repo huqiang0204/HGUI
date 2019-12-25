@@ -72,6 +72,7 @@ namespace Assets.Core.HGUI
                     _border = value.border;
                     _pivot = value.pivot;
                     material.SetTexture("_MainTex", value.texture);
+                    _vertexChange = true;
                 }
             }
         }

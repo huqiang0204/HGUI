@@ -40,7 +40,9 @@ namespace Assets.Core.HGUI
                     _TextMaterial = new Material(DefShader);
                     _TextMaterial.SetTexture("_MainTex", fontTexture);
                 }
-                return _TextMaterial; }
+                _TextMaterial.SetTexture("_MainTex", DefaultFont.material.mainTexture);
+                return _TextMaterial;
+            }
         }
         static Texture _emoji;
         public static Texture EmojiTexture
@@ -80,7 +82,6 @@ namespace Assets.Core.HGUI
                 _text = value;
                 _textChanged = true;
             } }
-        Color[] colors;
         EmojiString emojiString = new EmojiString();
         IList<UILineInfo> lines;
         IList<UICharInfo> characters;
@@ -220,6 +221,7 @@ namespace Assets.Core.HGUI
             {
                 text.tris = null;
                 text.SubMesh = null;
+                text.Colors = null;
                 return;
             }
             Vector3[] vertex = new Vector3[c];
@@ -239,7 +241,7 @@ namespace Assets.Core.HGUI
             }
             text.vertex = vertex;
             text.uv = uv;
-            text.colors = colors;
+            text.Colors = colors;
             int ec = emojis.Count;
             if(ec>0)
             {
@@ -335,7 +337,7 @@ namespace Assets.Core.HGUI
             {
                 if(material==null)
                 {
-                    return DefaultFont.material;
+                    return DefaultTextMaterial;
                 }
                 return material;
             }

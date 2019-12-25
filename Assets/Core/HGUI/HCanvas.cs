@@ -254,6 +254,7 @@ namespace Assets.Core.HGUI
 
         public List<Vector3> vertex = new List<Vector3>();
         public List<Vector2> uv = new List<Vector2>();
+        public List<Color> colors = new List<Color>();
         public List<Material> materials = new List<Material>();
         List<int> ids = new List<int>();
         public List<int[]> submesh = new List<int[]>();
@@ -261,6 +262,7 @@ namespace Assets.Core.HGUI
         {
             vertex.Clear();
             uv.Clear();
+            colors.Clear();
             materials.Clear();
             ids.Clear();
             submesh.Clear();
@@ -317,6 +319,7 @@ namespace Assets.Core.HGUI
                 mesh.Clear();
                 mesh.vertices = vertex.ToArray();
                 mesh.uv = uv.ToArray();
+                mesh.colors = colors.ToArray();
                 mesh.subMeshCount = submesh.Count;
                 for (int i = 0; i < submesh.Count; i++)
                     mesh.SetTriangles(submesh[i], i);

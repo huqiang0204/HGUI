@@ -14,10 +14,11 @@ namespace Assets.Core.HGUI
                 return shader;
             } }
         public static Shader shader;
-        Color _color;
-        public Color Color { get; set; }
+        Color _color = Color.white;
+        public virtual Color Color { get => _color; set { _color = value; } }
         internal Vector3[] vertex;
         internal Vector2[] uv;
+        internal Color[] Colors;
         internal int[] tris;
         internal int[][] SubMesh;
         internal Material[] materials;

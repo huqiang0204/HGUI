@@ -48,7 +48,31 @@ namespace Assets.Core.HGUI
                         var t = q * vert[j];
                         t.x *= s.x;
                         t.y *= s.y;
-                        vs.Add(pos + t);
+                        vs.Add(o + t);
+                    }
+                    if(graphics.Colors==null)
+                    {
+                        var col = graphics.Color;
+                        for (int j = 0; j < vert.Length; j++)
+                        {
+                            canvas.colors.Add(col);
+                        }
+                    }
+                    else
+                    {
+                        if (graphics.Colors.Length == 0)
+                        {
+                            var col = graphics.Color;
+                            for (int j = 0; j < vert.Length; j++)
+                            {
+                                canvas.colors.Add(col);
+                            }
+                        }
+                        else
+                        {
+                            for (int j = 0; j < graphics.Colors.Length; j++)
+                                canvas.colors.Add(graphics.Colors[j]);
+                        }
                     }
                     canvas.uv.AddRange(graphics.uv);
                     var ms = graphics.SubMesh;
@@ -71,7 +95,8 @@ namespace Assets.Core.HGUI
                                 }
                             }
                         }
-                    }else if(graphics.tris!=null)
+                    }
+                    else if(graphics.tris!=null)
                     {
                         var src = graphics.tris;
                         if (src.Length > 0)

@@ -46,8 +46,8 @@ namespace Assets.Core.HGUI
                     for (int j = 0; j < vert.Length; j++)
                     {
                         var t = q * vert[j];
-                        //t.x *= s.x;
-                        //t.y *= s.y;
+                        t.x *= s.x;
+                        t.y *= s.y;
                         vs.Add(pos + t);
                     }
                     canvas.uv.AddRange(graphics.uv);

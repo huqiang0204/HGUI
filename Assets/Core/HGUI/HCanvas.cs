@@ -314,9 +314,6 @@ namespace Assets.Core.HGUI
                     mesh = new Mesh();
                     mf.mesh = mesh;
                 }
-                //mesh.triangles = null;
-                //mesh.vertices = null;
-                //mesh.uv = null;
                 mesh.Clear();
                 mesh.vertices = vertex.ToArray();
                 mesh.uv = uv.ToArray();

@@ -21,6 +21,7 @@ namespace Assets.Core.HGUI
                     fontTexture = defFont.material.mainTexture;
                     Font.textureRebuilt += (o) => {
                         fontTexture = defFont.material.mainTexture;
+                        DefaultTextMaterial.SetTexture("_MainTex",fontTexture);
                     };
                 }
                 return defFont;
@@ -29,6 +30,17 @@ namespace Assets.Core.HGUI
             {
                 defFont = value;
             }
+        }
+        static Material _TextMaterial;
+        static Material DefaultTextMaterial
+        {
+            get {
+                if (_TextMaterial == null)
+                {
+                    _TextMaterial = new Material(DefShader);
+                    _TextMaterial.SetTexture("_MainTex", fontTexture);
+                }
+                return _TextMaterial; }
         }
         static Texture _emoji;
         public static Texture EmojiTexture
@@ -44,6 +56,16 @@ namespace Assets.Core.HGUI
                 _emoji = value;
             }
         }
+        static Material _EmojiMaterial;
+        static Material DefaultEmojiMaterial {
+            get {
+                if (_EmojiMaterial == null)
+                {
+                    _EmojiMaterial = new Material(DefShader);
+                    _EmojiMaterial.SetTexture("_MainTex", EmojiTexture);
+                }
+                return _EmojiMaterial;
+            } }
         static TextGenerator shareGenerator;
         static TextGenerator Generator { get {
                 if (shareGenerator == null)
@@ -54,13 +76,15 @@ namespace Assets.Core.HGUI
         internal string _text;
         public string Text {
             get => _text;
-            set { _text = value; } }
+            set {
+                _text = value;
+                _textChanged = true;
+            } }
         Color[] colors;
         EmojiString emojiString = new EmojiString();
         IList<UILineInfo> lines;
         IList<UICharInfo> characters;
         IList<UIVertex> verts;
-        internal int[] secondTris;
         internal Font _font;
         public Font Font { get => _font;
             set {
@@ -146,8 +170,6 @@ namespace Assets.Core.HGUI
         public override void Initial()
         {
             Font = DefaultFont;
-            emojiMaterial = new Material(DefShader);
-            emojiMaterial.SetTexture("_MainTex",EmojiTexture);
         }
         public override void MainUpdate()
         {
@@ -197,7 +219,7 @@ namespace Assets.Core.HGUI
             if (c == 0)
             {
                 text.tris = null;
-                text.secondTris = null;
+                text.SubMesh = null;
                 return;
             }
             Vector3[] vertex = new Vector3[c];
@@ -271,13 +293,15 @@ namespace Assets.Core.HGUI
                         ap++;
                     }
                 }
-                text.tris = triA;
-                text.secondTris = triB;
+                if (text.SubMesh == null)
+                    text.SubMesh = new int[2][];
+                text.SubMesh[0] = triA;
+                text.SubMesh[1] = triB;
             }
             else
             {
                 text.tris = CreateTri(c);
-                text.secondTris = null;
+                text.SubMesh = null;
             }
         }
         static int[] CreateTri(int len)
@@ -305,32 +329,25 @@ namespace Assets.Core.HGUI
             }
             return tri;
         }
-#if UNITY_EDITOR
-        public void Test()
+        internal override Material GetMaterial(int index, HCanvas canvas)
         {
-            _textChanged = true;
-            MainUpdate();
-            UpdateMesh();
-            var mesh = GetComponent<MeshFilter>();
-            if (mesh != null)
+            if (index == 0)
             {
-                mesh.sharedMesh.triangles = null;
-                mesh.sharedMesh.vertices = null;
-                mesh.sharedMesh.uv = null;
-
-                mesh.sharedMesh.vertices = vertex;
-                mesh.sharedMesh.uv = uv;
-                mesh.sharedMesh.subMeshCount = 2;
-                mesh.sharedMesh.SetTriangles(tris, 0);
-                mesh.sharedMesh.SetTriangles(secondTris,1);
+                if(material==null)
+                {
+                    return DefaultFont.material;
+                }
+                return material;
             }
-            var mr = GetComponent<MeshRenderer>();
-            if (mr != null)
+            else if (index == 1)
             {
-                //material.SetTexture("_MainTex",_font.material);
-                mr.materials = new Material[] { Font.material, emojiMaterial };
+                if(emojiMaterial==null)
+                {
+                    return DefaultEmojiMaterial;
+                }
+                return emojiMaterial;
             }
+            return null;
         }
-#endif
     }
 }

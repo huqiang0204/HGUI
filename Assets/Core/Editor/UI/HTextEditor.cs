@@ -21,6 +21,21 @@ public class HTextEditor:Editor
             style.wordWrap = true;
             txt.Text = EditorGUILayout.TextArea(txt.Text,style);
             txt.Font = EditorGUILayout.ObjectField("Font", txt.Font, typeof(Font), true) as Font;
+            if(GUI.changed)
+            {
+                var can = FindHCanvas(txt.transform);
+                if (can != null)
+                    can.Refresh();
+            }
         }
+    }
+    HCanvas FindHCanvas(Transform trans)
+    {
+        if (trans == null)
+            return null;
+        var can = trans.GetComponent<HCanvas>();
+        if (can == null)
+            return FindHCanvas(trans.parent);
+        return can;
     }
 }

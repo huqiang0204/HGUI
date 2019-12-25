@@ -314,14 +314,16 @@ namespace Assets.Core.HGUI
                     mesh = new Mesh();
                     mf.mesh = mesh;
                 }
-                mesh.triangles = null;
-                mesh.vertices = null;
-                mesh.uv = null;
+                //mesh.triangles = null;
+                //mesh.vertices = null;
+                //mesh.uv = null;
+                mesh.Clear();
                 mesh.vertices = vertex.ToArray();
                 mesh.uv = uv.ToArray();
+                mesh.subMeshCount = submesh.Count;
                 for (int i = 0; i < submesh.Count; i++)
                     mesh.SetTriangles(submesh[i], i);
-                mesh.subMeshCount = submesh.Count;
+             
             }
             var mr = GetComponent<MeshRenderer>();
             if (mr != null)

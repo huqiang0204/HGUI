@@ -52,8 +52,6 @@ public class HImageEditor:Editor
             }
             if (GUILayout.Button("Set Native Size"))
                 img.SetNativeSize();
-            else if(GUI.changed)
-                img.Test();
         }
     }
 }

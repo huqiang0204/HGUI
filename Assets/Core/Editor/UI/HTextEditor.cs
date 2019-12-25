@@ -21,8 +21,6 @@ public class HTextEditor:Editor
             style.wordWrap = true;
             txt.Text = EditorGUILayout.TextArea(txt.Text,style);
             txt.Font = EditorGUILayout.ObjectField("Font", txt.Font, typeof(Font), true) as Font;
-            if (GUI.changed)
-                txt.Test();
         }
     }
 }

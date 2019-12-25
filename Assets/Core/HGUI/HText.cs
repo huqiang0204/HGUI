@@ -164,7 +164,7 @@ namespace Assets.Core.HGUI
                 settings.resizeTextMinSize = resizeTextMinSize;
                 settings.generateOutOfBounds = generateOutOfBounds;
                 settings.resizeTextForBestFit = _resizeBestFit;
-                settings.textAnchor = textAnchor;
+                settings.textAnchor = anchor;
                 settings.fontStyle = _fontStyle;
                 settings.scaleFactor = scaleFactor;
                 settings.richText = _richText;

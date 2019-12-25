@@ -46,8 +46,8 @@ namespace Assets.Core.HGUI
                     for (int j = 0; j < vert.Length; j++)
                     {
                         var t = q * vert[j];
-                        t.x *= s.x;
-                        t.y *= s.y;
+                        //t.x *= s.x;
+                        //t.y *= s.y;
                         vs.Add(pos + t);
                     }
                     canvas.uv.AddRange(graphics.uv);
@@ -70,6 +70,19 @@ namespace Assets.Core.HGUI
                                     canvas.AddMaterial(graphics.GetMaterial(j,canvas),graphics.InstanceID);
                                 }
                             }
+                        }
+                    }else if(graphics.tris!=null)
+                    {
+                        var src = graphics.tris;
+                        if (src.Length > 0)
+                        {
+                            int[] tmp = new int[src.Length];
+                            for (int k = 0; k < tmp.Length; k++)
+                            {
+                                tmp[k] = src[k] + vc;
+                            }
+                            canvas.submesh.Add(tmp);
+                            canvas.AddMaterial(graphics.GetMaterial(0, canvas), graphics.InstanceID);
                         }
                     }
                 }

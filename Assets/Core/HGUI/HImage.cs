@@ -130,32 +130,9 @@ namespace Assets.Core.HGUI
                 _vertexChange = false;
             }
         }
-        public override void SubUpdate()
+        internal override Material GetMaterial(int index, HCanvas canvas)
         {
-
+            return material;
         }
-#if UNITY_EDITOR
-        public void Test()
-        {
-            HGUIMesh.CreateMesh(this);
-            var mesh = GetComponent<MeshFilter>();
-            if(mesh!=null)
-            {
-                mesh.sharedMesh.triangles = null;
-                mesh.sharedMesh.vertices = null;
-                mesh.sharedMesh.uv = null;
-
-                mesh.sharedMesh.vertices = vertex;
-                if (_sprite != null)
-                    mesh.sharedMesh.uv = uv;
-                mesh.sharedMesh.triangles = tris;
-            }
-            //var mr = GetComponent<MeshRenderer>();
-            //if(mr!=null)
-            //{
-            //    mr.material = material;
-            //}
-        }
-#endif
     }
 }

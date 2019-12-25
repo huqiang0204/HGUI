@@ -23,28 +23,5 @@ public class HCanvasEditor:Editor
         if (canvas == null)
             return;
         canvas.Refresh();
-        var mf = canvas.GetComponent<MeshFilter>();
-        if (mf != null)
-        {
-            var mesh = mf.sharedMesh;
-            if (mesh == null)
-            {
-                mesh = new Mesh();
-                mf.mesh = mesh;
-            }
-            mesh.triangles = null;
-            mesh.vertices = null;
-            mesh.uv = null;
-            mesh.vertices = canvas.vertex.ToArray();
-            mesh.uv = canvas.uv.ToArray();
-            for (int i = 0; i < canvas.submesh.Count; i++)
-                mesh.SetTriangles(canvas.submesh[i], i);
-            mesh.subMeshCount = canvas.submesh.Count;
-        }
-        var mr = canvas.GetComponent<MeshRenderer>();
-        if (mr != null)
-        {
-            mr.materials = canvas.materials.ToArray();
-        }
     }
 }

@@ -100,7 +100,7 @@ namespace Assets.Core.HGUI
                 }
                 else
                 {
-                    float near = cam.nearClipPlane;
+                    float near = cam.nearClipPlane+0.1f;
                     float s = 2 / (float)h;
                     float o = MathH.Tan(cam.fieldOfView) / near;
                     s /= o;
@@ -305,6 +305,29 @@ namespace Assets.Core.HGUI
                
             ClearMesh();
             HBatch.Batch(this, PipeLine);
+            var mf = GetComponent<MeshFilter>();
+            if (mf != null)
+            {
+                var mesh = mf.sharedMesh;
+                if (mesh == null)
+                {
+                    mesh = new Mesh();
+                    mf.mesh = mesh;
+                }
+                mesh.triangles = null;
+                mesh.vertices = null;
+                mesh.uv = null;
+                mesh.vertices = vertex.ToArray();
+                mesh.uv = uv.ToArray();
+                for (int i = 0; i < submesh.Count; i++)
+                    mesh.SetTriangles(submesh[i], i);
+                mesh.subMeshCount = submesh.Count;
+            }
+            var mr = GetComponent<MeshRenderer>();
+            if (mr != null)
+            {
+                mr.materials = materials.ToArray();
+            }
         }
 #endif
     }

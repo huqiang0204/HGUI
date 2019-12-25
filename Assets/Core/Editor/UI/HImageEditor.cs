@@ -15,6 +15,7 @@ public class HImageEditor:Editor
         HImage img = target as HImage;
         if(img!=null)
         {
+            bool changed = false;
             img.Sprite = EditorGUILayout.ObjectField("Sprite",img.Sprite,typeof(Sprite),true) as Sprite;
             img.SprType = (SpriteType)EditorGUILayout.EnumPopup("SpriteType",img.SprType);
             if(img.SprType==SpriteType.Filled)
@@ -44,7 +45,12 @@ public class HImageEditor:Editor
                 img.FillAmount = EditorGUILayout.Slider("FillAmount",img.FillAmount,0,1);
             }
             if (img.SprType == SpriteType.Simple | img.SprType == SpriteType.Filled)
+            {
+                bool p = img.PreserveAspect;
                 img.PreserveAspect = EditorGUILayout.Toggle("PreserveAspect", img.PreserveAspect);
+                if (p != img.PreserveAspect)
+                    changed = true;
+            }
             else
             {
                 img.FillCenter = EditorGUILayout.Toggle("FillCenter", img.FillCenter);
@@ -52,6 +58,21 @@ public class HImageEditor:Editor
             }
             if (GUILayout.Button("Set Native Size"))
                 img.SetNativeSize();
+            if(GUI.changed |changed)
+            {
+                var can = FindHCanvas(img.transform);
+                if (can != null)
+                    can.Refresh();
+            }
         }
+    }
+    HCanvas FindHCanvas(Transform trans)
+    {
+        if (trans == null)
+            return null;
+        var can = trans.GetComponent<HCanvas>();
+        if (can == null)
+            return FindHCanvas(trans.parent);
+        return can;
     }
 }

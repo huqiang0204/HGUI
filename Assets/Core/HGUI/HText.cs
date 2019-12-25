@@ -9,6 +9,37 @@ namespace Assets.Core.HGUI
 {
     public class HText:HGraphics
     {
+        public static Font defFont;
+        static Font DefaultFont
+        {
+            get
+            {
+                if (defFont == null)
+                {
+                    defFont = Font.CreateDynamicFontFromOSFont("Arial", 16);
+                    defFont.material = new Material(defShader);
+                }
+                return defFont;
+            }
+            set
+            {
+                defFont = value;
+            }
+        }
+        static Texture _emoji;
+        public static Texture emojiTexture
+        {
+            get
+            {
+                if (_emoji == null)
+                    _emoji = Resources.Load<Texture>("emoji");
+                return _emoji;
+            }
+            set
+            {
+                _emoji = value;
+            }
+        }
         static TextGenerator shareGenerator;
         static TextGenerator generator { get {
                 if (shareGenerator == null)
@@ -26,7 +57,11 @@ namespace Assets.Core.HGUI
         IList<UICharInfo> characters;
         IList<UIVertex> verts;
         internal int[] secondTris;
-        public Font font { get; set; }
+        internal Font _font;
+        public Font font { get => _font;
+            set {
+                _font = value;
+            } }
         public Vector2 pivot { get; set; }
         public HorizontalWrapMode horizontalOverflow;
         public VerticalWrapMode verticalOverflow;
@@ -40,8 +75,15 @@ namespace Assets.Core.HGUI
         public float scaleFactor = 1;
         public bool richText;
         public float lineSpacing;
-        public int fontSize;
+        public int fontSize=14;
         public bool alignByGeometry;
+        public Material emojiMaterial;
+        public override void Initial()
+        {
+            font = DefaultFont;
+            emojiMaterial = new Material(defShader);
+            emojiMaterial.SetTexture("_MainTex",emojiTexture);
+        }
         public override void MainUpdate()
         {
             if(_textChanged)
@@ -192,5 +234,32 @@ namespace Assets.Core.HGUI
             }
             return tri;
         }
+#if UNITY_EDITOR
+        public void Test()
+        {
+            _textChanged = true;
+            MainUpdate();
+            UpdateMesh();
+            var mesh = GetComponent<MeshFilter>();
+            if (mesh != null)
+            {
+                mesh.sharedMesh.triangles = null;
+                mesh.sharedMesh.vertices = null;
+                mesh.sharedMesh.uv = null;
+
+                mesh.sharedMesh.vertices = vertex;
+                mesh.sharedMesh.uv = uv;
+                mesh.sharedMesh.subMeshCount = 2;
+                mesh.sharedMesh.SetTriangles(tris,0);
+                mesh.sharedMesh.SetTriangles(secondTris,1);
+            }
+            var mr = GetComponent<MeshRenderer>();
+            if (mr != null)
+            {
+                //material.SetTexture("_MainTex",_font.material);
+                mr.materials = new Material[] { font.material,emojiMaterial};
+            }
+        }
+#endif
     }
 }

@@ -20,7 +20,6 @@ namespace Assets.Core.HGUI
         public bool PauseEvent;
         public UserAction.InputType inputType = UserAction.InputType.OnlyMouse;
 
-        
         /// <summary>
         /// 信息采集
         /// </summary>

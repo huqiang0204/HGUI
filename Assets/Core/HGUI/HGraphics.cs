@@ -22,6 +22,7 @@ namespace Assets.Core.HGUI
         internal int[][] SubMesh;
         internal Material[] materials;
         public Material material;
+        internal int InstanceID;
         internal bool _vertexChange;
         public override void Initial()
         {

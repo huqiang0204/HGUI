@@ -67,21 +67,81 @@ namespace Assets.Core.HGUI
                 _font = value;
             } }
         internal Vector2 _pivot = new Vector2(0.5f,0.5f);
-        public Vector2 pivot { get => _pivot; set { _pivot = value; } }
-        public HorizontalWrapMode horizontalOverflow;
-        public VerticalWrapMode verticalOverflow;
+        public Vector2 pivot {
+            get => _pivot;
+            set {
+                _pivot = value;
+                _vertexChange = true;
+            }
+        }
+        HorizontalWrapMode _hof;
+        public HorizontalWrapMode horizontalOverflow {
+            get => _hof;
+            set {
+                _hof = value;
+                _vertexChange = true;
+            } }
+        VerticalWrapMode _vof;
+        public VerticalWrapMode verticalOverflow {
+            get => _vof;
+            set {
+                _vof = value;
+                _vertexChange = true;
+            } }
         public bool updateBounds;
         private int resizeTextMaxSize = 40;
         private int resizeTextMinSize = 10;
         private bool generateOutOfBounds;
-        public bool resizeForBestFit = false;
-        public TextAnchor textAnchor;
-        public FontStyle fontStyle;
-        public float scaleFactor = 1;
-        public bool richText;
-        public float lineSpacing;
-        public int fontSize =14;
-        public bool alignByGeometry;
+        bool _resizeBestFit;
+        public bool resizeForBestFit {
+            get => _resizeBestFit;
+            set {
+                _resizeBestFit = true;
+                _vertexChange = true;
+            } }
+        TextAnchor anchor;
+        public TextAnchor textAnchor {
+            get => anchor;
+            set {
+                anchor = value;
+                _vertexChange = true;
+            } }
+        FontStyle _fontStyle;
+        public FontStyle fontStyle {
+            get => _fontStyle;
+            set {
+                _fontStyle = value;
+                _vertexChange = true;
+            } }
+        float scaleFactor = 1;
+        bool _richText;
+        public bool richText {
+            get => _richText;
+            set {
+                _richText = value;
+                _vertexChange = true;
+            } }
+        float _lineSpace;
+        public float lineSpacing {
+            get => _lineSpace;
+            set {
+                _lineSpace = value;
+                _vertexChange = true;
+            } }
+        int _fontSize = 14;
+        public int fontSize {
+            get => _fontSize;
+            set {
+                _fontSize = value;
+                _vertexChange = true;
+            } }
+        bool _align;
+        public bool alignByGeometry {
+            get => _align;
+            set {
+                _align = value;
+                _vertexChange = true;
+            } }
         public Material emojiMaterial;
         public override void Initial()
         {
@@ -98,20 +158,20 @@ namespace Assets.Core.HGUI
                 settings.font = font;
                 settings.pivot = pivot;
                 settings.generationExtents = SizeDelta;
-                settings.horizontalOverflow = horizontalOverflow;
-                settings.verticalOverflow = verticalOverflow;
-                settings.resizeTextMaxSize = fontSize;
-                settings.resizeTextMinSize = fontSize;
+                settings.horizontalOverflow = _hof;
+                settings.verticalOverflow = _vof;
+                settings.resizeTextMaxSize = resizeTextMaxSize;
+                settings.resizeTextMinSize = resizeTextMinSize;
                 settings.generateOutOfBounds = generateOutOfBounds;
-                settings.resizeTextForBestFit = resizeForBestFit;
+                settings.resizeTextForBestFit = _resizeBestFit;
                 settings.textAnchor = textAnchor;
-                settings.fontStyle = fontStyle;
+                settings.fontStyle = _fontStyle;
                 settings.scaleFactor = scaleFactor;
-                settings.richText = richText;
-                settings.lineSpacing = lineSpacing;
-                settings.fontSize = fontSize;
+                settings.richText = _richText;
+                settings.lineSpacing = _lineSpace;
+                settings.fontSize = _fontSize;
                 settings.color = color;
-                settings.alignByGeometry = alignByGeometry;
+                settings.alignByGeometry = _align;
                 var g = generator;
                 g.Populate(emojiString.FilterString,settings);
                 lines = g.lines;

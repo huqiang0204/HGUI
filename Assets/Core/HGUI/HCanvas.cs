@@ -7,7 +7,8 @@ using UnityEngine;
 
 namespace Assets.Core.HGUI
 {
-    public sealed class Canvas:AsyncScript
+    [RequireComponent(typeof( MeshFilter),typeof(MeshRenderer))]
+    public sealed class HCanvas:AsyncScript
     {
         //static List<Canvas> canvases = new List<Canvas>();
         public Camera camera;

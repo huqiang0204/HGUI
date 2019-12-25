@@ -254,7 +254,7 @@ namespace Assets.Core.HGUI
 
         public List<Vector3> vertex = new List<Vector3>();
         public List<Vector2> uv = new List<Vector2>();
-        List<Material> materials = new List<Material>();
+        public List<Material> materials = new List<Material>();
         List<int> ids = new List<int>();
         public List<int[]> submesh = new List<int[]>();
         void ClearMesh()
@@ -281,5 +281,22 @@ namespace Assets.Core.HGUI
             }
             return null;
         }
+#if UNITY_EDITOR
+        public void Refresh()
+        {
+            point = 1;
+            max = 0;
+            Collection(transform, -1, 0);
+            CheckSize();
+            for (int i = 0; i < max; i++)
+                scripts[i].MainUpdate();
+            int len = max;
+            if (scripts != null)
+                for (int i = 0; i < len; i++)
+                    scripts[i].SubUpdate();
+            ClearMesh();
+            HBatch.Batch(this, PipeLine);
+        }
+#endif
     }
 }

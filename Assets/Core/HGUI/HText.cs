@@ -80,7 +80,7 @@ namespace Assets.Core.HGUI
         public float scaleFactor = 1;
         public bool richText;
         public float lineSpacing;
-        public int fontSize=14;
+        public int fontSize =14;
         public bool alignByGeometry;
         public Material emojiMaterial;
         public override void Initial()

@@ -19,6 +19,8 @@ namespace Assets.Core.HGUI
         internal Vector3[] vertex;
         internal Vector2[] uv;
         internal int[] tris;
+        internal int[][] SubMesh;
+        internal Material[] materials;
         public Material material;
         internal bool _vertexChange;
         public override void Initial()

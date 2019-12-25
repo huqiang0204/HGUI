@@ -30,9 +30,19 @@ namespace Assets.Core.HGUI
         static void Batch(GUIElement[] pipeLine,int index)
         {
             GUIElement root = pipeLine[index];
-            if(root.script!=null)
+            if(root.active)
             {
-
+                if (root.script != null)
+                {
+                    var graphics = root.script as HGraphics;
+                }
+                int c = root.childCount;
+                int os = root.childOffset;
+                for (int i = 0; i < c; i++)
+                {
+                    Batch(pipeLine, os);
+                    os++;
+                }
             }
         }
     }

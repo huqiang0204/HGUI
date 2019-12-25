@@ -68,6 +68,7 @@ namespace Assets.Core.HGUI
                 if (scripts != null)
                     for (int i = 0; i < len; i++)
                         scripts[i].SubUpdate();
+                HBatch.Batch(this, PipeLine);
             }, null);
         }
         void CheckSize()

@@ -9,7 +9,7 @@ namespace Assets.Core.HGUI
 {
     internal class HBatch
     {
-       internal class MeshCollector
+        internal class MeshCollector
         {
             public List<Vector3> vertex = new List<Vector3>();
             public List<Vector2> uv = new List<Vector2>();
@@ -33,7 +33,7 @@ namespace Assets.Core.HGUI
                 return null;
             }
         }
-        public static void Batch(GUIElement[] pipeLine)
+        public static void Batch(HCanvas canvas, GUIElement[] pipeLine)
         {
             MeshCollector collector = new MeshCollector();
             GUIElement root = pipeLine[0];

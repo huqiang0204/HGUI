@@ -40,7 +40,7 @@ namespace Assets.Core.HGUI
                     _TextMaterial = new Material(DefShader);
                     _TextMaterial.SetTexture("_MainTex", fontTexture);
                 }
-                _TextMaterial.SetTexture("_MainTex", DefaultFont.material.mainTexture);
+                _TextMaterial.SetTexture("_MainTex", fontTexture);
                 return _TextMaterial;
             }
         }
@@ -176,6 +176,7 @@ namespace Assets.Core.HGUI
         {
             if(_textChanged)
             {
+               
                 emojiString.FullString = _text;
                 TextGenerationSettings settings = new TextGenerationSettings();
                 settings.font = Font;
@@ -202,6 +203,7 @@ namespace Assets.Core.HGUI
                 characters = g.characters;
                 _textChanged = false;
                 _vertexChange = true;
+                fontTexture = Font.material.mainTexture;
             }
         }
         public override void UpdateMesh()

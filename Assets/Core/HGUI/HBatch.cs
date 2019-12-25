@@ -43,24 +43,16 @@ namespace Assets.Core.HGUI
                     var vs = canvas.vertex;
                     var vc = vs.Count;
                     var vert = graphics.vertex;
-                    for (int j = 0; j < vert.Length; j++)
+                    if(vert!=null)
                     {
-                        var t = q * vert[j];
-                        t.x *= s.x;
-                        t.y *= s.y;
-                        vs.Add(o + t);
-                    }
-                    if(graphics.Colors==null)
-                    {
-                        var col = graphics.Color;
                         for (int j = 0; j < vert.Length; j++)
                         {
-                            canvas.colors.Add(col);
+                            var t = q * vert[j];
+                            t.x *= s.x;
+                            t.y *= s.y;
+                            vs.Add(o + t);
                         }
-                    }
-                    else
-                    {
-                        if (graphics.Colors.Length == 0)
+                        if (graphics.Colors == null)
                         {
                             var col = graphics.Color;
                             for (int j = 0; j < vert.Length; j++)
@@ -70,44 +62,55 @@ namespace Assets.Core.HGUI
                         }
                         else
                         {
-                            for (int j = 0; j < graphics.Colors.Length; j++)
-                                canvas.colors.Add(graphics.Colors[j]);
-                        }
-                    }
-                    canvas.uv.AddRange(graphics.uv);
-                    var ms = graphics.SubMesh;
-                    if (ms != null)
-                    {
-                        for (int j = 0; j < ms.Length; j++)
-                        {
-                            var src = ms[j];
-                            if(src!=null)
+                            if (graphics.Colors.Length == 0)
                             {
-                                if(src.Length>0)
+                                var col = graphics.Color;
+                                for (int j = 0; j < vert.Length; j++)
                                 {
-                                    int[] tmp = new int[src.Length];
-                                    for (int k = 0; k < tmp.Length; k++)
+                                    canvas.colors.Add(col);
+                                }
+                            }
+                            else
+                            {
+                                for (int j = 0; j < graphics.Colors.Length; j++)
+                                    canvas.colors.Add(graphics.Colors[j]);
+                            }
+                        }
+                        canvas.uv.AddRange(graphics.uv);
+                        var ms = graphics.SubMesh;
+                        if (ms != null)
+                        {
+                            for (int j = 0; j < ms.Length; j++)
+                            {
+                                var src = ms[j];
+                                if (src != null)
+                                {
+                                    if (src.Length > 0)
                                     {
-                                        tmp[k] = src[k] + vc;
+                                        int[] tmp = new int[src.Length];
+                                        for (int k = 0; k < tmp.Length; k++)
+                                        {
+                                            tmp[k] = src[k] + vc;
+                                        }
+                                        canvas.submesh.Add(tmp);
+                                        canvas.AddMaterial(graphics.GetMaterial(j, canvas), graphics.InstanceID);
                                     }
-                                    canvas.submesh.Add(tmp);
-                                    canvas.AddMaterial(graphics.GetMaterial(j,canvas),graphics.InstanceID);
                                 }
                             }
                         }
-                    }
-                    else if(graphics.tris!=null)
-                    {
-                        var src = graphics.tris;
-                        if (src.Length > 0)
+                        else if (graphics.tris != null)
                         {
-                            int[] tmp = new int[src.Length];
-                            for (int k = 0; k < tmp.Length; k++)
+                            var src = graphics.tris;
+                            if (src.Length > 0)
                             {
-                                tmp[k] = src[k] + vc;
+                                int[] tmp = new int[src.Length];
+                                for (int k = 0; k < tmp.Length; k++)
+                                {
+                                    tmp[k] = src[k] + vc;
+                                }
+                                canvas.submesh.Add(tmp);
+                                canvas.AddMaterial(graphics.GetMaterial(0, canvas), graphics.InstanceID);
                             }
-                            canvas.submesh.Add(tmp);
-                            canvas.AddMaterial(graphics.GetMaterial(0, canvas), graphics.InstanceID);
                         }
                     }
                 }

@@ -100,7 +100,7 @@ namespace Assets.Core.HGUI
                 }
                 else
                 {
-                    float near = cam.nearClipPlane+0.1f;
+                    float near = cam.nearClipPlane + 0.1f;
                     float s = 2 / (float)h;
                     float o = MathH.Tan(cam.fieldOfView) / near;
                     s /= o;

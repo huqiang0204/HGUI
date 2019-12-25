@@ -32,6 +32,7 @@ namespace Assets.Core.HGUI
             PipeLine[index].localRotation = trans.localRotation;
             PipeLine[index].localScale = trans.localScale;
             PipeLine[index].trans = trans;
+            PipeLine[index].active = trans.gameObject.activeSelf;
             var script= trans.GetComponent<AsyncScript>();
             if(script!=null)
             {

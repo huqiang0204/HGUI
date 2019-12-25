@@ -321,14 +321,14 @@ namespace Assets.Core.HGUI
                 mesh.sharedMesh.vertices = vertex;
                 mesh.sharedMesh.uv = uv;
                 mesh.sharedMesh.subMeshCount = 2;
-                mesh.sharedMesh.SetTriangles(tris,0);
+                mesh.sharedMesh.SetTriangles(tris, 0);
                 mesh.sharedMesh.SetTriangles(secondTris,1);
             }
             var mr = GetComponent<MeshRenderer>();
             if (mr != null)
             {
                 //material.SetTexture("_MainTex",_font.material);
-                mr.materials = new Material[] { Font.material,emojiMaterial};
+                mr.materials = new Material[] { Font.material, emojiMaterial };
             }
         }
 #endif

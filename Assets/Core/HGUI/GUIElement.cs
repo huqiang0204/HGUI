@@ -11,6 +11,7 @@ namespace Assets.Core.HGUI
         public Vector3 localPosition;
         public Quaternion localRotation;
         public Vector3 localScale;
+        public bool active;
         public Transform trans;
         public AsyncScript script;
     }

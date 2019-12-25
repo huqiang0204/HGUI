@@ -9,6 +9,7 @@ namespace Assets.Core.HGUI
 {
     public class HText:HGraphics
     {
+        static Texture fontTexture;
         public static Font defFont;
         static Font DefaultFont
         {
@@ -17,7 +18,10 @@ namespace Assets.Core.HGUI
                 if (defFont == null)
                 {
                     defFont = Font.CreateDynamicFontFromOSFont("Arial", 16);
-                    defFont.material = new Material(defShader);
+                    fontTexture = defFont.material.mainTexture;
+                    Font.textureRebuilt += (o) => {
+                        fontTexture = defFont.material.mainTexture;
+                    };
                 }
                 return defFont;
             }
@@ -62,7 +66,8 @@ namespace Assets.Core.HGUI
             set {
                 _font = value;
             } }
-        public Vector2 pivot { get; set; }
+        internal Vector2 _pivot = new Vector2(0.5f,0.5f);
+        public Vector2 pivot { get => _pivot; set { _pivot = value; } }
         public HorizontalWrapMode horizontalOverflow;
         public VerticalWrapMode verticalOverflow;
         public bool updateBounds;
@@ -129,6 +134,12 @@ namespace Assets.Core.HGUI
             var emojis = text.emojiString.emojis;
             var verts = text.verts;
             int c = verts.Count;
+            if (c == 0)
+            {
+                text.tris = null;
+                text.secondTris = null;
+                return;
+            }
             Vector3[] vertex = new Vector3[c];
             Color[] colors = new Color[c];
             Vector2[] uv = new Vector2[c];
@@ -170,17 +181,17 @@ namespace Assets.Core.HGUI
                             info = emojis[si];
                         si++;
                         int p = i * 4;
-                        triA[bp] = p;
+                        triB[bp] = p;
                         bp++;
-                        triA[bp] = p + 1;
+                        triB[bp] = p + 1;
                         bp++;
-                        triA[bp] = p + 2;
+                        triB[bp] = p + 2;
                         bp++;
-                        triA[bp] = p + 2;
+                        triB[bp] = p + 2;
                         bp++;
-                        triA[bp] = p + 3;
+                        triB[bp] = p + 3;
                         bp++;
-                        triA[bp] = p;
+                        triB[bp] = p;
                         bp++;
                     }
                     else

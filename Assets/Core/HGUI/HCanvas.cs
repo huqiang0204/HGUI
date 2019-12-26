@@ -7,10 +7,8 @@ using UnityEngine;
 
 namespace Assets.Core.HGUI
 {
-    [RequireComponent(typeof( MeshFilter),typeof(MeshRenderer))]
     public sealed class HCanvas:AsyncScript
     {
-        //static List<Canvas> canvases = new List<Canvas>();
         public Camera camera;
         public RenderMode renderMode;
         GUIElement[] PipeLine = new GUIElement[4096];
@@ -94,8 +92,8 @@ namespace Assets.Core.HGUI
                 renderer = GetComponent<MeshRenderer>();
             if (renderer != null)
             {
-                if (swapMaterials != null)
-                    renderer.materials = swapMaterials;
+                //if (swapMaterials != null)
+                //    renderer.materials = swapMaterials;
             }
         }
         void SubMission(object obj)
@@ -372,7 +370,6 @@ namespace Assets.Core.HGUI
                 mesh.subMeshCount = submesh.Count;
                 for (int i = 0; i < submesh.Count; i++)
                     mesh.SetTriangles(submesh[i], i);
-             
             }
             var mr = GetComponent<MeshRenderer>();
             if (mr != null)

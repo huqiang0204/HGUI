@@ -10,7 +10,7 @@ namespace Assets.Core.HGUI
     {
         internal static Shader DefShader { get {
                 if(shader==null)
-                    shader = Shader.Find("Custom/UIDef");
+                    shader = Shader.Find("Custom/UIDef");//Custom/UIDef
                 return shader;
             } }
         public static Shader shader;
@@ -25,12 +25,9 @@ namespace Assets.Core.HGUI
         public Material material;
         internal bool m_dirty = true;
         internal bool _vertexChange = true;
-        public override void Initial()
-        {
-            material = new Material(DefShader);
-        }
         public virtual void UpdateMesh()
         {
+            
         }
         internal virtual Material GetMaterial(int index,HCanvas canvas)
         {

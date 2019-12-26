@@ -93,7 +93,7 @@ namespace Assets.Core.HGUI
                                             tmp[k] = src[k] + vc;
                                         }
                                         canvas.submesh.Add(tmp);
-                                        canvas.AddMaterial(graphics.GetMaterial(j, canvas), graphics.InstanceID);
+                                        canvas.AddMaterial(graphics.GetMaterial(j, canvas));
                                     }
                                 }
                             }
@@ -109,7 +109,7 @@ namespace Assets.Core.HGUI
                                     tmp[k] = src[k] + vc;
                                 }
                                 canvas.submesh.Add(tmp);
-                                canvas.AddMaterial(graphics.GetMaterial(0, canvas), graphics.InstanceID);
+                                canvas.AddMaterial(graphics.GetMaterial(0, canvas));
                             }
                         }
                     }

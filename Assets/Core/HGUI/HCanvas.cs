@@ -267,21 +267,9 @@ namespace Assets.Core.HGUI
             ids.Clear();
             submesh.Clear();
         }
-        public void AddMaterial(Material material, int id)
+        public void AddMaterial(Material material)
         {
             materials.Add(material);
-            ids.Add(id);
-        }
-        public Material FindMaterial(int id)
-        {
-            for (int i = 0; i < ids.Count; i++)
-            {
-                if (ids[i] == id)
-                {
-                    return materials[i];
-                }
-            }
-            return null;
         }
 #if UNITY_EDITOR
         public void Refresh()

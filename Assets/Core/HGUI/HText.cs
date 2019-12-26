@@ -9,6 +9,15 @@ namespace Assets.Core.HGUI
 {
     public class HText:HGraphics
     {
+        internal static Shader DefFontShader
+        {
+            get
+            {
+                if (shader == null)
+                    shader = Shader.Find("Custom/FontDef");
+                return shader;
+            }
+        }
         static Texture fontTexture;
         public static Font defFont;
         static Font DefaultFont
@@ -37,7 +46,7 @@ namespace Assets.Core.HGUI
             get {
                 if (_TextMaterial == null)
                 {
-                    _TextMaterial = new Material(DefShader);
+                    _TextMaterial = new Material(DefFontShader);
                     _TextMaterial.SetTexture("_MainTex", fontTexture);
                 }
                 _TextMaterial.SetTexture("_MainTex", fontTexture);
@@ -155,7 +164,8 @@ namespace Assets.Core.HGUI
                 m_lineSpace = value;
                 m_dirty = true;
             } }
-        int m_fontSize = 14;
+        [SerializeField]
+        internal int m_fontSize = 14;
         public int FontSize {
             get => m_fontSize;
             set {
@@ -195,7 +205,7 @@ namespace Assets.Core.HGUI
                 settings.richText = m_richText;
                 settings.lineSpacing = m_lineSpace;
                 settings.fontSize = m_fontSize;
-                settings.color = Color;
+                settings.color = m_color;
                 settings.alignByGeometry = m_align;
                 var g = Generator;
                 g.Populate(emojiString.FilterString,settings);

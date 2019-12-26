@@ -15,14 +15,13 @@ namespace Assets.Core.HGUI
             } }
         public static Shader shader;
         [SerializeField]
-        internal Color _color = Color.white;
-        public virtual Color Color { get => _color; set { _color = value; } }
+        internal Color m_color = Color.white;
+        public virtual Color Color { get => m_color; set { m_color = value; } }
         internal Vector3[] vertex;
         internal Vector2[] uv;
         internal Color[] Colors;
         internal int[] tris;
         internal int[][] SubMesh;
-        internal Material[] materials;
         public Material material;
         internal int InstanceID;
         internal bool m_dirty;

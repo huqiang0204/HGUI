@@ -375,7 +375,7 @@ namespace Assets.Core.HGUI
         }
         static void CreateFilledMesh(HImage image)
         {
-            switch(image._fillMethod)
+            switch(image.m_fillMethod)
             {
                 case FillMethod.Horizontal:
                     FillHorizontal(image);

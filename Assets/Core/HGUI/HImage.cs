@@ -82,10 +82,10 @@ namespace Assets.Core.HGUI
             }
         }
         public SpriteType SprType { get; set; }
-        internal FillMethod _fillMethod;
-        public FillMethod FillMethod { get => _fillMethod;
+        internal FillMethod m_fillMethod;
+        public FillMethod FillMethod { get => m_fillMethod;
             set {
-                _fillMethod = value;
+                m_fillMethod = value;
                 _vertexChange = true;
             } }
         internal bool m_fillClockwise;

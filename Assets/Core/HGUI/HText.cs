@@ -49,9 +49,16 @@ namespace Assets.Core.HGUI
                     _TextMaterial = new Material(DefFontShader);
                     _TextMaterial.SetTexture("_MainTex", fontTexture);
                 }
-                _TextMaterial.SetTexture("_MainTex", fontTexture);
                 return _TextMaterial;
             }
+        }
+        internal static void MainFrameDone()
+        {
+            if (_TextMaterial == null)
+            {
+                _TextMaterial = new Material(DefFontShader);
+            }
+            _TextMaterial.SetTexture("_MainTex", fontTexture);
         }
         static Texture _emoji;
         public static Texture EmojiTexture
@@ -92,9 +99,9 @@ namespace Assets.Core.HGUI
                 m_dirty = true;
             } }
         EmojiString emojiString = new EmojiString();
-        IList<UILineInfo> lines;
-        IList<UICharInfo> characters;
-        IList<UIVertex> verts;
+        UILineInfo[] lines;
+        UICharInfo[] characters;
+        UIVertex[] verts;
         [SerializeField]
         internal Font _font;
         public Font Font { get => _font;
@@ -209,9 +216,9 @@ namespace Assets.Core.HGUI
                 settings.alignByGeometry = m_align;
                 var g = Generator;
                 g.Populate(emojiString.FilterString,settings);
-                lines = g.lines;
-                verts = g.verts;
-                characters = g.characters;
+                //lines = g.lines.ToArray();
+                verts = g.verts.ToArray();
+                //characters = g.characters.ToArray();
                 m_dirty = false;
                 _vertexChange = true;
                 fontTexture = Font.material.mainTexture;
@@ -229,7 +236,7 @@ namespace Assets.Core.HGUI
         {
             var emojis = text.emojiString.emojis;
             var verts = text.verts;
-            int c = verts.Count;
+            int c = verts.Length;
             if (c == 0)
             {
                 text.tris = null;

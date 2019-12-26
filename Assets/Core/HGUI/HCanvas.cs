@@ -60,6 +60,7 @@ namespace Assets.Core.HGUI
             CheckSize();
             for (int i = 0; i < max; i++)
                 scripts[i].MainUpdate();
+            HText.MainFrameDone();
             UserAction.Update();
             DispatchUserAction();
             thread.AddSubMission((o) =>
@@ -290,7 +291,7 @@ namespace Assets.Core.HGUI
             }
             for (int i = 0; i < max; i++)
                 scripts[i].MainUpdate();
-          
+            HText.MainFrameDone();
             if (scripts != null)
             {
                 for (int i = 0; i < len; i++)

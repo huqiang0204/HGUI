@@ -74,14 +74,13 @@ namespace Assets.Core.HGUI
                     shareGenerator = new TextGenerator();
                 return shareGenerator;
             } }
-        bool _textChanged;
         [TextArea(3,10)][SerializeField]
         internal string _text;
         public string Text {
             get => _text;
             set {
                 _text = value;
-                _textChanged = true;
+                _dirty = true;
             } }
         EmojiString emojiString = new EmojiString();
         IList<UILineInfo> lines;
@@ -98,7 +97,7 @@ namespace Assets.Core.HGUI
             get => _pivot;
             set {
                 _pivot = value;
-                _textChanged = true;
+                _dirty = true;
             }
         }
         HorizontalWrapMode _hof;
@@ -106,39 +105,39 @@ namespace Assets.Core.HGUI
             get => _hof;
             set {
                 _hof = value;
-                _textChanged = true;
+                _dirty = true;
             } }
         VerticalWrapMode _vof;
         public VerticalWrapMode VerticalOverflow {
             get => _vof;
             set {
                 _vof = value;
-                _textChanged = true;
+                _dirty = true;
             } }
         public bool updateBounds;
         private int resizeTextMaxSize = 40;
         private int resizeTextMinSize = 10;
-        private bool generateOutOfBounds;
+        private bool generateOutOfBounds = false;
         bool _resizeBestFit;
         public bool ResizeForBestFit {
             get => _resizeBestFit;
             set {
                 _resizeBestFit = true;
-                _textChanged = true;
+                _dirty = true;
             } }
         TextAnchor anchor;
         public TextAnchor TextAnchor {
             get => anchor;
             set {
                 anchor = value;
-                _textChanged = true;
+                _dirty = true;
             } }
         FontStyle _fontStyle;
         public FontStyle FontStyle {
             get => _fontStyle;
             set {
                 _fontStyle = value;
-                _textChanged = true;
+                _dirty = true;
             } }
         float scaleFactor = 1;
         bool _richText;
@@ -146,28 +145,28 @@ namespace Assets.Core.HGUI
             get => _richText;
             set {
                 _richText = value;
-                _textChanged = true;
+                _dirty = true;
             } }
         float _lineSpace;
         public float LineSpacing {
             get => _lineSpace;
             set {
                 _lineSpace = value;
-                _textChanged = true;
+                _dirty = true;
             } }
         int _fontSize = 14;
         public int FontSize {
             get => _fontSize;
             set {
                 _fontSize = value;
-                _textChanged = true;
+                _dirty = true;
             } }
         bool _align;
         public bool AlignByGeometry {
             get => _align;
             set {
                 _align = value;
-                _textChanged = true;
+                _dirty = true;
             } }
         public Material emojiMaterial;
         public override void Initial()
@@ -176,9 +175,8 @@ namespace Assets.Core.HGUI
         }
         public override void MainUpdate()
         {
-            if(_textChanged)
+            if(_dirty)
             {
-               
                 emojiString.FullString = _text;
                 TextGenerationSettings settings = new TextGenerationSettings();
                 settings.font = Font;
@@ -203,7 +201,7 @@ namespace Assets.Core.HGUI
                 lines = g.lines;
                 verts = g.verts;
                 characters = g.characters;
-                _textChanged = false;
+                _dirty = false;
                 _vertexChange = true;
                 fontTexture = Font.material.mainTexture;
             }

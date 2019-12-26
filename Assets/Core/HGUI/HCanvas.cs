@@ -290,9 +290,19 @@ namespace Assets.Core.HGUI
             max = 0;
             Collection(transform, -1, 0);
             CheckSize();
+            int len = max;
+            for (int i = 0; i < len; i++)
+            {
+                var grap = scripts[i] as HGraphics;
+                if (grap != null)
+                {
+                    grap._dirty = true;
+                    grap._vertexChange = true;
+                }
+            }
             for (int i = 0; i < max; i++)
                 scripts[i].MainUpdate();
-            int len = max;
+          
             if (scripts != null)
             {
                 for (int i = 0; i < len; i++)

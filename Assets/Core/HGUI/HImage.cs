@@ -65,16 +65,20 @@ namespace Assets.Core.HGUI
             set
             {
                 _sprite = value;
-                if (value != null)
-                {
-                    _rect = value.rect;
-                    _textureSize.x = value.texture.width;
-                    _textureSize.y = value.texture.height;
-                    _border = value.border;
-                    _pivot = value.pivot;
-                    material.SetTexture("_MainTex", value.texture);
-                    _vertexChange = true;
-                }
+                _dirty = true;
+            }
+        }
+        internal void ApplySpriteInfo()
+        {
+            if (_sprite != null)
+            {
+                _rect = _sprite.rect;
+                _textureSize.x = _sprite.texture.width;
+                _textureSize.y = _sprite.texture.height;
+                _border = _sprite.border;
+                _pivot = _sprite.pivot;
+                material.SetTexture("_MainTex", _sprite.texture);
+                _vertexChange = true;
             }
         }
         public SpriteType SprType { get; set; }
@@ -122,6 +126,14 @@ namespace Assets.Core.HGUI
             {
                 SizeDelta.x = _sprite.rect.width;
                 SizeDelta.y = _sprite.rect.height;
+            }
+        }
+        public override void MainUpdate()
+        {
+            if(_dirty)
+            {
+                ApplySpriteInfo();
+                _dirty = false;
             }
         }
         public override void UpdateMesh()

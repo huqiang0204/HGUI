@@ -75,6 +75,7 @@ namespace Assets.Core.HGUI
                 return shareGenerator;
             } }
         bool _textChanged;
+        [TextArea(3,10)][SerializeField]
         internal string _text;
         public string Text {
             get => _text;
@@ -86,6 +87,7 @@ namespace Assets.Core.HGUI
         IList<UILineInfo> lines;
         IList<UICharInfo> characters;
         IList<UIVertex> verts;
+        [SerializeField]
         internal Font _font;
         public Font Font { get => _font;
             set {

@@ -50,6 +50,7 @@ namespace Assets.Core.HGUI
     }
     public class HImage:HGraphics
     {
+        [SerializeField]
         internal Sprite _sprite = null;
         internal Rect _rect;
         internal Vector2 _textureSize;

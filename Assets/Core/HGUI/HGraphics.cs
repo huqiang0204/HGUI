@@ -14,7 +14,8 @@ namespace Assets.Core.HGUI
                 return shader;
             } }
         public static Shader shader;
-        Color _color = Color.white;
+        [SerializeField]
+        internal Color _color = Color.white;
         public virtual Color Color { get => _color; set { _color = value; } }
         internal Vector3[] vertex;
         internal Vector2[] uv;

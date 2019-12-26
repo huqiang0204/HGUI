@@ -16,12 +16,6 @@ public class HTextEditor:Editor
         HText txt = target as HText;
         if (txt != null)
         {
-            txt.Color= EditorGUILayout.ColorField("Color",txt.Color);
-            EditorGUILayout.LabelField("Text");
-            var style = GUI.skin.textArea;
-            style.wordWrap = true;
-            txt.Text = EditorGUILayout.TextArea(txt.Text,style);
-            txt.Font = EditorGUILayout.ObjectField("Font", txt.Font, typeof(Font), true) as Font;
             if(GUI.changed)
             {
                 var can = FindHCanvas(txt.transform);

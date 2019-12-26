@@ -16,8 +16,6 @@ public class HImageEditor:Editor
         if(img!=null)
         {
             bool changed = false;
-            img.Color = EditorGUILayout.ColorField("Color", img.Color);
-            img.Sprite = EditorGUILayout.ObjectField("Sprite",img.Sprite,typeof(Sprite),true) as Sprite;
             img.SprType = (SpriteType)EditorGUILayout.EnumPopup("SpriteType",img.SprType);
             if(img.SprType==SpriteType.Filled)
             {

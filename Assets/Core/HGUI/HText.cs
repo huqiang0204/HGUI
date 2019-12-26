@@ -75,12 +75,12 @@ namespace Assets.Core.HGUI
                 return shareGenerator;
             } }
         [TextArea(3,10)][SerializeField]
-        internal string _text;
+        internal string m_text;
         public string Text {
-            get => _text;
+            get => m_text;
             set {
-                _text = value;
-                _dirty = true;
+                m_text = value;
+                m_dirty = true;
             } }
         EmojiString emojiString = new EmojiString();
         IList<UILineInfo> lines;
@@ -97,111 +97,112 @@ namespace Assets.Core.HGUI
             get => _pivot;
             set {
                 _pivot = value;
-                _dirty = true;
+                m_dirty = true;
             }
         }
-        HorizontalWrapMode _hof;
+        HorizontalWrapMode m_hof;
         public HorizontalWrapMode HorizontalOverflow {
-            get => _hof;
+            get => m_hof;
             set {
-                _hof = value;
-                _dirty = true;
+                m_hof = value;
+                m_dirty = true;
             } }
-        VerticalWrapMode _vof;
+        VerticalWrapMode m_vof;
         public VerticalWrapMode VerticalOverflow {
-            get => _vof;
+            get => m_vof;
             set {
-                _vof = value;
-                _dirty = true;
+                m_vof = value;
+                m_dirty = true;
             } }
         public bool updateBounds;
         private int resizeTextMaxSize = 40;
         private int resizeTextMinSize = 10;
         private bool generateOutOfBounds = false;
-        bool _resizeBestFit;
+        bool m_resizeBestFit;
         public bool ResizeForBestFit {
-            get => _resizeBestFit;
+            get => m_resizeBestFit;
             set {
-                _resizeBestFit = true;
-                _dirty = true;
+                m_resizeBestFit = true;
+                m_dirty = true;
             } }
         TextAnchor anchor;
         public TextAnchor TextAnchor {
             get => anchor;
             set {
                 anchor = value;
-                _dirty = true;
+                m_dirty = true;
             } }
-        FontStyle _fontStyle;
+        FontStyle m_fontStyle;
         public FontStyle FontStyle {
-            get => _fontStyle;
+            get => m_fontStyle;
             set {
-                _fontStyle = value;
-                _dirty = true;
+                m_fontStyle = value;
+                m_dirty = true;
             } }
         float scaleFactor = 1;
-        bool _richText;
+        bool m_richText;
         public bool RichText {
-            get => _richText;
+            get => m_richText;
             set {
-                _richText = value;
-                _dirty = true;
+                m_richText = value;
+                m_dirty = true;
             } }
-        float _lineSpace;
+
+        internal float m_lineSpace;
         public float LineSpacing {
-            get => _lineSpace;
+            get => m_lineSpace;
             set {
-                _lineSpace = value;
-                _dirty = true;
+                m_lineSpace = value;
+                m_dirty = true;
             } }
-        int _fontSize = 14;
+        int m_fontSize = 14;
         public int FontSize {
-            get => _fontSize;
+            get => m_fontSize;
             set {
-                _fontSize = value;
-                _dirty = true;
+                m_fontSize = value;
+                m_dirty = true;
             } }
-        bool _align;
+        bool m_align;
         public bool AlignByGeometry {
-            get => _align;
+            get => m_align;
             set {
-                _align = value;
-                _dirty = true;
+                m_align = value;
+                m_dirty = true;
             } }
         public Material emojiMaterial;
         public override void Initial()
         {
             Font = DefaultFont;
         }
+        static TextGenerationSettings settings;
         public override void MainUpdate()
         {
-            if(_dirty)
+            if(m_dirty)
             {
-                emojiString.FullString = _text;
-                TextGenerationSettings settings = new TextGenerationSettings();
+                emojiString.FullString = m_text;
                 settings.font = Font;
                 settings.pivot = Pivot;
                 settings.generationExtents = SizeDelta;
-                settings.horizontalOverflow = _hof;
-                settings.verticalOverflow = _vof;
+                settings.horizontalOverflow = m_hof;
+                settings.verticalOverflow = m_vof;
                 settings.resizeTextMaxSize = resizeTextMaxSize;
                 settings.resizeTextMinSize = resizeTextMinSize;
                 settings.generateOutOfBounds = generateOutOfBounds;
-                settings.resizeTextForBestFit = _resizeBestFit;
+                settings.resizeTextForBestFit = m_resizeBestFit;
                 settings.textAnchor = anchor;
-                settings.fontStyle = _fontStyle;
+                settings.fontStyle = m_fontStyle;
                 settings.scaleFactor = scaleFactor;
-                settings.richText = _richText;
-                settings.lineSpacing = _lineSpace;
-                settings.fontSize = _fontSize;
+                settings.richText = m_richText;
+                settings.lineSpacing = m_lineSpace;
+                settings.fontSize = m_fontSize;
                 settings.color = Color;
-                settings.alignByGeometry = _align;
+                settings.alignByGeometry = m_align;
                 var g = Generator;
                 g.Populate(emojiString.FilterString,settings);
                 lines = g.lines;
                 verts = g.verts;
                 characters = g.characters;
-                _dirty = false;
+                m_dirty = false;
                 _vertexChange = true;
                 fontTexture = Font.material.mainTexture;
             }

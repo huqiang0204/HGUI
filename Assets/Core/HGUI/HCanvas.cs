@@ -296,7 +296,7 @@ namespace Assets.Core.HGUI
                 var grap = scripts[i] as HGraphics;
                 if (grap != null)
                 {
-                    grap._dirty = true;
+                    grap.m_dirty = true;
                     grap._vertexChange = true;
                 }
             }

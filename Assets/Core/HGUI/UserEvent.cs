@@ -114,9 +114,9 @@ namespace Assets.Core.HGUI
         public Vector2 RawPosition { get; protected set; }
         Vector2 LastPosition;
         public int HoverTime { get; protected set; }
-        public long pressTime { get; internal set; }
-        public long entryTime { get; protected set; }
-        public long stayTime { get; protected set; }
+        public long PressTime { get; internal set; }
+        public long EntryTime { get; protected set; }
+        public long StayTime { get; protected set; }
         public bool Pressed { get; internal set; }
         public bool forbid;
     }

@@ -51,8 +51,8 @@ namespace Assets.Core.HGUI
     public class HImage:HGraphics
     {
         [SerializeField]
-        internal Sprite _sprite = null;
-        internal Rect _rect;
+        internal Sprite m_sprite = null;
+        internal Rect m_rect;
         internal Vector2 _textureSize;
         internal Vector4 _border;
         internal Vector2 _pivot;
@@ -60,24 +60,24 @@ namespace Assets.Core.HGUI
         {
             get
             {
-                return _sprite;
+                return m_sprite;
             }
             set
             {
-                _sprite = value;
-                _dirty = true;
+                m_sprite = value;
+                m_dirty = true;
             }
         }
         internal void ApplySpriteInfo()
         {
-            if (_sprite != null)
+            if (m_sprite != null)
             {
-                _rect = _sprite.rect;
-                _textureSize.x = _sprite.texture.width;
-                _textureSize.y = _sprite.texture.height;
-                _border = _sprite.border;
-                _pivot = _sprite.pivot;
-                material.SetTexture("_MainTex", _sprite.texture);
+                m_rect = m_sprite.rect;
+                _textureSize.x = m_sprite.texture.width;
+                _textureSize.y = m_sprite.texture.height;
+                _border = m_sprite.border;
+                _pivot = m_sprite.pivot;
+                material.SetTexture("_MainTex", m_sprite.texture);
                 _vertexChange = true;
             }
         }
@@ -88,18 +88,18 @@ namespace Assets.Core.HGUI
                 _fillMethod = value;
                 _vertexChange = true;
             } }
-        internal bool _fillClockwise;
+        internal bool m_fillClockwise;
         public bool FillClockwise { get; set; }
-        internal int _fillOrigin;
-        public int FillOrigin { get => _fillOrigin; set {
-                _fillOrigin = value;
+        internal int m_fillOrigin;
+        public int FillOrigin { get => m_fillOrigin; set {
+                m_fillOrigin = value;
                 _vertexChange = true;
             } }
-        internal float _fillAmount = 1;
+        internal float m_fillAmount = 1;
         public float FillAmount {
-            get => _fillAmount;
+            get => m_fillAmount;
             set {
-                _fillAmount = value;
+                m_fillAmount = value;
                 _vertexChange = true;
             } }
         /// <summary>
@@ -122,18 +122,18 @@ namespace Assets.Core.HGUI
             } }
         public void SetNativeSize()
         {
-            if(_sprite!=null)
+            if(m_sprite!=null)
             {
-                SizeDelta.x = _sprite.rect.width;
-                SizeDelta.y = _sprite.rect.height;
+                SizeDelta.x = m_sprite.rect.width;
+                SizeDelta.y = m_sprite.rect.height;
             }
         }
         public override void MainUpdate()
         {
-            if(_dirty)
+            if(m_dirty)
             {
                 ApplySpriteInfo();
-                _dirty = false;
+                m_dirty = false;
             }
         }
         public override void UpdateMesh()

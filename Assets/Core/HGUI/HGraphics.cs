@@ -25,7 +25,7 @@ namespace Assets.Core.HGUI
         internal Material[] materials;
         public Material material;
         internal int InstanceID;
-        internal bool _dirty;
+        internal bool m_dirty;
         internal bool _vertexChange;
         public override void Initial()
         {

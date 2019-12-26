@@ -36,44 +36,41 @@ namespace Assets.Core.HGUI
                 defFont = value;
             }
         }
-        Material _TextMaterial;
+        Material m_TextMaterial;
         Material DefaultTextMaterial
         {
             get {
-                if (_TextMaterial == null)
+                if (m_TextMaterial == null)
                 {
-                    _TextMaterial = new Material(DefFontShader);
+                    m_TextMaterial = new Material(DefFontShader);
                 }
-                return _TextMaterial;
+                return m_TextMaterial;
             }
         }
-        internal static void MainFrameDone()
-        {
-           
-        }
-        static Texture _emoji;
+        Material mainMaterial;
+        static Texture m_emoji;
         public static Texture EmojiTexture
         {
             get
             {
-                if (_emoji == null)
-                    _emoji = Resources.Load<Texture>("emoji");
-                return _emoji;
+                if (m_emoji == null)
+                    m_emoji = Resources.Load<Texture>("emoji");
+                return m_emoji;
             }
             set
             {
-                _emoji = value;
+                m_emoji = value;
             }
         }
-        static Material _EmojiMaterial;
+        static Material m_EmojiMaterial;
         static Material DefaultEmojiMaterial {
             get {
-                if (_EmojiMaterial == null)
+                if (m_EmojiMaterial == null)
                 {
-                    _EmojiMaterial = new Material(DefShader);
-                    _EmojiMaterial.SetTexture("_MainTex", EmojiTexture);
+                    m_EmojiMaterial = new Material(DefShader);
+                    m_EmojiMaterial.SetTexture("_MainTex", EmojiTexture);
                 }
-                return _EmojiMaterial;
+                return m_EmojiMaterial;
             } }
         static TextGenerator shareGenerator;
         static TextGenerator Generator { get {
@@ -99,11 +96,11 @@ namespace Assets.Core.HGUI
             set {
                 _font = value;
             } }
-        internal Vector2 _pivot = new Vector2(0.5f,0.5f);
+        internal Vector2 m_pivot = new Vector2(0.5f,0.5f);
         public Vector2 Pivot {
-            get => _pivot;
+            get => m_pivot;
             set {
-                _pivot = value;
+                m_pivot = value;
                 m_dirty = true;
             }
         }
@@ -214,9 +211,15 @@ namespace Assets.Core.HGUI
                 m_dirty = false;
                 _vertexChange = true;
                 if (material != null)
+                {
                     material.mainTexture = font.material.mainTexture;
+                    mainMaterial = material;
+                }
                 else
+                {
                     DefaultTextMaterial.SetTexture("_MainTex", font.material.mainTexture);
+                    mainMaterial = m_TextMaterial;
+                }
             }
         }
         public override void UpdateMesh()
@@ -350,19 +353,11 @@ namespace Assets.Core.HGUI
         {
             if (index == 0)
             {
-                if(material==null)
-                {
-                    return _TextMaterial;
-                }
-                return material;
+                return mainMaterial;
             }
             else if (index == 1)
             {
-                if(emojiMaterial==null)
-                {
-                    return DefaultEmojiMaterial;
-                }
-                return emojiMaterial;
+                return m_EmojiMaterial;
             }
             return null;
         }

@@ -60,18 +60,48 @@ namespace Assets.Core.HGUI
             CheckSize();
             for (int i = 0; i < max; i++)
                 scripts[i].MainUpdate();
-            HText.MainFrameDone();
             UserAction.Update();
             DispatchUserAction();
-            thread.AddSubMission((o) =>
+            ApplyMesh();
+            thread.AddSubMission(SubMission, null);
+        }
+        MeshFilter meshFilter;
+        MeshRenderer renderer;
+        void ApplyMesh()
+        {
+            if (meshFilter == null)
+                meshFilter = GetComponent<MeshFilter>();
+            if (meshFilter != null)
             {
-                int len = max;
-                if (scripts != null)
-                    for (int i = 0; i < len; i++)
-                        scripts[i].SubUpdate();
-                ClearMesh();
-                HBatch.Batch(this, PipeLine);
-            }, null);
+                var mesh = meshFilter.mesh;
+                if (mesh == null)
+                {
+                    mesh = new Mesh();
+                    meshFilter.mesh = mesh;
+                }
+                mesh.Clear();
+                mesh.vertices = vertex.ToArray();
+                mesh.uv = uv.ToArray();
+                mesh.colors = colors.ToArray();
+                mesh.subMeshCount = submesh.Count;
+                for (int i = 0; i < submesh.Count; i++)
+                    mesh.SetTriangles(submesh[i], i);
+            }
+            if (renderer == null)
+                renderer = GetComponent<MeshRenderer>();
+            if (renderer != null)
+            {
+                renderer.materials = materials.ToArray();
+            }
+        }
+        void SubMission(object obj)
+        {
+            int len = max;
+            if (scripts != null)
+                for (int i = 0; i < len; i++)
+                    scripts[i].SubUpdate();
+            ClearMesh();
+            HBatch.Batch(this, PipeLine);
         }
         void CheckSize()
         {
@@ -256,15 +286,13 @@ namespace Assets.Core.HGUI
         internal List<Vector2> uv = new List<Vector2>();
         internal List<Color> colors = new List<Color>();
         internal List<Material> materials = new List<Material>();
-        List<int> ids = new List<int>();
-        public List<int[]> submesh = new List<int[]>();
+        internal List<int[]> submesh = new List<int[]>();
         void ClearMesh()
         {
             vertex.Clear();
             uv.Clear();
             colors.Clear();
             materials.Clear();
-            ids.Clear();
             submesh.Clear();
         }
         public void AddMaterial(Material material)
@@ -290,7 +318,6 @@ namespace Assets.Core.HGUI
             }
             for (int i = 0; i < max; i++)
                 scripts[i].MainUpdate();
-            HText.MainFrameDone();
             if (scripts != null)
             {
                 for (int i = 0; i < len; i++)
@@ -305,6 +332,11 @@ namespace Assets.Core.HGUI
                
             ClearMesh();
             HBatch.Batch(this, PipeLine);
+            if (Application.isPlaying)
+            {
+                ApplyMesh();
+                return;
+            }
             var mf = GetComponent<MeshFilter>();
             if (mf != null)
             {

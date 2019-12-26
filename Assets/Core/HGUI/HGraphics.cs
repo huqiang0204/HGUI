@@ -23,7 +23,6 @@ namespace Assets.Core.HGUI
         internal int[] tris;
         internal int[][] SubMesh;
         public Material material;
-        internal int InstanceID;
         internal bool m_dirty;
         internal bool _vertexChange;
         public override void Initial()

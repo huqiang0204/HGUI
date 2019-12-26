@@ -23,8 +23,8 @@ namespace Assets.Core.HGUI
         internal int[] tris;
         internal int[][] SubMesh;
         public Material material;
-        internal bool m_dirty;
-        internal bool _vertexChange;
+        internal bool m_dirty = true;
+        internal bool _vertexChange = true;
         public override void Initial()
         {
             material = new Material(DefShader);

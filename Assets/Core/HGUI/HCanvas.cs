@@ -80,18 +80,22 @@ namespace Assets.Core.HGUI
                     meshFilter.mesh = mesh;
                 }
                 mesh.Clear();
-                mesh.vertices = vertex.ToArray();
-                mesh.uv = uv.ToArray();
-                mesh.colors = colors.ToArray();
-                mesh.subMeshCount = submesh.Count;
-                for (int i = 0; i < submesh.Count; i++)
-                    mesh.SetTriangles(submesh[i], i);
+                if (swapVertex != null)
+                {
+                    mesh.vertices = swapVertex;
+                    mesh.uv = swapUV;
+                    mesh.colors = swapColors;
+                    mesh.subMeshCount = swapSubmesh.Length;
+                    for (int i = 0; i < swapSubmesh.Length; i++)
+                        mesh.SetTriangles(swapSubmesh[i], i);
+                }
             }
             if (renderer == null)
                 renderer = GetComponent<MeshRenderer>();
             if (renderer != null)
             {
-                renderer.materials = materials.ToArray();
+                if (swapMaterials != null)
+                    renderer.materials = swapMaterials;
             }
         }
         void SubMission(object obj)
@@ -102,6 +106,11 @@ namespace Assets.Core.HGUI
                     scripts[i].SubUpdate();
             ClearMesh();
             HBatch.Batch(this, PipeLine);
+            swapVertex = vertex.ToArray();
+            swapUV = uv.ToArray();
+            swapColors = colors.ToArray();
+            swapMaterials = materials.ToArray();
+            swapSubmesh = submesh.ToArray();
         }
         void CheckSize()
         {
@@ -287,6 +296,11 @@ namespace Assets.Core.HGUI
         internal List<Color> colors = new List<Color>();
         internal List<Material> materials = new List<Material>();
         internal List<int[]> submesh = new List<int[]>();
+        Vector3[] swapVertex;
+        Vector2[] swapUV;
+        Color[] swapColors;
+        Material[] swapMaterials;
+        int[][] swapSubmesh;
         void ClearMesh()
         {
             vertex.Clear();
@@ -334,6 +348,11 @@ namespace Assets.Core.HGUI
             HBatch.Batch(this, PipeLine);
             if (Application.isPlaying)
             {
+                swapVertex = vertex.ToArray();
+                swapUV = uv.ToArray();
+                swapColors = colors.ToArray();
+                swapMaterials = materials.ToArray();
+                swapSubmesh = submesh.ToArray();
                 ApplyMesh();
                 return;
             }

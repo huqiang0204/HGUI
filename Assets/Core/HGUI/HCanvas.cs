@@ -252,11 +252,10 @@ namespace Assets.Core.HGUI
                 for (int i = 0; i < inputs.Length; i++)
                     inputs[i].Clear();
         }
-
-        public List<Vector3> vertex = new List<Vector3>();
-        public List<Vector2> uv = new List<Vector2>();
-        public List<Color> colors = new List<Color>();
-        public List<Material> materials = new List<Material>();
+        internal List<Vector3> vertex = new List<Vector3>();
+        internal List<Vector2> uv = new List<Vector2>();
+        internal List<Color> colors = new List<Color>();
+        internal List<Material> materials = new List<Material>();
         List<int> ids = new List<int>();
         public List<int[]> submesh = new List<int[]>();
         void ClearMesh()

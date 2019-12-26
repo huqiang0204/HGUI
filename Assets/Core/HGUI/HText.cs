@@ -28,10 +28,6 @@ namespace Assets.Core.HGUI
                 {
                     defFont = Font.CreateDynamicFontFromOSFont("Arial", 16);
                     fontTexture = defFont.material.mainTexture;
-                    Font.textureRebuilt += (o) => {
-                        fontTexture = defFont.material.mainTexture;
-                        DefaultTextMaterial.SetTexture("_MainTex",fontTexture);
-                    };
                 }
                 return defFont;
             }
@@ -40,25 +36,20 @@ namespace Assets.Core.HGUI
                 defFont = value;
             }
         }
-        static Material _TextMaterial;
-        static Material DefaultTextMaterial
+        Material _TextMaterial;
+        Material DefaultTextMaterial
         {
             get {
                 if (_TextMaterial == null)
                 {
                     _TextMaterial = new Material(DefFontShader);
-                    _TextMaterial.SetTexture("_MainTex", fontTexture);
                 }
                 return _TextMaterial;
             }
         }
         internal static void MainFrameDone()
         {
-            if (_TextMaterial == null)
-            {
-                _TextMaterial = new Material(DefFontShader);
-            }
-            _TextMaterial.SetTexture("_MainTex", fontTexture);
+           
         }
         static Texture _emoji;
         public static Texture EmojiTexture
@@ -196,8 +187,9 @@ namespace Assets.Core.HGUI
         {
             if(m_dirty)
             {
+                var font = Font;
                 emojiString.FullString = m_text;
-                settings.font = Font;
+                settings.font = font;
                 settings.pivot = Pivot;
                 settings.generationExtents = SizeDelta;
                 settings.horizontalOverflow = m_hof;
@@ -221,7 +213,10 @@ namespace Assets.Core.HGUI
                 //characters = g.characters.ToArray();
                 m_dirty = false;
                 _vertexChange = true;
-                fontTexture = Font.material.mainTexture;
+                if (material != null)
+                    material.mainTexture = font.material.mainTexture;
+                else
+                    DefaultTextMaterial.SetTexture("_MainTex", font.material.mainTexture);
             }
         }
         public override void UpdateMesh()
@@ -357,7 +352,7 @@ namespace Assets.Core.HGUI
             {
                 if(material==null)
                 {
-                    return DefaultTextMaterial;
+                    return _TextMaterial;
                 }
                 return material;
             }

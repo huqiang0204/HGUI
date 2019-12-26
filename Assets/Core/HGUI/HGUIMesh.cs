@@ -67,8 +67,8 @@ namespace Assets.Core.HGUI
         }
         static void CreateSimpleMesh(HImage image)
         {
-            float px = image._pivot.x / image.m_rect.width;
-            float py = image._pivot.y / image.m_rect.height;
+            float px = image.m_pivot.x / image.m_rect.width;
+            float py = image.m_pivot.y / image.m_rect.height;
             var vertex = new Vector3[4];
             float x = image.SizeDelta.x;
             float lx = -px * x;
@@ -87,8 +87,8 @@ namespace Assets.Core.HGUI
         
             image.vertex = vertex;
             Vector2[] uv = new Vector2[4];
-            float w = image._textureSize.x;
-            float h = image._textureSize.y;
+            float w = image.m_textureSize.x;
+            float h = image.m_textureSize.y;
             lx = image.m_rect.x / w;
             rx = lx + image.m_rect.width / w;
             dy = image.m_rect.y / h;
@@ -107,30 +107,30 @@ namespace Assets.Core.HGUI
         }
         static void CreateSlicedMesh(HImage image)
         {
-            float px = image._pivot.x / image.m_rect.width;
-            float py = image._pivot.y / image.m_rect.height;
+            float px = image.m_pivot.x / image.m_rect.width;
+            float py = image.m_pivot.y / image.m_rect.height;
             float x = image.SizeDelta.x;
             float lx = -px * x;
             float rx = (1 - px) * x;
             float y = image.SizeDelta.y;
             float dy = -py * y;
             float ty = (1 - py) * y;
-            float p = image._pixelsPerUnit;
+            float p = image.m_pixelsPerUnit;
             if (p < 0.01f)
                 p = 0.01f;
-            float slx = lx +  image._border.x / image._pixelsPerUnit;
-            float sdy = dy +  image._border.y / image._pixelsPerUnit;
-            float srx = rx -  image._border.z / image._pixelsPerUnit;
-            float sty = ty - image._border.w / image._pixelsPerUnit;
+            float slx = lx +  image.m_border.x / image.m_pixelsPerUnit;
+            float sdy = dy +  image.m_border.y / image.m_pixelsPerUnit;
+            float srx = rx -  image.m_border.z / image.m_pixelsPerUnit;
+            float sty = ty - image.m_border.w / image.m_pixelsPerUnit;
             if (srx <= slx )
             {
-                float cx = image._border.x / (image._border.x + image._border.z) * x + lx;
+                float cx = image.m_border.x / (image.m_border.x + image.m_border.z) * x + lx;
                 slx = cx;
                 srx = cx;
             }
             if (sty < sdy)
             {
-                float cy = image._border.y / (image._border.y + image._border.w) * y + dy;
+                float cy = image.m_border.y / (image.m_border.y + image.m_border.w) * y + dy;
                 sdy = cy;
                 sty = cy;
             }
@@ -173,17 +173,17 @@ namespace Assets.Core.HGUI
             image.vertex = vertex;
 
             Vector2[] uv = new Vector2[16];
-            float w = image._textureSize.x;
-            float h = image._textureSize.y;
+            float w = image.m_textureSize.x;
+            float h = image.m_textureSize.y;
             lx = image.m_rect.x / w;
             rx = lx + image.m_rect.width / w;
             dy = image.m_rect.y / h;
             ty = dy + image.m_rect.height / h;
 
-            slx = lx + image._border.x / w;
-            sdy = dy + image._border.y / h;
-            srx = rx - image._border.z / w;
-            sty = ty - image._border.w / h;
+            slx = lx + image.m_border.x / w;
+            sdy = dy + image.m_border.y / h;
+            srx = rx - image.m_border.z / w;
+            sty = ty - image.m_border.w / h;
 
             uv[0].x = lx;
             uv[0].y = dy;
@@ -222,7 +222,7 @@ namespace Assets.Core.HGUI
             uv[15].y = ty;
             image.uv = uv;
 
-            if (image._fillCenter)
+            if (image.m_fillCenter)
                 image.tris = TwelveRectangle;
             else image.tris = ElevenRectangle;
         }
@@ -232,42 +232,42 @@ namespace Assets.Core.HGUI
         /// <param name="image"></param>
         static void CreateTiledMesh(HImage image)
         {
-            float px = image._pivot.x / image.m_rect.width;
-            float py = image._pivot.y / image.m_rect.height;
+            float px = image.m_pivot.x / image.m_rect.width;
+            float py = image.m_pivot.y / image.m_rect.height;
             float x = image.SizeDelta.x;
             float lx = -px * x;
             float rx = (1 - px) * x;
             float y = image.SizeDelta.y;
             float dy = -py * y;
             float ty = (1 - py) * y;
-            float p = image._pixelsPerUnit;
+            float p = image.m_pixelsPerUnit;
             if (p < 0.01f)
                 p = 0.01f;
-            float slx = lx + image._border.x / image._pixelsPerUnit;
-            float sdy = dy + image._border.y / image._pixelsPerUnit;
-            float srx = rx - image._border.z / image._pixelsPerUnit;
-            float sty = ty - image._border.w / image._pixelsPerUnit;
+            float slx = lx + image.m_border.x / image.m_pixelsPerUnit;
+            float sdy = dy + image.m_border.y / image.m_pixelsPerUnit;
+            float srx = rx - image.m_border.z / image.m_pixelsPerUnit;
+            float sty = ty - image.m_border.w / image.m_pixelsPerUnit;
 
             float w = image.m_rect.width;
-            float cw = x * (1 - image._border.x - image._border.z) / p;
+            float cw = x * (1 - image.m_border.x - image.m_border.z) / p;
             float h = image.m_rect.height;
-            float ch = y * (1 - image._border.y - image._border.w) / p;
+            float ch = y * (1 - image.m_border.y - image.m_border.w) / p;
             int col = (int)((srx - slx) / cw);//列
             int row = (int)((sty - sdy) / ch);//行
 
-            float tw = image._textureSize.x;
-            float th = image._textureSize.y;
+            float tw = image.m_textureSize.x;
+            float th = image.m_textureSize.y;
             float ulx = image.m_rect.x / tw;
             float urx = ulx + w / tw;
             float udy = image.m_rect.y / th;
             float uty = udy + h / th;
 
-            float uslx = ulx + image._border.x / w;
-            float usdy = udy + image._border.y / h;
-            float usrx = urx - image._border.z / w;
-            float usty = uty -  image._border.w / h;
+            float uslx = ulx + image.m_border.x / w;
+            float usdy = udy + image.m_border.y / h;
+            float usrx = urx - image.m_border.z / w;
+            float usty = uty -  image.m_border.w / h;
 
-            if(image._fillCenter)
+            if(image.m_fillCenter)
             {
                 int all = (col + 3) * (row + 3);
                 Vector3[] vertex = new Vector3[all];
@@ -396,16 +396,16 @@ namespace Assets.Core.HGUI
         }
         static void FillHorizontal(HImage image)
         {
-            float px = image._pivot.x / image.m_rect.width;
-            float py = image._pivot.y / image.m_rect.height;
+            float px = image.m_pivot.x / image.m_rect.width;
+            float py = image.m_pivot.y / image.m_rect.height;
           
             float x = image.SizeDelta.x;
             float y = image.SizeDelta.y;
             float dy = -py * y;
             float ty = (1 - py) * y;
 
-            float w = image._textureSize.x;
-            float h = image._textureSize.y;
+            float w = image.m_textureSize.x;
+            float h = image.m_textureSize.y;
             float udy = image.m_rect.y / h;
             float uty = udy + image.m_rect.height / h;
             float lx, rx, ulx, urx;
@@ -449,16 +449,16 @@ namespace Assets.Core.HGUI
         }
         static void FillVertical(HImage image)
         {
-            float px = image._pivot.x / image.m_rect.width;
-            float py = image._pivot.y / image.m_rect.height;
+            float px = image.m_pivot.x / image.m_rect.width;
+            float py = image.m_pivot.y / image.m_rect.height;
 
             float x = image.SizeDelta.x;
             float y = image.SizeDelta.y;
             float lx = -px * x;
             float rx = (1 - px) * x;
 
-            float w = image._textureSize.x;
-            float h = image._textureSize.y;
+            float w = image.m_textureSize.x;
+            float h = image.m_textureSize.y;
             float ulx = image.m_rect.x / w;
             float urx = ulx + image.m_rect.width / w;
             float dy, ty, udy, uty;
@@ -502,16 +502,16 @@ namespace Assets.Core.HGUI
         }
         static void FillRadial90(HImage image)
         {
-            float px = image._pivot.x / image.m_rect.width;
-            float py = image._pivot.y / image.m_rect.height;
+            float px = image.m_pivot.x / image.m_rect.width;
+            float py = image.m_pivot.y / image.m_rect.height;
             float x = image.SizeDelta.x;
             float lx = -px * x;
             float rx = (1 - px) * x;
             float y = image.SizeDelta.y;
             float dy = -py * y;
             float ty = (1 - py) * y;
-            float w = image._textureSize.x;
-            float h = image._textureSize.y;
+            float w = image.m_textureSize.x;
+            float h = image.m_textureSize.y;
             float ulx = image.m_rect.x / w;
             float urx = ulx + image.m_rect.width / w;
             float udy = image.m_rect.y / h;
@@ -658,16 +658,16 @@ namespace Assets.Core.HGUI
         static int[] ThreeTriangleB = new int[] { 0, 2, 3, 0, 3, 1, 1, 3, 4, };
         static void FillRadial180Bottom(HImage image)
         {
-            float px = image._pivot.x / image.m_rect.width;
-            float py = image._pivot.y / image.m_rect.height;
+            float px = image.m_pivot.x / image.m_rect.width;
+            float py = image.m_pivot.y / image.m_rect.height;
             float x = image.SizeDelta.x;
             float lx = -px * x;
             float rx = (1 - px) * x;
             float y = image.SizeDelta.y;
             float dy = -py * y;
             float ty = (1 - py) * y;
-            float w = image._textureSize.x;
-            float h = image._textureSize.y;
+            float w = image.m_textureSize.x;
+            float h = image.m_textureSize.y;
             float ulx = image.m_rect.x / w;
             float urx = ulx + image.m_rect.width / w;
             float udy = image.m_rect.y / h;
@@ -791,16 +791,16 @@ namespace Assets.Core.HGUI
         static int[] TriangleL3 = new int[] { 0, 1, 2, 1, 3, 4, 1, 4, 2 };
         static void FillRadial180Left(HImage image)
         {
-            float px = image._pivot.x / image.m_rect.width;
-            float py = image._pivot.y / image.m_rect.height;
+            float px = image.m_pivot.x / image.m_rect.width;
+            float py = image.m_pivot.y / image.m_rect.height;
             float x = image.SizeDelta.x;
             float lx = -px * x;
             float rx = (1 - px) * x;
             float y = image.SizeDelta.y;
             float dy = -py * y;
             float ty = (1 - py) * y;
-            float w = image._textureSize.x;
-            float h = image._textureSize.y;
+            float w = image.m_textureSize.x;
+            float h = image.m_textureSize.y;
             float ulx = image.m_rect.x / w;
             float urx = ulx + image.m_rect.width / w;
             float udy = image.m_rect.y / h;
@@ -926,16 +926,16 @@ namespace Assets.Core.HGUI
         static int[] TriangleT3 = new int[] { 0, 3, 1, 1, 3, 4, 1, 4, 2 };
         static void FillRadial180Top(HImage image)
         {
-            float px = image._pivot.x / image.m_rect.width;
-            float py = image._pivot.y / image.m_rect.height;
+            float px = image.m_pivot.x / image.m_rect.width;
+            float py = image.m_pivot.y / image.m_rect.height;
             float x = image.SizeDelta.x;
             float lx = -px * x;
             float rx = (1 - px) * x;
             float y = image.SizeDelta.y;
             float dy = -py * y;
             float ty = (1 - py) * y;
-            float w = image._textureSize.x;
-            float h = image._textureSize.y;
+            float w = image.m_textureSize.x;
+            float h = image.m_textureSize.y;
             float ulx = image.m_rect.x / w;
             float urx = ulx + image.m_rect.width / w;
             float udy = image.m_rect.y / h;
@@ -1058,16 +1058,16 @@ namespace Assets.Core.HGUI
         static int[] TriangleR3 = new int[] { 0, 2, 3, 0, 3, 1, 2, 4, 3 };
         static void FillRadial180Right(HImage image)
         {
-            float px = image._pivot.x / image.m_rect.width;
-            float py = image._pivot.y / image.m_rect.height;
+            float px = image.m_pivot.x / image.m_rect.width;
+            float py = image.m_pivot.y / image.m_rect.height;
             float x = image.SizeDelta.x;
             float lx = -px * x;
             float rx = (1 - px) * x;
             float y = image.SizeDelta.y;
             float dy = -py * y;
             float ty = (1 - py) * y;
-            float w = image._textureSize.x;
-            float h = image._textureSize.y;
+            float w = image.m_textureSize.x;
+            float h = image.m_textureSize.y;
             float ulx = image.m_rect.x / w;
             float urx = ulx + image.m_rect.width / w;
             float udy = image.m_rect.y / h;
@@ -1254,14 +1254,14 @@ namespace Assets.Core.HGUI
                     }
                 }
             }
-            float px = image._pivot.x / image.m_rect.width;
-            float py = image._pivot.y / image.m_rect.height;
+            float px = image.m_pivot.x / image.m_rect.width;
+            float py = image.m_pivot.y / image.m_rect.height;
             float lx = -px * x;
             float rx = (1 - px) * x;
             float dy = -py * y;
             float ty = (1 - py) * y;
-            float w = image._textureSize.x;
-            float h = image._textureSize.y;
+            float w = image.m_textureSize.x;
+            float h = image.m_textureSize.y;
             float ulx = image.m_rect.x / w;
             float urx = ulx + image.m_rect.width / w;
             float udy = image.m_rect.y / h;
@@ -1604,14 +1604,14 @@ namespace Assets.Core.HGUI
                     }
                 }
             }
-            float px = image._pivot.x / image.m_rect.width;
-            float py = image._pivot.y / image.m_rect.height;
+            float px = image.m_pivot.x / image.m_rect.width;
+            float py = image.m_pivot.y / image.m_rect.height;
             float lx = -px * x;
             float rx = (1 - px) * x;
             float dy = -py * y;
             float ty = (1 - py) * y;
-            float w = image._textureSize.x;
-            float h = image._textureSize.y;
+            float w = image.m_textureSize.x;
+            float h = image.m_textureSize.y;
             float ulx = image.m_rect.x / w;
             float urx = ulx + image.m_rect.width / w;
             float udy = image.m_rect.y / h;
@@ -1948,14 +1948,14 @@ namespace Assets.Core.HGUI
                     }
                 }
             }
-            float px = image._pivot.x / image.m_rect.width;
-            float py = image._pivot.y / image.m_rect.height;
+            float px = image.m_pivot.x / image.m_rect.width;
+            float py = image.m_pivot.y / image.m_rect.height;
             float lx = -px * x;
             float rx = (1 - px) * x;
             float dy = -py * y;
             float ty = (1 - py) * y;
-            float w = image._textureSize.x;
-            float h = image._textureSize.y;
+            float w = image.m_textureSize.x;
+            float h = image.m_textureSize.y;
             float ulx = image.m_rect.x / w;
             float urx = ulx + image.m_rect.width / w;
             float udy = image.m_rect.y / h;
@@ -2295,14 +2295,14 @@ namespace Assets.Core.HGUI
                     }
                 }
             }
-            float px = image._pivot.x / image.m_rect.width;
-            float py = image._pivot.y / image.m_rect.height;
+            float px = image.m_pivot.x / image.m_rect.width;
+            float py = image.m_pivot.y / image.m_rect.height;
             float lx = -px * x;
             float rx = (1 - px) * x;
             float dy = -py * y;
             float ty = (1 - py) * y;
-            float w = image._textureSize.x;
-            float h = image._textureSize.y;
+            float w = image.m_textureSize.x;
+            float h = image.m_textureSize.y;
             float ulx = image.m_rect.x / w;
             float urx = ulx + image.m_rect.width / w;
             float udy = image.m_rect.y / h;

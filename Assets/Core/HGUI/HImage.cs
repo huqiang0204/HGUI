@@ -53,9 +53,9 @@ namespace Assets.Core.HGUI
         [SerializeField]
         internal Sprite m_sprite = null;
         internal Rect m_rect;
-        internal Vector2 _textureSize;
-        internal Vector4 _border;
-        internal Vector2 _pivot;
+        internal Vector2 m_textureSize;
+        internal Vector4 m_border;
+        internal Vector2 m_pivot;
         public Sprite Sprite
         {
             get
@@ -73,10 +73,10 @@ namespace Assets.Core.HGUI
             if (m_sprite != null)
             {
                 m_rect = m_sprite.rect;
-                _textureSize.x = m_sprite.texture.width;
-                _textureSize.y = m_sprite.texture.height;
-                _border = m_sprite.border;
-                _pivot = m_sprite.pivot;
+                m_textureSize.x = m_sprite.texture.width;
+                m_textureSize.y = m_sprite.texture.height;
+                m_border = m_sprite.border;
+                m_pivot = m_sprite.pivot;
                 material.SetTexture("_MainTex", m_sprite.texture);
                 _vertexChange = true;
             }
@@ -106,19 +106,19 @@ namespace Assets.Core.HGUI
         /// 开启此项,按弧度填充,否则按矩形四个角填充
         /// </summary>
         public bool PreserveAspect { get; set; }
-        internal float _pixelsPerUnit = 1;
-        internal bool _fillCenter = true;
+        internal float m_pixelsPerUnit = 1;
+        internal bool m_fillCenter = true;
         public bool FillCenter {
-            get { return _fillCenter; }
-            set { if (_fillCenter != value)
+            get { return m_fillCenter; }
+            set { if (m_fillCenter != value)
                     _vertexChange = true;
-                _fillCenter = value; }
+                m_fillCenter = value; }
         }
-        public float PixelsPerUnitMultiplier { get => _pixelsPerUnit;
+        public float PixelsPerUnitMultiplier { get => m_pixelsPerUnit;
             set {
-                if (_pixelsPerUnit != value)
+                if (m_pixelsPerUnit != value)
                     _vertexChange = true;
-                _pixelsPerUnit = value;
+                m_pixelsPerUnit = value;
             } }
         public void SetNativeSize()
         {

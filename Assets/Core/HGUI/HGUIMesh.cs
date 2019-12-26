@@ -63,6 +63,7 @@ namespace Assets.Core.HGUI
             vertex[3].x = rx;
             vertex[3].y = ty;
             image.vertex = vertex;
+            image.uv = new Vector2[4];
             image.tris = Rectangle;
         }
         static void CreateSimpleMesh(HImage image)

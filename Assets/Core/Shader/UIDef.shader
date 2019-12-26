@@ -74,7 +74,6 @@
 				};
 
 				fixed4 _Color;
-				fixed4 _TextureSampleAdd;
 				float4 _ClipRect;
 
 				v2f vert(appdata_t IN)
@@ -94,6 +93,7 @@
 				fixed4 frag(v2f IN) : SV_Target
 				{
 					half4 color = tex2D(_MainTex, IN.texcoord);
+					color *= IN.color;
 					//color.a *= UnityGet2DClipping(IN.worldPosition.xy, _ClipRect);
 					#ifdef UNITY_UI_ALPHACLIP
 					//clip(color.a - 0.001);

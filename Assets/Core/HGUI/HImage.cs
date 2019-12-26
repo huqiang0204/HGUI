@@ -78,8 +78,11 @@ namespace Assets.Core.HGUI
                 m_border = m_sprite.border;
                 m_pivot = m_sprite.pivot;
                 material.SetTexture("_MainTex", m_sprite.texture);
-                _vertexChange = true;
+            }else
+            {
+                material.SetTexture("_MainTex", null);
             }
+            _vertexChange = true;
         }
         public SpriteType SprType { get; set; }
         internal FillMethod m_fillMethod;

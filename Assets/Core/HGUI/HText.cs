@@ -359,5 +359,14 @@ namespace Assets.Core.HGUI
             }
             return null;
         }
+        public override bool CompareMaterial(HGraphics graphics)
+        {
+            HText text = graphics as HText;
+            if (text == null)
+                return false;
+            if (text.mainMaterial == mainMaterial)
+                return true;
+            return false;
+        }
     }
 }

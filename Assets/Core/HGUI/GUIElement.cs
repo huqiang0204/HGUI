@@ -28,7 +28,6 @@ namespace Assets.Core.HGUI
             if (current == null)
             {
                 current = graphics;
-
             }
             if (graphics.Mask)
             {

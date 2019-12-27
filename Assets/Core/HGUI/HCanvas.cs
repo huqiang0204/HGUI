@@ -92,8 +92,8 @@ namespace Assets.Core.HGUI
                 renderer = GetComponent<MeshRenderer>();
             if (renderer != null)
             {
-                //if (swapMaterials != null)
-                //    renderer.materials = swapMaterials;
+                if (swapMaterials != null)
+                    renderer.materials = swapMaterials;
             }
         }
         void SubMission(object obj)
@@ -325,7 +325,7 @@ namespace Assets.Core.HGUI
                 if (grap != null)
                 {
                     grap.m_dirty = true;
-                    grap._vertexChange = true;
+                    grap.m_vertexChange = true;
                 }
             }
             for (int i = 0; i < max; i++)

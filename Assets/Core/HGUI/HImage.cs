@@ -93,28 +93,28 @@ namespace Assets.Core.HGUI
             {
                 mainMaterial = DefaultMat;
             }
-            _vertexChange = true;
+            m_vertexChange = true;
         }
         public SpriteType SprType { get; set; }
         internal FillMethod m_fillMethod;
         public FillMethod FillMethod { get => m_fillMethod;
             set {
                 m_fillMethod = value;
-                _vertexChange = true;
+                m_vertexChange = true;
             } }
         internal bool m_fillClockwise;
         public bool FillClockwise { get; set; }
         internal int m_fillOrigin;
         public int FillOrigin { get => m_fillOrigin; set {
                 m_fillOrigin = value;
-                _vertexChange = true;
+                m_vertexChange = true;
             } }
         internal float m_fillAmount = 1;
         public float FillAmount {
             get => m_fillAmount;
             set {
                 m_fillAmount = value;
-                _vertexChange = true;
+                m_vertexChange = true;
             } }
         /// <summary>
         /// 开启此项,按弧度填充,否则按矩形四个角填充
@@ -125,13 +125,13 @@ namespace Assets.Core.HGUI
         public bool FillCenter {
             get { return m_fillCenter; }
             set { if (m_fillCenter != value)
-                    _vertexChange = true;
+                    m_vertexChange = true;
                 m_fillCenter = value; }
         }
         public float PixelsPerUnitMultiplier { get => m_pixelsPerUnit;
             set {
                 if (m_pixelsPerUnit != value)
-                    _vertexChange = true;
+                    m_vertexChange = true;
                 m_pixelsPerUnit = value;
             } }
         public void SetNativeSize()
@@ -152,10 +152,10 @@ namespace Assets.Core.HGUI
         }
         public override void UpdateMesh()
         {
-            if(_vertexChange)
+            if(m_vertexChange)
             {
                 HGUIMesh.CreateMesh(this);
-                _vertexChange = false;
+                m_vertexChange = false;
             }
         }
         internal override Material GetMaterial(int index, HCanvas canvas)

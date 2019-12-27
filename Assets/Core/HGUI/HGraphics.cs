@@ -24,18 +24,18 @@ namespace Assets.Core.HGUI
         internal int[][] SubMesh;
         public Material material;
         internal bool m_dirty = true;
-        internal bool _vertexChange = true;
+        internal bool m_vertexChange = true;
         public Texture MainTexture { get; set; }
         public bool ShareMaterial;
         public bool Mask;
         public virtual void UpdateMesh()
         {
         }
-        public virtual bool CompareMaterial(Material material, int index)
+        public virtual bool CompareMaterial(Graphics graphics)
         {
             return false;
         }
-        internal virtual Material GetMaterial(int index,HCanvas canvas)
+        internal virtual Material GetMaterial(int index, HCanvas canvas)
         {
             return null;
         }

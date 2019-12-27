@@ -207,7 +207,7 @@ namespace Assets.Core.HGUI
                 g.Populate(emojiString.FilterString,settings);
                 verts = g.verts.ToArray();
                 m_dirty = false;
-                _vertexChange = true;
+                m_vertexChange = true;
                 if (material != null)
                 {
                     material.mainTexture = font.material.mainTexture;
@@ -222,10 +222,10 @@ namespace Assets.Core.HGUI
         }
         public override void UpdateMesh()
         {
-            if (_vertexChange)
+            if (m_vertexChange)
             {
                 CreateEmojiMesh(this);
-                _vertexChange = false;
+                m_vertexChange = false;
             }
         }
         static void CreateEmojiMesh(HText text)

@@ -42,7 +42,7 @@ namespace Assets.Core.HGUI
                     var vs = canvas.vertex;
                     var vc = vs.Count;
                     var vert = graphics.vertex;
-                    if(vert!=null)
+                    if (vert != null)
                     {
                         for (int j = 0; j < vert.Length; j++)
                         {

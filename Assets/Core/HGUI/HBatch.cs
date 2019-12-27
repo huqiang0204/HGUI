@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Assets.Core.HGUI
@@ -124,6 +123,10 @@ namespace Assets.Core.HGUI
                     os++;
                 }
             }
+        }
+        public static void MainBach(HCanvas canvas,GUIElement [] pipeLine)
+        {
+
         }
     }
 }

@@ -15,4 +15,12 @@ namespace Assets.Core.HGUI
         public Transform trans;
         public AsyncScript script;
     }
+    public struct Batch
+    {
+        public Material Fmaterial;
+        public Material Smaterial;
+        public Material Tmaterial;
+        public int MatCount;
+        public int CombineCount;
+    }
 }

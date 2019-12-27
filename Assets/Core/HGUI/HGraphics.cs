@@ -25,9 +25,15 @@ namespace Assets.Core.HGUI
         public Material material;
         internal bool m_dirty = true;
         internal bool _vertexChange = true;
+        public Texture MainTexture { get; set; }
+        public bool ShareMaterial;
+        public bool Mask;
         public virtual void UpdateMesh()
         {
-            
+        }
+        public virtual bool CompareMaterial(Material material, int index)
+        {
+            return false;
         }
         internal virtual Material GetMaterial(int index,HCanvas canvas)
         {

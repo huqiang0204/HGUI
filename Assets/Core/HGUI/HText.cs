@@ -205,9 +205,7 @@ namespace Assets.Core.HGUI
                 settings.alignByGeometry = m_align;
                 var g = Generator;
                 g.Populate(emojiString.FilterString,settings);
-                //lines = g.lines.ToArray();
                 verts = g.verts.ToArray();
-                //characters = g.characters.ToArray();
                 m_dirty = false;
                 _vertexChange = true;
                 if (material != null)

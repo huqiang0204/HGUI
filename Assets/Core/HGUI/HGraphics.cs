@@ -31,7 +31,7 @@ namespace Assets.Core.HGUI
         public virtual void UpdateMesh()
         {
         }
-        public virtual bool CompareMaterial(Graphics graphics)
+        public virtual bool CompareMaterial(HGraphics graphics)
         {
             return false;
         }

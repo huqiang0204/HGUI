@@ -22,5 +22,26 @@ namespace Assets.Core.HGUI
         public Material Tmaterial;
         public int MatCount;
         public int CombineCount;
+        HGraphics current;
+        public void AddGraphics(HCanvas canvas, HGraphics graphics)
+        {
+            if (current == null)
+            {
+                current = graphics;
+
+            }
+            if (graphics.Mask)
+            {
+
+            }
+            if (current.CompareMaterial(graphics))
+            {
+
+            }
+            else
+            {
+
+            }
+        }
     }
 }

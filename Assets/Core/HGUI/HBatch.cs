@@ -22,7 +22,7 @@ namespace Assets.Core.HGUI
                 }
             }
         }
-        static void Batch(GUIElement[] pipeLine,int index,HCanvas canvas, Vector3 pos, Vector3 scale, Quaternion quate)
+        static void Batch(GUIElement[] pipeLine, int index, HCanvas canvas, Vector3 pos, Vector3 scale, Quaternion quate)
         {
             GUIElement root = pipeLine[index];
             Vector3 p = quate * pipeLine[index].localPosition;
@@ -124,7 +124,7 @@ namespace Assets.Core.HGUI
                 }
             }
         }
-        public static void MainBach(HCanvas canvas,GUIElement [] pipeLine)
+        public static void MainBatch(HCanvas canvas,GUIElement [] pipeLine)
         {
 
         }

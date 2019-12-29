@@ -76,28 +76,7 @@ namespace Assets.Core.HGUI
                             }
                         }
                         canvas.uv.AddRange(graphics.uv);
-                        var ms = graphics.SubMesh;
-                        if (ms != null)
-                        {
-                            for (int j = 0; j < ms.Length; j++)
-                            {
-                                var src = ms[j];
-                                if (src != null)
-                                {
-                                    if (src.Length > 0)
-                                    {
-                                        int[] tmp = new int[src.Length];
-                                        for (int k = 0; k < tmp.Length; k++)
-                                        {
-                                            tmp[k] = src[k] + vc;
-                                        }
-                                        canvas.submesh.Add(tmp);
-                                        canvas.AddMaterial(graphics.GetMaterial(j, canvas));
-                                    }
-                                }
-                            }
-                        }
-                        else if (graphics.tris != null)
+                        if (graphics.tris != null)
                         {
                             var src = graphics.tris;
                             if (src.Length > 0)

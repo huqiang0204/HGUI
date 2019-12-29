@@ -21,7 +21,6 @@ namespace Assets.Core.HGUI
         internal Vector2[] uv;
         internal Color[] Colors;
         internal int[] tris;
-        internal int[][] SubMesh;
         public Material material;
         internal bool m_dirty = true;
         internal bool m_vertexChange = true;

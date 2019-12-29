@@ -236,7 +236,6 @@ namespace Assets.Core.HGUI
             if (c == 0)
             {
                 text.tris = null;
-                text.SubMesh = null;
                 text.Colors = null;
                 return;
             }
@@ -258,68 +257,23 @@ namespace Assets.Core.HGUI
             text.vertex = vertex;
             text.uv = uv;
             text.Colors = colors;
+            text.tris = CreateTri(c);
             int ec = emojis.Count;
-            if(ec>0)
+            for (int i = 0; i < ec; i++)
             {
-                var info = emojis[0];
-                int si = 1;
-                int ap = 0;
-                int bp = 0;
-                for (int i = 0; i < e; i++)
-                {
-                    if(i==info.pos)
-                    {
-                        int o = i * 4;
-                        uv[o] = info.uv[0];
-                        o++;
-                        uv[o] = info.uv[1];
-                        o++;
-                        uv[o] = info.uv[2];
-                        o++;
-                        uv[o] = info.uv[3];
-                        if (si < ec)
-                            info = emojis[si];
-                        si++;
-                        int p = i * 4;
-                        triB[bp] = p;
-                        bp++;
-                        triB[bp] = p + 1;
-                        bp++;
-                        triB[bp] = p + 2;
-                        bp++;
-                        triB[bp] = p + 2;
-                        bp++;
-                        triB[bp] = p + 3;
-                        bp++;
-                        triB[bp] = p;
-                        bp++;
-                    }
-                    else
-                    {
-                        int p = i * 4;
-                        triA[ap] = p;
-                        ap++;
-                        triA[ap] = p + 1;
-                        ap++;
-                        triA[ap] = p + 2;
-                        ap++;
-                        triA[ap] = p + 2;
-                        ap++;
-                        triA[ap] = p + 3;
-                        ap++;
-                        triA[ap] = p;
-                        ap++;
-                    }
-                }
-                if (text.SubMesh == null)
-                    text.SubMesh = new int[2][];
-                text.SubMesh[0] = triA;
-                text.SubMesh[1] = triB;
-            }
-            else
-            {
-                text.tris = CreateTri(c);
-                text.SubMesh = null;
+                EmojiInfo info = emojis[i];
+                int o = info.pos * 4;
+                uv[o] = info.uv[0];
+                colors[o].a = 0;
+                o++;
+                uv[o] = info.uv[1];
+                colors[o].a = 0;
+                o++;
+                uv[o] = info.uv[2];
+                colors[o].a = 0;
+                o++;
+                uv[o] = info.uv[3];
+                colors[o].a = 0;
             }
         }
         static int[] CreateTri(int len)

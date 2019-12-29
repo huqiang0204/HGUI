@@ -218,6 +218,7 @@ namespace Assets.Core.HGUI
             Vector3[] vertex = new Vector3[c];
             Color[] colors = new Color[c];
             Vector2[] uv = new Vector2[c];
+            Vector2[] uv1 = new Vector2[c];
             int e = c / 4;
             int all = e * 6;
             int b = emojis.Count * 6;
@@ -240,15 +241,19 @@ namespace Assets.Core.HGUI
                 EmojiInfo info = emojis[i];
                 int o = info.pos * 4;
                 uv[o] = info.uv[0];
+                uv[o].x = 1;
                 colors[o].a = 0;
                 o++;
                 uv[o] = info.uv[1];
+                uv[o].x = 1;
                 colors[o].a = 0;
                 o++;
                 uv[o] = info.uv[2];
+                uv[o].x = 1;
                 colors[o].a = 0;
                 o++;
                 uv[o] = info.uv[3];
+                uv[o].x = 1;
                 colors[o].a = 0;
             }
         }

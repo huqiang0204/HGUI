@@ -233,6 +233,7 @@ namespace Assets.Core.HGUI
             }
             text.vertex = vertex;
             text.uv = uv;
+            text.uv1 = uv1;
             text.Colors = colors;
             text.tris = CreateTri(c);
             int ec = emojis.Count;
@@ -241,19 +242,19 @@ namespace Assets.Core.HGUI
                 EmojiInfo info = emojis[i];
                 int o = info.pos * 4;
                 uv[o] = info.uv[0];
-                uv[o].x = 1;
+                uv1[o].x = 1;
                 colors[o].a = 0;
                 o++;
                 uv[o] = info.uv[1];
-                uv[o].x = 1;
+                uv1[o].x = 1;
                 colors[o].a = 0;
                 o++;
                 uv[o] = info.uv[2];
-                uv[o].x = 1;
+                uv1[o].x = 1;
                 colors[o].a = 0;
                 o++;
                 uv[o] = info.uv[3];
-                uv[o].x = 1;
+                uv1[o].x = 1;
                 colors[o].a = 0;
             }
         }

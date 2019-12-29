@@ -39,5 +39,6 @@ namespace Assets.Core.HGUI
         {
             return null;
         }
+        internal int PipelineIndex;
     }
 }

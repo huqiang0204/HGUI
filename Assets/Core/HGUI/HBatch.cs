@@ -107,5 +107,11 @@ namespace Assets.Core.HGUI
         {
 
         }
+
+        public static int AddTexture(Texture txt, int id, bool force = false)
+        {
+
+            return 0;
+        }
     }
 }

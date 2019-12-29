@@ -13,6 +13,8 @@ namespace Assets.Core.HGUI
             GUIElement root = pipeLine[0];
             if (root.script != null)
             {
+                for (int i = 0; i < 4096; i++)
+                    Table[i] = 0;
                 Max = 0;
                 int c = root.childCount;
                 int os = root.childOffset;
@@ -97,7 +99,7 @@ namespace Assets.Core.HGUI
                                 {
                                     canvas.CompeleteSub();
                                     canvas.CombinationMesh(tmp);
-                                    canvas.AddMaterial(graphics.GetMaterial(0, canvas));
+                                    canvas.AddMaterial(graphics.material);
                                 }
                             }
                         }

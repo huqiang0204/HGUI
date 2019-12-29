@@ -2,10 +2,10 @@
 {
 	Properties
 	{
-		_emoji("Sprite Texture", 2D) = "white" {}
+		[PerRendererData]_emoji("Sprite Texture", 2D) = "white" {}
 		[PerRendererData] _MainTex("Sprite Texture", 2D) = "white" {}
 		_Color("Tint", Color) = (1,1,1,1)
-
+		 [PerRendererData]_ClipRect("_ClipRect",Vector)=(-10000,-10000,10000,10000)
 		_StencilComp("Stencil Comparison", Float) = 8
 		_Stencil("Stencil ID", Float) = 0
 		_StencilOp("Stencil Operation", Float) = 0
@@ -13,7 +13,7 @@
 		_StencilReadMask("Stencil Read Mask", Float) = 255
 
 		_ColorMask("Color Mask", Float) = 15
-
+		
 		[Toggle(UNITY_UI_ALPHACLIP)] _UseUIAlphaClip("Use Alpha Clip", Float) = 0
 	}
 
@@ -75,7 +75,6 @@
 				};
 
 				fixed4 _Color;
-				fixed4 _TextureSampleAdd;
 				float4 _ClipRect;
 
 				v2f vert(appdata_t IN)
@@ -95,7 +94,7 @@
 				sampler2D _emoji;
 				fixed4 frag(v2f IN) : SV_Target
 				{
-					half4 color;
+				half4 color;
 				float a = IN.color.a;
 				if (a == 0)
 				{
@@ -104,13 +103,10 @@
 					color.a *= _Color.a;
 				}
 				else {
-					color = (tex2D(_MainTex, IN.texcoord) + _TextureSampleAdd);
+					color = tex2D(_MainTex, IN.texcoord);
 					color.a *= UnityGet2DClipping(IN.worldPosition.xy, _ClipRect);
 					color.a *= a;
 					color.xyz = IN.color.xyz;
-#ifdef UNITY_UI_ALPHACLIP
-					clip(color.a - 0.001);
-#endif
 			    }
 					return color;
 				}

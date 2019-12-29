@@ -26,6 +26,7 @@ namespace Assets.Core.HGUI
         internal bool m_dirty = true;
         internal bool m_vertexChange = true;
         public Texture MainTexture { get; set; }
+        internal int TextureID;
         public bool ShareMaterial;
         public bool Mask;
         public virtual void UpdateMesh()

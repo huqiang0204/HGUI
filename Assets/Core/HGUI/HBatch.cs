@@ -13,6 +13,7 @@ namespace Assets.Core.HGUI
             GUIElement root = pipeLine[0];
             if (root.script != null)
             {
+                Max = 0;
                 int c = root.childCount;
                 int os = root.childOffset;
                 for (int i = 0; i < c; i++)
@@ -20,6 +21,7 @@ namespace Assets.Core.HGUI
                     Batch(pipeLine, os, canvas, Vector3.zero, Vector3.one, Quaternion.identity);
                     os++;
                 }
+                canvas.CompeleteSub();
             }
         }
         static void Batch(GUIElement[] pipeLine, int index, HCanvas canvas, Vector3 pos, Vector3 scale, Quaternion quate)
@@ -86,8 +88,17 @@ namespace Assets.Core.HGUI
                                 {
                                     tmp[k] = src[k] + vc;
                                 }
-                                canvas.submesh.Add(tmp);
-                                canvas.AddMaterial(graphics.GetMaterial(0, canvas));
+                                int tid = 0;
+                                if(Combination(graphics.MainTexture,graphics.TextureID,ref tid))
+                                {
+                                    canvas.CombinationMesh(tmp);
+                                }
+                                else
+                                {
+                                    canvas.CompeleteSub();
+                                    canvas.CombinationMesh(tmp);
+                                    canvas.AddMaterial(graphics.GetMaterial(0, canvas));
+                                }
                             }
                         }
                     }
@@ -116,56 +127,52 @@ namespace Assets.Core.HGUI
         static int[] Table = new Int32[4096];
 
         static int Max = 0;
-        static int TMax = 0;
-        
-        public static int AddTexture(Texture txt, int id, bool force = false)
+        static bool Combination(Texture txt, int id, ref int index, bool not = false)
         {
-        lable:;
-            if(force)
+            if(not)
             {
-                int c = Table[Max * 4];
+                index = 0;
+                int c = Table[Max];
                 if (c > 0)
                     Max++;
-                textures[TMax].texture = txt;
-                textures[TMax].ID = id;
-                Table[Max * 5] = 1;
-                Table[Max * 5 + 1] = TMax;
-                TMax++;
-                return Max << 8;
+                int s = Max * 4;
+                textures[s].texture = txt;
+                textures[s].ID = id;
+                Table[Max] = 1;
+                return false;
             }
             else
             {
-                int s = Max * 5;
-                int c = Table[s];
+                int c = Table[Max];
+                int s = Max * 4;
                 for (int i = 0; i < c; i++)
                 {
-                    s++;
-                    int j = Table[s];
-                    if (textures[j].ID == id)
+                    if (textures[s].ID == id)
                     {
-                        return (i << 8) | j;
+                        index = i;
+                        return true;
                     }
+                    s++;
                 }
-                if (c < 4)
+                if(c<4)
                 {
-                    textures[TMax].texture = txt;
-                    textures[TMax].ID = id;
-                    Table[s] = TMax;
-                    TMax++;
-                    Table[Max * 5]++;
+                    s = Max * 4+ Table[Max];
+                    textures[s].texture = txt;
+                    textures[s].ID = id;
+                    Table[Max]++;
+                    return true;
                 }
                 else
                 {
-                    force = true;
-                    goto lable;
+                    index = 0;
+                    Max++;
+                    s = Max * 4;
+                    textures[s].texture = txt;
+                    textures[s].ID = id;
+                    Table[Max] = 1;
+                    return false;
                 }
             }
-            return 0;
-        }
-        public static int AddTexture(Texture[] txt, int id, bool force = false)
-        {
-
-            return 0;
         }
     }
 }

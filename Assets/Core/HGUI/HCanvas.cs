@@ -294,6 +294,7 @@ namespace Assets.Core.HGUI
         internal List<Color> colors = new List<Color>();
         internal List<Material> materials = new List<Material>();
         internal List<int[]> submesh = new List<int[]>();
+        
         Vector3[] swapVertex;
         Vector2[] swapUV;
         Color[] swapColors;
@@ -306,6 +307,30 @@ namespace Assets.Core.HGUI
             colors.Clear();
             materials.Clear();
             submesh.Clear();
+        }
+        List<int[]> tmpMesh = new List<int[]>();
+        public void CombinationMesh(int[] sub)
+        {
+            tmpMesh.Add(sub);
+        }
+        public void CompeleteSub()
+        {
+            int c = tmpMesh.Count;
+            int all = 0;
+            for (int i = 0; i < c; i++)
+                all += tmpMesh[i].Length;
+            int[] buf = new int[all];
+            int s = 0;
+            for (int i = 0; i < c; i++)
+            {
+                var t = tmpMesh[i];
+                for (int j = 0; j < t.Length; j++)
+                {
+                    buf[s] = t[j];
+                    s++;
+                }
+            }
+            submesh.Add(buf);
         }
         public void AddMaterial(Material material)
         {

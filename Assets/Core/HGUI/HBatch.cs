@@ -8,6 +8,11 @@ namespace Assets.Core.HGUI
 {
     internal class HBatch
     {
+        struct BatchPart
+        {
+            public Texture[] Textures;
+            public int count;
+        }
         public static void Batch(HCanvas canvas, GUIElement[] pipeLine)
         {
             GUIElement root = pipeLine[0];
@@ -107,8 +112,14 @@ namespace Assets.Core.HGUI
         {
 
         }
-
+        static BatchPart[] buffer = new BatchPart[4096];
+        static int Max = 0;
         public static int AddTexture(Texture txt, int id, bool force = false)
+        {
+            
+            return 0;
+        }
+        public static int AddTexture(Texture[] txt, int id, bool force = false)
         {
 
             return 0;

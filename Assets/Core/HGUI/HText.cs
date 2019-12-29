@@ -14,7 +14,7 @@ namespace Assets.Core.HGUI
             get
             {
                 if (shader == null)
-                    shader = Shader.Find("Custom/FontDef");
+                    shader = Shader.Find("Custom/UIEmoji");
                 return shader;
             }
         }
@@ -48,30 +48,6 @@ namespace Assets.Core.HGUI
             }
         }
         Material mainMaterial;
-        static Texture m_emoji;
-        public static Texture EmojiTexture
-        {
-            get
-            {
-                if (m_emoji == null)
-                    m_emoji = Resources.Load<Texture>("emoji");
-                return m_emoji;
-            }
-            set
-            {
-                m_emoji = value;
-            }
-        }
-        static Material m_EmojiMaterial;
-        static Material DefaultEmojiMaterial {
-            get {
-                if (m_EmojiMaterial == null)
-                {
-                    m_EmojiMaterial = new Material(DefShader);
-                    m_EmojiMaterial.SetTexture("_MainTex", EmojiTexture);
-                }
-                return m_EmojiMaterial;
-            } }
         static TextGenerator shareGenerator;
         static TextGenerator Generator { get {
                 if (shareGenerator == null)
@@ -303,15 +279,7 @@ namespace Assets.Core.HGUI
         }
         internal override Material GetMaterial(int index, HCanvas canvas)
         {
-            if (index == 0)
-            {
-                return mainMaterial;
-            }
-            else if (index == 1)
-            {
-                return m_EmojiMaterial;
-            }
-            return null;
+            return mainMaterial;
         }
         public override bool CompareMaterial(HGraphics graphics)
         {

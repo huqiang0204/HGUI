@@ -3,8 +3,11 @@
 	Properties
 	{
 		 _MainTex("Sprite Texture", 2D) = "white" {}
+		 [PerRendererData]_STex("Sprite Texture", 2D) = "white" {}
+		 [PerRendererData]_TTex("Sprite Texture", 2D) = "white" {}
+		  [PerRendererData]_FTex("Sprite Texture", 2D) = "white" {}
 		_Color("Tint", Color) = (1,1,1,1)
-
+		[PerRendererData]_ClipRect("_ClipRect",Vector) = (-10000,-10000,10000,10000)
 		_StencilComp("Stencil Comparison", Float) = 8
 		_Stencil("Stencil ID", Float) = 0
 		_StencilOp("Stencil Operation", Float) = 0
@@ -61,6 +64,7 @@
 					float4 vertex   : POSITION;
 					float4 color    : COLOR;
 					float2 texcoord : TEXCOORD0;
+					float2   uv : TEXCOORD1;
 					UNITY_VERTEX_INPUT_INSTANCE_ID
 				};
 
@@ -69,7 +73,8 @@
 					float4 vertex   : SV_POSITION;
 					fixed4 color : COLOR;
 					float2 texcoord  : TEXCOORD0;
-					float4 worldPosition : TEXCOORD1;
+					float2   uv : TEXCOORD1;
+					float4 worldPosition : TEXCOORD2;
 					UNITY_VERTEX_OUTPUT_STEREO
 				};
 
@@ -84,15 +89,30 @@
 					OUT.worldPosition = IN.vertex;
 					OUT.vertex = UnityObjectToClipPos(OUT.worldPosition);
 					OUT.texcoord = IN.texcoord;
+					OUT.uv = IN.uv;
 					OUT.color = IN.color * _Color;
 					return OUT;
 				}
 
 				sampler2D _MainTex;
-
+				sampler2D _STex;
+				sampler2D _TTex;
+				sampler2D _FTex;
 				fixed4 frag(v2f IN) : SV_Target
 				{
-					half4 color = tex2D(_MainTex, IN.texcoord);
+					half4 color;
+					if (IN.uv.x == 0)
+					{
+						if(IN.uv.y==0)
+							color = tex2D(_MainTex, IN.texcoord);
+						else color = tex2D(_STex, IN.texcoord);
+					}
+                   else
+                   {
+						if (IN.uv.y == 0)
+							color = tex2D(_TTex, IN.texcoord);
+						else color = tex2D(_FTex, IN.texcoord);
+                   }
 					color *= IN.color;
 					//color.a *= UnityGet2DClipping(IN.worldPosition.xy, _ClipRect);
 					#ifdef UNITY_UI_ALPHACLIP

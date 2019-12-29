@@ -62,6 +62,7 @@
 					float4 vertex   : POSITION;
 					float4 color    : COLOR;
 					float2 texcoord : TEXCOORD0;
+					float2   uv : TEXCOORD1;
 					UNITY_VERTEX_INPUT_INSTANCE_ID
 				};
 
@@ -70,7 +71,8 @@
 					float4 vertex   : SV_POSITION;
 					float4 color : COLOR;
 					float2 texcoord  : TEXCOORD0;
-					float4 worldPosition : TEXCOORD1;
+					float2   uv : TEXCOORD1;
+					float4 worldPosition : TEXCOORD2;
 					UNITY_VERTEX_OUTPUT_STEREO
 				};
 
@@ -86,6 +88,7 @@
 					OUT.vertex = UnityObjectToClipPos(OUT.worldPosition);
 
 					OUT.texcoord = IN.texcoord;
+					OUT.uv = IN.uv;
 					OUT.color = IN.color * _Color;
 					return OUT;
 				}

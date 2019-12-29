@@ -291,6 +291,8 @@ namespace Assets.Core.HGUI
         }
         internal List<Vector3> vertex = new List<Vector3>();
         internal List<Vector2> uv = new List<Vector2>();
+        internal List<Vector2> uv1 = new List<Vector2>();
+        internal List<Vector2> uv2 = new List<Vector2>();
         internal List<Color> colors = new List<Color>();
         internal List<Material> materials = new List<Material>();
         internal List<int[]> submesh = new List<int[]>();
@@ -304,6 +306,8 @@ namespace Assets.Core.HGUI
         {
             vertex.Clear();
             uv.Clear();
+            uv1.Clear();
+            uv2.Clear();
             colors.Clear();
             materials.Clear();
             submesh.Clear();

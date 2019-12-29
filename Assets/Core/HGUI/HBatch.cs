@@ -48,13 +48,17 @@ namespace Assets.Core.HGUI
                     var vert = graphics.vertex;
                     if (vert != null)
                     {
+                        Vector2[] uv2 = new Vector2[vert.Length];
                         for (int j = 0; j < vert.Length; j++)
                         {
                             var t = q * vert[j];
                             t.x *= s.x;
                             t.y *= s.y;
                             vs.Add(o + t);
+                            uv2[j].x = (t.x + 10000) / 20000;
+                            uv2[j].y = (t.y + 10000) / 20000;
                         }
+                        canvas.uv2.AddRange(uv2);
                         if (graphics.Colors == null)
                         {
                             var col = graphics.Color;

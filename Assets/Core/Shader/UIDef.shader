@@ -63,8 +63,9 @@
 				{
 					float4 vertex   : POSITION;
 					float4 color    : COLOR;
-					float2 texcoord : TEXCOORD0;
-					float2   uv : TEXCOORD1;
+					float2 uv : TEXCOORD0;
+					float2   uv1 : TEXCOORD1;
+					float2   uv2 : TEXCOORD2;
 					UNITY_VERTEX_INPUT_INSTANCE_ID
 				};
 
@@ -72,9 +73,9 @@
 				{
 					float4 vertex   : SV_POSITION;
 					fixed4 color : COLOR;
-					float2 texcoord  : TEXCOORD0;
-					float2   uv : TEXCOORD1;
-					float4 worldPosition : TEXCOORD2;
+					float2 uv  : TEXCOORD0;
+					float2   uv1 : TEXCOORD1;
+					float2 uv2 : TEXCOORD2;
 					UNITY_VERTEX_OUTPUT_STEREO
 				};
 
@@ -86,10 +87,10 @@
 					v2f OUT;
 					UNITY_SETUP_INSTANCE_ID(IN);
 					UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(OUT);
-					OUT.worldPosition = IN.vertex;
-					OUT.vertex = UnityObjectToClipPos(OUT.worldPosition);
-					OUT.texcoord = IN.texcoord;
+					OUT.vertex = IN.vertex;
 					OUT.uv = IN.uv;
+					OUT.uv1 = IN.uv1;
+					OUT.uv2 = IN.uv2;
 					OUT.color = IN.color * _Color;
 					return OUT;
 				}
@@ -101,23 +102,21 @@
 				fixed4 frag(v2f IN) : SV_Target
 				{
 					half4 color;
-					if (IN.uv.x == 0)
+					if (IN.uv1.x == 0)
 					{
-						if(IN.uv.y==0)
-							color = tex2D(_MainTex, IN.texcoord);
-						else color = tex2D(_STex, IN.texcoord);
+						if(IN.uv1.y==0)
+							color = tex2D(_MainTex, IN.uv);
+						else color = tex2D(_STex, IN.uv);
 					}
                    else
                    {
-						if (IN.uv.y == 0)
-							color = tex2D(_TTex, IN.texcoord);
-						else color = tex2D(_FTex, IN.texcoord);
+						if (IN.uv1.y == 0)
+							color = tex2D(_TTex, IN.uv);
+						else color = tex2D(_FTex, IN.uv);
                    }
 					color *= IN.color;
-					//color.a *= UnityGet2DClipping(IN.worldPosition.xy, _ClipRect);
-					#ifdef UNITY_UI_ALPHACLIP
-					//clip(color.a - 0.001);
-					#endif
+					if (IN.uv2.x< _ClipRect.x || IN.uv2.x > _ClipRect.z || IN.uv2.y < _ClipRect.y || IN.uv2.y < _ClipRect.w)
+						color.a = 0;
 					return color;
 				}
 			ENDCG

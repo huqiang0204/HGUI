@@ -20,6 +20,7 @@ namespace Assets.Core.HGUI
         internal Vector3[] vertex;
         internal Vector2[] uv;
         internal Vector2[] uv1;
+        internal Vector2[] uv2;
         internal Color[] Colors;
         internal int[] tris;
         public Material material;

@@ -112,11 +112,58 @@ namespace Assets.Core.HGUI
         {
 
         }
+        struct TextureInfo
+        {
+            public Texture texture;
+            public int ID;
+        }
+        static TextureInfo[] textures = new TextureInfo[4096];
+        static int[] Table = new Int32[4096];
         static BatchPart[] buffer = new BatchPart[4096];
         static int Max = 0;
+        static int TMax = 0;
         public static int AddTexture(Texture txt, int id, bool force = false)
         {
-            
+        lable:;
+            if(force)
+            {
+                int c = Table[Max * 4];
+                if (c > 0)
+                    Max++;
+                textures[TMax].texture = txt;
+                textures[TMax].ID = id;
+                Table[Max * 5] = 1;
+                Table[Max * 5 + 1] = TMax;
+                TMax++;
+                return Max << 8;
+            }
+            else
+            {
+                int s = Max * 5;
+                int c = Table[s];
+                for (int i = 0; i < c; i++)
+                {
+                    s++;
+                    int j = Table[s];
+                    if (textures[j].ID == id)
+                    {
+                        return (i << 8) | j;
+                    }
+                }
+                if (c < 4)
+                {
+                    textures[TMax].texture = txt;
+                    textures[TMax].ID = id;
+                    Table[s] = TMax;
+                    TMax++;
+                    Table[Max * 5]++;
+                }
+                else
+                {
+                    force = true;
+                    goto lable;
+                }
+            }
             return 0;
         }
         public static int AddTexture(Texture[] txt, int id, bool force = false)

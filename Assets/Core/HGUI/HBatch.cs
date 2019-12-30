@@ -11,6 +11,11 @@ namespace Assets.Core.HGUI
         public Texture texture;
         public int ID;
     }
+    internal struct MaterialInfo
+    {
+        public Material material;
+        public int ID;
+    }
     internal class HBatch
     {
         public static void Batch(HCanvas canvas, GUIElement[] pipeLine)

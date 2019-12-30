@@ -340,6 +340,9 @@ namespace Assets.Core.HGUI
         {
             materials.Add(material);
         }
+        TextureInfo[] textures = new TextureInfo[4096];
+        int[] Table = new Int32[1024];
+        Material[] mats = new Material[1024];
 #if UNITY_EDITOR
         public void Refresh()
         {

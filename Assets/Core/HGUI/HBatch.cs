@@ -6,6 +6,11 @@ using UnityEngine;
 
 namespace Assets.Core.HGUI
 {
+    internal struct TextureInfo
+    {
+        public Texture texture;
+        public int ID;
+    }
     internal class HBatch
     {
         public static void Batch(HCanvas canvas, GUIElement[] pipeLine)
@@ -124,11 +129,7 @@ namespace Assets.Core.HGUI
         {
 
         }
-        struct TextureInfo
-        {
-            public Texture texture;
-            public int ID;
-        }
+   
         static TextureInfo[] textures = new TextureInfo[4096];
         static int[] Table = new Int32[4096];
 

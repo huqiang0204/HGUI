@@ -13,8 +13,113 @@ namespace Assets.Core.HGUI
     }
     internal struct MaterialInfo
     {
+        public Vector4 clip;
         public Material material;
         public int ID;
+    }
+    class MaterialCollector
+    {
+        public TextureInfo[] textures;
+        public MaterialInfo[] materials;
+        int[] table;
+        int max = 0;
+        
+        public MaterialCollector(int length=1024)
+        {
+            materials = new MaterialInfo[length];
+            table = new int[length];
+            textures = new TextureInfo[length*4];
+        }
+        public void Start()
+        {
+            for(int i=0;i<table.Length;i++)
+            {
+                table[i] = 0;
+                materials[i].material = null;
+                materials[i].ID = -1;
+            }
+            tmpMesh.Clear();
+        }
+        public bool CombinationMaterial(Material mat, int matID, Texture texture, int texID, ref int offset)
+        {
+            if (materials[max].ID == matID)//材质相同
+            {
+                int c = table[max];//获取当前材质的纹理数量
+                int s = max * 4;//计算材质的起始位置
+                for (int i = 0; i < c; i++)
+                {
+                    if (textures[s].ID == texID)//如果纹理相等
+                    {
+                        offset = i;
+                        return true;
+                    }
+                    s++;
+                }
+                if (c < 4)//如果4张纹理未填满
+                {
+                    table[max]++;
+                    textures[s].texture = texture;
+                    textures[s].ID = texID;
+                    offset = c;
+                    return true;
+                }
+            }
+            max++;
+            offset = 0;
+            table[max] = 1;
+            materials[max].material = mat;
+            materials[max].ID = matID;
+            int o = max * 4;
+            textures[o].texture = texture;
+            textures[o].ID = texID;
+            return false;
+        }
+        List<int[]> tmpMesh = new List<int[]>();
+        public void CombinationMesh(int[] sub)
+        {
+            tmpMesh.Add(sub);
+        }
+        public void End()
+        {
+
+        }
+        public Material[] GenerateMaterial()
+        {
+            int len = max + 1;
+            Material[] mats = new Material[len];
+            for (int i = 0; i <len; i++)
+            {
+                int c = table[i];
+                var mat = materials[i].material;
+                if (mat == null)//如果为空,则使用默认材质球
+                {
+                    mat = new Material(HGraphics.DefShader);
+                    int s = i * 4;
+                    if (c > 0)
+                    {
+                        mat.SetTexture("_MainTex", textures[s].texture);
+                        if (c > 1)
+                        {
+                            s++;
+                            mat.SetTexture("_STex", textures[s].texture);
+                            if (c > 2)
+                            {
+                                s++;
+                                mat.SetTexture("_TTex", textures[s].texture);
+                                if (c > 3)
+                                {
+                                    s++;
+                                    mat.SetTexture("_FTex", textures[s].texture);
+                                }
+                            }
+                        }
+                    }
+                }
+                mat.SetVector("_ClipRect",materials[i].clip);
+                mats[i] = mat;
+            }
+            return mats;
+        }
     }
     internal class HBatch
     {

@@ -161,19 +161,5 @@ namespace Assets.Core.HGUI
                 m_vertexChange = false;
             }
         }
-
-        internal override Material GetMaterial(int index, HCanvas canvas)
-        {
-            return mainMaterial;
-        }
-        public override bool CompareMaterial(HGraphics graphics)
-        {
-            HImage image = graphics as HImage;
-            if (image == null)
-                return false;
-            if (graphics.MainTexture == MainTexture)
-                return true;
-            return true;
-        }
     }
 }

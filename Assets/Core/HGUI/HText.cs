@@ -36,18 +36,6 @@ namespace Assets.Core.HGUI
                 defFont = value;
             }
         }
-        Material m_TextMaterial;
-        Material DefaultTextMaterial
-        {
-            get {
-                if (m_TextMaterial == null)
-                {
-                    m_TextMaterial = new Material(DefFontShader);
-                }
-                return m_TextMaterial;
-            }
-        }
-        Material mainMaterial;
         static TextGenerator shareGenerator;
         static TextGenerator Generator { get {
                 if (shareGenerator == null)
@@ -183,16 +171,7 @@ namespace Assets.Core.HGUI
                 verts = g.verts.ToArray();
                 m_dirty = false;
                 m_vertexChange = true;
-                if (material != null)
-                {
-                    material.mainTexture = font.material.mainTexture;
-                    mainMaterial = material;
-                }
-                else
-                {
-                    DefaultTextMaterial.SetTexture("_MainTex", font.material.mainTexture);
-                    mainMaterial = m_TextMaterial;
-                }
+                MainTexture = font.material.mainTexture;
             }
         }
         public override void UpdateMesh()
@@ -284,15 +263,13 @@ namespace Assets.Core.HGUI
         }
         internal override Material GetMaterial(int index, HCanvas canvas)
         {
-            return mainMaterial;
+            return material;
         }
         public override bool CompareMaterial(HGraphics graphics)
         {
             HText text = graphics as HText;
             if (text == null)
                 return false;
-            if (text.mainMaterial == mainMaterial)
-                return true;
             return false;
         }
     }

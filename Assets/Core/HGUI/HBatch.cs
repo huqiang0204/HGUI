@@ -40,6 +40,7 @@ namespace Assets.Core.HGUI
             }
             tmpMesh.Clear();
             submesh.Clear();
+            max = 0;
         }
         /// <summary>
         /// 添加自定义材质球,无法合批

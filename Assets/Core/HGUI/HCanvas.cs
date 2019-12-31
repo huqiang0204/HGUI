@@ -370,14 +370,15 @@ namespace Assets.Core.HGUI
                 mesh.vertices = vertex.ToArray();
                 mesh.uv = uv.ToArray();
                 mesh.colors = colors.ToArray();
-                mesh.subMeshCount = submesh.Count;
-                for (int i = 0; i < submesh.Count; i++)
-                    mesh.SetTriangles(submesh[i], i);
+                swapSubmesh = Collector.submesh.ToArray();
+                mesh.subMeshCount = swapSubmesh.Length;
+                for (int i = 0; i < swapSubmesh.Length; i++)
+                    mesh.SetTriangles(swapSubmesh[i], i);
             }
             var mr = GetComponent<MeshRenderer>();
             if (mr != null)
             {
-                mr.materials = materials.ToArray();
+                mr.materials = Collector.GenerateMaterial();
             }
         }
 #endif

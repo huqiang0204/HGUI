@@ -34,5 +34,6 @@ namespace Assets.Core.HGUI
         private Margin lastmargin;
         public UserEvent userEvent;
         internal int PipelineIndex;
+        public bool Mask;
     }
 }

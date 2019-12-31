@@ -115,8 +115,8 @@
 						else color = tex2D(_FTex, IN.uv);
                    }
 					color *= IN.color;
-				/*	if (IN.uv2.x< _ClipRect.x || IN.uv2.x > _ClipRect.z || IN.uv2.y < _ClipRect.y || IN.uv2.y < _ClipRect.w)
-						color.a = 0;*/
+					if (IN.uv2.x< _ClipRect.x || IN.uv2.x > _ClipRect.z || IN.uv2.y < _ClipRect.y || IN.uv2.y < _ClipRect.w)
+						color.a = 0;
 					return color;
 				}
 			ENDCG

@@ -82,7 +82,6 @@ namespace Assets.Core.HGUI
         internal int STexID;
         internal int TTexID;
         internal int FTexID;
-        public bool Mask;
         public virtual void UpdateMesh()
         {
         }

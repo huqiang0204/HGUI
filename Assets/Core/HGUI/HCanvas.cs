@@ -83,6 +83,8 @@ namespace Assets.Core.HGUI
                 {
                     mesh.vertices = swapVertex;
                     mesh.uv = swapUV;
+                    mesh.uv2 = swapUV1;
+                    mesh.uv3 = swapUV2;
                     mesh.colors = swapColors;
                     mesh.subMeshCount = swapSubmesh.Length;
                     for (int i = 0; i < swapSubmesh.Length; i++)
@@ -93,8 +95,7 @@ namespace Assets.Core.HGUI
                 renderer = GetComponent<MeshRenderer>();
             if (renderer != null)
             {
-                if (swapMaterials != null)
-                    renderer.materials = swapMaterials;
+                renderer.materials = Collector.GenerateMaterial();
             }
         }
         void SubMission(object obj)
@@ -107,9 +108,10 @@ namespace Assets.Core.HGUI
             HBatch.Batch(this, PipeLine);
             swapVertex = vertex.ToArray();
             swapUV = uv.ToArray();
+            swapUV1 = uv1.ToArray();
+            swapUV2 = uv2.ToArray();
             swapColors = colors.ToArray();
-            swapMaterials = materials.ToArray();
-            swapSubmesh = submesh.ToArray();
+            swapSubmesh = Collector.submesh.ToArray();
         }
         void CheckSize()
         {
@@ -295,11 +297,11 @@ namespace Assets.Core.HGUI
         internal List<Vector2> uv1 = new List<Vector2>();
         internal List<Vector2> uv2 = new List<Vector2>();
         internal List<Color> colors = new List<Color>();
-        internal List<Material> materials = new List<Material>();
-        internal List<int[]> submesh = new List<int[]>();
         
         Vector3[] swapVertex;
         Vector2[] swapUV;
+        Vector2[] swapUV1;
+        Vector2[] swapUV2;
         Color[] swapColors;
         Material[] swapMaterials;
         internal MaterialCollector Collector = new MaterialCollector();
@@ -311,8 +313,6 @@ namespace Assets.Core.HGUI
             uv1.Clear();
             uv2.Clear();
             colors.Clear();
-            materials.Clear();
-            submesh.Clear();
         }
 #if UNITY_EDITOR
         public void Refresh()

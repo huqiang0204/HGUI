@@ -301,6 +301,7 @@ namespace Assets.Core.HGUI
         Vector2[] swapUV;
         Color[] swapColors;
         Material[] swapMaterials;
+        internal MaterialCollector Collector = new MaterialCollector();
         int[][] swapSubmesh;
         void ClearMesh()
         {

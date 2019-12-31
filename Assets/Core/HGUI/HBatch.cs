@@ -17,7 +17,7 @@ namespace Assets.Core.HGUI
         public Material material;
         public int ID;
     }
-    class MaterialCollector
+    internal class MaterialCollector
     {
         public TextureInfo[] textures;
         public MaterialInfo[] materials;
@@ -199,6 +199,7 @@ namespace Assets.Core.HGUI
                             }
                         }
                         canvas.uv.AddRange(graphics.uv);
+                        int tid = 0;
                         if (graphics.tris != null)
                         {
                             var src = graphics.tris;
@@ -209,7 +210,7 @@ namespace Assets.Core.HGUI
                                 {
                                     tmp[k] = src[k] + vc;
                                 }
-                                int tid = 0;
+                              
                                 if(Combination(graphics.MainTexture,graphics.TextureID,ref tid))
                                 {
                                     canvas.CombinationMesh(tmp);
@@ -222,6 +223,26 @@ namespace Assets.Core.HGUI
                                 }
                             }
                         }
+                        Vector2[] uv1 = new Vector2[vert.Length];
+                        switch (tid)
+                        {
+                            case 1:
+                                for (int i = 0; i < uv1.Length; i++)
+                                    uv1[i].y = 1;
+                                break;
+                            case 2:
+                                for (int i = 0; i < uv1.Length; i++)
+                                    uv1[i].x = 1;
+                                break;
+                            case 3:
+                                for (int i = 0; i < uv1.Length; i++)
+                                {
+                                    uv1[i].x = 1;
+                                    uv1[i].y = 1;
+                                }
+                                break;
+                        }
+                        canvas.uv1.AddRange(uv1);
                     }
                 }
                 s.x *= scale.x;

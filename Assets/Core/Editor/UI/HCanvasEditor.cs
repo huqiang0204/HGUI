@@ -10,7 +10,7 @@ public class HCanvasEditor:Editor
 {
     private void OnEnable()
     {
-        Refresh(target as HCanvas);
+        //Refresh(target as HCanvas);
     }
     public override void OnInspectorGUI()
     {

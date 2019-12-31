@@ -5,8 +5,8 @@
 		 _MainTex("Sprite Texture", 2D) = "white" {}
 		 [PerRendererData]_STex("Sprite Texture", 2D) = "white" {}
 		 [PerRendererData]_TTex("Sprite Texture", 2D) = "white" {}
-		  [PerRendererData]_FTex("Sprite Texture", 2D) = "white" {}
-		//_Color("Tint", Color) = (1,1,1,1)
+		 [PerRendererData]_FTex("Sprite Texture", 2D) = "white" {}
+		_Color("Tint", Color) = (1,1,1,1)
 		_ClipRect("_ClipRect",Vector) = (0,0,1,1)
 		_StencilComp("Stencil Comparison", Float) = 8
 		_Stencil("Stencil ID", Float) = 0
@@ -15,8 +15,6 @@
 		_StencilReadMask("Stencil Read Mask", Float) = 255
 
 		_ColorMask("Color Mask", Float) = 15
-
-		[Toggle(UNITY_UI_ALPHACLIP)] _UseUIAlphaClip("Use Alpha Clip", Float) = 0
 	}
 
 		SubShader
@@ -79,9 +77,6 @@
 					UNITY_VERTEX_OUTPUT_STEREO
 				};
 
-				//fixed4 _Color;
-				float4 _ClipRect;
-
 				v2f vert(appdata_t IN)
 				{
 					v2f OUT;
@@ -99,6 +94,8 @@
 				sampler2D _STex;
 				sampler2D _TTex;
 				sampler2D _FTex;
+				float4 _ClipRect;
+				float4 _Color;
 				fixed4 frag(v2f IN) : SV_Target
 				{
 					half4 color;

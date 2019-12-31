@@ -187,6 +187,7 @@ namespace Assets.Core.HGUI
                 }
             }
             submesh.Add(buf);
+            tmpMesh.Clear();
         }
         public void End()
         {

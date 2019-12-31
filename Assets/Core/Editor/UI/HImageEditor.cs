@@ -9,6 +9,22 @@ using UnityEngine;
 [CanEditMultipleObjects]
 public class HImageEditor:Editor
 {
+    Vector3 pos;
+    Vector3 scale;
+    Vector3 angle;
+    private void OnEnable()
+    {
+        HImage img = target as HImage;
+        if (img != null)
+        {
+            var can = FindHCanvas(img.transform);
+            if (can != null)
+                can.Refresh();
+            pos = img.transform.localPosition;
+            scale = img.transform.localScale;
+            angle = img.transform.localEulerAngles;
+        }
+    }
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
@@ -16,6 +32,15 @@ public class HImageEditor:Editor
         if(img!=null)
         {
             bool changed = false;
+            if (pos != img.transform.localPosition)
+                changed = true;
+            else if (scale != img.transform.localScale)
+                changed = true;
+            else if (angle != img.transform.localEulerAngles)
+                changed = true;
+            pos = img.transform.localPosition;
+            scale = img.transform.localScale;
+            angle = img.transform.localEulerAngles;
             img.SprType = (SpriteType)EditorGUILayout.EnumPopup("SpriteType",img.SprType);
             if(img.SprType==SpriteType.Filled)
             {

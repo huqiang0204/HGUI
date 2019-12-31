@@ -19,7 +19,8 @@ namespace Assets.Core.HGUI
                 int os = root.childOffset;
                 for (int i = 0; i < c; i++)
                 {
-                    Batch(pipeLine, os, canvas, Vector3.zero, Vector3.one, Quaternion.identity,new Vector4(-10000,-10000,10000,10000));
+                    if(pipeLine[os].active)
+                        Batch(pipeLine, os, canvas, Vector3.zero, Vector3.one, Quaternion.identity, new Vector4(-10000, -10000, 10000, 10000));
                     os++;
                 }
                 canvas.Collector.End();
@@ -36,50 +37,60 @@ namespace Assets.Core.HGUI
             o += pos;
             Vector3 s = pipeLine[index].localScale;
             Quaternion q = quate * pipeLine[index].localRotation;
-     
-            if (root.active)
+
+            bool mask = false;
+            if (root.script != null)
             {
-                if (root.script != null)
+                mask = root.script.Mask;
+                if (mask)//计算遮挡区域
                 {
-                    if(root.script.Mask)
+                    float x = root.script.SizeDelta.x;
+                    float y = root.script.SizeDelta.y;
+                    float hx = x * 0.5f;
+                    hx *= s.x;
+                    float hy = y * 0.5f;
+                    hy *= s.y;
+                    Vector4 v = new Vector4(o.x - hx, o.y - hy, o.x + hx, o.y + hy);
+                    v.x += 10000;
+                    v.x /= 20000;
+                    v.y += 10000;
+                    v.y /= 20000;
+                    v.z += 10000;
+                    v.z /= 20000;
+                    v.w += 10000;
+                    v.w /= 20000;
+                    clip = CutRect(clip, v);
+                }
+                var graphics = root.script as HGraphics;
+                if (graphics != null)//计算图形
+                {
+                    var vs = canvas.vertex;
+                    var vc = vs.Count;
+                    var vert = graphics.vertex;
+                    if (vert != null)
                     {
-                        float x = root.script.SizeDelta.x;
-                        float y = root.script.SizeDelta.y;
-                        float hx = x * 0.5f;
-                        hx *= s.x;
-                        float hy = y * 0.5f;
-                        hy *= s.y;
-                        Vector4 v = new Vector4(o.x - hx, o.y - hy, o.x + hx, o.y + hy);
-                        v.x += 10000;
-                        v.x /= 20000;
-                        v.y += 10000;
-                        v.y /= 20000;
-                        v.z += 10000;
-                        v.z /= 20000;
-                        v.w += 10000;
-                        v.w /= 20000;
-                        clip = CutRect(clip, v);
-                    }
-                    var graphics = root.script as HGraphics;
-                    if(graphics!=null)
-                    {
-                        var vs = canvas.vertex;
-                        var vc = vs.Count;
-                        var vert = graphics.vertex;
-                        if (vert != null)
+                        Vector2[] uv2 = new Vector2[vert.Length];
+                        for (int j = 0; j < vert.Length; j++)
                         {
-                            Vector2[] uv2 = new Vector2[vert.Length];
+                            var t = q * vert[j];
+                            t.x *= s.x;
+                            t.y *= s.y;
+                            vs.Add(o + t);
+                            uv2[j].x = (o.x + t.x + 10000) / 20000;
+                            uv2[j].y = (o.y + t.y + 10000) / 20000;
+                        }
+                        canvas.uv2.AddRange(uv2);
+                        if (graphics.Colors == null)
+                        {
+                            var col = graphics.Color;
                             for (int j = 0; j < vert.Length; j++)
                             {
-                                var t = q * vert[j];
-                                t.x *= s.x;
-                                t.y *= s.y;
-                                vs.Add(o + t);
-                                uv2[j].x = (t.x + 10000) / 20000;
-                                uv2[j].y = (t.y + 10000) / 20000;
+                                canvas.colors.Add(col);
                             }
-                            canvas.uv2.AddRange(uv2);
-                            if (graphics.Colors == null)
+                        }
+                        else
+                        {
+                            if (graphics.Colors.Length == 0)
                             {
                                 var col = graphics.Color;
                                 for (int j = 0; j < vert.Length; j++)
@@ -89,88 +100,77 @@ namespace Assets.Core.HGUI
                             }
                             else
                             {
-                                if (graphics.Colors.Length == 0)
-                                {
-                                    var col = graphics.Color;
-                                    for (int j = 0; j < vert.Length; j++)
-                                    {
-                                        canvas.colors.Add(col);
-                                    }
-                                }
-                                else
-                                {
-                                    for (int j = 0; j < graphics.Colors.Length; j++)
-                                        canvas.colors.Add(graphics.Colors[j]);
-                                }
+                                for (int j = 0; j < graphics.Colors.Length; j++)
+                                    canvas.colors.Add(graphics.Colors[j]);
                             }
-                            canvas.uv.AddRange(graphics.uv);
-                            int tid = 0;
-                            if (graphics.tris != null)
+                        }
+                        canvas.uv.AddRange(graphics.uv);
+                        int tid = 0;
+                        if (graphics.tris != null)
+                        {
+                            var src = graphics.tris;
+                            if (src.Length > 0)
                             {
-                                var src = graphics.tris;
-                                if (src.Length > 0)
+                                int[] tmp = new int[src.Length];
+                                for (int k = 0; k < tmp.Length; k++)
                                 {
+                                    tmp[k] = src[k] + vc;
+                                }
+                                canvas.Collector.CombinationMaterial(graphics, tmp, ref tid, ref clip);
+                            }
+                        }
+                        else if (graphics.subTris != null)
+                        {
+                            var subs = graphics.subTris;
+                            int l = subs.Length;
+                            if (l > 0)
+                            {
+                                int[] ids = new int[l];
+                                int[][] buf = new int[l][];
+                                for (int i = 0; i < l; i++)
+                                {
+                                    var src = subs[i];
                                     int[] tmp = new int[src.Length];
                                     for (int k = 0; k < tmp.Length; k++)
                                     {
                                         tmp[k] = src[k] + vc;
                                     }
-                                    canvas.Collector.CombinationMaterial(graphics, tmp, ref tid, ref clip);
+                                    buf[i] = tmp;
                                 }
+                                canvas.Collector.CombinationMaterial(graphics, buf, ids, ref clip);
                             }
-                            else if (graphics.subTris != null)
-                            {
-                                var subs = graphics.subTris;
-                                int l = subs.Length;
-                                if (l > 0)
-                                {
-                                    int[] ids = new int[l];
-                                    int[][] buf = new int[l][];
-                                    for (int i = 0; i < l; i++)
-                                    {
-                                        var src = subs[i];
-                                        int[] tmp = new int[src.Length];
-                                        for (int k = 0; k < tmp.Length; k++)
-                                        {
-                                            tmp[k] = src[k] + vc;
-                                        }
-                                        buf[i] = tmp;
-                                    }
-                                    canvas.Collector.CombinationMaterial(graphics, buf, ids, ref clip);
-                                }
-                            }
-                            Vector2[] uv1 = new Vector2[vert.Length];
-                            switch (tid)
-                            {
-                                case 1:
-                                    for (int i = 0; i < uv1.Length; i++)
-                                        uv1[i].y = 1;
-                                    break;
-                                case 2:
-                                    for (int i = 0; i < uv1.Length; i++)
-                                        uv1[i].x = 1;
-                                    break;
-                                case 3:
-                                    for (int i = 0; i < uv1.Length; i++)
-                                    {
-                                        uv1[i].x = 1;
-                                        uv1[i].y = 1;
-                                    }
-                                    break;
-                            }
-                            canvas.uv1.AddRange(uv1);
                         }
+                        Vector2[] uv1 = new Vector2[vert.Length];
+                        switch (tid)
+                        {
+                            case 1:
+                                for (int i = 0; i < uv1.Length; i++)
+                                    uv1[i].y = 1;
+                                break;
+                            case 2:
+                                for (int i = 0; i < uv1.Length; i++)
+                                    uv1[i].x = 1;
+                                break;
+                            case 3:
+                                for (int i = 0; i < uv1.Length; i++)
+                                {
+                                    uv1[i].x = 1;
+                                    uv1[i].y = 1;
+                                }
+                                break;
+                        }
+                        canvas.uv1.AddRange(uv1);
                     }
                 }
-                s.x *= scale.x;
-                s.y *= scale.y;
-                int c = root.childCount;
-                int os = root.childOffset;
-                for (int i = 0; i < c; i++)
-                {
-                    Batch(pipeLine, os, canvas, o, s, q,clip);
-                    os++;
-                }
+            }
+            s.x *= scale.x;
+            s.y *= scale.y;
+            int c = root.childCount;
+            int os = root.childOffset;
+            for (int i = 0; i < c; i++)
+            {
+                Batch(pipeLine, os, canvas, o, s, q, clip);
+                os++;
             }
         }
         static Vector4 CutRect(Vector4 v0,Vector4 v1)

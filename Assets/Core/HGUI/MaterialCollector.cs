@@ -39,6 +39,10 @@ namespace Assets.Core.HGUI
             tmpMesh.Clear();
             submesh.Clear();
             max = 0;
+            materials[0].clip.x = -10000;
+            materials[0].clip.y = -10000;
+            materials[0].clip.z = 10000;
+            materials[0].clip.w = 10000;
         }
         /// <summary>
         /// 添加自定义材质球,无法合批
@@ -61,30 +65,36 @@ namespace Assets.Core.HGUI
         /// <param name="texID"></param>
         /// <param name="offset"></param>
         /// <returns></returns>
-        bool CombinationMaterial(Texture texture, int texID, ref int offset, ref Vector4 clip)
+        bool CombinationMaterial(Texture texture, int texID, ref int offset, ref Vector4 clip,bool mask)
         {
-            if (materials[max].ID == 0)//材质相同
+            if(!mask)
             {
-                int c = table[max];//获取当前材质的纹理数量
-                int s = max * 4;//计算材质的起始位置
-                for (int i = 0; i < c; i++)
+                if (materials[max].ID == 0)//材质相同
                 {
-                    if (textures[s].ID == texID)//如果纹理相等
+                    if (materials[max].clip != clip)
+                        goto label;
+                    int c = table[max];//获取当前材质的纹理数量
+                    int s = max * 4;//计算材质的起始位置
+                    for (int i = 0; i < c; i++)
                     {
-                        offset = i;
+                        if (textures[s].ID == texID)//如果纹理相等
+                        {
+                            offset = i;
+                            return true;
+                        }
+                        s++;
+                    }
+                    if (c < 4)//如果4张纹理未填满
+                    {
+                        table[max]++;
+                        textures[s].texture = texture;
+                        textures[s].ID = texID;
+                        offset = c;
                         return true;
                     }
-                    s++;
-                }
-                if (c < 4)//如果4张纹理未填满
-                {
-                    table[max]++;
-                    textures[s].texture = texture;
-                    textures[s].ID = texID;
-                    offset = c;
-                    return true;
                 }
             }
+        label:;
             max++;
             offset = 0;
             table[max] = 1;
@@ -94,7 +104,6 @@ namespace Assets.Core.HGUI
             int o = max * 4;
             textures[o].texture = texture;
             textures[o].ID = texID;
-
             return false;
         }
         public void CombinationMaterial(HGraphics graphics, int[] tris, ref int offset, ref Vector4 clip)
@@ -102,7 +111,8 @@ namespace Assets.Core.HGUI
             int id = graphics.MatID;
             if (id == 0)//使用默认材质球
             {
-                if (CombinationMaterial(graphics.textures[0], graphics.texIds[0], ref offset, ref clip))
+                bool mask = graphics.Mask;
+                if (CombinationMaterial(graphics.textures[0], graphics.texIds[0], ref offset, ref clip,mask))
                 {
                     CombinationMesh(tris);
                 }
@@ -125,9 +135,10 @@ namespace Assets.Core.HGUI
                 if (trisArray != null)
                 {
                     int c = trisArray.Length;
+                    bool mask = graphics.Mask;
                     for (int i = 0; i < c; i++)
                     {
-                        if (CombinationMaterial(graphics.textures[i], graphics.texIds[i], ref offsets[i], ref clip))
+                        if (CombinationMaterial(graphics.textures[i], graphics.texIds[i], ref offsets[i], ref clip, mask))
                         {
                             CombinationMesh(trisArray[i]);
                         }
@@ -136,6 +147,7 @@ namespace Assets.Core.HGUI
                             CompeleteSub();
                             CombinationMesh(trisArray[i]);
                         }
+                        mask = false;
                     }
                 }
             }

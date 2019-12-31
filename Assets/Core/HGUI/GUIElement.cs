@@ -33,14 +33,6 @@ namespace Assets.Core.HGUI
             {
 
             }
-            if (current.CompareMaterial(graphics))
-            {
-
-            }
-            else
-            {
-
-            }
         }
     }
 }

@@ -6,8 +6,8 @@
 		 [PerRendererData]_STex("Sprite Texture", 2D) = "white" {}
 		 [PerRendererData]_TTex("Sprite Texture", 2D) = "white" {}
 		  [PerRendererData]_FTex("Sprite Texture", 2D) = "white" {}
-		_Color("Tint", Color) = (1,1,1,1)
-		[PerRendererData]_ClipRect("_ClipRect",Vector) = (-10000,-10000,10000,10000)
+		//_Color("Tint", Color) = (1,1,1,1)
+		_ClipRect("_ClipRect",Vector) = (0,0,1,1)
 		_StencilComp("Stencil Comparison", Float) = 8
 		_Stencil("Stencil ID", Float) = 0
 		_StencilOp("Stencil Operation", Float) = 0
@@ -79,7 +79,7 @@
 					UNITY_VERTEX_OUTPUT_STEREO
 				};
 
-				fixed4 _Color;
+				//fixed4 _Color;
 				float4 _ClipRect;
 
 				v2f vert(appdata_t IN)
@@ -91,7 +91,7 @@
 					OUT.uv = IN.uv;
 					OUT.uv1 = IN.uv1;
 					OUT.uv2 = IN.uv2;
-					OUT.color = IN.color * _Color;
+					OUT.color = IN.color;
 					return OUT;
 				}
 

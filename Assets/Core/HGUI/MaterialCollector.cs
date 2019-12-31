@@ -120,13 +120,15 @@ namespace Assets.Core.HGUI
                 }
                 else
                 {
-                    if (max != 0)
+                    if (max > 0)
                         CompeleteSub();
                     CombinationMesh(tris);
                 }
             }
             else//使用自定义材质球
             {
+                if (max > -1)
+                    CompeleteSub();
                 CombinationMaterial(graphics.Material, id, ref clip);
             }
         }
@@ -147,7 +149,8 @@ namespace Assets.Core.HGUI
                         }
                         else
                         {
-                            CompeleteSub();
+                            if (max > 0)
+                                CompeleteSub();
                             CombinationMesh(trisArray[i]);
                         }
                         mask = false;
@@ -156,6 +159,8 @@ namespace Assets.Core.HGUI
             }
             else//使用自定义材质球
             {
+                if (max > -1)
+                    CompeleteSub();
                 CombinationMaterial(graphics.Material, id, ref clip);
             }
         }

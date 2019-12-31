@@ -20,7 +20,7 @@ namespace Assets.Core.HGUI
                 for (int i = 0; i < c; i++)
                 {
                     if(pipeLine[os].active)
-                        Batch(pipeLine, os, canvas, Vector3.zero, Vector3.one, Quaternion.identity, new Vector4(-10000, -10000, 10000, 10000));
+                        Batch(pipeLine, os, canvas, Vector3.zero, Vector3.one, Quaternion.identity, new Vector4(0, 0, 1, 1));
                     os++;
                 }
                 canvas.Collector.End();
@@ -75,9 +75,11 @@ namespace Assets.Core.HGUI
                             var t = q * vert[j];
                             t.x *= s.x;
                             t.y *= s.y;
-                            vs.Add(o + t);
-                            uv2[j].x = (o.x + t.x + 10000) / 20000;
-                            uv2[j].y = (o.y + t.y + 10000) / 20000;
+                            t += o;
+                            t.z = 0;
+                            vs.Add( t);
+                            uv2[j].x = (t.x + 10000) / 20000;
+                            uv2[j].y = (t.y + 10000) / 20000;
                         }
                         canvas.uv2.AddRange(uv2);
                         if (graphics.Colors == null)

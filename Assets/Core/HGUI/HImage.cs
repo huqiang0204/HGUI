@@ -87,10 +87,10 @@ namespace Assets.Core.HGUI
                 m_textureSize.y = m_sprite.texture.height;
                 m_border = m_sprite.border;
                 m_pivot = m_sprite.pivot;
-                if (material == null)
-                    material = new Material(DefShader);
-                material.SetTexture("_MainTex", m_sprite.texture);
-                mainMaterial = material;
+                if (Material == null)
+                    Material = new Material(DefShader);
+                Material.SetTexture("_MainTex", m_sprite.texture);
+                mainMaterial = Material;
             }
             else
             {

@@ -23,7 +23,8 @@ namespace Assets.Core.HGUI
         internal Vector2[] uv2;
         internal Color[] Colors;
         internal int[] tris;
-        public Material material { get; set; }
+        internal int[][] subTris;
+        public Material Material { get; set; }
         internal int MatID;
         internal bool m_dirty = true;
         internal bool m_vertexChange = true;

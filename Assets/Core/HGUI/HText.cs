@@ -215,26 +215,77 @@ namespace Assets.Core.HGUI
             text.Colors = colors;
             text.tris = CreateTri(c);
             int ec = emojis.Count;
-            for (int i = 0; i < ec; i++)
+            if (ec > 0)
             {
-                EmojiInfo info = emojis[i];
-                int o = info.pos * 4;
-                uv[o] = info.uv[0];
-                uv1[o].x = 1;
-                colors[o].a = 0;
-                o++;
-                uv[o] = info.uv[1];
-                uv1[o].x = 1;
-                colors[o].a = 0;
-                o++;
-                uv[o] = info.uv[2];
-                uv1[o].x = 1;
-                colors[o].a = 0;
-                o++;
-                uv[o] = info.uv[3];
-                uv1[o].x = 1;
-                colors[o].a = 0;
+                var info = emojis[0];
+                int si = 1;
+                int ap = 0;
+                int bp = 0;
+                for (int i = 0; i < e; i++)
+                {
+                    if (i == info.pos)
+                    {
+                        int o = i * 4;
+                        uv[o] = info.uv[0];
+                        uv1[o].y = 1;
+                        o++;
+                        uv[o] = info.uv[1];
+                        uv1[o].y = 1;
+                        o++;
+                        uv[o] = info.uv[2];
+                        uv1[o].y = 1;
+                        o++;
+                        uv[o] = info.uv[3];
+                        uv1[o].y = 1;
+                        if (si < ec)
+                            info = emojis[si];
+                        si++;
+                        int p = i * 4;
+                        triB[bp] = p;
+                        bp++;
+                        triB[bp] = p + 1;
+                        bp++;
+                        triB[bp] = p + 2;
+                        bp++;
+                        triB[bp] = p + 2;
+                        bp++;
+                        triB[bp] = p + 3;
+                        bp++;
+                        triB[bp] = p;
+                        bp++;
+                    }
+                    else
+                    {
+                        int p = i * 4;
+                        triA[ap] = p;
+                        ap++;
+                        triA[ap] = p + 1;
+                        ap++;
+                        triA[ap] = p + 2;
+                        ap++;
+                        triA[ap] = p + 2;
+                        ap++;
+                        triA[ap] = p + 3;
+                        ap++;
+                        triA[ap] = p;
+                        ap++;
+                    }
+                }
+                if (text.subTris == null)
+                    text.subTris = new int[2][];
+                text.subTris[0] = triA;
+                text.subTris[1] = triB;
             }
+            else
+            {
+                text.tris = CreateTri(c);
+                text.subTris = null;
+            }
+            text.vertex = vertex;
+            text.uv = uv;
+            text.uv1 = uv1;
+            text.Colors = colors;
+          
         }
         static int[] CreateTri(int len)
         {
@@ -263,7 +314,7 @@ namespace Assets.Core.HGUI
         }
         internal override Material GetMaterial(int index, HCanvas canvas)
         {
-            return material;
+            return Material;
         }
         public override bool CompareMaterial(HGraphics graphics)
         {

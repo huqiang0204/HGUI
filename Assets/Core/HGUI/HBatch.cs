@@ -103,20 +103,23 @@ namespace Assets.Core.HGUI
                 if (trisArray != null)
                 {
                     int c = trisArray.Length;
-                    if (CombinationMaterial(graphics.MainTexture, graphics.MatID, ref offsets[0]))
+                    for (int i = 0; i < c; i++)
                     {
-                        CombinationMesh(trisArray[0]);
-                    }
-                    else
-                    {
-                        CompeleteSub();
-                        CombinationMesh(trisArray[0]);
+                        if (CombinationMaterial(graphics.textures[i], graphics.texIds[i], ref offsets[i]))
+                        {
+                            CombinationMesh(trisArray[i]);
+                        }
+                        else
+                        {
+                            CompeleteSub();
+                            CombinationMesh(trisArray[i]);
+                        }
                     }
                 }
             }
             else//使用自定义材质球
             {
-                CombinationMaterial(graphics.material, id);
+                CombinationMaterial(graphics.Material, id);
             }
         }
         List<int[]> tmpMesh = new List<int[]>();

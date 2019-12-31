@@ -19,9 +19,10 @@ namespace Assets.Core.HGUI
         public virtual Color Color { get => m_color; set { m_color = value; } }
         internal Vector3[] vertex;
         internal Vector2[] uv;
-        internal Vector2[] uv1;
         internal Vector2[] uv2;
         internal Color[] Colors;
+
+        internal int[] uvOffset;
         internal int[] tris;
         internal int[][] subTris;
         public Material Material { get; set; }

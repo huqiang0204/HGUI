@@ -95,6 +95,26 @@ namespace Assets.Core.HGUI
             textures[o].ID = texID;
             return false;
         }
+        public void CombinationMaterial(HGraphics graphics, int[] tris, ref int offset)
+        {
+            int id = graphics.MatID;
+            if (id == 0)//使用默认材质球
+            {
+                if (CombinationMaterial(graphics.textures[0], graphics.texIds[0], ref offset))
+                {
+                    CombinationMesh(tris);
+                }
+                else
+                {
+                    CompeleteSub();
+                    CombinationMesh(tris);
+                }
+            }
+            else//使用自定义材质球
+            {
+                CombinationMaterial(graphics.Material, id);
+            }
+        }
         public void CombinationMaterial(HGraphics graphics,int[][] trisArray,int[] offsets)
         {
             int id = graphics.MatID;
@@ -281,20 +301,30 @@ namespace Assets.Core.HGUI
                                 {
                                     tmp[k] = src[k] + vc;
                                 }
-                              
-                                //if(canvas.Collector.CombinationMaterial(graphics.MainTexture,graphics.TextureID,ref tid))
-                                //{
-                                //    canvas.CombinationMesh(tmp);
-                                //}
-                                //else
-                                //{
-                                //    canvas.CompeleteSub();
-                                //    canvas.CombinationMesh(tmp);
-                                //    canvas.AddMaterial(graphics.material);
-                                //}
+                                canvas.Collector.CombinationMaterial(graphics,tmp,ref tid);
+                            }
+                        }else if(graphics.subTris!=null)
+                        {
+                            var subs = graphics.subTris;
+                            int l = subs.Length;
+                            if (l > 0)
+                            {
+                                int[] ids = new int[l];
+                                int[][] buf = new int[l][];
+                                for (int i = 0; i < l; i++)
+                                {
+                                    var src = subs[i];
+                                    int[] tmp = new int[src.Length];
+                                    for (int k = 0; k < tmp.Length; k++)
+                                    {
+                                        tmp[k] = src[k] + vc;
+                                    }
+                                    buf[i] = tmp;
+                                }
+                                canvas.Collector.CombinationMaterial(graphics, buf, ids);
                             }
                         }
-                        Vector2[] uv1 = new Vector2[vert.Length];
+                        Vector2[]  uv1 = new Vector2[vert.Length];
                         switch (tid)
                         {
                             case 1:

@@ -196,7 +196,7 @@ namespace Assets.Core.HGUI
             Vector3[] vertex = new Vector3[c];
             Color[] colors = new Color[c];
             Vector2[] uv = new Vector2[c];
-            Vector2[] uv1 = new Vector2[c];
+           
             int e = c / 4;
             int all = e * 6;
             int b = emojis.Count * 6;
@@ -210,33 +210,37 @@ namespace Assets.Core.HGUI
                 uv[i] = verts[i].uv0;
             }
             text.vertex = vertex;
-            text.uv = uv;
-            text.uv1 = uv1;
             text.Colors = colors;
-            text.tris = CreateTri(c);
+
             int ec = emojis.Count;
             if (ec > 0)
             {
+                int[] offset = new int[c];
                 var info = emojis[0];
                 int si = 1;
                 int ap = 0;
                 int bp = 0;
+                Color col = Color.white;
                 for (int i = 0; i < e; i++)
                 {
                     if (i == info.pos)
                     {
                         int o = i * 4;
                         uv[o] = info.uv[0];
-                        uv1[o].y = 1;
+                        colors[o] = col;
+                        offset[o] = 1;
                         o++;
                         uv[o] = info.uv[1];
-                        uv1[o].y = 1;
+                        colors[o] = col;
+                        offset[o] = 1;
                         o++;
                         uv[o] = info.uv[2];
-                        uv1[o].y = 1;
+                        colors[o] = col;
+                        offset[o] = 1;
                         o++;
                         uv[o] = info.uv[3];
-                        uv1[o].y = 1;
+                        colors[o] = col;
+                        offset[o] = 1;
                         if (si < ec)
                             info = emojis[si];
                         si++;
@@ -275,17 +279,18 @@ namespace Assets.Core.HGUI
                     text.subTris = new int[2][];
                 text.subTris[0] = triA;
                 text.subTris[1] = triB;
+                text.tris = null;
+                text.uvOffset = offset;
             }
             else
             {
                 text.tris = CreateTri(c);
                 text.subTris = null;
+                text.uvOffset = null;
             }
             text.vertex = vertex;
             text.uv = uv;
-            text.uv1 = uv1;
             text.Colors = colors;
-          
         }
         static int[] CreateTri(int len)
         {

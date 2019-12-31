@@ -317,16 +317,5 @@ namespace Assets.Core.HGUI
             }
             return tri;
         }
-        internal override Material GetMaterial(int index, HCanvas canvas)
-        {
-            return Material;
-        }
-        public override bool CompareMaterial(HGraphics graphics)
-        {
-            HText text = graphics as HText;
-            if (text == null)
-                return false;
-            return false;
-        }
     }
 }

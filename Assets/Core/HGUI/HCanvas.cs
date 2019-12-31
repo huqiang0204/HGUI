@@ -314,37 +314,6 @@ namespace Assets.Core.HGUI
             materials.Clear();
             submesh.Clear();
         }
-        List<int[]> tmpMesh = new List<int[]>();
-        public void CombinationMesh(int[] sub)
-        {
-            tmpMesh.Add(sub);
-        }
-        public void CompeleteSub()
-        {
-            int c = tmpMesh.Count;
-            int all = 0;
-            for (int i = 0; i < c; i++)
-                all += tmpMesh[i].Length;
-            int[] buf = new int[all];
-            int s = 0;
-            for (int i = 0; i < c; i++)
-            {
-                var t = tmpMesh[i];
-                for (int j = 0; j < t.Length; j++)
-                {
-                    buf[s] = t[j];
-                    s++;
-                }
-            }
-            submesh.Add(buf);
-        }
-        public void AddMaterial(Material material)
-        {
-            materials.Add(material);
-        }
-        TextureInfo[] textures = new TextureInfo[4096];
-        int[] Table = new Int32[1024];
-        Material[] mats = new Material[1024];
 #if UNITY_EDITOR
         public void Refresh()
         {
@@ -383,8 +352,8 @@ namespace Assets.Core.HGUI
                 swapVertex = vertex.ToArray();
                 swapUV = uv.ToArray();
                 swapColors = colors.ToArray();
-                swapMaterials = materials.ToArray();
-                swapSubmesh = submesh.ToArray();
+                swapMaterials = Collector.GenerateMaterial();
+                swapSubmesh = Collector.submesh.ToArray();
                 ApplyMesh();
                 return;
             }

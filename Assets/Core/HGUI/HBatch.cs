@@ -219,9 +219,6 @@ namespace Assets.Core.HGUI
             if (root.script != null)
             {
                 canvas.Collector.Start();
-                for (int i = 0; i < 4096; i++)
-                    Table[i] = 0;
-                Max = 0;
                 int c = root.childCount;
                 int os = root.childOffset;
                 for (int i = 0; i < c; i++)
@@ -354,62 +351,6 @@ namespace Assets.Core.HGUI
                 {
                     Batch(pipeLine, os, canvas, o, s, q);
                     os++;
-                }
-            }
-        }
-        public static void MainBatch(HCanvas canvas,GUIElement [] pipeLine)
-        {
-
-        }
-   
-        static TextureInfo[] textures = new TextureInfo[4096];
-        static int[] Table = new Int32[4096];
-
-        static int Max = 0;
-        static bool Combination(Texture txt, int id, ref int index, bool not = false)
-        {
-            if(not)
-            {
-                index = 0;
-                int c = Table[Max];
-                if (c > 0)
-                    Max++;
-                int s = Max * 4;
-                textures[s].texture = txt;
-                textures[s].ID = id;
-                Table[Max] = 1;
-                return false;
-            }
-            else
-            {
-                int c = Table[Max];
-                int s = Max * 4;
-                for (int i = 0; i < c; i++)
-                {
-                    if (textures[s].ID == id)
-                    {
-                        index = i;
-                        return true;
-                    }
-                    s++;
-                }
-                if(c<4)
-                {
-                    s = Max * 4+ Table[Max];
-                    textures[s].texture = txt;
-                    textures[s].ID = id;
-                    Table[Max]++;
-                    return true;
-                }
-                else
-                {
-                    index = 0;
-                    Max++;
-                    s = Max * 4;
-                    textures[s].texture = txt;
-                    textures[s].ID = id;
-                    Table[Max] = 1;
-                    return false;
                 }
             }
         }

@@ -33,5 +33,6 @@ namespace Assets.Core.HGUI
         private AnchorPointType lastAnchorType;
         private Margin lastmargin;
         public UserEvent userEvent;
+        internal int PipelineIndex;
     }
 }

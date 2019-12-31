@@ -87,14 +87,5 @@ namespace Assets.Core.HGUI
         public virtual void UpdateMesh()
         {
         }
-        public virtual bool CompareMaterial(HGraphics graphics)
-        {
-            return false;
-        }
-        internal virtual Material GetMaterial(int index, HCanvas canvas)
-        {
-            return null;
-        }
-        internal int PipelineIndex;
     }
 }

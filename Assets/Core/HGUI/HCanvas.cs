@@ -32,8 +32,9 @@ namespace Assets.Core.HGUI
             PipeLine[index].trans = trans;
             PipeLine[index].active = trans.gameObject.activeSelf;
             var script= trans.GetComponent<AsyncScript>();
-            if(script!=null)
+            if (script != null)
             {
+                script.PipelineIndex = index;
                 scripts[max] = script;
                 max++;
             }

@@ -169,7 +169,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 1997286502}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -221,7 +220,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 1997286502}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -234,9 +232,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 24788670}
-  - component: {fileID: 24788667}
   - component: {fileID: 24788669}
   - component: {fileID: 24788668}
+  - component: {fileID: 24788667}
   m_Layer: 0
   m_Name: GameObject
   m_TagString: Untagged
@@ -382,7 +380,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 0}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -434,7 +431,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 1997286502}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -483,7 +479,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 0}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -532,7 +527,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 0}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -581,7 +575,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 0}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -633,7 +626,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 1997286502}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -682,7 +674,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 0}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -694,17 +685,7 @@ Mesh:
   m_PrefabAsset: {fileID: 0}
   m_Name: 
   serializedVersion: 10
-  m_SubMeshes:
-  - serializedVersion: 2
-    firstByte: 0
-    indexCount: 792
-    topology: 0
-    baseVertex: 0
-    firstVertex: 0
-    vertexCount: 176
-    localAABB:
-      m_Center: {x: -1.1500015, y: -3.5, z: -9.5}
-      m_Extent: {x: 131.85, y: 57.6, z: 20.7}
+  m_SubMeshes: []
   m_Shapes:
     vertices: []
     shapes: []
@@ -721,7 +702,7 @@ Mesh:
   m_KeepVertices: 1
   m_KeepIndices: 1
   m_IndexFormat: 0
-  m_IndexBuffer: 00000200030000000300010004000600070004000700050008000a000b0008000b0009000c000e000f000c000f000d0010001200130010001300110014001600170014001700150018001a001b0018001b0019001c001e001f001c001f001d0020002200230020002300210024002600270024002700250028002a002b0028002b0029002c002e002f002c002f002d0030003200330030003300310034003600370034003700350038003a003b0038003b0039003c003e003f003c003f003d0040004200430040004300410044004600470044004700450048004a004b0048004b0049004c004e004f004c004f004d0050005200530050005300510054005600570054005700550058005a005b0058005b0059005c005e005f005c005f005d0060006200630060006300610064006600670064006700650068006a006b0068006b0069006c006e006f006c006f006d0070007200730070007300710074007600770074007700750078007a007b0078007b0079007c007e007f007c007f007d0080008200830080008300810084008600870084008700850088008a008b0088008b0089008c008e008f008c008f008d0090009200930090009300910094009600970094009700950098009a009b0098009b0099009c009e009f009c009f009d00a000a200a300a000a300a100a400a600a700a400a700a500a800aa00ab00a800ab00a900ac00ae00af00ac00af00ad0000000200030000000300010004000600070004000700050008000a000b0008000b0009000c000e000f000c000f000d0010001200130010001300110014001600170014001700150018001a001b0018001b0019001c001e001f001c001f001d0020002200230020002300210024002600270024002700250028002a002b0028002b0029002c002e002f002c002f002d0030003200330030003300310034003600370034003700350038003a003b0038003b0039003c003e003f003c003f003d0040004200430040004300410044004600470044004700450048004a004b0048004b0049004c004e004f004c004f004d0050005200530050005300510054005600570054005700550058005a005b0058005b0059005c005e005f005c005f005d0060006200630060006300610064006600670064006700650068006a006b0068006b0069006c006e006f006c006f006d0070007200730070007300710074007600770074007700750078007a007b0078007b0079007c007e007f007c007f007d0080008200830080008300810084008600870084008700850088008a008b0088008b0089008c008e008f008c008f008d0090009200930090009300910094009600970094009700950098009a009b0098009b0099009c009e009f009c009f009d00a000a200a300a000a300a100a400a600a700a400a700a500a800aa00ab00a800ab00a900ac00ae00af00ac00af00ad0000000200030000000300010004000600070004000700050008000a000b0008000b0009000c000e000f000c000f000d0010001200130010001300110014001600170014001700150018001a001b0018001b0019001c001e001f001c001f001d0020002200230020002300210024002600270024002700250028002a002b0028002b0029002c002e002f002c002f002d0030003200330030003300310034003600370034003700350038003a003b0038003b0039003c003e003f003c003f003d0040004200430040004300410044004600470044004700450048004a004b0048004b0049004c004e004f004c004f004d0050005200530050005300510054005600570054005700550058005a005b0058005b0059005c005e005f005c005f005d0060006200630060006300610064006600670064006700650068006a006b0068006b0069006c006e006f006c006f006d0070007200730070007300710074007600770074007700750078007a007b0078007b0079007c007e007f007c007f007d0080008200830080008300810084008600870084008700850088008a008b0088008b0089008c008e008f008c008f008d0090009200930090009300910094009600970094009700950098009a009b0098009b0099009c009e009f009c009f009d00a000a200a300a000a300a100a400a600a700a400a700a500a800aa00ab00a800ab00a900ac00ae00af00ac00af00ad00
+  m_IndexBuffer: 
   m_VertexData:
     serializedVersion: 3
     m_VertexCount: 176
@@ -897,7 +878,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 1997286502}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -946,7 +926,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 0}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -995,7 +974,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 0}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -1047,7 +1025,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 1997286502}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -1096,7 +1073,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 0}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -1145,7 +1121,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 0}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -1197,7 +1172,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 1997286502}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -1249,7 +1223,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 1997286502}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -1298,7 +1271,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 0}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -1395,7 +1367,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 0}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -1444,7 +1415,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 0}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -1493,7 +1463,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 0}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -1542,7 +1511,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 0}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -1591,7 +1559,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 0}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -1640,7 +1607,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 0}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -1689,7 +1655,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 0}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -1741,7 +1706,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 1997286502}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -1790,7 +1754,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 0}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -1839,7 +1802,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 0}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -1888,7 +1850,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 0}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -1937,7 +1898,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 0}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -1989,7 +1949,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 1997286502}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -2038,7 +1997,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 0}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -2087,7 +2045,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 0}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -2136,7 +2093,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 0}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -2185,7 +2141,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 0}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -2234,7 +2189,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 0}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -2283,7 +2237,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 0}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -2335,7 +2288,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 1997286502}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -2540,7 +2492,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 0}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -2589,7 +2540,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 0}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -2638,7 +2588,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 0}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -2687,43 +2636,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 0}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
---- !u!21 &1997286502
-Material:
-  serializedVersion: 6
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Custom/UIDef
-  m_Shader: {fileID: 4800000, guid: cabe688b41bac2649be3055d8299759d, type: 3}
-  m_ShaderKeywords: 
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _MainTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Floats:
-    - _ColorMask: 15
-    - _Stencil: 0
-    - _StencilComp: 8
-    - _StencilOp: 0
-    - _StencilReadMask: 255
-    - _StencilWriteMask: 255
-    - _UseUIAlphaClip: 0
-    m_Colors:
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &2003863394
 GameObject:
   m_ObjectHideFlags: 0
@@ -2769,7 +2684,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 0}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}
@@ -2818,7 +2732,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SizeDelta: {x: 100, y: 100}
   m_color: {r: 1, g: 1, b: 1, a: 1}
-  material: {fileID: 0}
   ShareMaterial: 0
   Mask: 0
   m_sprite: {fileID: 0}

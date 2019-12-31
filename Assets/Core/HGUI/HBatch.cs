@@ -23,7 +23,7 @@ namespace Assets.Core.HGUI
         public MaterialInfo[] materials;
         int[] table;
         int max = 0;
-        
+        internal List<int[]> submesh = new List<int[]>();
         public MaterialCollector(int length=1024)
         {
             materials = new MaterialInfo[length];
@@ -39,10 +39,31 @@ namespace Assets.Core.HGUI
                 materials[i].ID = -1;
             }
             tmpMesh.Clear();
+            submesh.Clear();
         }
-        public bool CombinationMaterial(Material mat, int matID, Texture texture, int texID, ref int offset)
+        /// <summary>
+        /// 添加自定义材质球,无法合批
+        /// </summary>
+        /// <param name="mat"></param>
+        /// <param name="matID"></param>
+        /// <returns></returns>
+        void CombinationMaterial(Material mat, int matID)
         {
-            if (materials[max].ID == matID)//材质相同
+            max++;
+            table[max] = 1;
+            materials[max].material = mat;
+            materials[max].ID = matID;
+        }
+        /// <summary>
+        /// 组合默认材质球
+        /// </summary>
+        /// <param name="texture"></param>
+        /// <param name="texID"></param>
+        /// <param name="offset"></param>
+        /// <returns></returns>
+        bool CombinationMaterial(Texture texture, int texID, ref int offset)
+        {
+            if (materials[max].ID == 0)//材质相同
             {
                 int c = table[max];//获取当前材质的纹理数量
                 int s = max * 4;//计算材质的起始位置
@@ -67,21 +88,67 @@ namespace Assets.Core.HGUI
             max++;
             offset = 0;
             table[max] = 1;
-            materials[max].material = mat;
-            materials[max].ID = matID;
+            materials[max].material = null;
+            materials[max].ID = 0;
             int o = max * 4;
             textures[o].texture = texture;
             textures[o].ID = texID;
             return false;
+        }
+        public void CombinationMaterial(HGraphics graphics,int[][] trisArray,int[] offsets)
+        {
+            int id = graphics.MatID;
+            if (id == 0)//使用默认材质球
+            {
+                if (trisArray != null)
+                {
+                    int c = trisArray.Length;
+                    if (CombinationMaterial(graphics.MainTexture, graphics.MatID, ref offsets[0]))
+                    {
+                        CombinationMesh(trisArray[0]);
+                    }
+                    else
+                    {
+                        CompeleteSub();
+                        CombinationMesh(trisArray[0]);
+                    }
+                }
+            }
+            else//使用自定义材质球
+            {
+                CombinationMaterial(graphics.material, id);
+            }
         }
         List<int[]> tmpMesh = new List<int[]>();
         public void CombinationMesh(int[] sub)
         {
             tmpMesh.Add(sub);
         }
+        public void CompeleteSub()
+        {
+            int c = tmpMesh.Count;
+            int all = 0;
+            for (int i = 0; i < c; i++)
+                all += tmpMesh[i].Length;
+            int[] buf = new int[all];
+            int s = 0;
+            for (int i = 0; i < c; i++)
+            {
+                var t = tmpMesh[i];
+                for (int j = 0; j < t.Length; j++)
+                {
+                    buf[s] = t[j];
+                    s++;
+                }
+            }
+            submesh.Add(buf);
+        }
         public void End()
         {
-
+            if(tmpMesh.Count>0)
+            {
+                CompeleteSub();
+            }
         }
         public Material[] GenerateMaterial()
         {
@@ -128,6 +195,7 @@ namespace Assets.Core.HGUI
             GUIElement root = pipeLine[0];
             if (root.script != null)
             {
+                canvas.Collector.Start();
                 for (int i = 0; i < 4096; i++)
                     Table[i] = 0;
                 Max = 0;
@@ -138,7 +206,7 @@ namespace Assets.Core.HGUI
                     Batch(pipeLine, os, canvas, Vector3.zero, Vector3.one, Quaternion.identity);
                     os++;
                 }
-                canvas.CompeleteSub();
+                canvas.Collector.End();
             }
         }
         static void Batch(GUIElement[] pipeLine, int index, HCanvas canvas, Vector3 pos, Vector3 scale, Quaternion quate)
@@ -211,16 +279,16 @@ namespace Assets.Core.HGUI
                                     tmp[k] = src[k] + vc;
                                 }
                               
-                                if(Combination(graphics.MainTexture,graphics.TextureID,ref tid))
-                                {
-                                    canvas.CombinationMesh(tmp);
-                                }
-                                else
-                                {
-                                    canvas.CompeleteSub();
-                                    canvas.CombinationMesh(tmp);
-                                    canvas.AddMaterial(graphics.material);
-                                }
+                                //if(canvas.Collector.CombinationMaterial(graphics.MainTexture,graphics.TextureID,ref tid))
+                                //{
+                                //    canvas.CombinationMesh(tmp);
+                                //}
+                                //else
+                                //{
+                                //    canvas.CompeleteSub();
+                                //    canvas.CombinationMesh(tmp);
+                                //    canvas.AddMaterial(graphics.material);
+                                //}
                             }
                         }
                         Vector2[] uv1 = new Vector2[vert.Length];

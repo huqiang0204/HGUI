@@ -150,7 +150,6 @@ namespace Assets.Core.HGUI
                 m_align = value;
                 m_dirty = true;
             } }
-        public Material emojiMaterial;
         public override void Initial()
         {
             Font = DefaultFont;

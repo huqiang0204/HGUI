@@ -38,7 +38,7 @@ namespace Assets.Core.HGUI
             }
             tmpMesh.Clear();
             submesh.Clear();
-            max = 0;
+            max = -1;
             materials[0].clip.x = -10000;
             materials[0].clip.y = -10000;
             materials[0].clip.z = 10000;
@@ -67,6 +67,8 @@ namespace Assets.Core.HGUI
         /// <returns></returns>
         bool CombinationMaterial(Texture texture, int texID, ref int offset, ref Vector4 clip,bool mask)
         {
+            if (max < 0)
+                goto label;
             if(!mask)
             {
                 if (materials[max].ID == 0)//材质相同
@@ -118,7 +120,8 @@ namespace Assets.Core.HGUI
                 }
                 else
                 {
-                    CompeleteSub();
+                    if (max != 0)
+                        CompeleteSub();
                     CombinationMesh(tris);
                 }
             }

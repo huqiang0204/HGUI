@@ -148,6 +148,7 @@ namespace Assets.Core.HGUI
             if(m_dirty)
             {
                 var font = Font;
+                font.material.color = Color.white;
                 emojiString.FullString = m_text;
                 settings.font = font;
                 settings.pivot = Pivot;
@@ -171,6 +172,8 @@ namespace Assets.Core.HGUI
                 verts = g.verts.ToArray();
                 m_dirty = false;
                 m_vertexChange = true;
+                MainTexture = font.material.mainTexture;
+                fillColors[0] = true;
             }
         }
         public override void UpdateMesh()
@@ -208,8 +211,6 @@ namespace Assets.Core.HGUI
                 colors[i] = verts[i].color;
                 uv[i] = verts[i].uv0;
             }
-            text.vertex = vertex;
-            text.Colors = colors;
 
             int ec = emojis.Count;
             if (ec > 0)

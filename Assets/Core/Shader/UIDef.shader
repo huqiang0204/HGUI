@@ -3,11 +3,12 @@
 	Properties
 	{
 		 _MainTex("Sprite Texture", 2D) = "white" {}
-		 [PerRendererData]_STex("Sprite Texture", 2D) = "white" {}
-		 [PerRendererData]_TTex("Sprite Texture", 2D) = "white" {}
-		 [PerRendererData]_FTex("Sprite Texture", 2D) = "white" {}
+		 _STex("Sprite Texture", 2D) = "white" {}
+		 _TTex("Sprite Texture", 2D) = "white" {}
+		 _FTex("Sprite Texture", 2D) = "white" {}
 		_Color("Tint", Color) = (1,1,1,1)
 		_ClipRect("_ClipRect",Vector) = (0,0,1,1)
+		_FillColor("Fill color", Vector) = (0,0,0,0)
 		_StencilComp("Stencil Comparison", Float) = 8
 		_Stencil("Stencil ID", Float) = 0
 		_StencilOp("Stencil Operation", Float) = 0
@@ -96,22 +97,56 @@
 				sampler2D _FTex;
 				float4 _ClipRect;
 				float4 _Color;
+				float4 _FillColor;
 				fixed4 frag(v2f IN) : SV_Target
 				{
 					half4 color;
 					if (IN.uv1.x == 0)
 					{
-						if(IN.uv1.y==0)
+						if (IN.uv1.y == 0)
+						{
 							color = tex2D(_MainTex, IN.uv);
-						else color = tex2D(_STex, IN.uv);
+							if(_FillColor.x==0)
+								color *= IN.color;
+							else { 
+								color.xyz = IN.color.xyz; 
+								color.a *= IN.color.a;
+							}
+						}
+						else
+						{ 
+							color = tex2D(_STex, IN.uv); 
+							if (_FillColor.y == 0)
+								color *= IN.color;
+							else {
+								color.xyz = IN.color.xyz;
+								color.a *= IN.color.a;
+							}
+						}
 					}
                    else
                    {
 						if (IN.uv1.y == 0)
+						{
 							color = tex2D(_TTex, IN.uv);
-						else color = tex2D(_FTex, IN.uv);
+							if (_FillColor.z == 0)
+								color *= IN.color;
+							else {
+								color.xyz = IN.color.xyz;
+								color.a *= IN.color.a;
+							}
+						}
+						else
+						{ 
+							color = tex2D(_FTex, IN.uv); 
+							if (_FillColor.w == 0)
+								color *= IN.color;
+							else {
+								color.xyz = IN.color.xyz;
+								color.a *= IN.color.a;
+							}
+						}
                    }
-					color *= IN.color;
 					if (IN.uv2.x < _ClipRect.x || IN.uv2.x > _ClipRect.z || IN.uv2.y < _ClipRect.y || IN.uv2.y > _ClipRect.w)
 						color.a = 0;
 					return color;

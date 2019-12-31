@@ -31,6 +31,7 @@ namespace Assets.Core.HGUI
         internal bool m_vertexChange = true;
         internal Texture[] textures = new Texture[4];
         internal int[] texIds = new int[4];
+        internal bool[] fillColors = new bool[4];
         public Texture MainTexture
         {
             get => textures[0];

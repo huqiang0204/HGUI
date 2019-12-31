@@ -7,6 +7,7 @@ namespace Assets.Core.HGUI
     internal struct TextureInfo
     {
         public Texture texture;
+        public bool fillcolor;//需要替换颜色
         public int ID;
     }
     internal struct MaterialInfo
@@ -65,7 +66,7 @@ namespace Assets.Core.HGUI
         /// <param name="texID"></param>
         /// <param name="offset"></param>
         /// <returns></returns>
-        bool CombinationMaterial(Texture texture, int texID, ref int offset, ref Vector4 clip,bool mask)
+        bool CombinationMaterial(Texture texture, int texID, bool fillcolor, ref int offset, ref Vector4 clip,bool mask)
         {
             if (max < 0)
                 goto label;
@@ -91,6 +92,7 @@ namespace Assets.Core.HGUI
                         table[max]++;
                         textures[s].texture = texture;
                         textures[s].ID = texID;
+                        textures[s].fillcolor = fillcolor;
                         offset = c;
                         return true;
                     }
@@ -106,6 +108,7 @@ namespace Assets.Core.HGUI
             int o = max * 4;
             textures[o].texture = texture;
             textures[o].ID = texID;
+            textures[o].fillcolor = fillcolor;
             return false;
         }
         public void CombinationMaterial(HGraphics graphics, int[] tris, ref int offset, ref Vector4 clip)
@@ -114,7 +117,7 @@ namespace Assets.Core.HGUI
             if (id == 0)//使用默认材质球
             {
                 bool mask = graphics.Mask;
-                if (CombinationMaterial(graphics.textures[0], graphics.texIds[0], ref offset, ref clip,mask))
+                if (CombinationMaterial(graphics.textures[0], graphics.texIds[0], graphics.fillColors[0], ref offset, ref clip,mask))
                 {
                     CombinationMesh(tris);
                 }
@@ -143,7 +146,7 @@ namespace Assets.Core.HGUI
                     bool mask = graphics.Mask;
                     for (int i = 0; i < c; i++)
                     {
-                        if (CombinationMaterial(graphics.textures[i], graphics.texIds[i], ref offsets[i], ref clip, mask))
+                        if (CombinationMaterial(graphics.textures[i], graphics.texIds[i],graphics.fillColors[i], ref offsets[i], ref clip, mask))
                         {
                             CombinationMesh(trisArray[i]);
                         }
@@ -207,26 +210,36 @@ namespace Assets.Core.HGUI
                 if (mat == null)//如果为空,则使用默认材质球
                 {
                     mat = new Material(HGraphics.DefShader);
+                    Vector4 v = Vector4.zero;
                     int s = i * 4;
                     if (c > 0)
                     {
                         mat.SetTexture("_MainTex", textures[s].texture);
+                        if (textures[s].fillcolor)
+                            v.x = 1;
                         if (c > 1)
                         {
                             s++;
                             mat.SetTexture("_STex", textures[s].texture);
+                            if (textures[s].fillcolor)
+                                v.y = 1;
                             if (c > 2)
                             {
                                 s++;
                                 mat.SetTexture("_TTex", textures[s].texture);
+                                if (textures[s].fillcolor)
+                                    v.z = 1;
                                 if (c > 3)
                                 {
                                     s++;
                                     mat.SetTexture("_FTex", textures[s].texture);
+                                    if (textures[s].fillcolor)
+                                        v.w = 1;
                                 }
                             }
                         }
                     }
+                    mat.SetVector("_FillColor", v);
                 }
                 mat.SetVector("_ClipRect", materials[i].clip);
                 mats[i] = mat;

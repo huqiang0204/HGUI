@@ -25,11 +25,10 @@ public class HImageEditor:Editor
             angle = img.transform.localEulerAngles;
         }
     }
-    public override void OnInspectorGUI()
+    private void OnSceneGUI()
     {
-        base.OnInspectorGUI();
         HImage img = target as HImage;
-        if(img!=null)
+        if (img != null)
         {
             bool changed = false;
             if (pos != img.transform.localPosition)
@@ -41,6 +40,21 @@ public class HImageEditor:Editor
             pos = img.transform.localPosition;
             scale = img.transform.localScale;
             angle = img.transform.localEulerAngles;
+            if (changed)
+            {
+                var can = FindHCanvas(img.transform);
+                if (can != null)
+                    can.Refresh();
+            }
+        }
+    }
+    public override void OnInspectorGUI()
+    {
+        base.OnInspectorGUI();
+        HImage img = target as HImage;
+        if(img!=null)
+        {
+            bool changed = false;
             img.SprType = (SpriteType)EditorGUILayout.EnumPopup("SpriteType",img.SprType);
             if(img.SprType==SpriteType.Filled)
             {

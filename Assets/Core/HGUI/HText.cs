@@ -171,7 +171,6 @@ namespace Assets.Core.HGUI
                 verts = g.verts.ToArray();
                 m_dirty = false;
                 m_vertexChange = true;
-                MainTexture = font.material.mainTexture;
             }
         }
         public override void UpdateMesh()

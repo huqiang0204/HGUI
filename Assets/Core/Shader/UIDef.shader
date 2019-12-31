@@ -87,7 +87,7 @@
 					v2f OUT;
 					UNITY_SETUP_INSTANCE_ID(IN);
 					UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(OUT);
-					OUT.vertex = IN.vertex;
+					OUT.vertex = UnityObjectToClipPos(IN.vertex);
 					OUT.uv = IN.uv;
 					OUT.uv1 = IN.uv1;
 					OUT.uv2 = IN.uv2;
@@ -115,8 +115,8 @@
 						else color = tex2D(_FTex, IN.uv);
                    }
 					color *= IN.color;
-					if (IN.uv2.x< _ClipRect.x || IN.uv2.x > _ClipRect.z || IN.uv2.y < _ClipRect.y || IN.uv2.y < _ClipRect.w)
-						color.a = 0;
+				/*	if (IN.uv2.x< _ClipRect.x || IN.uv2.x > _ClipRect.z || IN.uv2.y < _ClipRect.y || IN.uv2.y < _ClipRect.w)
+						color.a = 0;*/
 					return color;
 				}
 			ENDCG

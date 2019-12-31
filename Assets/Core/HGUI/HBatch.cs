@@ -36,7 +36,7 @@ namespace Assets.Core.HGUI
             {
                 table[i] = 0;
                 materials[i].material = null;
-                materials[i].ID = -1;
+                materials[i].ID = 0;
             }
             tmpMesh.Clear();
             submesh.Clear();

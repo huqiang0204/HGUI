@@ -369,6 +369,8 @@ namespace Assets.Core.HGUI
                 mesh.Clear();
                 mesh.vertices = vertex.ToArray();
                 mesh.uv = uv.ToArray();
+                mesh.uv2 = uv1.ToArray();
+                mesh.uv3 = uv2.ToArray();
                 mesh.colors = colors.ToArray();
                 swapSubmesh = Collector.submesh.ToArray();
                 mesh.subMeshCount = swapSubmesh.Length;

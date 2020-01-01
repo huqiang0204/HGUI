@@ -13,6 +13,16 @@ public class HTextEditor:Editor
     Vector3 pos;
     Vector3 scale;
     Vector3 angle;
+    string str;
+    private void OnEnable()
+    {
+        HText img = target as HText;
+        if (img != null)
+        {
+            str = img.Text;
+        }
+            
+    }
     private void OnSceneGUI()
     {
         HText img = target as HText;
@@ -42,7 +52,15 @@ public class HTextEditor:Editor
         HText txt = target as HText;
         if (txt != null)
         {
-            if(GUI.changed)
+            bool changed = false;
+            if (str != txt.Text)
+            {
+                str = txt.Text;
+                txt.Text = str;
+                changed = true;
+            }
+            str = txt.Text;
+            if(GUI.changed |changed)
             {
                 var can = FindHCanvas(txt.transform);
                 if (can != null)

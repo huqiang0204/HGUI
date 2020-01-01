@@ -340,6 +340,7 @@ namespace Assets.Core.HGUI
         {
             point = 1;
             max = 0;
+            TxtCollector.Clear();
             Collection(transform, -1, 0);
             CheckSize();
             int len = max;
@@ -354,6 +355,7 @@ namespace Assets.Core.HGUI
             }
             for (int i = 0; i < max; i++)
                 scripts[i].MainUpdate();
+            TxtCollector.GenerateTexture();
             if (scripts != null)
             {
                 for (int i = 0; i < len; i++)

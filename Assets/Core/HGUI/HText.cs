@@ -9,25 +9,14 @@ namespace Assets.Core.HGUI
 {
     public class HText:HGraphics
     {
-        internal static Shader DefFontShader
-        {
-            get
-            {
-                if (shader == null)
-                    shader = Shader.Find("Custom/UIEmoji");
-                return shader;
-            }
-        }
-        static Texture fontTexture;
-        public static Font defFont;
-        static Font DefaultFont
+        static Font defFont;
+        public static Font DefaultFont
         {
             get
             {
                 if (defFont == null)
                 {
                     defFont = Font.CreateDynamicFontFromOSFont("Arial", 16);
-                    fontTexture = defFont.material.mainTexture;
                 }
                 return defFont;
             }
@@ -170,8 +159,8 @@ namespace Assets.Core.HGUI
             verts = g.verts.ToArray();
             m_dirty = false;
             m_vertexChange = true;
-            MainTexture = font.material.mainTexture;
             fillColors[0] = true;
+            //MainTexture = font.material.mainTexture;
         }
         public override void UpdateMesh()
         {
@@ -183,6 +172,8 @@ namespace Assets.Core.HGUI
         }
         static void CreateEmojiMesh(HText text)
         {
+            if (text.verts == null)
+                return;
             var emojis = text.emojiString.emojis;
             var verts = text.verts;
             int c = verts.Length;

@@ -64,14 +64,14 @@ namespace Assets.Core.HGUI
                 }
                 if (dirty)
                 {
-                    for (int j = 0; i < c; j++)
+                    for (int j = 0; j < c; j++)
                         buf[j].Populate();
-                    var tex = HText.defFont.material.mainTexture;
+                    var tex = buf[0].Font.material.mainTexture;
                     var id = tex.GetInstanceID();
                     for (int j = 0; j < c; j++)
                     {
-                        buf[i].texIds[0] = id;
-                        buf[i].textures[0] = tex;
+                        buf[j].texIds[0] = id;
+                        buf[j].textures[0] = tex;
                     }
                 }
             }

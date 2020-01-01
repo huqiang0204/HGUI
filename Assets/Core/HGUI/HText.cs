@@ -57,14 +57,16 @@ namespace Assets.Core.HGUI
                 m_dirty = true;
             }
         }
-        HorizontalWrapMode m_hof;
+        [SerializeField]
+        protected HorizontalWrapMode m_hof;
         public HorizontalWrapMode HorizontalOverflow {
             get => m_hof;
             set {
                 m_hof = value;
                 m_dirty = true;
             } }
-        VerticalWrapMode m_vof;
+        [SerializeField]
+        protected VerticalWrapMode m_vof;
         public VerticalWrapMode VerticalOverflow {
             get => m_vof;
             set {
@@ -82,7 +84,8 @@ namespace Assets.Core.HGUI
                 m_resizeBestFit = true;
                 m_dirty = true;
             } }
-        TextAnchor anchor;
+        [SerializeField]
+       protected TextAnchor anchor;
         public TextAnchor TextAnchor {
             get => anchor;
             set {
@@ -104,8 +107,8 @@ namespace Assets.Core.HGUI
                 m_richText = value;
                 m_dirty = true;
             } }
-
-        internal float m_lineSpace;
+        [SerializeField]
+        internal float m_lineSpace=1;
         public float LineSpacing {
             get => m_lineSpace;
             set {
@@ -160,7 +163,6 @@ namespace Assets.Core.HGUI
             m_dirty = false;
             m_vertexChange = true;
             fillColors[0] = true;
-            //MainTexture = font.material.mainTexture;
         }
         public override void UpdateMesh()
         {

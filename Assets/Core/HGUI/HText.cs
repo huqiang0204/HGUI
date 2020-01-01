@@ -308,7 +308,7 @@ namespace Assets.Core.HGUI
         {
             if (_font == null)
                 Font = DefaultFont;
-            STexture = UnityEngine.Resources.Load<Texture>("Emoji");
+            STexture = Resources.Load<Texture>("Emoji");
         }
     }
 }

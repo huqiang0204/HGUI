@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace Assets.Core.HGUI
 {
-   
     internal class HBatch
     {
         public static void Batch(HCanvas canvas, GUIElement[] pipeLine)
@@ -82,7 +81,7 @@ namespace Assets.Core.HGUI
                         canvas.uv2.AddRange(uv2);
                         if (graphics.Colors == null)
                         {
-                            var col = graphics.Color;
+                            var col = graphics.m_color;
                             for (int j = 0; j < vert.Length; j++)
                             {
                                 canvas.colors.Add(col);
@@ -92,7 +91,7 @@ namespace Assets.Core.HGUI
                         {
                             if (graphics.Colors.Length == 0)
                             {
-                                var col = graphics.Color;
+                                var col = graphics.m_color;
                                 for (int j = 0; j < vert.Length; j++)
                                 {
                                     canvas.colors.Add(col);

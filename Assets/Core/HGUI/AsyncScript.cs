@@ -10,7 +10,6 @@ namespace Assets.Core.HGUI
         protected static ThreadMission thread = new ThreadMission("async");
         public virtual void MainUpdate()
         {
-
         }
         public virtual void SubUpdate()
         {
@@ -29,5 +28,19 @@ namespace Assets.Core.HGUI
         internal int PipelineIndex;
         public bool Mask;
         public virtual Color Chromatically { get; set; }
+        public T RegEvent<T>() where T : UserEvent, new()
+        {
+            var t = new T();
+            t.Context = this;
+            t.Initial();
+            return t;
+        }
+        public object RegEvent(Type type)
+        {
+            UserEvent u = Activator.CreateInstance(type) as UserEvent;
+            u.Context = this;
+            u.Initial();
+            return u;
+        }
     }
 }

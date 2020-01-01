@@ -292,7 +292,12 @@ namespace Assets.Core.HGUI
             Collection(transform, -1, 0);
             CheckSize();
             for (int i = 0; i < max; i++)
+            {
+                var scr = scripts[i];
+                if (scr.userEvent != null)
+                    scr.userEvent.Update();
                 scripts[i].MainUpdate();
+            }
             TxtCollector.GenerateTexture();
             thread.AddSubMission(SubMission, null);
         }

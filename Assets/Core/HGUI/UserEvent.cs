@@ -9,11 +9,17 @@ namespace Assets.Core.HGUI
     {
         public static T RegEvent<T>(AsyncScript element) where T : UserEvent, new()
         {
-            return new T();
+            var t = new T();
+            t.Context = element;
+            t.Initial();
+            return t;
         }
-        public static object RegEvent(huqiang.UI.ModelElement element, Type type)
+        public static object RegEvent(AsyncScript script, Type type)
         {
-            return null;
+            UserEvent u = Activator.CreateInstance(type) as UserEvent;
+            u.Context = script;
+            u.Initial();
+            return u;
         }
         public static long ClickTime = 1800000;
         public static float ClickArea = 400;
@@ -457,7 +463,7 @@ namespace Assets.Core.HGUI
             if (MouseWheel != null)
                 MouseWheel(this, action);
         }
-        protected virtual void Initial()
+        internal virtual void Initial()
         {
         }
         public void RemoveFocus()
@@ -474,5 +480,7 @@ namespace Assets.Core.HGUI
             RemoveFocus();
             //events.Remove(this);
         }
+        internal void Update()
+        { }
     }
 }

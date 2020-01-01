@@ -16,7 +16,7 @@ namespace Assets.Core.HGUI
         public static Shader shader;
         [SerializeField]
         internal Color m_color = Color.white;
-        public virtual Color Color { get => m_color; set { m_color = value; } }
+        public override Color Chromatically { get => m_color; set { m_color = value; } }
         internal Vector3[] vertex;
         internal Vector2[] uv;
         internal Vector2[] uv2;

@@ -25,7 +25,13 @@ namespace Assets.Core.HGUI
         internal int[] uvOffset;
         internal int[] tris;
         internal int[][] subTris;
-        public Material Material { get; set; }
+        internal Material m_material;
+        public Material Material { get => m_material; set {
+                m_material = value;
+                if (value == null)
+                    MatID = 0;
+                else MatID = value.GetInstanceID();
+            } }
         internal int MatID;
         internal bool m_dirty = true;
         internal bool m_vertexChange = true;

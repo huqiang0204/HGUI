@@ -12,6 +12,7 @@ public class HImageEditor:Editor
     Vector3 pos;
     Vector3 scale;
     Vector3 angle;
+    Sprite sprite;
     private void OnEnable()
     {
         HImage img = target as HImage;
@@ -23,6 +24,7 @@ public class HImageEditor:Editor
             pos = img.transform.localPosition;
             scale = img.transform.localScale;
             angle = img.transform.localEulerAngles;
+            sprite = img.Sprite;
         }
     }
     private void OnSceneGUI()
@@ -55,6 +57,11 @@ public class HImageEditor:Editor
         if(img!=null)
         {
             bool changed = false;
+            if(sprite!=img.Sprite)
+            {
+                sprite = img.Sprite;
+                img.Sprite = sprite;
+            }
             img.SprType = (SpriteType)EditorGUILayout.EnumPopup("SpriteType",img.SprType);
             if(img.SprType==SpriteType.Filled)
             {

@@ -76,7 +76,8 @@ namespace Assets.Core.HGUI
                 {
                     MainTexture = null;
                 }
-                else {
+                else
+                {
                     MainTexture = value.texture;
                 }
             }

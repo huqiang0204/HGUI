@@ -8,14 +8,6 @@ namespace Assets.Core.HGUI
     public class AsyncScript:MonoBehaviour
     {
         protected static ThreadMission thread = new ThreadMission("async");
-        private void Reset()
-        {
-            Initial();
-        }
-        public virtual void Initial()
-        {
-
-        }
         public virtual void MainUpdate()
         {
 

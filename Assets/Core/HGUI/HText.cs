@@ -130,10 +130,7 @@ namespace Assets.Core.HGUI
                 m_align = value;
                 m_dirty = true;
             } }
-        public override void Initial()
-        {
-            Font = DefaultFont;
-        }
+
         static TextGenerationSettings settings;
         public void Populate()
         {
@@ -306,6 +303,12 @@ namespace Assets.Core.HGUI
                 tri[s] = p;
             }
             return tri;
+        }
+        public void Reset()
+        {
+            if (_font == null)
+                Font = DefaultFont;
+            STexture = UnityEngine.Resources.Load<Texture>("Emoji");
         }
     }
 }

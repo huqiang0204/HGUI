@@ -25,6 +25,7 @@ namespace Assets.Core.HGUI
         internal int[] uvOffset;
         internal int[] tris;
         internal int[][] subTris;
+        [SerializeField]
         internal Material m_material;
         public Material Material { get => m_material; set {
                 m_material = value;

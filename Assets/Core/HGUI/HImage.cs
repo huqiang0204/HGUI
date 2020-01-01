@@ -50,12 +50,6 @@ namespace Assets.Core.HGUI
     }
     public class HImage:HGraphics
     {
-        static Material m_DefaultMat;
-        static Material DefaultMat {
-            get { if (m_DefaultMat == null)
-                    m_DefaultMat = new Material(DefShader);
-                return m_DefaultMat;
-            } }
         [SerializeField]
         internal Sprite m_sprite = null;
         internal Rect m_rect;
@@ -82,7 +76,6 @@ namespace Assets.Core.HGUI
                 }
             }
         }
-        Material mainMaterial;
         internal void ApplySpriteInfo()
         {
             if (m_sprite != null)
@@ -92,14 +85,8 @@ namespace Assets.Core.HGUI
                 m_textureSize.y = m_sprite.texture.height;
                 m_border = m_sprite.border;
                 m_pivot = m_sprite.pivot;
-                if (Material == null)
-                    Material = new Material(DefShader);
-                Material.SetTexture("_MainTex", m_sprite.texture);
-                mainMaterial = Material;
-            }
-            else
-            {
-                mainMaterial = DefaultMat;
+                if (Material != null)
+                    Material.SetTexture("_MainTex", m_sprite.texture);
             }
             m_vertexChange = true;
         }
@@ -110,6 +97,7 @@ namespace Assets.Core.HGUI
                 m_fillMethod = value;
                 m_vertexChange = true;
             } }
+        [SerializeField]
         internal bool m_fillClockwise;
         public bool FillClockwise { get; set; }
         internal int m_fillOrigin;

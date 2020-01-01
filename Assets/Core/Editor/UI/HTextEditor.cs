@@ -20,7 +20,6 @@ public class HTextEditor:AsyncScriptEditor
         {
             str = img.Text;
         }
-            
     }
     public override void OnSceneGUI()
     {

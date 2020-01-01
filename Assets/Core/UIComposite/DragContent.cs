@@ -1,9 +1,7 @@
-﻿using huqiang.UI;
+﻿using Assets.Core.HGUI;
+using huqiang.UI;
 using huqiang.UIEvent;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 
 namespace huqiang.UIComposite
@@ -14,7 +12,7 @@ namespace huqiang.UIComposite
         {
             None,X,Y
         }
-        protected Vector2 ScrollNone(EventCallBack eventCall, ref Vector2 v, ref float x, ref float y)
+        protected Vector2 ScrollNone(UserEvent eventCall, ref Vector2 v, ref float x, ref float y)
         {
             Vector2 v2 = Vector2.zero;
             float vx = x - v.x;
@@ -55,7 +53,7 @@ namespace huqiang.UIComposite
             }
             return v2;
         }
-        protected Vector2 BounceBack(EventCallBack eventCall, ref Vector2 v, ref float x, ref float y)
+        protected Vector2 BounceBack(UserEvent eventCall, ref Vector2 v, ref float x, ref float y)
         {
             x -= v.x;
             y += v.y;
@@ -107,13 +105,13 @@ namespace huqiang.UIComposite
         public ScrollType scrollType = ScrollType.BounceBack;
         public ModelElement view;
         public ModelElement Content;
-        public EventCallBack eventCall;
+        public UserEvent eventCall;
         public Action<DragContent, Vector2> Scroll;
         public override void Initial(ModelElement element)
         {
             view = element;
             Size = element.data.sizeDelta;
-            element.RegEvent<EventCallBack>();
+            element.RegEvent<UserEvent>();
             eventCall = element.baseEvent;
             eventCall.Drag = (o, e, s) => {
                 Scrolling(o, s);
@@ -134,7 +132,7 @@ namespace huqiang.UIComposite
                 ContentSize = Content.data.sizeDelta;
         }
     
-        void Scrolling(EventCallBack back, Vector2 v)
+        void Scrolling(UserEvent back, Vector2 v)
         {
             v.x /= view.data.localScale.x;
             v.y /= view.data.localScale.y;
@@ -182,7 +180,7 @@ namespace huqiang.UIComposite
             if (Scroll != null)
                 Scroll(this, v);
         }
-        void OnScrollEndX(EventCallBack back)
+        void OnScrollEndX(UserEvent back)
         {
             if (scrollType == ScrollType.BounceBack)
             {
@@ -190,7 +188,7 @@ namespace huqiang.UIComposite
                 {
                     back.DecayRateX = 0.988f;
                     float d = -Position.x;
-                    back.ScrollDistanceX = -d * eventCall.Context.data.localScale.x;
+                    back.ScrollDistanceX = -d * eventCall.Context.transform.localScale.x;
                 }
                 else
                 {
@@ -201,7 +199,7 @@ namespace huqiang.UIComposite
                     {
                         back.DecayRateX = 0.988f;
                         float d = ContentSize.x - Position.x - Size.x;
-                        back.ScrollDistanceX = -d * eventCall.Context.data.localScale.x;
+                        back.ScrollDistanceX = -d * eventCall.Context.transform.localScale.x;
                     }
                     else
                     {
@@ -213,7 +211,7 @@ namespace huqiang.UIComposite
             //else if (ScrollEnd != null)
             //    ScrollEnd(this);
         }
-        void OnScrollEndY(EventCallBack back)
+        void OnScrollEndY(UserEvent back)
         {
             if (scrollType == ScrollType.BounceBack)
             {
@@ -221,7 +219,7 @@ namespace huqiang.UIComposite
                 {
                     back.DecayRateY = 0.988f;
                     float d = -Position.y;
-                    back.ScrollDistanceY = d * eventCall.Context.data.localScale.y;
+                    back.ScrollDistanceY = d * eventCall.Context.transform.localScale.y;
                 }
                 else
                 {
@@ -232,7 +230,7 @@ namespace huqiang.UIComposite
                     {
                         back.DecayRateY = 0.988f;
                         float d = ContentSize.y - Position.y - Size.y;
-                        back.ScrollDistanceY = d * eventCall.Context.data.localScale.y;
+                        back.ScrollDistanceY = d * eventCall.Context.transform.localScale.y;
                     }
                     else
                     {

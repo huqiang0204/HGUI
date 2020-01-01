@@ -1,4 +1,5 @@
-﻿using huqiang.UI;
+﻿using Assets.Core.HGUI;
+using huqiang.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,17 +51,17 @@ namespace huqiang.UIEvent
         public long EventTicks { get; set; }
         Vector3[] FramePos = new Vector3[16];
         int Frame;
-        List<EventCallBack> LastEntry;
-        public List<EventCallBack> CurrentEntry;
-        List<EventCallBack> LastFocus;
-        public List<EventCallBack> MultiFocus;
+        List<UserEvent> LastEntry;
+        public List<UserEvent> CurrentEntry;
+        List<UserEvent> LastFocus;
+        public List<UserEvent> MultiFocus;
         public UserAction(int id)
         {
             Id = id;
-            LastEntry = new List<EventCallBack>();
-            CurrentEntry = new List<EventCallBack>();
-            LastFocus = new List<EventCallBack>();
-            MultiFocus = new List<EventCallBack>();
+            LastEntry = new List<UserEvent>();
+            CurrentEntry = new List<UserEvent>();
+            LastFocus = new List<UserEvent>();
+            MultiFocus = new List<UserEvent>();
         }
         public void Clear()
         {
@@ -299,12 +300,12 @@ namespace huqiang.UIEvent
         {
             if (IsLeftButtonDown | IsRightButtonDown | IsMiddleButtonDown)
             {
-                List<EventCallBack> tmp = MultiFocus;
+                List<UserEvent> tmp = MultiFocus;
                 LastFocus.Clear();
                 MultiFocus = LastFocus;
                 LastFocus = tmp;
             }
-            EventCallBack.DispatchEvent(this, root);
+            //UserEvent.DispatchEvent(this, root);
             if (IsLeftButtonDown | IsRightButtonDown | IsMiddleButtonDown)
             {
                 for (int i = 0; i < LastFocus.Count; i++)
@@ -360,25 +361,25 @@ namespace huqiang.UIEvent
                 label:;
                 }
             }
-            List<EventCallBack> tmp = LastEntry;
+            List<UserEvent> tmp = LastEntry;
             tmp.Clear();
             LastEntry = CurrentEntry;
             CurrentEntry = tmp;
         }
-        public bool ExistFocus(EventCallBack eve)
+        public bool ExistFocus(UserEvent eve)
         {
             return MultiFocus.Contains(eve);
         }
-        public void AddFocus(EventCallBack eve)
+        public void AddFocus(UserEvent eve)
         {
             if (MultiFocus.Contains(eve))
                 return;
             MultiFocus.Add(eve);
             eve.Pressed = isPressed;
             if (eve.Pressed)
-                eve.pressTime = EventTicks;
+                eve.PressTime = EventTicks;
         }
-        public void RemoveFocus(EventCallBack callBack)
+        public void RemoveFocus(UserEvent callBack)
         {
             LastEntry.Remove(callBack);
             CurrentEntry.Remove(callBack);

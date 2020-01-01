@@ -1,4 +1,5 @@
-﻿using huqiang.UI;
+﻿using Assets.Core.HGUI;
+using huqiang.UI;
 using huqiang.UIEvent;
 using System;
 using UnityEngine;
@@ -7,7 +8,7 @@ namespace huqiang.UIComposite
 {
     public class ScrollYPop:ScrollContent
     {
-        public EventCallBack eventCall;
+        public UserEvent eventCall;
         protected float height;
         int wm;
         /// <summary>
@@ -18,7 +19,7 @@ namespace huqiang.UIComposite
         public override void Initial(ModelElement mod)
         {
             Model = mod;
-            eventCall = EventCallBack.RegEvent<EventCallBack>(mod);
+            //eventCall = UserEvent.RegEvent<UserEvent>(mod);
             eventCall.Drag = (o, e, s) => { Scrolling(o, s); };
             eventCall.DragEnd = (o, e, s) => { Scrolling(o, s); };
             eventCall.Scrolling = Scrolling;
@@ -28,7 +29,7 @@ namespace huqiang.UIComposite
         }
         public Action<ScrollYPop, Vector2> Scroll;
         public Action<ScrollYPop, Vector2> ScrollEnd;
-        void Scrolling(EventCallBack back, Vector2 v)
+        void Scrolling(UserEvent back, Vector2 v)
         {
             if (Model == null)
                 return;

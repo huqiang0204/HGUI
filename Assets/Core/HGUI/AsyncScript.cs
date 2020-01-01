@@ -20,6 +20,7 @@ namespace Assets.Core.HGUI
         {
         }
         public Vector2 SizeDelta = new Vector2(100,100);
+        public Vector2 pivot = new Vector2(0.5f, 0.5f);
         private ScaleType lastScaleType;
         private AnchorType lastSizeType;
         private AnchorPointType lastAnchorType;
@@ -27,5 +28,6 @@ namespace Assets.Core.HGUI
         public UserEvent userEvent;
         internal int PipelineIndex;
         public bool Mask;
+        public virtual Color Chromatically { get; set; }
     }
 }

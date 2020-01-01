@@ -1,4 +1,5 @@
-﻿using huqiang.UI;
+﻿using Assets.Core.HGUI;
+using huqiang.UI;
 using huqiang.UIEvent;
 using System;
 using System.Collections.Generic;
@@ -24,7 +25,7 @@ namespace huqiang.UIComposite
             tar += sy * 0.5f;
             scroll.eventCall.ScrollDistanceY = tar;
         }
-        public EventCallBack eventCall;//scrollY自己的按钮
+        public UserEvent eventCall;//scrollY自己的按钮
         protected float height;
         int Column = 1;
         float m_point;
@@ -54,7 +55,7 @@ namespace huqiang.UIComposite
         public override void Initial(ModelElement model)
         {
             base.Initial(model);
-            eventCall = EventCallBack.RegEvent<EventCallBack>(model);
+            //eventCall = UserEvent.RegEvent<UserEvent>(model);
             eventCall.Drag = Draging;
             eventCall.DragEnd = (o, e, s) =>
             {
@@ -77,7 +78,7 @@ namespace huqiang.UIComposite
         public Action<ScrollY, Vector2> Scroll;
         public Action<ScrollY> ScrollStart;
         public Action<ScrollY> ScrollEnd;
-        void Draging(EventCallBack back, UserAction action, Vector2 v)
+        void Draging(UserEvent back, UserAction action, Vector2 v)
         {
             back.DecayRateY = 0.998f;
             Scrolling(back, v);
@@ -87,12 +88,12 @@ namespace huqiang.UIComposite
         /// </summary>
         /// <param name="back"></param>
         /// <param name="v">移动的实际像素位移</param>
-        void Scrolling(EventCallBack back, Vector2 v)
+        void Scrolling(UserEvent back, Vector2 v)
         {
             if (Model == null)
                 return;
             Vector2 u = v;
-            v.y /= eventCall.Context.data.localScale.y;
+            v.y /= eventCall.Context.transform.localScale.y;
             back.VelocityX = 0;
             v.x = 0;
             float x = 0;
@@ -121,7 +122,7 @@ namespace huqiang.UIComposite
                     ScrollEnd(this);
             }
         }
-        void OnScrollEnd(EventCallBack back)
+        void OnScrollEnd(UserEvent back)
         {
             if (scrollType == ScrollType.BounceBack)
             {
@@ -129,7 +130,7 @@ namespace huqiang.UIComposite
                 {
                     back.DecayRateY = 0.988f;
                     float d = - m_point;
-                    back.ScrollDistanceY = d * eventCall.Context.data.localScale.y;
+                    back.ScrollDistanceY = d * eventCall.Context.transform.localScale.y;
                 }
                 else
                 {
@@ -140,7 +141,7 @@ namespace huqiang.UIComposite
                     {
                         back.DecayRateY = 0.988f;
                         float d = ActualSize.y - m_point - Size.y;
-                        back.ScrollDistanceY = d * eventCall.Context.data.localScale.y;
+                        back.ScrollDistanceY = d * eventCall.Context.transform.localScale.y;
                     }
                     else
                     {

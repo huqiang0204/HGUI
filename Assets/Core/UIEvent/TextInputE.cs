@@ -1,4 +1,5 @@
-﻿using huqiang.UI;
+﻿using Assets.Core.HGUI;
+using huqiang.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -322,7 +323,7 @@ namespace huqiang.UIEvent
             tri.Add(1);
             tri.Add(3);
         }
-        public static int GetPressIndex(TextInfo info, EventCallBack callBack, UserAction action,ref int dock)
+        public static int GetPressIndex(TextInfo info, UserEvent callBack, UserAction action,ref int dock)
         {
             dock = 0;
             if (info == null)

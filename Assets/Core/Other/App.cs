@@ -1,4 +1,5 @@
-﻿using huqiang.Data;
+﻿using Assets.Core.HGUI;
+using huqiang.Data;
 using huqiang.UI;
 using huqiang.UIEvent;
 using UGUI;
@@ -99,7 +100,6 @@ namespace huqiang
         }
         static void SubThread(object obj)
         {
-            EventCallBack.Rolling();
             RenderForm.DispatchAction();
             TextInput.SubDispatch();
             Resize();
@@ -132,7 +132,6 @@ namespace huqiang
         }
         public static void Dispose()
         {
-            EventCallBack.ClearEvent();
             ThreadMission.DisposeAll();
             RecordManager.ReleaseAll();
             ElementAsset.bundles.Clear();

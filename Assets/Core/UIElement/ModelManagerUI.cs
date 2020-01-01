@@ -1,4 +1,5 @@
-﻿using huqiang.Data;
+﻿using Assets.Core.HGUI;
+using huqiang.Data;
 using huqiang.Pool;
 using huqiang.UIEvent;
 using System;
@@ -307,8 +308,8 @@ namespace huqiang.UI
                 {
                     if (m.FieldType == typeof(ModelElement))
                         m.Value = mod;
-                    else if (typeof(EventCallBack).IsAssignableFrom(m.FieldType))
-                        m.Value = EventCallBack.RegEvent(mod,m.FieldType);
+                    else if (typeof(UserEvent).IsAssignableFrom(m.FieldType))
+                        m.Value = UserEvent.RegEvent(mod,m.FieldType);
                     else if (typeof(ModelInital).IsAssignableFrom(m.FieldType))
                     {
                         var obj = Activator.CreateInstance(m.FieldType) as ModelInital;

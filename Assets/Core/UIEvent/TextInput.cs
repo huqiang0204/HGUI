@@ -1,4 +1,5 @@
-﻿using huqiang.Data;
+﻿using Assets.Core.HGUI;
+using huqiang.Data;
 using huqiang.UI;
 using System;
 using System.Text;
@@ -18,7 +19,7 @@ namespace huqiang.UIEvent
         public static int Size = sizeof(TextInputData);
         public static int ElementSize = Size / 4;
     }
-    public partial class TextInput:EventCallBack
+    public partial class TextInput:UserEvent
     {
         public enum ContentType
         {
@@ -324,7 +325,7 @@ namespace huqiang.UIEvent
         }
         internal override void OnDragEnd(UserAction action)
         {
-            long r = action.EventTicks - pressTime;
+            long r = action.EventTicks - PressTime;
             if (r <= ClickTime)
             {
                 float x = action.CanPosition.x;
@@ -344,7 +345,7 @@ namespace huqiang.UIEvent
                 OnSelectEnd(this, action);
             base.OnDragEnd(action);
         }
-        void OnClick(EventCallBack eventCall, UserAction action)
+        void OnClick(UserEvent eventCall, UserAction action)
         {
             TextInput input = eventCall as TextInput;
             if (input == null)
@@ -357,11 +358,11 @@ namespace huqiang.UIEvent
             ThreadMission.InvokeToMain((o) => {
                 bool pass = InputEvent.contentType == ContentType.Password ? true : false;
                 Keyboard.OnInput(textInfo.text, InputEvent.touchType, InputEvent.multiLine, pass, CharacterLimit);
-                InputCaret.SetParent(Context.Context);
+                //InputCaret.SetParent(Context.Context);
                 InputCaret.ChangeCaret(textInfo);
             }, null);
         }
-        void OnLostFocus(EventCallBack eventCall, UserAction action)
+        void OnLostFocus(UserEvent eventCall, UserAction action)
         {
             TextInput text = eventCall as TextInput;
             if (text == InputEvent)

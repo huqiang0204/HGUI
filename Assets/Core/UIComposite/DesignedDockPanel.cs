@@ -1,4 +1,5 @@
-﻿using huqiang.UI;
+﻿using Assets.Core.HGUI;
+using huqiang.UI;
 using huqiang.UIEvent;
 using System;
 using System.Collections.Generic;
@@ -103,47 +104,47 @@ namespace huqiang.UIComposite
         }
         void InitialDocker()
         {
-            var mod = docker.Find("Center");
-            var eve = EventCallBack.RegEvent<EventCallBack>(mod);
-            eve.PointerUp = CenterPointUp;
-            eve.PointerEntry = CenterPointEntry;
-            eve.PointerLeave = PointLeave;
+            //var mod = docker.Find("Center");
+            //var eve = UserEvent.RegEvent<UserEvent>(mod);
+            //eve.PointerUp = CenterPointUp;
+            //eve.PointerEntry = CenterPointEntry;
+            //eve.PointerLeave = PointLeave;
 
-            mod = docker.Find("Left");
-            eve = EventCallBack.RegEvent<EventCallBack>(mod);
-            eve.PointerUp = PointUp;
-            eve.PointerEntry = LeftPointEntry;
-            eve.PointerLeave = PointLeave;
-            eve.DataContext = DockpanelArea.Dock.Left;
+            //mod = docker.Find("Left");
+            //eve = UserEvent.RegEvent<UserEvent>(mod);
+            //eve.PointerUp = PointUp;
+            //eve.PointerEntry = LeftPointEntry;
+            //eve.PointerLeave = PointLeave;
+            //eve.DataContext = DockpanelArea.Dock.Left;
 
-            mod = docker.Find("Top");
-            eve = EventCallBack.RegEvent<EventCallBack>(mod);
-            eve.PointerUp = PointUp;
-            eve.PointerEntry = TopPointEntry;
-            eve.PointerLeave = PointLeave;
-            eve.DataContext = DockpanelArea.Dock.Top;
+            //mod = docker.Find("Top");
+            //eve = UserEvent.RegEvent<UserEvent>(mod);
+            //eve.PointerUp = PointUp;
+            //eve.PointerEntry = TopPointEntry;
+            //eve.PointerLeave = PointLeave;
+            //eve.DataContext = DockpanelArea.Dock.Top;
 
-            mod = docker.Find("Right");
-            eve = EventCallBack.RegEvent<EventCallBack>(mod);
-            eve.PointerUp = PointUp;
-            eve.PointerEntry = RightPointEntry;
-            eve.PointerLeave = PointLeave;
-            eve.DataContext = DockpanelArea.Dock.Right;
+            //mod = docker.Find("Right");
+            //eve = UserEvent.RegEvent<UserEvent>(mod);
+            //eve.PointerUp = PointUp;
+            //eve.PointerEntry = RightPointEntry;
+            //eve.PointerLeave = PointLeave;
+            //eve.DataContext = DockpanelArea.Dock.Right;
 
-            mod = docker.Find("Down");
-            eve = EventCallBack.RegEvent<EventCallBack>(mod);
-            eve.PointerUp = PointUp;
-            eve.PointerEntry = DownPointEntry;
-            eve.PointerLeave = PointLeave;
-            eve.DataContext = DockpanelArea.Dock.Down;
+            //mod = docker.Find("Down");
+            //eve = UserEvent.RegEvent<UserEvent>(mod);
+            //eve.PointerUp = PointUp;
+            //eve.PointerEntry = DownPointEntry;
+            //eve.PointerLeave = PointLeave;
+            //eve.DataContext = DockpanelArea.Dock.Down;
         }
-        void CenterPointEntry(EventCallBack callBack, UserAction action)
+        void CenterPointEntry(UserEvent callBack, UserAction action)
         {
             Cover.data.localPosition = Vector3.zero;
             Cover.data.sizeDelta = model.data.sizeDelta;
             Cover.activeSelf = true;
         }
-        void CenterPointUp(EventCallBack callBack, UserAction action)
+        void CenterPointUp(UserEvent callBack, UserAction action)
         {
             Cover.activeSelf = false;
             if (control.ExistContent(layout.DragContent))
@@ -154,11 +155,11 @@ namespace huqiang.UIComposite
             layout.Refresh();
             ModelElement.ScaleSize(layout.DragContent.Content);
         }
-        void PointLeave(EventCallBack callBack, UserAction action)
+        void PointLeave(UserEvent callBack, UserAction action)
         {
             Cover.activeSelf = false;
         }
-        void PointUp(EventCallBack callBack, UserAction action)
+        void PointUp(UserEvent callBack, UserAction action)
         {
             Cover.activeSelf = false;
             if (layout.DragAuxiliary == this)
@@ -176,7 +177,7 @@ namespace huqiang.UIComposite
             layout.Refresh();
             ModelElement.ScaleSize(layout.DragContent.Content);
         }
-        void LeftPointEntry(EventCallBack callBack, UserAction action)
+        void LeftPointEntry(UserEvent callBack, UserAction action)
         {
             var size = model.data.sizeDelta;
             Cover.data.localPosition.x = size.x * -0.25f;
@@ -185,7 +186,7 @@ namespace huqiang.UIComposite
             Cover.data.sizeDelta.y = size.y;
             Cover.activeSelf = true;
         }
-        void TopPointEntry(EventCallBack callBack, UserAction action)
+        void TopPointEntry(UserEvent callBack, UserAction action)
         {
             var size = model.data.sizeDelta;
             Cover.data.localPosition.x = 0;
@@ -194,7 +195,7 @@ namespace huqiang.UIComposite
             Cover.data.sizeDelta.y = size.y * 0.5f;
             Cover.activeSelf = true;
         }
-        void RightPointEntry(EventCallBack callBack, UserAction action)
+        void RightPointEntry(UserEvent callBack, UserAction action)
         {
             var size = model.data.sizeDelta;
             Cover.data.localPosition.x = size.x * 0.25f;
@@ -203,7 +204,7 @@ namespace huqiang.UIComposite
             Cover.data.sizeDelta.y = size.y;
             Cover.activeSelf = true;
         }
-        void DownPointEntry(EventCallBack callBack, UserAction action)
+        void DownPointEntry(UserEvent callBack, UserAction action)
         {
             var size = model.data.sizeDelta;
             Cover.data.localPosition.x = 0;
@@ -213,11 +214,11 @@ namespace huqiang.UIComposite
             Cover.activeSelf = true;
         }
         int ac;
-        void HeadPointDown(EventCallBack eventCall, UserAction action)
+        void HeadPointDown(UserEvent eventCall, UserAction action)
         {
             ac = 0;
         }
-        void HeadDrag(EventCallBack eventCall, UserAction action, Vector2 v)
+        void HeadDrag(UserEvent eventCall, UserAction action, Vector2 v)
         {
             if (!layout.LockLayout)
             {
@@ -238,7 +239,7 @@ namespace huqiang.UIComposite
                 }
             }
         }
-        void HeadDragEnd(EventCallBack eventCall, UserAction action, Vector2 v)
+        void HeadDragEnd(UserEvent eventCall, UserAction action, Vector2 v)
         {
             if (!layout.LockLayout)
             {
@@ -246,7 +247,7 @@ namespace huqiang.UIComposite
                 layout.DragEnd(action);
             }
         }
-        void CloseClick(EventCallBack eventCall, UserAction action)
+        void CloseClick(UserEvent eventCall, UserAction action)
         {
             ItemContent con = eventCall.DataContext as ItemContent;
             if(con!=null)
@@ -267,35 +268,35 @@ namespace huqiang.UIComposite
             ModelElement item = new ModelElement();
             item.Load(control.Item.ModData);
             ItemContent con = new ItemContent();
-            con.Parent = control;
-            con.Item = item;
-            item.RegEvent<EventCallBack>();
-            item.baseEvent.PointerDown = HeadPointDown;
-            item.baseEvent.Drag = HeadDrag;
-            item.baseEvent.DragEnd = HeadDragEnd;
-            item.baseEvent.DataContext = con;
+            //con.Parent = control;
+            //con.Item = item;
+            //item.RegEvent<UserEvent>();
+            //item.baseEvent.PointerDown = HeadPointDown;
+            //item.baseEvent.Drag = HeadDrag;
+            //item.baseEvent.DragEnd = HeadDragEnd;
+            //item.baseEvent.DataContext = con;
 
-            var t =  ModelElement.CreateNew(name);
-            t.data.SizeScale = true;
-            t.data.marginType = MarginType.Margin;
-            con.Content = t;
-            con.Back = item.Find("Back");
+            //var t =  ModelElement.CreateNew(name);
+            //t.data.SizeScale = true;
+            //t.data.marginType = MarginType.Margin;
+            //con.Content = t;
+            //con.Back = item.Find("Back");
 
-            con.Label = item.Find("Label");
-            var txt = con.Label.GetComponent<TextElement>();
-            txt.Text = name;
-            txt.AsyncGetTextSizeX((o,e)=> {
-                o.model.data.sizeDelta = e;
-                OrderHeadLabel(con);
-            });
-            con.Close = item.Find("Close");
-            if (con.Close != null)
-            {
-                con.Close.RegEvent<EventCallBack>();
-                con.Close.baseEvent.Click = CloseClick;
-                con.Close.baseEvent.DataContext = con;
-            }
-            control.AddContent(con);
+            //con.Label = item.Find("Label");
+            //var txt = con.Label.GetComponent<TextElement>();
+            //txt.Text = name;
+            //txt.AsyncGetTextSizeX((o,e)=> {
+            //    o.model.data.sizeDelta = e;
+            //    OrderHeadLabel(con);
+            //});
+            //con.Close = item.Find("Close");
+            //if (con.Close != null)
+            //{
+            //    con.Close.RegEvent<UserEvent>();
+            //    con.Close.baseEvent.Click = CloseClick;
+            //    con.Close.baseEvent.DataContext = con;
+            //}
+            //control.AddContent(con);
             return con;
         }
         /// <summary>

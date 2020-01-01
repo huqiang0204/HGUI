@@ -1,4 +1,5 @@
-﻿using huqiang.Data;
+﻿using Assets.Core.HGUI;
+using huqiang.Data;
 using huqiang.UI;
 using huqiang.UIEvent;
 using System;
@@ -28,7 +29,7 @@ namespace huqiang.UIComposite
         public ModelElement Nob;
         public SliderInfo info;
         float ratio;
-        EventCallBack callBack;
+        UserEvent callBack;
         Vector2 pos;
         public void SetFillSize(float value)
         {
@@ -70,7 +71,7 @@ namespace huqiang.UIComposite
         public override void Initial(ModelElement mod)
         {
             Model= mod;
-            callBack = EventCallBack.RegEvent<EventCallBack>(Model);
+            //callBack = UserEvent.RegEvent<UserEvent>(Model);
             callBack.Drag = callBack.DragEnd = Draging;
             callBack.PointerDown = PointDown;
             callBack.AutoColor = false;
@@ -90,14 +91,14 @@ namespace huqiang.UIComposite
                 }
             }
         }
-        void Draging(EventCallBack back, UserAction action, Vector2 v)
+        void Draging(UserEvent back, UserAction action, Vector2 v)
         {
             pos += v;
             ApplyValue();
             if (OnValueChanged != null)
                 OnValueChanged(this);
         }
-        void PointDown(EventCallBack back, UserAction action)
+        void PointDown(UserEvent back, UserAction action)
         {
             var v = new Vector2(back.GlobalPosition.x,back.GlobalPosition.y);
             pos = action.CanPosition - v;

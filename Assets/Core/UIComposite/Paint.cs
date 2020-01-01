@@ -1,4 +1,5 @@
-﻿using huqiang.Data;
+﻿using Assets.Core.HGUI;
+using huqiang.Data;
 using huqiang.UI;
 using huqiang.UIEvent;
 using UnityEngine;
@@ -40,7 +41,7 @@ namespace huqiang.UIComposite
             HalfW = Width/2;
             HalfH = Height/2;
             buffer = new Color[Width*Height];
-            gesture = EventCallBack.RegEvent<GestureEvent>(model);
+            //gesture = UserEvent.RegEvent<GestureEvent>(model);
             gesture.PointerDown = PointDown;
             gesture.Drag = Drag;
             gesture.DragEnd = DragEnd;
@@ -48,13 +49,13 @@ namespace huqiang.UIComposite
             gesture.TowFingerMove = TowFingerMove;
             ThreadMission.InvokeToMain(Apply, null);
         }
-        void PointDown(EventCallBack callBack, UserAction action)
+        void PointDown(UserEvent callBack, UserAction action)
         {
             Origin = callBack.ScreenToLocal(action.CanPosition);
             LastPos = Origin;
             loopBuffer.Clear();
         }
-        void Drag(EventCallBack callBack, UserAction action,Vector2 v)
+        void Drag(UserEvent callBack, UserAction action,Vector2 v)
         {
             if(drawModel==DrawModel.Brush)
             {
@@ -70,7 +71,7 @@ namespace huqiang.UIComposite
                     }
             }
         }
-        void DragEnd(EventCallBack callBack, UserAction action, Vector2 v)
+        void DragEnd(UserEvent callBack, UserAction action, Vector2 v)
         {
 
         }

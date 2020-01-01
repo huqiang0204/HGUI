@@ -1,4 +1,5 @@
-﻿using huqiang.Other;
+﻿using Assets.Core.HGUI;
+using huqiang.Other;
 using huqiang.UI;
 using huqiang.UIEvent;
 using System;
@@ -8,8 +9,8 @@ namespace huqiang.UIComposite
 {
     public class UIPalette : ModelInital
     {
-        EventCallBack callBackR;
-        EventCallBack callBackC;
+        UserEvent callBackR;
+        UserEvent callBackC;
         ModelElement hc;
         ModelElement NobA;
         ModelElement NobB;
@@ -25,7 +26,7 @@ namespace huqiang.UIComposite
         public override void Initial(ModelElement mod)
         {
             palette = new Palette();
-            callBackR = EventCallBack.RegEvent<EventCallBack>(mod);
+            //callBackR = UserEvent.RegEvent<UserEvent>(mod);
             callBackR.IsCircular = true;
             callBackR.Drag = callBackR.DragEnd = DragingR;
             callBackR.PointerDown = PointDownR;
@@ -33,7 +34,7 @@ namespace huqiang.UIComposite
             NobB = mod.Find("NobB");
             hc = mod.Find("HTemplate");
             template = hc.GetComponent<RawImageElement>();
-            callBackC= EventCallBack.RegEvent<EventCallBack>(hc);
+            //callBackC= UserEvent.RegEvent<UserEvent>(hc);
             callBackC.Drag = callBackC.DragEnd = DragingC;
             callBackC.PointerDown = PointDownC;
             htemp = mod.GetComponent<RawImageElement>();
@@ -51,11 +52,11 @@ namespace huqiang.UIComposite
             uISlider.OnValueChanged = AlphaChanged;
             uISlider.Percentage = 1;
         }
-        void DragingR(EventCallBack back, UserAction action, Vector2 v)
+        void DragingR(UserEvent back, UserAction action, Vector2 v)
         {
             PointDownR(back,action);
         }
-        void PointDownR(EventCallBack back, UserAction action)
+        void PointDownR(UserEvent back, UserAction action)
         {
             float x = action.CanPosition.x - back.GlobalPosition.x;
             float y = action.CanPosition.y - back.GlobalPosition.y;
@@ -79,12 +80,12 @@ namespace huqiang.UIComposite
             if (TemplateChanged != null)
                 TemplateChanged(this);
         }
-        void DragingC(EventCallBack back, UserAction action, Vector2 v)
+        void DragingC(UserEvent back, UserAction action, Vector2 v)
         {
             PointDownC(back, action);
         }
         int Index;
-        void PointDownC(EventCallBack back, UserAction action)
+        void PointDownC(UserEvent back, UserAction action)
         {
             float x = action.CanPosition.x - back.GlobalPosition.x;
             float y = action.CanPosition.y - back.GlobalPosition.y;

@@ -1,4 +1,5 @@
-﻿using huqiang.Data;
+﻿using Assets.Core.HGUI;
+using huqiang.Data;
 using huqiang.UI;
 using huqiang.UIEvent;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ namespace huqiang.UIComposite
     {
         public ModelElement target;
         public ShareTextChildElement text;
-        public EventCallBack callBack;
+        public UserEvent callBack;
         public TreeViewNode node;
     }
     public class TreeView : ModelInital
@@ -29,7 +30,7 @@ namespace huqiang.UIComposite
         ModelElement model;
         public TreeViewNode nodes;
         public float ItemHigh = 16;
-        public EventCallBack eventCall;//scrollY自己的按钮
+        public UserEvent eventCall;//scrollY自己的按钮
         public ModelElement ItemMod;
         float m_point;
         public SwapBuffer<TreeViewItem, TreeViewNode> swap;
@@ -42,7 +43,7 @@ namespace huqiang.UIComposite
         public override void Initial(ModelElement mod)
         {
             View = mod;
-            eventCall = EventCallBack.RegEvent<EventCallBack>(mod);
+            //eventCall = UserEvent.RegEvent<UserEvent>(mod);
             eventCall.Drag = (o, e, s) => { Scrolling(o, s); };
             eventCall.DragEnd = (o, e, s) => { Scrolling(o, s); };
             eventCall.Scrolling = Scrolling;
@@ -60,7 +61,7 @@ namespace huqiang.UIComposite
                 }
             }
         }
-        void Draging(EventCallBack back, UserAction action, Vector2 v)
+        void Draging(UserEvent back, UserAction action, Vector2 v)
         {
             back.DecayRateY = 0.998f;
             Scrolling(back, v);
@@ -70,11 +71,11 @@ namespace huqiang.UIComposite
         /// </summary>
         /// <param name="back"></param>
         /// <param name="v">移动的实际像素位移</param>
-        void Scrolling(EventCallBack back, Vector2 v)
+        void Scrolling(UserEvent back, Vector2 v)
         {
             if (View == null)
                 return;
-            v.y /= eventCall.Context.data.localScale.y;
+            v.y /= eventCall.Context.transform.localScale.y;
             Limit(back, v.y);
             Refresh();
         }
@@ -131,8 +132,7 @@ namespace huqiang.UIComposite
                         }
                     }
                     var m = item.callBack.Context;
-                    m.data.localPosition = new Vector3(node.offset.x, hy - dy - ItemHigh * 0.5f, 0);
-                    m.IsChanged = true;
+                    m.transform.localPosition = new Vector3(node.offset.x, hy - dy - ItemHigh * 0.5f, 0);
                 }
         }
         protected TreeViewItem CreateItem()
@@ -152,7 +152,7 @@ namespace huqiang.UIComposite
             TreeViewItem a = new TreeViewItem();
             a.target = mod;
             a.text = mod.GetComponent<ShareTextChildElement>();
-            a.callBack = EventCallBack.RegEvent<EventCallBack>(mod);
+            //a.callBack = UserEvent.RegEvent<UserEvent>(mod);
             a.callBack.Click = (o, e) => {
                 var item = o.DataContext as TreeViewItem;
                 if (item.node != null)
@@ -164,7 +164,7 @@ namespace huqiang.UIComposite
             a.callBack.DataContext = a;
             return a;
         }
-        protected void Limit(EventCallBack callBack, float y)
+        protected void Limit(UserEvent callBack, float y)
         {
             var size = Size;
             if (size.y > aSize.y)

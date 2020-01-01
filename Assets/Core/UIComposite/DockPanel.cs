@@ -1,4 +1,5 @@
-﻿using huqiang.UI;
+﻿using Assets.Core.HGUI;
+using huqiang.UI;
 using huqiang.UIEvent;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ namespace huqiang.UIComposite
     public class DockPanelLine
     {
         public DockPanel layout;
-        EventCallBack callBack;
+        UserEvent callBack;
         public Direction direction { get; private set; }
         /// <summary>
         /// 需要绘制线
@@ -31,10 +32,10 @@ namespace huqiang.UIComposite
             model = mod;
             if (real)
             {
-                callBack = EventCallBack.RegEvent<EventCallBack>(model);
-                callBack.Drag = Drag;
+                //callBack = UserEvent.RegEvent<UserEvent>(model);
+                //callBack.Drag = Drag;
               
-                direction = dir;
+                //direction = dir;
 #if UNITY_EDITOR || UNITY_STANDALONE_WIN
                 //callBack.PointerEntry = (o, e) => {
                 //    ThreadMission.InvokeToMain((y) => {
@@ -52,7 +53,7 @@ namespace huqiang.UIComposite
             else mod.activeSelf = false;
             mod.SetParent(layout.LineLevel);
         }
-        void Drag(EventCallBack callBack,UserAction action,Vector2 v)
+        void Drag(UserEvent callBack,UserAction action,Vector2 v)
         {
             if(direction==Direction.Vertical)//竖线只能横向移动
             {

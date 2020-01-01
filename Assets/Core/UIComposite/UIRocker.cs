@@ -1,4 +1,5 @@
-﻿using huqiang.UI;
+﻿using Assets.Core.HGUI;
+using huqiang.UI;
 using huqiang.UIEvent;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ namespace huqiang.UIComposite
     {
         ModelElement model;
         public ModelElement Nob;
-        public EventCallBack callBack;
+        public UserEvent callBack;
         float _r;
         public float Radius { get { return _r; }set { _r = value;_s = _r * _r; } }
         public enum Direction
@@ -38,7 +39,7 @@ namespace huqiang.UIComposite
         public override void Initial(ModelElement mod)
         {
             model = mod;
-            callBack = EventCallBack.RegEvent<EventCallBack>(model);
+            //callBack = UserEvent.RegEvent<UserEvent>(model);
             callBack.Drag  = Draging;
             callBack.DragEnd = DragEnd;
             callBack.PointerDown = PointDown;
@@ -47,7 +48,7 @@ namespace huqiang.UIComposite
             _s = _r * _r;
             Nob = mod.Find("Nob");
         }
-        void Draging(EventCallBack back, UserAction action, Vector2 v)
+        void Draging(UserEvent back, UserAction action, Vector2 v)
         {
            float x = action.CanPosition.x - back.GlobalPosition.x;
            float y = action.CanPosition.y - back.GlobalPosition.y;
@@ -80,7 +81,7 @@ namespace huqiang.UIComposite
             if (Rocking != null)
                 Rocking(this);
         }
-        void DragEnd(EventCallBack back, UserAction action, Vector2 v)
+        void DragEnd(UserEvent back, UserAction action, Vector2 v)
         {
             if(Nob!=null)
             {
@@ -94,7 +95,7 @@ namespace huqiang.UIComposite
             if (Rocking != null)
                 Rocking(this);
         }
-        void PointDown(EventCallBack back, UserAction action)
+        void PointDown(UserEvent back, UserAction action)
         {
             float x = action.CanPosition.x - back.GlobalPosition.x;
             float y = action.CanPosition.y - back.GlobalPosition.y;

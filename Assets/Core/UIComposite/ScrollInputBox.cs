@@ -1,4 +1,5 @@
-﻿using huqiang.UI;
+﻿using Assets.Core.HGUI;
+using huqiang.UI;
 using huqiang.UIEvent;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,7 @@ namespace huqiang.UIComposite
         public override void Initial(ModelElement mod)
         {
             Model = mod;
-            input =  EventCallBack.RegEvent<TextInput>(mod);
+            //input =  UserEvent.RegEvent<TextInput>(mod);
             mod_slider = mod.Find("Slider");
             if(mod_slider!=null)
             {

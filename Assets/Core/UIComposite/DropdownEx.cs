@@ -1,4 +1,5 @@
-﻿using huqiang.UI;
+﻿using Assets.Core.HGUI;
+using huqiang.UI;
 using huqiang.UIEvent;
 using System;
 using System.Collections;
@@ -10,7 +11,7 @@ namespace huqiang.UIComposite
     {
         public class PopItemMod
         {
-            public EventCallBack Item;
+            public UserEvent Item;
             public TextElement Label;
             public ModelElement Checked;
             [NonSerialized]
@@ -42,7 +43,7 @@ namespace huqiang.UIComposite
         public float PopOffset = 0;
         public Vector2 ItemSize;
         int s_index;
-        public EventCallBack callBack;
+        public UserEvent callBack;
         public int SelectIndex
         {
             get { return s_index; }
@@ -71,22 +72,22 @@ namespace huqiang.UIComposite
         }
         public override void Initial(ModelElement mod)
         {
-            main = mod;
-            Label = mod.Find("Label");
-            ShowLabel = Label.GetComponent<TextElement>();
-            callBack = EventCallBack.RegEvent<EventCallBack>(mod);
-            callBack.Click = Show;
-            var scroll = mod.Find("Scroll");
-            if(scroll!=null)
-            {
-                m_scroll = new ScrollY();
-                m_scroll.Initial(scroll);
-                scroll.activeSelf = false;
-                ItemSize = m_scroll.ItemSize;
-                MaxHeight = m_scroll.Model.data.sizeDelta.y;
-            }
+            //main = mod;
+            //Label = mod.Find("Label");
+            //ShowLabel = Label.GetComponent<TextElement>();
+            //callBack = UserEvent.RegEvent<UserEvent>(mod);
+            //callBack.Click = Show;
+            //var scroll = mod.Find("Scroll");
+            //if(scroll!=null)
+            //{
+            //    m_scroll = new ScrollY();
+            //    m_scroll.Initial(scroll);
+            //    scroll.activeSelf = false;
+            //    ItemSize = m_scroll.ItemSize;
+            //    MaxHeight = m_scroll.Model.data.sizeDelta.y;
+            //}
         }
-        void Show(EventCallBack back, UserAction action)
+        void Show(UserEvent back, UserAction action)
         {
             if (m_scroll != null)
             {
@@ -128,7 +129,7 @@ namespace huqiang.UIComposite
         public Action<DropdownEx, object> OnSelectChanged;
         public TextElement ShowLabel;
 
-        void LostFocus(EventCallBack eve, UserAction action)
+        void LostFocus(UserEvent eve, UserAction action)
         {
             m_scroll.Model.activeSelf = false;
         }
@@ -141,9 +142,9 @@ namespace huqiang.UIComposite
 
             if (button.Item != null)
             {
-                var m = button.Item.Context.child[0];
-                m.data.sizeDelta = new Vector2(ItemSize.x - 20, ItemSize.y - 10);
-                m.IsChanged = true;
+                //var m = button.Item.Context.child[0];
+                //m.data.sizeDelta = new Vector2(ItemSize.x - 20, ItemSize.y - 10);
+                //m.IsChanged = true;
             }
             if (button.Label != null)
             {
@@ -174,7 +175,7 @@ namespace huqiang.UIComposite
                 else button.Checked.activeSelf = false;
             }
         }
-        void ItemClick(EventCallBack eventCall, UserAction action)
+        void ItemClick(UserEvent eventCall, UserAction action)
         {
             if (Checked != null)
                 Checked.activeSelf = false;

@@ -1,4 +1,5 @@
-﻿using huqiang.Data;
+﻿using Assets.Core.HGUI;
+using huqiang.Data;
 using huqiang.UIEvent;
 using System;
 using System.Collections.Generic;
@@ -698,19 +699,19 @@ namespace huqiang.UI
         public Vector3 GlobalScale { get => GetGlobaInfo(this).Scale; }
         public Quaternion GlobalRotate { get => GetGlobaInfo(this).quaternion; }
 
-        public EventCallBack baseEvent;
-        public void RegEvent<T>() where T : EventCallBack, new()
+        public UserEvent baseEvent;
+        public void RegEvent<T>() where T : UserEvent, new()
         {
-            if (baseEvent != null)
-            {
-                var t = baseEvent as T;
-                if (t != null)
-                {
-                    EventCallBack.RegEvent<T>(t);
-                    return;
-                }
-            }
-            baseEvent = EventCallBack.RegEvent<T>(this);
+            //if (baseEvent != null)
+            //{
+            //    var t = baseEvent as T;
+            //    if (t != null)
+            //    {
+            //        UserEvent.RegEvent<T>(t);
+            //        return;
+            //    }
+            //}
+            //baseEvent = UserEvent.RegEvent<T>(this);
         }
         public void Update()
         {

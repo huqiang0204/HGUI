@@ -1,4 +1,5 @@
-﻿using huqiang.Data;
+﻿using Assets.Core.HGUI;
+using huqiang.Data;
 using huqiang.UI;
 using huqiang.UIEvent;
 using System;
@@ -14,7 +15,7 @@ namespace huqiang.UIComposite
             public ShareTextChildElement Item;
         }
         ModelElement model;
-        EventCallBack callBack;
+        UserEvent callBack;
         ScrollY Year;
         ScrollY Month;
         ScrollY Day;

@@ -1,4 +1,5 @@
-﻿using huqiang.Data;
+﻿using Assets.Core.HGUI;
+using huqiang.Data;
 using huqiang.UI;
 using huqiang.UIEvent;
 using System;
@@ -353,7 +354,7 @@ namespace huqiang.UIComposite
                 items[i].target.activeSelf = false;
             }
         }
-        protected Vector2 ScrollNone(EventCallBack eventCall,ref Vector2 v,ref float x,ref float y)
+        protected Vector2 ScrollNone(UserEvent eventCall,ref Vector2 v,ref float x,ref float y)
         {
             Vector2 v2 = Vector2.zero;
             float vx = x - v.x;
@@ -394,7 +395,7 @@ namespace huqiang.UIComposite
             }
             return v2;
         }
-        protected Vector2 ScrollLoop(EventCallBack eventCall, ref Vector2 v, ref float x, ref float y)
+        protected Vector2 ScrollLoop(UserEvent eventCall, ref Vector2 v, ref float x, ref float y)
         {
             x -= v.x;
             y += v.y;
@@ -406,7 +407,7 @@ namespace huqiang.UIComposite
             else y %= ActualSize.y;
             return v;
         }
-        protected Vector2 BounceBack(EventCallBack eventCall, ref Vector2 v, ref float x, ref float y)
+        protected Vector2 BounceBack(UserEvent eventCall, ref Vector2 v, ref float x, ref float y)
         {
             if (eventCall.Pressed)
             {

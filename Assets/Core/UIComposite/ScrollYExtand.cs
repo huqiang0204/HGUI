@@ -1,4 +1,5 @@
-﻿using huqiang.UI;
+﻿using Assets.Core.HGUI;
+using huqiang.UI;
 using huqiang.UIEvent;
 using System;
 using System.Collections;
@@ -23,7 +24,7 @@ namespace huqiang.UIComposite
             public float ShowOffset = 0;
             public float aniTime;
         }
-        EventCallBack eventCall;
+        UserEvent eventCall;
         protected float height;
         int wm = 1;
         public float Point;
@@ -34,7 +35,7 @@ namespace huqiang.UIComposite
         public override void Initial(ModelElement model)
         {
             Model = model;
-            eventCall = EventCallBack.RegEvent<EventCallBack>(model);
+            //eventCall = UserEvent.RegEvent<UserEvent>(model);
             eventCall.Drag = (o, e, s) => { Scrolling(o, s); };
             eventCall.DragEnd = (o, e, s) => { Scrolling(o, s); };
             eventCall.ScrollEndY = OnScrollEnd;
@@ -72,11 +73,11 @@ namespace huqiang.UIComposite
                 Body.activeSelf = false;
             }
         }
-        void Scrolling(EventCallBack back, Vector2 v)
+        void Scrolling(UserEvent back, Vector2 v)
         {
             if ( Model== null)
                 return;
-            v.y /= eventCall.Context.data.localScale.y;
+            v.y /= eventCall.Context.transform.localScale.y;
             back.VelocityX = 0;
             v.x = 0;
             float x = 0;
@@ -89,13 +90,13 @@ namespace huqiang.UIComposite
                     Scroll(this, v);
             }
         }
-        void OnScrollEnd(EventCallBack back)
+        void OnScrollEnd(UserEvent back)
         {
             if (Point < -ScrollContent.Tolerance)
             {
                 back.DecayRateY = 0.988f;
                 float d = -Point;
-                back.ScrollDistanceY = d * eventCall.Context.data.localScale.y;
+                back.ScrollDistanceY = d * eventCall.Context.transform.localScale.y;
             }
             else
             {
@@ -106,7 +107,7 @@ namespace huqiang.UIComposite
                 {
                     back.DecayRateY = 0.988f;
                     float d = ActualSize.y - Point - Size.y;
-                    back.ScrollDistanceY = d * eventCall.Context.data.localScale.y;
+                    back.ScrollDistanceY = d * eventCall.Context.transform.localScale.y;
                 }
             }
         }
@@ -483,7 +484,7 @@ namespace huqiang.UIComposite
             return null;
         }
  
-        protected Vector2 BounceBack(EventCallBack eventCall, ref Vector2 v, ref float x, ref float y)
+        protected Vector2 BounceBack(UserEvent eventCall, ref Vector2 v, ref float x, ref float y)
         {
             if (eventCall.Pressed)
             {

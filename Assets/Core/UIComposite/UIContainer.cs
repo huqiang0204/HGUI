@@ -1,4 +1,5 @@
-﻿using huqiang.UI;
+﻿using Assets.Core.HGUI;
+using huqiang.UI;
 using huqiang.UIEvent;
 using System;
 using System.Collections.Generic;
@@ -139,7 +140,7 @@ namespace huqiang.UIComposite
             public object Data;
             public Linker linker;
         }
-        public EventCallBack eventCall;
+        public UserEvent eventCall;
         public ModelElement View;
         public Action<UIContainer, Vector2> Scroll;
         List<Item> items;
@@ -153,7 +154,7 @@ namespace huqiang.UIComposite
         {
             items = new List<Item>();
             View = mod;
-            eventCall = EventCallBack.RegEvent<EventCallBack>(mod);
+            //eventCall = UserEvent.RegEvent<UserEvent>(mod);
             eventCall.AutoColor = false;
             eventCall.ForceEvent = true;
             eventCall.Drag = (o, e, s) => { Scrolling(o, s); };
@@ -213,7 +214,7 @@ namespace huqiang.UIComposite
             son.IsChanged = true;
             return item;
         }
-        void Scrolling(EventCallBack scroll, Vector2 offset)
+        void Scrolling(UserEvent scroll, Vector2 offset)
         {
             if (datas.Count > 0)
             {
@@ -234,7 +235,7 @@ namespace huqiang.UIComposite
             }
             return d;
         }
-        void OnScrollEnd(EventCallBack back)
+        void OnScrollEnd(UserEvent back)
         {
             if (datas.Count == 0)
                 return;
@@ -242,7 +243,7 @@ namespace huqiang.UIComposite
             {
                 back.DecayRateY = 0.988f;
                 float d = -datas[pointIndex].high*pointOffsetRatio;
-                back.ScrollDistanceY = d * eventCall.Context.data.localScale.y;
+                back.ScrollDistanceY = d * eventCall.Context.transform.localScale.y;
             }
             else
             {
@@ -254,7 +255,7 @@ namespace huqiang.UIComposite
                     float d = f + item.offset - item.high ;
                     d = GetDownLenth(d);
                     if (d > 0.01f)
-                        back.ScrollDistanceY = -d * eventCall.Context.data.localScale.y;
+                        back.ScrollDistanceY = -d * eventCall.Context.transform.localScale.y;
                     else back.VelocityY = 0;
                 }
             }
@@ -423,7 +424,7 @@ namespace huqiang.UIComposite
             }
             return false;
         }
-        protected void BounceBack(EventCallBack eventCall, ref Vector2 v)
+        protected void BounceBack(UserEvent eventCall, ref Vector2 v)
         {
             var Size = View.data.sizeDelta;
             if (eventCall.Pressed)

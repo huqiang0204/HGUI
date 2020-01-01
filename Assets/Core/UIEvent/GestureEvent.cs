@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assets.Core.HGUI;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using UnityEngine;
 
 namespace huqiang.UIEvent
 {
-    public class GestureEvent : EventCallBack
+    public class GestureEvent : UserEvent
     {
         internal static void Dispatch(List<UserAction> actions)
         {

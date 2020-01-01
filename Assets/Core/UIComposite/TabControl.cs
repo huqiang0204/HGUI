@@ -1,4 +1,5 @@
-﻿using huqiang.UI;
+﻿using Assets.Core.HGUI;
+using huqiang.UI;
 using huqiang.UIEvent;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ namespace huqiang.UIComposite
         {
             public TabControl Parent;
             public ModelElement Item;
-            public EventCallBack eventCall;
+            public UserEvent eventCall;
             public ModelElement Label;
             public ModelElement Back;
             public ModelElement Content;
@@ -118,7 +119,7 @@ namespace huqiang.UIComposite
                     panel.IsChanged = true;
                 });
             }
-            mod.RegEvent<EventCallBack>();
+            mod.RegEvent<UserEvent>();
             mod.baseEvent.Click = ItemClick;
             mod.baseEvent.PointerEntry = ItemPointEntry;
             mod.baseEvent.PointerLeave = ItemPointLeave;
@@ -231,11 +232,11 @@ namespace huqiang.UIComposite
         {
             return contents.Contains(content);
         }
-        public void ItemClick(EventCallBack callBack,UserAction action)
+        public void ItemClick(UserEvent callBack,UserAction action)
         {
             ShowContent(callBack.DataContext as TableContent);
         }
-        public void ItemPointEntry(EventCallBack callBack,UserAction action)
+        public void ItemPointEntry(UserEvent callBack,UserAction action)
         {
             var c = callBack.DataContext as TableContent;
             if (c == curContent)
@@ -249,7 +250,7 @@ namespace huqiang.UIComposite
                 }
             }
         }
-        public void ItemPointLeave(EventCallBack callBack,UserAction action)
+        public void ItemPointLeave(UserEvent callBack,UserAction action)
         {
             var c = callBack.DataContext as TableContent;
             if (c == curContent)

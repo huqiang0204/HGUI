@@ -12,7 +12,6 @@ namespace Assets.Core.HGUI
     /// </summary>
     public class MaterialManager
     {
-        public static Shader DefSahder { get; set; }
         static int Max;
         static Shader shader;
         internal static Shader DefShader
@@ -24,9 +23,31 @@ namespace Assets.Core.HGUI
                 return shader;
             }
         }
-        public static void RelaeseUnused()
+        static List<Material> materials = new List<Material>();
+        static int point;   
+        public static void Reset()
         {
-            
+            point = 0;
+        }
+        internal static Material GetNextMaterial()
+        {
+            Material mat;
+            if(point==materials.Count)
+            {
+                mat = new Material(DefShader);
+                materials.Add(mat);
+            }
+            else
+            {
+                mat = materials[point];
+                if (mat == null)
+                {
+                    mat = new Material(DefShader);
+                    materials[point] = mat;
+                }
+                point++;
+            }
+            return mat;
         }
     }
 }

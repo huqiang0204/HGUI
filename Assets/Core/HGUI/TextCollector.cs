@@ -36,13 +36,13 @@ namespace Assets.Core.HGUI
                     buf.texts[j] = null;
                 buffer[i].max = 0;
             }
-            max = 0;
+            max = 1;
             point = 0;
         }
         public void Next()
         {
             point++;
-            max = point;
+            max = point+1;
         }
         public void Back()
         {

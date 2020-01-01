@@ -201,6 +201,7 @@ namespace Assets.Core.HGUI
         }
         public Material[] GenerateMaterial()
         {
+            MaterialManager.Reset();
             int len = max + 1;
             Material[] mats = new Material[len];
             for (int i = 0; i < len; i++)
@@ -209,7 +210,7 @@ namespace Assets.Core.HGUI
                 var mat = materials[i].material;
                 if (mat == null)//如果为空,则使用默认材质球
                 {
-                    mat = new Material(HGraphics.DefShader);
+                    mat = MaterialManager.GetNextMaterial();
                     Vector4 v = Vector4.zero;
                     int s = i * 4;
                     if (c > 0)

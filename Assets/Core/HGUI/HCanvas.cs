@@ -32,11 +32,20 @@ namespace Assets.Core.HGUI
             PipeLine[index].trans = trans;
             PipeLine[index].active = trans.gameObject.activeSelf;
             var script= trans.GetComponent<AsyncScript>();
+            bool mask = false;
             if (script != null)
             {
+                mask = script.Mask;
                 script.PipelineIndex = index;
                 scripts[max] = script;
                 max++;
+                if (mask)
+                    TxtCollector.Next();
+                var txt = script as HText;
+                if (txt != null)
+                {
+                    TxtCollector.AddText(txt);
+                }
             }
             PipeLine[index].script = script;
             int c = trans.childCount;
@@ -49,20 +58,16 @@ namespace Assets.Core.HGUI
                 Collection(trans.GetChild(i), index, s);
                 s++;
             }
+            if(mask)
+                TxtCollector.Back();
         }
   
         private void Update()
         {
-            point = 1;
-            max = 0;
-            Collection(transform, -1, 0);
-            CheckSize();
-            for (int i = 0; i < max; i++)
-                scripts[i].MainUpdate();
+            ApplyMesh();
             UserAction.Update();
             DispatchUserAction();
-            ApplyMesh();
-            thread.AddSubMission(SubMission, null);
+            MainMission();
         }
         MeshFilter meshFilter;
         MeshRenderer renderer;
@@ -95,24 +100,10 @@ namespace Assets.Core.HGUI
                 renderer = GetComponent<MeshRenderer>();
             if (renderer != null)
             {
-                renderer.materials = Collector.GenerateMaterial();
+                renderer.materials = MatCollector.GenerateMaterial();
             }
         }
-        void SubMission(object obj)
-        {
-            int len = max;
-            if (scripts != null)
-                for (int i = 0; i < len; i++)
-                    scripts[i].SubUpdate();
-            ClearMesh();
-            HBatch.Batch(this, PipeLine);
-            swapVertex = vertex.ToArray();
-            swapUV = uv.ToArray();
-            swapUV1 = uv1.ToArray();
-            swapUV2 = uv2.ToArray();
-            swapColors = colors.ToArray();
-            swapSubmesh = Collector.submesh.ToArray();
-        }
+       
         void CheckSize()
         {
             switch(renderMode)
@@ -292,6 +283,35 @@ namespace Assets.Core.HGUI
                 for (int i = 0; i < inputs.Length; i++)
                     inputs[i].Clear();
         }
+        #region UI绘制与合批
+        void MainMission()
+        {
+            point = 1;
+            max = 0;
+            TxtCollector.Clear();
+            Collection(transform, -1, 0);
+            CheckSize();
+            for (int i = 0; i < max; i++)
+                scripts[i].MainUpdate();
+            TxtCollector.GenerateTexture();
+            thread.AddSubMission(SubMission, null);
+        }
+        void SubMission(object obj)
+        {
+            int len = max;
+            if (scripts != null)
+                for (int i = 0; i < len; i++)
+                    scripts[i].SubUpdate();
+            ClearMesh();
+            HBatch.Batch(this, PipeLine);
+            swapVertex = vertex.ToArray();
+            swapUV = uv.ToArray();
+            swapUV1 = uv1.ToArray();
+            swapUV2 = uv2.ToArray();
+            swapColors = colors.ToArray();
+            swapSubmesh = MatCollector.submesh.ToArray();
+        }
+        internal TextCollector TxtCollector = new TextCollector();
         internal List<Vector3> vertex = new List<Vector3>();
         internal List<Vector2> uv = new List<Vector2>();
         internal List<Vector2> uv1 = new List<Vector2>();
@@ -304,7 +324,7 @@ namespace Assets.Core.HGUI
         Vector2[] swapUV2;
         Color[] swapColors;
         Material[] swapMaterials;
-        internal MaterialCollector Collector = new MaterialCollector();
+        internal MaterialCollector MatCollector = new MaterialCollector();
         int[][] swapSubmesh;
         void ClearMesh()
         {
@@ -314,6 +334,7 @@ namespace Assets.Core.HGUI
             uv2.Clear();
             colors.Clear();
         }
+
 #if UNITY_EDITOR
         public void Refresh()
         {
@@ -352,8 +373,8 @@ namespace Assets.Core.HGUI
                 swapVertex = vertex.ToArray();
                 swapUV = uv.ToArray();
                 swapColors = colors.ToArray();
-                swapMaterials = Collector.GenerateMaterial();
-                swapSubmesh = Collector.submesh.ToArray();
+                swapMaterials = MatCollector.GenerateMaterial();
+                swapSubmesh = MatCollector.submesh.ToArray();
                 ApplyMesh();
                 return;
             }
@@ -372,7 +393,7 @@ namespace Assets.Core.HGUI
                 mesh.uv2 = uv1.ToArray();
                 mesh.uv3 = uv2.ToArray();
                 mesh.colors = colors.ToArray();
-                swapSubmesh = Collector.submesh.ToArray();
+                swapSubmesh = MatCollector.submesh.ToArray();
                 mesh.subMeshCount = swapSubmesh.Length;
                 for (int i = 0; i < swapSubmesh.Length; i++)
                     mesh.SetTriangles(swapSubmesh[i], i);
@@ -380,9 +401,10 @@ namespace Assets.Core.HGUI
             var mr = GetComponent<MeshRenderer>();
             if (mr != null)
             {
-                mr.materials = Collector.GenerateMaterial();
+                mr.materials = MatCollector.GenerateMaterial();
             }
         }
 #endif
+        #endregion
     }
 }

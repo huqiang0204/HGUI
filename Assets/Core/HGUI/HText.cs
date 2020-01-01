@@ -143,38 +143,35 @@ namespace Assets.Core.HGUI
             Font = DefaultFont;
         }
         static TextGenerationSettings settings;
-        public override void MainUpdate()
+        public void Populate()
         {
-            if(m_dirty)
-            {
-                var font = Font;
-                font.material.color = Color.white;
-                emojiString.FullString = m_text;
-                settings.font = font;
-                settings.pivot = Pivot;
-                settings.generationExtents = SizeDelta;
-                settings.horizontalOverflow = m_hof;
-                settings.verticalOverflow = m_vof;
-                settings.resizeTextMaxSize = resizeTextMaxSize;
-                settings.resizeTextMinSize = resizeTextMinSize;
-                settings.generateOutOfBounds = generateOutOfBounds;
-                settings.resizeTextForBestFit = m_resizeBestFit;
-                settings.textAnchor = anchor;
-                settings.fontStyle = m_fontStyle;
-                settings.scaleFactor = scaleFactor;
-                settings.richText = m_richText;
-                settings.lineSpacing = m_lineSpace;
-                settings.fontSize = m_fontSize;
-                settings.color = m_color;
-                settings.alignByGeometry = m_align;
-                var g = Generator;
-                g.Populate(emojiString.FilterString,settings);
-                verts = g.verts.ToArray();
-                m_dirty = false;
-                m_vertexChange = true;
-                MainTexture = font.material.mainTexture;
-                fillColors[0] = true;
-            }
+            var font = Font;
+            font.material.color = Color.white;
+            emojiString.FullString = m_text;
+            settings.font = font;
+            settings.pivot = Pivot;
+            settings.generationExtents = SizeDelta;
+            settings.horizontalOverflow = m_hof;
+            settings.verticalOverflow = m_vof;
+            settings.resizeTextMaxSize = resizeTextMaxSize;
+            settings.resizeTextMinSize = resizeTextMinSize;
+            settings.generateOutOfBounds = generateOutOfBounds;
+            settings.resizeTextForBestFit = m_resizeBestFit;
+            settings.textAnchor = anchor;
+            settings.fontStyle = m_fontStyle;
+            settings.scaleFactor = scaleFactor;
+            settings.richText = m_richText;
+            settings.lineSpacing = m_lineSpace;
+            settings.fontSize = m_fontSize;
+            settings.color = m_color;
+            settings.alignByGeometry = m_align;
+            var g = Generator;
+            g.Populate(emojiString.FilterString, settings);
+            verts = g.verts.ToArray();
+            m_dirty = false;
+            m_vertexChange = true;
+            MainTexture = font.material.mainTexture;
+            fillColors[0] = true;
         }
         public override void UpdateMesh()
         {

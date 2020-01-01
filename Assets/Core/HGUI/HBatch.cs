@@ -12,7 +12,7 @@ namespace Assets.Core.HGUI
             GUIElement root = pipeLine[0];
             if (root.script != null)
             {
-                canvas.Collector.Start();
+                canvas.MatCollector.Start();
                 int c = root.childCount;
                 int os = root.childOffset;
                 for (int i = 0; i < c; i++)
@@ -21,7 +21,7 @@ namespace Assets.Core.HGUI
                         Batch(pipeLine, os, canvas, Vector3.zero, Vector3.one, Quaternion.identity, new Vector4(0, 0, 1, 1));
                     os++;
                 }
-                canvas.Collector.End();
+                canvas.MatCollector.End();
             }
         }
         static void Batch(GUIElement[] pipeLine, int index, HCanvas canvas, Vector3 pos, Vector3 scale, Quaternion quate,Vector4 clip)
@@ -116,7 +116,7 @@ namespace Assets.Core.HGUI
                                 {
                                     tmp[k] = src[k] + vc;
                                 }
-                                canvas.Collector.CombinationMaterial(graphics, tmp, ref tid, ref clip);
+                                canvas.MatCollector.CombinationMaterial(graphics, tmp, ref tid, ref clip);
                             }
                         }
                         else if (graphics.subTris != null)
@@ -137,7 +137,7 @@ namespace Assets.Core.HGUI
                                     }
                                     buf[i] = tmp;
                                 }
-                                canvas.Collector.CombinationMaterial(graphics, buf, ids, ref clip);
+                                canvas.MatCollector.CombinationMaterial(graphics, buf, ids, ref clip);
                             }
                         }
                         Vector2[] uv1 = new Vector2[vert.Length];

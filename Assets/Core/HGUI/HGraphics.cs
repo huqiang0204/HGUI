@@ -36,8 +36,14 @@ namespace Assets.Core.HGUI
         internal int MatID;
         internal bool m_dirty = true;
         internal bool m_vertexChange = true;
+        [HideInInspector]
+        [SerializeField]
         internal Texture[] textures = new Texture[4];
+        [HideInInspector]
+        [SerializeField]
         internal int[] texIds = new int[4];
+        [HideInInspector]
+        [SerializeField]
         internal bool[] fillColors = new bool[4];
         public Texture MainTexture
         {

@@ -6,12 +6,8 @@ using UnityEngine;
 
 [CustomEditor(typeof(HCanvas), true)]
 [CanEditMultipleObjects]
-public class HCanvasEditor:Editor
+public class HCanvasEditor:AsyncScriptEditor
 {
-    private void OnEnable()
-    {
-        //Refresh(target as HCanvas);
-    }
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();

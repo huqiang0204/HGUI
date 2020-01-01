@@ -7,7 +7,7 @@ using UnityEngine;
 
 [CustomEditor(typeof(HImage), true)]
 [CanEditMultipleObjects]
-public class HImageEditor:Editor
+public class HImageEditor:AsyncScriptEditor
 {
     Vector3 pos;
     Vector3 scale;
@@ -27,8 +27,9 @@ public class HImageEditor:Editor
             sprite = img.Sprite;
         }
     }
-    private void OnSceneGUI()
+    public override void OnSceneGUI()
     {
+        base.OnSceneGUI();
         HImage img = target as HImage;
         if (img != null)
         {
@@ -101,6 +102,7 @@ public class HImageEditor:Editor
                 img.FillCenter = EditorGUILayout.Toggle("FillCenter", img.FillCenter);
                 img.PixelsPerUnitMultiplier = EditorGUILayout.FloatField("PixelsPerUnitMultiplier", img.PixelsPerUnitMultiplier);
             }
+            img.MainTexture = EditorGUILayout.ObjectField("Texture", img.MainTexture, typeof(Texture), true) as Texture;
             if (GUILayout.Button("Set Native Size"))
                 img.SetNativeSize();
             if(GUI.changed |changed)

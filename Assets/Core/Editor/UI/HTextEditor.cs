@@ -1,14 +1,13 @@
 ﻿using Assets.Core.HGUI;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using huqiang;
 using UnityEditor;
 using UnityEngine;
 
 [CustomEditor(typeof(HText), true)]
 [CanEditMultipleObjects]
-public class HTextEditor:Editor
+public class HTextEditor:AsyncScriptEditor
 {
     Vector3 pos;
     Vector3 scale;
@@ -23,28 +22,30 @@ public class HTextEditor:Editor
         }
             
     }
-    private void OnSceneGUI()
+    public override void OnSceneGUI()
     {
-        HText img = target as HText;
-        if (img != null)
+        base.OnSceneGUI();
+        HText txt = target as HText;
+        if (txt != null)
         {
             bool changed = false;
-            if (pos != img.transform.localPosition)
+            if (pos != txt.transform.localPosition)
                 changed = true;
-            else if (scale != img.transform.localScale)
+            else if (scale != txt.transform.localScale)
                 changed = true;
-            else if (angle != img.transform.localEulerAngles)
+            else if (angle != txt.transform.localEulerAngles)
                 changed = true;
-            pos = img.transform.localPosition;
-            scale = img.transform.localScale;
-            angle = img.transform.localEulerAngles;
+            pos = txt.transform.localPosition;
+            scale = txt.transform.localScale;
+            angle = txt.transform.localEulerAngles;
             if (changed)
             {
-                var can = FindHCanvas(img.transform);
+                var can = FindHCanvas(txt.transform);
                 if (can != null)
                     can.Refresh();
             }
         }
+
     }
     public override void OnInspectorGUI()
     {

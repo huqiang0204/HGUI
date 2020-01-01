@@ -22,12 +22,13 @@ namespace Assets.Core.HGUI
                 buf = new HText[1024];
                 buffer[point].texts = buf;
             }
-            buf[buffer[point].max] = text;
+            int top = buffer[point].max;
+            buf[top] = text;
             buffer[point].max++;
         }
         public void Clear()
         {
-            for (int i = 0; i < max; i++)
+            for (int i = 0; i <= max; i++)
             {
                 int c = buffer[i].max;
                 var buf = buffer[i];

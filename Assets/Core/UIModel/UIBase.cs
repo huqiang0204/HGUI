@@ -2,6 +2,7 @@
 using huqiang.UI;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class UIBase
 {
@@ -36,7 +37,8 @@ public class UIBase
         point++;
     }
     public object DataContext;
-    public ModelElement Parent { get; protected set; }
+    public Transform Parent { get; protected set; }
+    public Transform Main { get; protected set; }
     public ModelElement model { get; protected set; }
     protected UIBase UIParent;
     public T LoadUI<T>(string asset, string name) where T : class, new()
@@ -46,14 +48,14 @@ public class UIBase
         ModelManagerUI.LoadToGame(model, t);
         return t;
     }
-    public virtual void Initial(huqiang.UI.ModelElement parent, UIBase ui, object obj = null)
+    public virtual void Initial(Transform parent, UIBase ui, object obj = null)
     {
         DataContext = obj;
         UIParent = ui;
         Parent = parent;
         if (parent != null)
-            if (model != null)
-                model.SetParent(parent);
+            if (Main != null)
+                Main.SetParent(parent);
     }
     public virtual void Dispose()
     {
@@ -83,8 +85,7 @@ public class UIBase
     }
     public virtual void ReSize()
     {
-        if (model != null)
-            ModelElement.ScaleSize(model);
+        
     }
     public virtual void Update(float time)
     {

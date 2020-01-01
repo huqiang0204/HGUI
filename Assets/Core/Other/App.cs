@@ -49,12 +49,12 @@ namespace huqiang
             }
             uiroot.SetCanvas(UIRoot);
             root = uiroot.model;
-            UIPage.Root = uiroot.AddNode("page");
-            UIPage.Root.data.sizeDelta = new Vector2(Screen.width,Screen.height);
-            UIMenu.Root = uiroot.AddNode("menu");
-            UIMenu.Root.data.sizeDelta = new Vector2(Screen.width, Screen.height);
-            UINotify.Root = uiroot.AddNode("notify");
-            UINotify.Root.data.sizeDelta = new Vector2(Screen.width, Screen.height);
+            //UIPage.Root = uiroot.AddNode("page");
+            //UIPage.Root.data.sizeDelta = new Vector2(Screen.width,Screen.height);
+            //UIMenu.Root = uiroot.AddNode("menu");
+            //UIMenu.Root.data.sizeDelta = new Vector2(Screen.width, Screen.height);
+            //UINotify.Root = uiroot.AddNode("notify");
+            //UINotify.Root.data.sizeDelta = new Vector2(Screen.width, Screen.height);
 
             var buff = new GameObject("buffer", typeof(RectTransform));
             buff.transform.SetParent(UIRoot);
@@ -113,15 +113,15 @@ namespace huqiang
             if(Scale.ScreenChanged())
             {
                 Vector2 v = new Vector2(Scale.LayoutWidth, Scale.LayoutHeight);
-                UIPage.Root.data.sizeDelta = v;
-                if (Scale.DpiScale)
-                {
-                    var dr = Scale.DpiRatio;
-                    UIPage.Root.data.localScale = new Vector3(dr, dr, dr);
-                }
-                else UIPage.Root.data.localScale = Vector3.one;
-                UIPage.Root.data.sizeDelta = new Vector2(Scale.ScreenWidth, Scale.ScreenHeight);
-                UIPage.Root.IsChanged = true;
+                //UIPage.Root.data.sizeDelta = v;
+                //if (Scale.DpiScale)
+                //{
+                //    var dr = Scale.DpiRatio;
+                //    UIPage.Root.data.localScale = new Vector3(dr, dr, dr);
+                //}
+                //else UIPage.Root.data.localScale = Vector3.one;
+                //UIPage.Root.data.sizeDelta = new Vector2(Scale.ScreenWidth, Scale.ScreenHeight);
+                //UIPage.Root.IsChanged = true;
                 if (UIPage.CurrentPage != null)
                     UIPage.CurrentPage.ReSize();
                 if (UIMenu.Instance != null)

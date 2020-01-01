@@ -67,7 +67,7 @@ public class CreateTestHelper: UICompositeHelp
         RenderForm.VertexCalculationAll();
         App.Update();
     }
-    public virtual void CreateTestPage(ModelElement parent)
+    public virtual void CreateTestPage(Transform parent)
     {
 
     }

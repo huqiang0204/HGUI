@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class UIMenu: UIBase
 {
-    public static ModelElement Root { get; set; }
+    public static Transform Root { get; set; }
     public static UIMenu Instance { get; set; }
     public static void UpdateData(string cmd, object obj)
     {

@@ -21,7 +21,7 @@ public class UIPage : UIBase
     {
         pages.Clear();
     }
-    public static ModelElement Root { get; set; }
+    public static Transform Root { get; set; }
     public static UIPage CurrentPage { get; private set; }
     public static void LoadPage<T>(object dat = null) where T : UIPage, new()
     {
@@ -99,18 +99,18 @@ public class UIPage : UIBase
     protected Type BackPop;
     protected object BackData;
     public PopWindow currentPop { get; private set; }
-    public virtual void Initial(ModelElement parent, object dat = null)
+    public virtual void Initial(Transform parent, object dat = null)
     {
         Parent = parent;
         DataContext = dat;
         if (parent != null)
-            if (model != null)
+            if (Main != null)
             {
-                model.SetParent(parent);
-                model.data.localPosition = Vector3.zero;
+                Main.SetParent(parent);
+                Main.localPosition = Vector3.zero;
             }
     }
-    public virtual void Initial(ModelElement parent, object dat = null, Type back = null, Type pop = null, object backData = null)
+    public virtual void Initial(Transform parent, object dat = null, Type back = null, Type pop = null, object backData = null)
     {
         Initial(parent, dat);
         BackPage = back;
@@ -141,7 +141,7 @@ public class UIPage : UIBase
         currentPop = null;
     }
     List<PopWindow> pops;
-    protected T ShowPopWindow<T>(object obj = null, huqiang.UI.ModelElement parent = null) where T : PopWindow, new()
+    protected T ShowPopWindow<T>(object obj = null, Transform parent = null) where T : PopWindow, new()
     {
         if (currentPop != null)
         {
@@ -164,7 +164,7 @@ public class UIPage : UIBase
         t.ReSize();
         return t;
     }
-    protected object ShowPopWindow(Type type, object obj = null, ModelElement parent = null)
+    protected object ShowPopWindow(Type type, object obj = null, Transform parent = null)
     {
         if (currentPop != null)
         { currentPop.Hide(); currentPop = null; }

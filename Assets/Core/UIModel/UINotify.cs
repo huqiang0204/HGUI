@@ -1,10 +1,11 @@
 ﻿using huqiang.UI;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class UINotify : UIBase
 {
-    public static ModelElement Root { get; set; }
+    public static Transform Root { get; set; }
     public static UINotify Instance { get; private set; }
     public static void UpdateData(string cmd, object obj)
     {

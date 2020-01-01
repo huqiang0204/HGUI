@@ -215,7 +215,7 @@ namespace huqiang.UIEvent
             Click = OnClick;
             LostFocus = OnLostFocus;
         }
-        protected override void Initial()
+        internal override void Initial()
         {
             var txt = TextCom = Context.GetComponent<TextElement>();
             InputString = txt.Text;

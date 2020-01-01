@@ -300,8 +300,17 @@ namespace Assets.Core.HGUI
         {
             int len = max;
             if (scripts != null)
+            {
                 for (int i = 0; i < len; i++)
                     scripts[i].SubUpdate();
+                for (int i = 0; i < len; i++)
+                {
+                    var grap = scripts[i] as HGraphics;
+                    if (grap != null)
+                        grap.UpdateMesh();
+                }
+            }
+              
             ClearMesh();
             HBatch.Batch(this, PipeLine);
             swapVertex = vertex.ToArray();
@@ -338,6 +347,10 @@ namespace Assets.Core.HGUI
 #if UNITY_EDITOR
         public void Refresh()
         {
+            if (Application.isPlaying)
+            {
+                return;
+            }
             point = 1;
             max = 0;
             TxtCollector.Clear();
@@ -370,16 +383,7 @@ namespace Assets.Core.HGUI
                
             ClearMesh();
             HBatch.Batch(this, PipeLine);
-            if (Application.isPlaying)
-            {
-                swapVertex = vertex.ToArray();
-                swapUV = uv.ToArray();
-                swapColors = colors.ToArray();
-                swapMaterials = MatCollector.GenerateMaterial();
-                swapSubmesh = MatCollector.submesh.ToArray();
-                ApplyMesh();
-                return;
-            }
+         
             var mf = GetComponent<MeshFilter>();
             if (mf != null)
             {

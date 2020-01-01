@@ -24,7 +24,7 @@ namespace Assets.Core.HGUI
             8, 12, 13, 8, 13, 9, 9, 13, 14, 9, 14, 10, 10, 14, 15, 10, 15, 11 };
         public static void CreateMesh(HImage image)
         {
-            if (image.m_sprite == null)
+            if (image.texIds[0] ==0)
             {
                 CreateSimpleVertex(image);
                 return;

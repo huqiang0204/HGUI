@@ -86,5 +86,9 @@ namespace Assets.Core.HGUI
         public virtual void UpdateMesh()
         {
         }
+        private void Start()
+        {
+            m_dirty = true;
+        }
     }
 }

@@ -73,8 +73,12 @@ namespace Assets.Core.HGUI
                 m_sprite = value;
                 m_dirty = true;
                 if (value == null)
+                {
                     MainTexture = null;
-                else MainTexture = value.texture;
+                }
+                else {
+                    MainTexture = value.texture;
+                }
             }
         }
         Material mainMaterial;

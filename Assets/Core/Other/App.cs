@@ -18,6 +18,7 @@ namespace huqiang
         }
        public static void RegUI()
         {
+            
             ModelManagerUI.RegComponent(new ComponentType<RectTransform, ModelElement>(ModelElement.LoadFromObject));
             ModelManagerUI.RegComponent(new ComponentType<Image, ImageElement>(ImageElement.LoadFromObject));
             ModelManagerUI.RegComponent(new ComponentType<ShareTextChild, ShareTextChildElement>(null));

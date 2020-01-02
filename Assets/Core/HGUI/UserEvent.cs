@@ -119,8 +119,8 @@ namespace Assets.Core.HGUI
                     }
                     else
                     {
-                        float px = script.pivot.x;
-                        float py = script.pivot.y;
+                        float px = script.Pivot.x;
+                        float py = script.Pivot.y;
                         float lx = -px * w;
                         float rx = lx + w;
                         float dy = -py * h;

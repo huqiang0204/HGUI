@@ -19,14 +19,15 @@ namespace Assets.Core.HGUI
         {
         }
         public Vector2 SizeDelta = new Vector2(100,100);
-        public Vector2 pivot = new Vector2(0.5f, 0.5f);
-        private ScaleType lastScaleType;
-        private AnchorType lastSizeType;
-        private AnchorPointType lastAnchorType;
-        private Margin lastmargin;
+        public Vector2 Pivot = new Vector2(0.5f, 0.5f);
+        internal ScaleType scaleType;
+        internal AnchorType sizeType;
+        internal AnchorPointType anchorType;
+        internal Margin margin;
+        public bool Mask;
         public UserEvent userEvent;
         internal int PipelineIndex;
-        public bool Mask;
+  
         public virtual Color Chromatically { get; set; }
         public T RegEvent<T>() where T : UserEvent, new()
         {

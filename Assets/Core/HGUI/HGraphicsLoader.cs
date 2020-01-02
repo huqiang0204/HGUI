@@ -22,32 +22,32 @@ namespace Assets.Core.HGUI
     }
     public class HGraphicsLoader:AsyncScriptLoader
     {
-        public unsafe override void LoadToObject(FakeStruct fake, Component com)
-        {
-            var hg = com as HGraphics;
-            LoadScript(fake.ip, hg);
-            LoadHGraphics(fake, hg);
-        }
+        protected string shader;
+        protected string asset;
+        protected string MainTexture;
+        protected string STexture;
+        protected string TTexture;
+        protected string FTexture;
         protected unsafe void LoadHGraphics(FakeStruct fake, HGraphics tar)
         {
             HGraphicsData* src = (HGraphicsData*)fake.ip;
-            string asset = fake.GetData<string>(src->asset);
-            if(asset!=null)
+            asset = fake.GetData<string>(src->asset);
+            if (asset != null)
             {
-                string str = fake.GetData<string>(src->MainTexture);
-                if (str != null)
-                    tar.MainTexture = ElementAsset.FindTexture(asset, str);
-                str = fake.GetData<string>(src->STexture);
-                if (str != null)
-                    tar.STexture = ElementAsset.FindTexture(asset, str);
-                str = fake.GetData<string>(src->TTexture);
-                if (str != null)
-                    tar.TTexture = ElementAsset.FindTexture(asset, str);
-                str = fake.GetData<string>(src->FTexture);
-                if (str != null)
-                    tar.FTexture = ElementAsset.FindTexture(asset, str);
+                MainTexture = fake.GetData<string>(src->MainTexture);
+                if (MainTexture != null)
+                    tar.MainTexture = ElementAsset.FindTexture(asset, MainTexture);
+                STexture = fake.GetData<string>(src->STexture);
+                if (STexture != null)
+                    tar.STexture = ElementAsset.FindTexture(asset, STexture);
+                TTexture = fake.GetData<string>(src->TTexture);
+                if (TTexture != null)
+                    tar.TTexture = ElementAsset.FindTexture(asset, TTexture);
+                FTexture = fake.GetData<string>(src->FTexture);
+                if (FTexture != null)
+                    tar.FTexture = ElementAsset.FindTexture(asset, FTexture);
             }
-            string shader = fake.GetData<string>(src->shader);
+            shader = fake.GetData<string>(src->shader);
             if (shader != null)
                 tar.Material = new Material(Shader.Find(shader));
             tar.m_color = src->color;
@@ -98,6 +98,14 @@ namespace Assets.Core.HGUI
             if (src.m_material != null)
                 tar->shader = fake.buffer.AddData(src.m_material.shader.name);
             tar->color = src.m_color;
+        }
+        public unsafe override void LoadToObject(FakeStruct fake, Component com)
+        {
+            var hg = com as HGraphics;
+            if (hg == null)
+                return;
+            LoadScript(fake.ip, hg);
+            LoadHGraphics(fake, hg);
         }
         public unsafe override FakeStruct LoadFromObject(Component com, DataBuffer buffer)
         {

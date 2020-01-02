@@ -22,11 +22,7 @@ namespace Assets.Core.HGUI
     }
     public class AsyncScriptLoader:DataLoader
     {
-        public unsafe override void LoadToObject(FakeStruct fake, Component com)
-        {
-            LoadScript(fake.ip, com as AsyncScript);
-        }
-        protected unsafe void LoadScript(byte* ip,AsyncScript tar)
+        protected unsafe void LoadScript(byte* ip, AsyncScript tar)
         {
             var src = (AsyncScriptData*)ip;
             tar.SizeDelta = src->SizeDelta;
@@ -47,6 +43,10 @@ namespace Assets.Core.HGUI
             tar->anchorType = src.anchorType;
             tar->margin = src.margin;
             tar->Mask = src.Mask;
+        }
+        public unsafe override void LoadToObject(FakeStruct fake, Component com)
+        {
+            LoadScript(fake.ip, com as AsyncScript);
         }
         public override unsafe FakeStruct LoadFromObject(Component com, DataBuffer buffer)
         {

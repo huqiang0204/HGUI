@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using huqiang.Data;
 using UnityEngine;
 
@@ -24,13 +21,37 @@ namespace Assets.Core.HGUI
     }
     public class HImageLoader:HGraphicsLoader
     {
-        public override FakeStruct LoadFromObject(Component com, DataBuffer buffer)
+        protected unsafe void LoadHImage(FakeStruct fake, HImage tar)
         {
-            return base.LoadFromObject(com, buffer);
+            HImageData* src = (HImageData*)fake.ip;
+            string str = fake.GetData<string>(src->Sprite);
+            if (str != null)
+                tar.Sprite = ElementAsset.FindSprite();
         }
-        public override void LoadToObject(FakeStruct fake, Component com)
+        protected unsafe void SaveHImage(FakeStruct fake, HImage src)
         {
-            base.LoadToObject(fake, com);
+            HImageData* tar = (HImageData*)fake.ip;
+         
+        }
+        public unsafe override FakeStruct LoadFromObject(Component com, DataBuffer buffer)
+        {
+            var src = com as HImage;
+            if (src == null)
+                return null;
+            FakeStruct fake = new FakeStruct(buffer, HImageData.ElementSize);
+            SaveScript(fake.ip, src);
+            SaveHGraphics(fake, src);
+            SaveHImage(fake,src);
+            return fake;
+        }
+        public unsafe override void LoadToObject(FakeStruct fake, Component com)
+        {
+            HImage image = com as HImage;
+            if (image == null)
+                return;
+            LoadScript(fake.ip,image);
+            LoadHGraphics(fake,image);
+            LoadHImage(fake,image);
         }
     }
 }

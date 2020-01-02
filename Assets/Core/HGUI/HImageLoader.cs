@@ -46,6 +46,15 @@ namespace Assets.Core.HGUI
             if (sprite != null)
                 tar->Sprite = fake.buffer.AddData(sprite.name);
         }
+        public unsafe override void LoadToObject(FakeStruct fake, Component com)
+        {
+            HImage image = com as HImage;
+            if (image == null)
+                return;
+            LoadScript(fake.ip, image);
+            LoadHGraphics(fake, image);
+            LoadHImage(fake, image);
+        }
         public unsafe override FakeStruct LoadFromObject(Component com, DataBuffer buffer)
         {
             var src = com as HImage;
@@ -57,14 +66,6 @@ namespace Assets.Core.HGUI
             SaveHImage(fake,src);
             return fake;
         }
-        public unsafe override void LoadToObject(FakeStruct fake, Component com)
-        {
-            HImage image = com as HImage;
-            if (image == null)
-                return;
-            LoadScript(fake.ip,image);
-            LoadHGraphics(fake,image);
-            LoadHImage(fake,image);
-        }
+
     }
 }

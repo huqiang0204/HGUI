@@ -41,7 +41,7 @@ namespace huqiang.UI
                     return fonts[i];
             }
             if (fonts.Count == 0)
-                TextElement.fonts.Add(Font.CreateDynamicFontFromOSFont("Arial", 16));
+                fonts.Add(Font.CreateDynamicFontFromOSFont("Arial", 16));
             return fonts[0];
         }
         public static void AsyncGetSizeX(string fontName, Vector2 designSize, int fontSize, EmojiString txt, FontStyle style, Action<Vector2> callback)

@@ -50,7 +50,7 @@ namespace Assets.Core.HGUI
                 _font = value;
             } }
         internal Vector2 m_pivot = new Vector2(0.5f,0.5f);
-        public Vector2 Pivot {
+        public Vector2 TextPivot {
             get => m_pivot;
             set {
                 m_pivot = value;
@@ -58,7 +58,7 @@ namespace Assets.Core.HGUI
             }
         }
         [SerializeField]
-        protected HorizontalWrapMode m_hof;
+        internal HorizontalWrapMode m_hof;
         public HorizontalWrapMode HorizontalOverflow {
             get => m_hof;
             set {
@@ -66,7 +66,7 @@ namespace Assets.Core.HGUI
                 m_dirty = true;
             } }
         [SerializeField]
-        protected VerticalWrapMode m_vof;
+        internal VerticalWrapMode m_vof;
         public VerticalWrapMode VerticalOverflow {
             get => m_vof;
             set {
@@ -85,7 +85,7 @@ namespace Assets.Core.HGUI
                 m_dirty = true;
             } }
         [SerializeField]
-        protected TextAnchor anchor;
+        internal TextAnchor anchor;
         public TextAnchor TextAnchor {
             get => anchor;
             set {
@@ -139,7 +139,7 @@ namespace Assets.Core.HGUI
             font.material.color = Color.white;
             emojiString.FullString = m_text;
             settings.font = font;
-            settings.pivot = Pivot;
+            settings.pivot = TextPivot;
             settings.generationExtents = SizeDelta;
             settings.horizontalOverflow = m_hof;
             settings.verticalOverflow = m_vof;

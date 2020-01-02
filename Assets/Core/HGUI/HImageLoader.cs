@@ -12,21 +12,26 @@ namespace Assets.Core.HGUI
         public bool fillCenter;
         public bool fillClockwise;
         public FillMethod fillMethod;
-        public Int32 fillOrigin;
-        public bool preserveAspect;
-        public int filltype;
-        public Int32 shader;
+        public Int32 fillOrigin;//方向
+        public float pixelsPerUnit;
         public static int Size = sizeof(HGraphicsData);
         public static int ElementSize = Size / 4;
     }
     public class HImageLoader:HGraphicsLoader
     {
+        protected string Sprite;
         protected unsafe void LoadHImage(FakeStruct fake, HImage tar)
         {
             HImageData* src = (HImageData*)fake.ip;
-            string str = fake.GetData<string>(src->Sprite);
-            if (str != null)
-                tar.Sprite = ElementAsset.FindSprite();
+            Sprite = fake.GetData<string>(src->Sprite);
+            if (Sprite != null)
+                tar.Sprite = ElementAsset.FindSprite(asset, MainTexture, Sprite);
+            tar.m_fillAmount = src->fillAmount;
+            tar.m_fillCenter = src->fillCenter;
+            tar.m_fillClockwise = src->fillClockwise;
+            tar.m_fillMethod = src->fillMethod;
+            tar.m_fillOrigin = src->fillOrigin;
+            tar.m_pixelsPerUnit = src->pixelsPerUnit;
         }
         protected unsafe void SaveHImage(FakeStruct fake, HImage src)
         {

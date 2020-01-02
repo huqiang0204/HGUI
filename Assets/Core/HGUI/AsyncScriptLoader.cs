@@ -16,6 +16,7 @@ namespace Assets.Core.HGUI
         public AnchorType sizeType;
         public AnchorPointType anchorType;
         public Margin margin;
+        public bool Mask;
         public static int Size = sizeof(AsyncScriptData);
         public static int ElementSize = Size / 4;
     }
@@ -34,6 +35,7 @@ namespace Assets.Core.HGUI
             tar.sizeType = src->sizeType;
             tar.anchorType = src->anchorType;
             tar.margin = src->margin;
+            tar.Mask = src->Mask;
         }
         protected unsafe void SaveScript(byte* ip, AsyncScript src)
         {
@@ -44,6 +46,7 @@ namespace Assets.Core.HGUI
             tar->sizeType = src.sizeType;
             tar->anchorType = src.anchorType;
             tar->margin = src.margin;
+            tar->Mask = src.Mask;
         }
         public override unsafe FakeStruct LoadFromObject(Component com, DataBuffer buffer)
         {

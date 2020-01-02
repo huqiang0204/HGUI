@@ -15,7 +15,6 @@ public class AniRecordHelper : UICompositeHelp
     public List<RecordData> records = new List<RecordData>();
     public void AddRecord()
     {
-        App.RegUI();
         DataBuffer db = new DataBuffer(1024);
         db.fakeStruct = ModelElement.LoadFromObject(transform as RectTransform, db);
         RecordData record = new RecordData();

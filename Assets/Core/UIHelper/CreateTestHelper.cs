@@ -42,7 +42,6 @@ public class CreateTestHelper: UICompositeHelp
     public void Initital()
     {
        LoadBundle();
-       TestHelper.InitialUI();
         var c = transform.childCount;
         for (int i = 0; i < c; i++)
             GameObject.Destroy(transform.GetChild(i).gameObject);

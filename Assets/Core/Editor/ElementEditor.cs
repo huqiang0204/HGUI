@@ -1,4 +1,5 @@
-﻿using huqiang;
+﻿using Assets.Core.HGUI;
+using huqiang;
 using huqiang.Data;
 using huqiang.UI;
 using System.IO;
@@ -100,6 +101,6 @@ public class ElementEditor : Editor
     }
     static void InitialUI()
     {
-        App.RegUI();
+        
     }
 }

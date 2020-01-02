@@ -43,10 +43,8 @@ namespace Assets.Core.HGUI
             tar->fillOrigin = src.m_fillOrigin;
             tar->pixelsPerUnit = src.m_pixelsPerUnit;
             var sprite = src.m_sprite;
-            if(sprite!=null)
-            {
+            if (sprite != null)
                 tar->Sprite = fake.buffer.AddData(sprite.name);
-            }
         }
         public unsafe override FakeStruct LoadFromObject(Component com, DataBuffer buffer)
         {

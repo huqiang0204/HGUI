@@ -85,7 +85,7 @@ namespace Assets.Core.HGUI
                 m_dirty = true;
             } }
         [SerializeField]
-       protected TextAnchor anchor;
+        protected TextAnchor anchor;
         public TextAnchor TextAnchor {
             get => anchor;
             set {
@@ -100,7 +100,8 @@ namespace Assets.Core.HGUI
                 m_dirty = true;
             } }
         float scaleFactor = 1;
-        bool m_richText;
+        [SerializeField]
+        internal bool m_richText;
         public bool RichText {
             get => m_richText;
             set {
@@ -123,7 +124,7 @@ namespace Assets.Core.HGUI
                 m_fontSize = value;
                 m_dirty = true;
             } }
-        bool m_align;
+        internal bool m_align;
         public bool AlignByGeometry {
             get => m_align;
             set {

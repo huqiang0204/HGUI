@@ -36,7 +36,17 @@ namespace Assets.Core.HGUI
         protected unsafe void SaveHImage(FakeStruct fake, HImage src)
         {
             HImageData* tar = (HImageData*)fake.ip;
-         
+            tar->fillAmount = src.m_fillAmount;
+            tar->fillCenter = src.m_fillCenter;
+            tar->fillClockwise = src.m_fillClockwise;
+            tar->fillMethod = src.m_fillMethod;
+            tar->fillOrigin = src.m_fillOrigin;
+            tar->pixelsPerUnit = src.m_pixelsPerUnit;
+            var sprite = src.m_sprite;
+            if(sprite!=null)
+            {
+                tar->Sprite = fake.buffer.AddData(sprite.name);
+            }
         }
         public unsafe override FakeStruct LoadFromObject(Component com, DataBuffer buffer)
         {

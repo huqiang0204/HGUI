@@ -86,7 +86,7 @@ namespace Assets.Core.HGUI
             var src = com as HText;
             if (src == null)
                 return null;
-            FakeStruct fake = new FakeStruct(buffer,HTextData.ElementSize);
+            FakeStruct fake = new FakeStruct(buffer, HTextData.ElementSize);
             SaveScript(fake.ip, src);
             SaveHGraphics(fake, src);
             SaveHText(fake, src);

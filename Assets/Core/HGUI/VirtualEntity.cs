@@ -135,7 +135,7 @@ namespace Assets.Core.HGUI
         }
         public Vector3 lossyScale { get => GetGlobaInfo(this).Scale; }
 
-        public List<VirtualEntity> Child;
+        public List<VirtualEntity> Child = new List<VirtualEntity>();
         public VirtualEntity parent { get; private set; }
         public void SetParent(VirtualEntity entity)
         {
@@ -146,5 +146,14 @@ namespace Assets.Core.HGUI
             parent = entity;
             m_changed = true;
         }
+        public Vector2 SizeDelta = new Vector2(100, 100);
+        public Vector2 pivot = new Vector2(0.5f, 0.5f);
+        private ScaleType lastScaleType;
+        private AnchorType lastSizeType;
+        private AnchorPointType lastAnchorType;
+        private Margin lastmargin;
+        public UserEvent userEvent;
+        internal int PipelineIndex;
+        public bool Mask;
     }
 }

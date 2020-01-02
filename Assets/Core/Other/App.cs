@@ -16,30 +16,9 @@ namespace huqiang
             IME.Initial();
 #endif     
         }
-       public static void RegUI()
-        {
-            
-            ModelManagerUI.RegComponent(new ComponentType<RectTransform, ModelElement>(ModelElement.LoadFromObject));
-            ModelManagerUI.RegComponent(new ComponentType<Image, ImageElement>(ImageElement.LoadFromObject));
-            ModelManagerUI.RegComponent(new ComponentType<ShareTextChild, ShareTextChildElement>(null));
-            ModelManagerUI.RegComponent(new ComponentType<ShareText, ShareTextElement>(null));
-            ModelManagerUI.RegComponent(new ComponentType<EmojiText, EmojiElement>(TextElement.LoadFromObject));
-            ModelManagerUI.RegComponent(new ComponentType<Text, TextElement>(TextElement.LoadFromObject));
-            ModelManagerUI.RegComponent(new ComponentType<ShareImageChild, ShareImageChildElement>(null));
-            ModelManagerUI.RegComponent(new ComponentType<ShareImage, ShareImageElement>(RawImageElement.LoadFromObject));
-            ModelManagerUI.RegComponent(new ComponentType<CustomRawImage, RawImageElement>(RawImageElement.LoadFromObject));
-            ModelManagerUI.RegComponent(new ComponentType<RenderImage, RenderImageElement>(RawImageElement.LoadFromObject));
-            ModelManagerUI.RegComponent(new ComponentType<RawImage, RawImageElement>(RawImageElement.LoadFromObject));
-            ModelManagerUI.RegComponent(new ComponentType<RectMask2D, RectMaskElement>(RectMaskElement.LoadFromObject));
-            ModelManagerUI.RegComponent(new ComponentType<Mask, MaskElement>(MaskElement.LoadFromObject));
-            ModelManagerUI.RegComponent(new ComponentType<Outline, OutLineElement>(ShadowElement.LoadFromObject));
-            ModelManagerUI.RegComponent(new ComponentType<Shadow, ShadowElement>(ShadowElement.LoadFromObject));
-            ModelManagerUI.RegComponent(new ComponentType<UILayout, huqiang.UI.LayoutElement>(null));
-        }
         public static RenderForm uiroot;
         static void CreateUI() 
         {
-            uiroot = new RenderForm("Root");
             if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer)
             {
                 uiroot.inputType = UserAction.InputType.OnlyTouch;
@@ -48,7 +27,6 @@ namespace huqiang
             {
                 uiroot.inputType = UserAction.InputType.Blend;
             }
-            uiroot.SetCanvas(UIRoot);
             root = uiroot.model;
             //UIPage.Root = uiroot.AddNode("page");
             //UIPage.Root.data.sizeDelta = new Vector2(Screen.width,Screen.height);
@@ -62,7 +40,7 @@ namespace huqiang
             buff.SetActive(false);
             ModelManagerUI.CycleBuffer = buff.transform;
         }
-        public static RectTransform UIRoot;
+        public static Transform UIRoot;
         static ThreadMission mission;
         static ModelElement root;
         public static void Initial(Transform uiRoot)
@@ -70,8 +48,7 @@ namespace huqiang
             ThreadMission.SetMianId();
             Scale.Initial();
             InitialInput();
-            RegUI();
-            UIRoot = uiRoot as RectTransform;
+            UIRoot = uiRoot;
             if (UIRoot == null)
             {
                 UIRoot = new GameObject("UI", typeof(Canvas)).transform as RectTransform;

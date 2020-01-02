@@ -31,7 +31,7 @@ namespace Assets.Core.HGUI
             db.fakeStruct = GameBuffer.GetDataLoader(0).LoadFromObject(uiRoot, db);
             File.WriteAllBytes(path, db.ToBytes());
         }
-        static List<PrefabAsset> prefabAssets = new List<PrefabAsset>();
+        public static List<PrefabAsset> prefabAssets = new List<PrefabAsset>();
         public unsafe static PrefabAsset LoadModels(byte[] buff, string name)
         {
             DataBuffer db = new DataBuffer(buff);

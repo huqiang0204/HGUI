@@ -1,7 +1,8 @@
-﻿using huqiang;
+﻿using Assets.Core.HGUI;
+using huqiang;
 using huqiang.Communication;
 using huqiang.Data;
-using huqiang.UI;
+using huqiang.Data2D;
 using huqiang.UIEvent;
 using System.IO;
 using UnityEngine;
@@ -12,10 +13,6 @@ using UnityEngine;
 /// </summary>
 public class TestHelper:UICompositeHelp
 {
-    public static void InitialUI()
-    {
-        App.RegUI();
-    }
     public virtual void LoadBundle()
     {
 #if UNITY_EDITOR
@@ -43,14 +40,14 @@ public class TestHelper:UICompositeHelp
     public void Initital()
     {
         LoadBundle();
-        InitialUI();
+        HGUIManager.Initial(transform);
         DataBuffer db = new DataBuffer(1024);
-        db.fakeStruct = ModelElement.LoadFromObject(transform, db);
+        db.fakeStruct = HGUIManager.GameBuffer.GetDataLoader(0).LoadFromObject(transform, db);
         PrefabAsset asset = new PrefabAsset();
-        asset.models = new ModelElement();
-        asset.models.Load(db.fakeStruct);
+        asset.models = db.fakeStruct;
         asset.name = AssetName;
-        ModelManagerUI.prefabs.Add(asset);
+        HGUIManager.prefabAssets.Clear();
+        HGUIManager.prefabAssets.Add(asset);
         var c = transform.childCount;
         for (int i = 0; i < c; i++)
             GameObject.Destroy(transform.GetChild(i).gameObject);

@@ -16,6 +16,7 @@ namespace Assets.Core.HGUI
         public Int32 STexture;
         public Int32 TTexture;
         public Int32 FTexture;
+        public Color color;
         public static int Size = sizeof(HGraphicsData);
         public static int ElementSize = Size / 4;
     }
@@ -49,6 +50,7 @@ namespace Assets.Core.HGUI
             string shader = fake.GetData<string>(src->shader);
             if (shader != null)
                 tar.Material = new Material(Shader.Find(shader));
+            tar.m_color = src->color;
         }
         protected unsafe void SaveHGraphics(FakeStruct fake, HGraphics src)
         {
@@ -57,32 +59,45 @@ namespace Assets.Core.HGUI
             if (tex != null)
             {
                 var an = ElementAsset.TxtureFormAsset(tex.name);
-                tar->asset = fake.buffer.AddData(an);
-                tar->MainTexture = fake.buffer.AddData(tex.name);
+                if (an != null)
+                {
+                    tar->asset = fake.buffer.AddData(an);
+                    tar->MainTexture = fake.buffer.AddData(tex.name);
+                }
             }
             tex = src.STexture;
             if (tex != null)
             {
                 var an = ElementAsset.TxtureFormAsset(tex.name);
-                tar->asset = fake.buffer.AddData(an);
-                tar->STexture = fake.buffer.AddData(tex.name);
+                if (an != null)
+                {
+                    tar->asset = fake.buffer.AddData(an);
+                    tar->STexture = fake.buffer.AddData(tex.name);
+                }
             }
             tex = src.TTexture;
             if (tex != null)
             {
                 var an = ElementAsset.TxtureFormAsset(tex.name);
-                tar->asset = fake.buffer.AddData(an);
-                tar->TTexture = fake.buffer.AddData(tex.name);
+                if (an != null)
+                {
+                    tar->asset = fake.buffer.AddData(an);
+                    tar->TTexture = fake.buffer.AddData(tex.name);
+                }
             }
             tex = src.FTexture;
             if (tex != null)
             {
                 var an = ElementAsset.TxtureFormAsset(tex.name);
-                tar->asset = fake.buffer.AddData(an);
-                tar->FTexture = fake.buffer.AddData(tex.name);
+                if (an != null)
+                {
+                    tar->asset = fake.buffer.AddData(an);
+                    tar->FTexture = fake.buffer.AddData(tex.name);
+                }
             }
             if (src.m_material != null)
                 tar->shader = fake.buffer.AddData(src.m_material.shader.name);
+            tar->color = src.m_color;
         }
         public unsafe override FakeStruct LoadFromObject(Component com, DataBuffer buffer)
         {

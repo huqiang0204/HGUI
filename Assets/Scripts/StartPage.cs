@@ -16,8 +16,8 @@ namespace Assets.Scripts
         View view;
         public override void Initial(Transform parent, object dat = null)
         {
-            view = LoadUI<View>("baseUI", "anitest");
             base.Initial(parent, dat);
+            view = LoadUI<View>("baseUI", "start");
         }
     }
 }

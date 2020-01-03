@@ -104,12 +104,6 @@ public class UIPage : UIBase
     {
         Parent = parent;
         DataContext = dat;
-        if (parent != null)
-            if (Main != null)
-            {
-                Main.SetParent(parent);
-                Main.localPosition = Vector3.zero;
-            }
     }
     public virtual void Initial(Transform parent, object dat = null, Type back = null, Type pop = null, object backData = null)
     {

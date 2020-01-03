@@ -136,7 +136,6 @@ namespace Assets.Core.HGUI
         public void Populate()
         {
             var font = Font;
-            font.material.color = Color.white;
             emojiString.FullString = m_text;
             settings.font = font;
             settings.pivot = TextPivot;

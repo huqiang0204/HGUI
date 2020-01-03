@@ -19,7 +19,6 @@ namespace Assets.Scripts
         {
             base.Initial(parent, dat);
             view = LoadUI<View>("baseUI", "start");
-            view.img.Click = (o, e) => { Debug.Log("ok"); };
         }
     }
 }

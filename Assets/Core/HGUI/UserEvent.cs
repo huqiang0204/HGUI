@@ -270,7 +270,7 @@ namespace Assets.Core.HGUI
         public bool entry { get; protected set; }
         private int index;
         public bool AutoColor = true;
-        Color g_color;
+        internal Color g_color;
         public object DataContext;
 
         public Action<UserEvent, UserAction> PointerDown;
@@ -337,7 +337,7 @@ namespace Assets.Core.HGUI
             RawPosition = action.CanPosition;
             if (AutoColor)
             {
-                Color a = Color.white;
+                Color a;
                 a.r = g_color.r * 0.8f;
                 a.g = g_color.g * 0.8f;
                 a.b = g_color.b * 0.8f;

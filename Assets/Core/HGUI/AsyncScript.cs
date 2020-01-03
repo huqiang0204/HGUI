@@ -35,6 +35,7 @@ namespace Assets.Core.HGUI
             t.Context = this;
             t.Initial();
             userEvent = t;
+            t.g_color = Chromatically;
             return t;
         }
         public object RegEvent(Type type)
@@ -43,6 +44,7 @@ namespace Assets.Core.HGUI
             u.Context = this;
             u.Initial();
             userEvent = u;
+            u.g_color = Chromatically;
             return u;
         }
     }

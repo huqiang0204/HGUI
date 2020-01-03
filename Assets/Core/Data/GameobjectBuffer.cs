@@ -282,8 +282,8 @@ namespace huqiang.Data
                 var m = reflections.All[i];
                 if (m.name == trans.name)
                 {
-                    if (m.FieldType == typeof(AsyncScript))
-                        m.Value = trans;
+                    if (typeof(Component).IsAssignableFrom(m.FieldType))
+                        m.Value = trans.GetComponent(m.FieldType);
                     else if (typeof(UserEvent).IsAssignableFrom(m.FieldType))
                     {
                         var script = trans.GetComponent<AsyncScript>();

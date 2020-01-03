@@ -1,4 +1,5 @@
-﻿using huqiang.UI;
+﻿using Assets.Core.HGUI;
+using huqiang.UI;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -40,7 +41,7 @@ public class UINotify : UIBase
             for (int i = 0; i < pops.Count; i++)
                 pops[i].Dispose();
         pops.Clear();
-        ModelManagerUI.RecycleElement(model);
+        HGUIManager.GameBuffer.RecycleGameObject(Main.gameObject);
         ClearUI();
     }
     public void HidePopWindow()
@@ -54,13 +55,13 @@ public class UINotify : UIBase
     public void ReleasePopWindow()
     {
         int c = pops.Count-1;
-        for(;c>=0;c--)
+        for (; c >= 0; c--)
         {
             var p = pops[c];
             if (p.model != null)
             { p.Dispose(); pops.RemoveAt(c); }
-            else if (!p.model.activeSelf)
-            { p.Dispose();pops.RemoveAt(c); }
+            else if (!p.Main.gameObject.activeSelf)
+            { p.Dispose(); pops.RemoveAt(c); }
         }
     }
     protected T ShowPopWindow<T>(object obj = null) where T : PopWindow, new()
@@ -90,7 +91,7 @@ public class UINotify : UIBase
         {
             var p = pops[i];
             if (p.model != null)
-                if (p.model.activeSelf)
+                if (p.Main.gameObject.activeSelf)
                     p.Update(time);
         }
     }

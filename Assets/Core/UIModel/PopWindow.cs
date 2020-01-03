@@ -17,11 +17,15 @@ public class PopWindow : UIBase
             if (page != null)
                 Main.SetParent(parent);
     }
-    public virtual void Show(object obj = null) { if (model != null) model.activeSelf = true; }
+    public virtual void Show(object obj = null)
+    {
+        if (Main != null)
+            Main.gameObject.SetActive(true);
+    }
     public virtual void Hide()
     {
-        if (model != null)
-            model.activeSelf = false;
+        if (Main != null)
+            Main.gameObject.SetActive(false);
     }
     public virtual bool Handling(string cmd, object dat)
     {

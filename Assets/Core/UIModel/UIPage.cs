@@ -5,6 +5,7 @@ using UnityEngine;
 using huqiang.UI;
 using huqiang.UIEvent;
 using System.Reflection;
+using Assets.Core.HGUI;
 
 public class UIPage : UIBase
 {
@@ -128,8 +129,11 @@ public class UIPage : UIBase
                 pops[i].Dispose();
         pops.Clear();
         currentPop = null;
-        model.SetParent(null);
-        ModelManagerUI.RecycleElement(model);
+        if (Main != null)
+        {
+            Main.SetParent(null);
+            HGUIManager.GameBuffer.RecycleGameObject(Main.gameObject);
+        }
         ClearUI();
     }
     public void HidePopWindow()
@@ -248,7 +252,7 @@ public class UIPage : UIBase
         PageInfo page = new PageInfo();
         page.Pagetype = GetType();
         if (currentPop != null)
-            if (currentPop.model.activeSelf)
+            if (currentPop.Main.gameObject.activeSelf)
             {
                 page.PopType = currentPop.GetType();
                 page.PopData = currentPop.DataContext;

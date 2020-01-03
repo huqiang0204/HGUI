@@ -9,9 +9,14 @@ namespace Assets.Scripts
 {
     public class StartPage:UIPage
     {
+        class View
+        {
+
+        }
+        View view;
         public override void Initial(Transform parent, object dat = null)
         {
-            //model = HGUIManager.FindModel("baseUI", "anitest");
+            view = LoadUI<View>("baseUI", "anitest");
             base.Initial(parent, dat);
         }
     }

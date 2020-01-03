@@ -1,4 +1,5 @@
-﻿using huqiang.UI;
+﻿using Assets.Core.HGUI;
+using huqiang.UI;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -39,7 +40,7 @@ public class UIMenu: UIBase
             for (int i = 0; i < pops.Count; i++)
                 pops[i].Dispose();
         pops.Clear();
-        ModelManagerUI.RecycleElement(model);
+        HGUIManager.GameBuffer.RecycleGameObject(Main.gameObject);
         ClearUI();
     }
     public void HideMenu()
@@ -57,9 +58,14 @@ public class UIMenu: UIBase
         {
             var p = pops[c];
             if (p.model != null)
-            { p.Dispose(); pops.RemoveAt(c); }
-            else if (!p.model.activeSelf)
-            { p.Dispose(); pops.RemoveAt(c); }
+            {
+                p.Dispose(); pops.RemoveAt(c);
+            }
+            else
+            if (!p.Main.gameObject.activeSelf)
+            {
+                p.Dispose(); pops.RemoveAt(c);
+            }
         }
     }
     public T ShowMenu<T>(UIBase context, Vector2 pos, object obj = null) where T : MenuWindow, new()
@@ -94,7 +100,7 @@ public class UIMenu: UIBase
         {
             var p = pops[i];
             if (p.model != null)
-                if (p.model.activeSelf)
+                if (p.Main.gameObject.activeSelf)
                     p.Update(time);
         }
     }

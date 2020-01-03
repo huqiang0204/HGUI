@@ -18,7 +18,9 @@ public class HTextEditor:AsyncScriptEditor
         HText img = target as HText;
         if (img != null)
         {
-            str = img.Text;
+            var can = FindHCanvas(img.transform);
+            if (can != null)
+                can.Refresh();
         }
     }
     public override void OnSceneGUI()

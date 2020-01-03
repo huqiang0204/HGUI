@@ -16,18 +16,8 @@ namespace huqiang
             IME.Initial();
 #endif     
         }
-        public static RenderForm uiroot;
         static void CreateUI() 
         {
-            if (Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer)
-            {
-                uiroot.inputType = UserAction.InputType.OnlyTouch;
-            }
-            else
-            {
-                uiroot.inputType = UserAction.InputType.Blend;
-            }
-            root = uiroot.model;
             //UIPage.Root = uiroot.AddNode("page");
             //UIPage.Root.data.sizeDelta = new Vector2(Screen.width,Screen.height);
             //UIMenu.Root = uiroot.AddNode("menu");

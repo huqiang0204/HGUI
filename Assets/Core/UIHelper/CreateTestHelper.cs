@@ -49,10 +49,6 @@ public class CreateTestHelper: UICompositeHelp
     }
     public void Build()
     {
-        if (App.uiroot != null)
-        {
-            App.uiroot.Dispose();
-        }
         int c = transform.childCount - 1;
         for (; c >= 0; c--)
         {

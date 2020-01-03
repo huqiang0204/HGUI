@@ -32,6 +32,7 @@ namespace Assets.Core.HGUI
             PipeLine[index].trans = trans;
             PipeLine[index].active = trans.gameObject.activeSelf;
             var script= trans.GetComponent<AsyncScript>();
+            PipeLine[index].script = script;
             bool mask = false;
             if (script != null)
             {

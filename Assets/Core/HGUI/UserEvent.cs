@@ -15,11 +15,11 @@ namespace Assets.Core.HGUI
             if (root.script != null)
             {
                  int c = root.childCount;
-                for (int i = c; i >= 1; i--)
+                for (int i = c; i >= 0; i--)
                 {
                     try
                     {
-                        if (DispatchEvent(pipeLine, c, Vector3.zero, Vector3.one, Quaternion.identity, action))
+                        if (DispatchEvent(pipeLine, i, Vector3.zero, Vector3.one, Quaternion.identity, action))
                             return;
                     }
                     catch (Exception ex)
@@ -171,6 +171,22 @@ namespace Assets.Core.HGUI
                                     return true;
                                 }
                             }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                int c = pipeLine[index].childCount;
+                if (c > 0)
+                {
+                    int os = pipeLine[index].childOffset + c;
+                    for (int i = 0; i < c; i++)
+                    {
+                        os--;
+                        if (DispatchEvent(pipeLine, os, o, s, q, action))
+                        {
+                            return true;
                         }
                     }
                 }

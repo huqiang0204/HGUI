@@ -39,7 +39,7 @@ public class UINotify : UIBase
             for (int i = 0; i < pops.Count; i++)
                 pops[i].Dispose();
         pops.Clear();
-        HGUIManager.GameBuffer.RecycleGameObject(Main.gameObject);
+        HGUIManager.GameBuffer.RecycleGameObject(Main);
         ClearUI();
     }
     public void HidePopWindow()

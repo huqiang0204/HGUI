@@ -39,18 +39,19 @@ public class UIBase
     }
     public object DataContext;
     public Transform Parent { get; protected set; }
-    public Transform Main { get; protected set; }
+    public GameObject Main { get; protected set; }
     public FakeStruct model { get; protected set; }
     protected UIBase UIParent;
     public T LoadUI<T>(string asset, string name) where T : class, new()
     {
         model = HGUIManager.FindModel(asset, name);
         T t = new T();
-        Main = HGUIManager.GameBuffer.Clone(model, t).transform;
-        Main.SetParent(Parent);
-        Main.localPosition = Vector3.zero;
-        Main.localScale = Vector3.one;
-        Main.localRotation = Quaternion.identity;
+        Main = HGUIManager.GameBuffer.Clone(model, t);
+        var trans = Main.transform;
+        trans.SetParent(Parent);
+        trans.localPosition = Vector3.zero;
+        trans.localScale = Vector3.one;
+        trans.localRotation = Quaternion.identity;
         return t;
     }
     public virtual void Initial(Transform parent, UIBase ui, object obj = null)
@@ -60,13 +61,13 @@ public class UIBase
         Parent = parent;
         if (parent != null)
             if (Main != null)
-                Main.SetParent(parent);
+                Main.transform.SetParent(parent);
     }
     public virtual void Dispose()
     {
         if (Main != null)
         {
-            HGUIManager.GameBuffer.RecycleGameObject(Main.gameObject);
+            HGUIManager.GameBuffer.RecycleGameObject(Main);
         }
         point--;
         if (buff[point] != null)

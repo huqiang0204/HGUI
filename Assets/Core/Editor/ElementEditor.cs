@@ -79,10 +79,10 @@ public class ElementEditor : Editor
             if (CloneName != null)
                 if (CloneName != "")
                 {
-                    LoadBundle();
-                    InitialUI();
-                    ModelManagerUI.LoadModels(ui, "assTest");
-                    EditorModelManager.LoadToGame(CloneName, null, root, "");
+                    //LoadBundle();
+                    //InitialUI();
+                    //ModelManagerUI.LoadModels(ui, "assTest");
+                    //EditorModelManager.LoadToGame(CloneName, null, root, "");
                 }
         }
     }
@@ -90,12 +90,12 @@ public class ElementEditor : Editor
     {
         if (ui != null)
         {
-            LoadBundle();
-            InitialUI();
-            var all = ModelManagerUI.LoadModels(ui, "assTest");
-            ModelElement element = new ModelElement();
-            element.Load(all.models.ModData);
-            element.Apply();
+            //LoadBundle();
+            //InitialUI();
+            //var all = ModelManagerUI.LoadModels(ui, "assTest");
+            //ModelElement element = new ModelElement();
+            //element.Load(all.models.ModData);
+            //element.Apply();
         }
     }
     static void InitialUI()

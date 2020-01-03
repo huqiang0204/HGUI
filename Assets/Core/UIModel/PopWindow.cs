@@ -15,7 +15,7 @@ public class PopWindow : UIBase
         mainPage = page;
         if (model != null)
             if (page != null)
-                Main.SetParent(parent);
+                Main.transform.SetParent(parent);
     }
     public virtual void Show(object obj = null)
     {

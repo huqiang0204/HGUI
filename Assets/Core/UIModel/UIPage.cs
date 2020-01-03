@@ -122,8 +122,8 @@ public class UIPage : UIBase
         currentPop = null;
         if (Main != null)
         {
-            Main.SetParent(null);
-            HGUIManager.GameBuffer.RecycleGameObject(Main.gameObject);
+            Main.transform.SetParent(null);
+            HGUIManager.GameBuffer.RecycleGameObject(Main);
         }
         ClearUI();
     }

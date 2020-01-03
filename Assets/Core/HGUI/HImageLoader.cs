@@ -23,7 +23,7 @@ namespace Assets.Core.HGUI
         protected unsafe void LoadHImage(FakeStruct fake, HImage tar)
         {
             HImageData* src = (HImageData*)fake.ip;
-            Sprite = fake.GetData<string>(src->Sprite);
+            Sprite = fake.buffer.GetData(src->Sprite)as string;
             if (Sprite != null)
                 tar.Sprite = ElementAsset.FindSprite(asset, MainTexture, Sprite);
             tar.m_fillAmount = src->fillAmount;

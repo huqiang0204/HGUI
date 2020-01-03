@@ -44,8 +44,9 @@ namespace Assets.Core.HGUI
         protected unsafe void LoadHText(FakeStruct fake,HText tar)
         {
             HTextData* src = (HTextData*)fake.ip;
-            tar.m_text = fake.GetData<string>(src->text);
-            fontName = fake.GetData<string>(src->font);
+            var buffer = fake.buffer;
+            tar.m_text = buffer.GetData(src->text)as string;
+            fontName = buffer.GetData(src->font)as string;
             if (fontName != null)
                 tar._font = FindFont(fontName);
             tar.TextPivot = src->pivot;

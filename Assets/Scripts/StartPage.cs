@@ -12,8 +12,6 @@ namespace Assets.Scripts
         class View
         {
             public HImage img;
-            public HText t1;
-            public HText t2;
         }
         View view;
         public override void Initial(Transform parent, object dat = null)

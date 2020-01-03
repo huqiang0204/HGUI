@@ -31,23 +31,24 @@ namespace Assets.Core.HGUI
         protected unsafe void LoadHGraphics(FakeStruct fake, HGraphics tar)
         {
             HGraphicsData* src = (HGraphicsData*)fake.ip;
-            asset = fake.GetData<string>(src->asset);
+            var buffer = fake.buffer;
+            asset = buffer.GetData(src->asset)as string ;
             if (asset != null)
             {
-                MainTexture = fake.GetData<string>(src->MainTexture);
+                MainTexture = buffer.GetData(src->MainTexture)as string ;
                 if (MainTexture != null)
                     tar.MainTexture = ElementAsset.FindTexture(asset, MainTexture);
-                STexture = fake.GetData<string>(src->STexture);
+                STexture = buffer.GetData(src->STexture)as string ;
                 if (STexture != null)
                     tar.STexture = ElementAsset.FindTexture(asset, STexture);
-                TTexture = fake.GetData<string>(src->TTexture);
+                TTexture = buffer.GetData(src->TTexture)as string ;
                 if (TTexture != null)
                     tar.TTexture = ElementAsset.FindTexture(asset, TTexture);
-                FTexture = fake.GetData<string>(src->FTexture);
+                FTexture = buffer.GetData(src->FTexture)as string ;
                 if (FTexture != null)
                     tar.FTexture = ElementAsset.FindTexture(asset, FTexture);
             }
-            shader = fake.GetData<string>(src->shader);
+            shader = buffer.GetData(src->shader)as string ;
             if (shader != null)
                 tar.Material = new Material(Shader.Find(shader));
             tar.m_color = src->color;
@@ -60,40 +61,32 @@ namespace Assets.Core.HGUI
             {
                 var an = ElementAsset.TxtureFormAsset(tex.name);
                 if (an != null)
-                {
                     tar->asset = fake.buffer.AddData(an);
-                    tar->MainTexture = fake.buffer.AddData(tex.name);
-                }
+                tar->MainTexture = fake.buffer.AddData(tex.name);
             }
             tex = src.STexture;
             if (tex != null)
             {
                 var an = ElementAsset.TxtureFormAsset(tex.name);
                 if (an != null)
-                {
                     tar->asset = fake.buffer.AddData(an);
-                    tar->STexture = fake.buffer.AddData(tex.name);
-                }
+                tar->STexture = fake.buffer.AddData(tex.name);
             }
             tex = src.TTexture;
             if (tex != null)
             {
                 var an = ElementAsset.TxtureFormAsset(tex.name);
                 if (an != null)
-                {
                     tar->asset = fake.buffer.AddData(an);
-                    tar->TTexture = fake.buffer.AddData(tex.name);
-                }
+                tar->TTexture = fake.buffer.AddData(tex.name);
             }
             tex = src.FTexture;
             if (tex != null)
             {
                 var an = ElementAsset.TxtureFormAsset(tex.name);
                 if (an != null)
-                {
                     tar->asset = fake.buffer.AddData(an);
-                    tar->FTexture = fake.buffer.AddData(tex.name);
-                }
+                tar->FTexture = fake.buffer.AddData(tex.name);
             }
             if (src.m_material != null)
                 tar->shader = fake.buffer.AddData(src.m_material.shader.name);

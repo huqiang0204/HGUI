@@ -18,14 +18,11 @@ namespace huqiang
         }
         static void CreateUI() 
         {
-            //UIPage.Root = uiroot.AddNode("page");
-            //UIPage.Root.data.sizeDelta = new Vector2(Screen.width,Screen.height);
-            //UIMenu.Root = uiroot.AddNode("menu");
-            //UIMenu.Root.data.sizeDelta = new Vector2(Screen.width, Screen.height);
-            //UINotify.Root = uiroot.AddNode("notify");
-            //UINotify.Root.data.sizeDelta = new Vector2(Screen.width, Screen.height);
+            var page = new GameObject("page");
+            UIPage.Root = page.transform;
+            page.transform.SetParent(UIRoot);
 
-            var buff = new GameObject("buffer", typeof(RectTransform));
+            var buff = new GameObject("buffer");
             buff.transform.SetParent(UIRoot);
             buff.SetActive(false);
             ModelManagerUI.CycleBuffer = buff.transform;
@@ -39,13 +36,7 @@ namespace huqiang
             Scale.Initial();
             InitialInput();
             UIRoot = uiRoot;
-            if (UIRoot == null)
-            {
-                UIRoot = new GameObject("UI", typeof(Canvas)).transform as RectTransform;
-                UIRoot.GetComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
-            }
             CreateUI();
-            mission = ThreadMission.CreateMission("UI");
         }
         public static float AllTime;
         public static float FrameTime = 33;

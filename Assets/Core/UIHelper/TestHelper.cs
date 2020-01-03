@@ -60,7 +60,6 @@ public class TestHelper:UICompositeHelp
 
     private void Update()
     {
-        App.Update();
         OnUpdate();
     }
     public virtual void OnUpdate()

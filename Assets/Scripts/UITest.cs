@@ -20,8 +20,4 @@ public class UITest : TestHelper
         ElementAsset.LoadAssetsAsync("base.unity3d",(o,e)=> { UIPage.LoadPage<AniTestPage>(); });
 #endif
     }
-    public override void OnUpdate()
-    {
-        base.OnUpdate();
-    }
 }

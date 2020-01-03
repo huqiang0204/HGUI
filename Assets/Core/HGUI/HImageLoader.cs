@@ -14,7 +14,7 @@ namespace Assets.Core.HGUI
         public FillMethod fillMethod;
         public Int32 fillOrigin;//方向
         public float pixelsPerUnit;
-        public static int Size = sizeof(HGraphicsData);
+        public static int Size = sizeof(HImageData);
         public static int ElementSize = Size / 4;
     }
     public class HImageLoader:HGraphicsLoader

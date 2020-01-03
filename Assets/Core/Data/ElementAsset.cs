@@ -49,7 +49,7 @@ namespace huqiang.Data
         {
             if(bundle==null)
             {
-                var ss= UnityEngine.Resources.LoadAll<Sprite>(tname);
+                var ss = UnityEngine.Resources.LoadAll<Sprite>(tname);
                 if(ss!=null)
                 {
                     for (int i = 0; i < ss.Length; i++)

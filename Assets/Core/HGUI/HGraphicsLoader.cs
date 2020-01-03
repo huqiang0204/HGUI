@@ -33,21 +33,18 @@ namespace Assets.Core.HGUI
             HGraphicsData* src = (HGraphicsData*)fake.ip;
             var buffer = fake.buffer;
             asset = buffer.GetData(src->asset)as string ;
-            if (asset != null)
-            {
-                MainTexture = buffer.GetData(src->MainTexture)as string ;
-                if (MainTexture != null)
-                    tar.MainTexture = ElementAsset.FindTexture(asset, MainTexture);
-                STexture = buffer.GetData(src->STexture)as string ;
-                if (STexture != null)
-                    tar.STexture = ElementAsset.FindTexture(asset, STexture);
-                TTexture = buffer.GetData(src->TTexture)as string ;
-                if (TTexture != null)
-                    tar.TTexture = ElementAsset.FindTexture(asset, TTexture);
-                FTexture = buffer.GetData(src->FTexture)as string ;
-                if (FTexture != null)
-                    tar.FTexture = ElementAsset.FindTexture(asset, FTexture);
-            }
+            MainTexture = buffer.GetData(src->MainTexture) as string;
+            if (MainTexture != null)
+                tar.MainTexture = ElementAsset.FindTexture(asset, MainTexture);
+            STexture = buffer.GetData(src->STexture) as string;
+            if (STexture != null)
+                tar.STexture = ElementAsset.FindTexture(asset, STexture);
+            TTexture = buffer.GetData(src->TTexture) as string;
+            if (TTexture != null)
+                tar.TTexture = ElementAsset.FindTexture(asset, TTexture);
+            FTexture = buffer.GetData(src->FTexture) as string;
+            if (FTexture != null)
+                tar.FTexture = ElementAsset.FindTexture(asset, FTexture);
             shader = buffer.GetData(src->shader)as string ;
             if (shader != null)
                 tar.Material = new Material(Shader.Find(shader));
@@ -56,40 +53,41 @@ namespace Assets.Core.HGUI
         protected unsafe void SaveHGraphics(FakeStruct fake, HGraphics src)
         {
             HGraphicsData* tar = (HGraphicsData*)fake.ip;
+            var buffer = fake.buffer;
             var tex = src.MainTexture;
             if (tex != null)
             {
                 var an = ElementAsset.TxtureFormAsset(tex.name);
                 if (an != null)
-                    tar->asset = fake.buffer.AddData(an);
-                tar->MainTexture = fake.buffer.AddData(tex.name);
+                    tar->asset = buffer.AddData(an);
+                tar->MainTexture = buffer.AddData(tex.name);
             }
             tex = src.STexture;
             if (tex != null)
             {
                 var an = ElementAsset.TxtureFormAsset(tex.name);
                 if (an != null)
-                    tar->asset = fake.buffer.AddData(an);
-                tar->STexture = fake.buffer.AddData(tex.name);
+                    tar->asset = buffer.AddData(an);
+                tar->STexture = buffer.AddData(tex.name);
             }
             tex = src.TTexture;
             if (tex != null)
             {
                 var an = ElementAsset.TxtureFormAsset(tex.name);
                 if (an != null)
-                    tar->asset = fake.buffer.AddData(an);
-                tar->TTexture = fake.buffer.AddData(tex.name);
+                    tar->asset = buffer.AddData(an);
+                tar->TTexture = buffer.AddData(tex.name);
             }
             tex = src.FTexture;
             if (tex != null)
             {
                 var an = ElementAsset.TxtureFormAsset(tex.name);
                 if (an != null)
-                    tar->asset = fake.buffer.AddData(an);
-                tar->FTexture = fake.buffer.AddData(tex.name);
+                    tar->asset = buffer.AddData(an);
+                tar->FTexture = buffer.AddData(tex.name);
             }
             if (src.m_material != null)
-                tar->shader = fake.buffer.AddData(src.m_material.shader.name);
+                tar->shader = buffer.AddData(src.m_material.shader.name);
             tar->color = src.m_color;
         }
         public unsafe override void LoadToObject(FakeStruct fake, Component com)

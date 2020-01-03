@@ -48,7 +48,7 @@ namespace Assets.Core.HGUI
         }
         public unsafe override void LoadToObject(FakeStruct fake, Component com)
         {
-            HImage image = com as HImage;
+            HImage image = com.GetComponent<HImage>();
             if (image == null)
                 return;
             LoadScript(fake.ip, image);

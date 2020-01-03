@@ -46,7 +46,7 @@ namespace Assets.Core.HGUI
         }
         public unsafe override void LoadToObject(FakeStruct fake, Component com)
         {
-            LoadScript(fake.ip, com as AsyncScript);
+            LoadScript(fake.ip, com.GetComponent<AsyncScript>());
         }
         public override unsafe FakeStruct LoadFromObject(Component com, DataBuffer buffer)
         {

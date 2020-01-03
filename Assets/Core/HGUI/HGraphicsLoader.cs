@@ -101,7 +101,7 @@ namespace Assets.Core.HGUI
         }
         public unsafe override void LoadToObject(FakeStruct fake, Component com)
         {
-            var hg = com as HGraphics;
+            var hg = com.GetComponent<HGraphics>();
             if (hg == null)
                 return;
             LoadScript(fake.ip, hg);

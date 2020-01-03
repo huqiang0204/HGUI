@@ -29,14 +29,12 @@ public class MenuWindow : UIBase
         if(mod!=null)
         {
             //mod.data.localPosition = Dock(pos,mod.data.sizeDelta);
-            mod.data.localScale = Vector3.one;
-            mod.activeSelf = true;
+       
         }
     }
     public virtual void Hide()
     {
-        if (model != null)
-            model.activeSelf = false;
+       
     }
     public virtual bool Handling(string cmd, object dat)
     {

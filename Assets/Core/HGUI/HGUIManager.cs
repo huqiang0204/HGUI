@@ -69,6 +69,17 @@ namespace Assets.Core.HGUI
                 }
             return null;
         }
+        public static unsafe FakeStruct FindModel(string assetName,string childName)
+        {
+            for (int i = 0; i < prefabAssets.Count; i++)
+            {
+                if (prefabAssets[i].name == assetName)
+                {
+                    return FindChild(prefabAssets[i].models, childName);
+                }
+            }
+            return null;
+        }
         /// <summary>
         /// 获取transform的所有子物体
         /// </summary>

@@ -1,4 +1,5 @@
-﻿using huqiang.Data;
+﻿using Assets.Core.HGUI;
+using huqiang.Data;
 using huqiang.UI;
 using System;
 using System.Collections.Generic;
@@ -39,13 +40,13 @@ public class UIBase
     public object DataContext;
     public Transform Parent { get; protected set; }
     public Transform Main { get; protected set; }
-    public ModelElement model { get; protected set; }
+    public FakeStruct model { get; protected set; }
     protected UIBase UIParent;
     public T LoadUI<T>(string asset, string name) where T : class, new()
     {
-        model = ModelManagerUI.CloneModel(asset, name);
+        model = HGUIManager.FindModel(asset, name);
         T t = new T();
-        ModelManagerUI.LoadToGame(model, t);
+        HGUIManager.GameBuffer.Clone(model);
         return t;
     }
     public virtual void Initial(Transform parent, UIBase ui, object obj = null)
@@ -59,8 +60,10 @@ public class UIBase
     }
     public virtual void Dispose()
     {
-        if (model != null)
-            ModelManagerUI.RecycleElement(model);
+        if (Main != null)
+        {
+            HGUIManager.GameBuffer.RecycleGameObject(Main.gameObject);
+        }
         point--;
         if (buff[point] != null)
             buff[point].Index = Index;

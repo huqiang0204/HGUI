@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Assets.Core.HGUI
+namespace huqiang.Core.HGUI
 {
     public unsafe struct AsyncScriptData
     {

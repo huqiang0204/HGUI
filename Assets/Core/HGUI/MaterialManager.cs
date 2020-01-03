@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Assets.Core.HGUI
+namespace huqiang.Core.HGUI
 {
     /// <summary>
     /// 材质管理器

@@ -1,9 +1,10 @@
 ﻿using huqiang;
+using huqiang.UIEvent;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Assets.Core.HGUI
+namespace huqiang.Core.HGUI
 {
     public class AsyncScript:MonoBehaviour
     {

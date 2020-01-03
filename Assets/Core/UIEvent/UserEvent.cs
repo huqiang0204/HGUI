@@ -1,17 +1,17 @@
 ﻿using huqiang;
-using huqiang.UIEvent;
+using huqiang.Core.HGUI;
 using System;
 using UnityEngine;
 
-namespace Assets.Core.HGUI
+namespace huqiang.UIEvent
 {
     public class UserEvent
     {
         public static long ClickTime = 1800000;
         public static float ClickArea = 400;
-        internal static void DispatchEvent(UserAction action, GUIElement[] pipeLine)
+        internal static void DispatchEvent(UserAction action, HGUIElement[] pipeLine)
         {
-            GUIElement root = pipeLine[0];
+            HGUIElement root = pipeLine[0];
             if (root.script != null)
             {
                  int c = root.childCount;
@@ -29,7 +29,7 @@ namespace Assets.Core.HGUI
                 }
             }
         }
-        static bool DispatchEvent(GUIElement[] pipeLine, int index,Vector3 pos,Vector3 scale,Quaternion quate, UserAction action)
+        static bool DispatchEvent(HGUIElement[] pipeLine, int index,Vector3 pos,Vector3 scale,Quaternion quate, UserAction action)
         {
             Vector3 p = quate * pipeLine[index].localPosition;
             Vector3 o = Vector3.zero;

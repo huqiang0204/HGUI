@@ -1,8 +1,9 @@
-﻿using Assets.Core.HGUI;
-using huqiang;
+﻿using huqiang;
+using huqiang.Core.HGUI;
 using huqiang.Data;
 using huqiang.Pool;
 using huqiang.UI;
+using huqiang.UIEvent;
 using System;
 using System.Collections.Generic;
 using System.Reflection;

@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Assets.Core.HGUI;
-using huqiang;
+﻿using huqiang;
+using huqiang.Core.HGUI;
 using UnityEditor;
 using UnityEngine;
 

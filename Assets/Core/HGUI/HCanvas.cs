@@ -5,13 +5,13 @@ using huqiang.UI;
 using huqiang.UIEvent;
 using UnityEngine;
 
-namespace Assets.Core.HGUI
+namespace huqiang.Core.HGUI
 {
     public sealed class HCanvas:AsyncScript
     {
         public Camera camera;
         public RenderMode renderMode;
-        GUIElement[] PipeLine = new GUIElement[4096];
+        HGUIElement[] PipeLine = new HGUIElement[4096];
         AsyncScript[] scripts = new AsyncScript[4096];
         int point = 0;
         int max;

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Assets.Core.HGUI
+namespace huqiang.Core.HGUI
 {
     public enum Origin180
     {

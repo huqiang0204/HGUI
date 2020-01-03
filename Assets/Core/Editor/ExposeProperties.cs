@@ -1,5 +1,4 @@
-﻿
-using Assets.Core.HGUI;
+﻿using huqiang.Core.HGUI;
 using System;
 using System.Collections.Generic;
 using System.Linq;

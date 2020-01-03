@@ -1,4 +1,4 @@
-﻿using Assets.Core.HGUI;
+﻿using huqiang.Core.HGUI;
 using System.Collections.Generic;
 using UnityEngine;
 

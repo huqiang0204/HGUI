@@ -1,11 +1,12 @@
 ﻿using huqiang;
+using huqiang.UIEvent;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace Assets.Core.HGUI
+namespace huqiang.Core.HGUI
 {
     public class VirtualEntity
     {

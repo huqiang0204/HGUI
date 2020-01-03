@@ -1,5 +1,4 @@
-﻿using Assets.Core.HGUI;
-using huqiang.Data;
+﻿using huqiang.Data;
 using huqiang.UIEvent;
 using System;
 using System.Collections.Generic;

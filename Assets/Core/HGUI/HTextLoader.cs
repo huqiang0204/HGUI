@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using huqiang.Data;
 using UnityEngine;
 
-namespace Assets.Core.HGUI
+namespace huqiang.Core.HGUI
 {
     public unsafe struct HTextData
     {

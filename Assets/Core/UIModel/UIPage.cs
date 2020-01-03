@@ -1,11 +1,8 @@
 ﻿using huqiang;
+using huqiang.Core.HGUI;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using huqiang.UI;
-using huqiang.UIEvent;
-using System.Reflection;
-using Assets.Core.HGUI;
 
 public class UIPage : UIBase
 {

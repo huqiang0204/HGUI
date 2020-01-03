@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Assets.Core.HGUI
+namespace huqiang.Core.HGUI
 {
     internal class HBatch
     {
-        public static void Batch(HCanvas canvas, GUIElement[] pipeLine)
+        public static void Batch(HCanvas canvas, HGUIElement[] pipeLine)
         {
-            GUIElement root = pipeLine[0];
+            HGUIElement root = pipeLine[0];
             if (root.script != null)
             {
                 canvas.MatCollector.Start();
@@ -23,9 +23,9 @@ namespace Assets.Core.HGUI
                 canvas.MatCollector.End();
             }
         }
-        static void Batch(GUIElement[] pipeLine, int index, HCanvas canvas, Vector3 pos, Vector3 scale, Quaternion quate,Vector4 clip)
+        static void Batch(HGUIElement[] pipeLine, int index, HCanvas canvas, Vector3 pos, Vector3 scale, Quaternion quate,Vector4 clip)
         {
-            GUIElement root = pipeLine[index];
+            HGUIElement root = pipeLine[index];
             Vector3 p = quate * pipeLine[index].localPosition;
             Vector3 o = Vector3.zero;
             o.x = p.x * scale.x;

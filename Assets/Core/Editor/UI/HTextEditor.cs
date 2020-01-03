@@ -1,7 +1,7 @@
-﻿using Assets.Core.HGUI;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using huqiang;
+using huqiang.Core.HGUI;
 using UnityEditor;
 using UnityEngine;
 

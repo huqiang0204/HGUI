@@ -1,4 +1,4 @@
-﻿using Assets.Core.HGUI;
+﻿using huqiang.Core.HGUI;
 using huqiang.Data;
 using huqiang.UI;
 using System;

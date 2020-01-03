@@ -1,9 +1,9 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Assets.Core.HGUI
+namespace huqiang.Core.HGUI
 {
-    public struct GUIElement
+    public struct HGUIElement
     {
         public int childCount;
         public int childOffset;

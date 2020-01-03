@@ -5,7 +5,7 @@ using System.Text;
 using UGUI;
 using UnityEngine;
 
-namespace Assets.Core.HGUI
+namespace huqiang.Core.HGUI
 {
     public class HText:HGraphics
     {
@@ -308,7 +308,7 @@ namespace Assets.Core.HGUI
         {
             if (_font == null)
                 Font = DefaultFont;
-            STexture = Resources.Load<Texture>("Emoji");
+            STexture = UnityEngine.Resources.Load<Texture>("Emoji");
         }
     }
 }

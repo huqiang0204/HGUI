@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Assets.Core.HGUI
+namespace huqiang.Core.HGUI
 {
     public class TextCollector
     {

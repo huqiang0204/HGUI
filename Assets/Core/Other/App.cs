@@ -21,10 +21,14 @@ namespace huqiang
             var page = new GameObject("page");
             UIPage.Root = page.transform;
             page.transform.SetParent(UIRoot);
+            UIPage.Root.localPosition = Vector3.zero;
+            UIPage.Root.localScale = Vector3.one;
+            UIPage.Root.localRotation = Quaternion.identity;
 
             var buff = new GameObject("buffer");
             buff.transform.SetParent(UIRoot);
             buff.SetActive(false);
+            buff.transform.localScale = Vector3.one;
             ModelManagerUI.CycleBuffer = buff.transform;
         }
         public static Transform UIRoot;

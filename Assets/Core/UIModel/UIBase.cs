@@ -50,6 +50,7 @@ public class UIBase
         Main.SetParent(Parent);
         Main.localPosition = Vector3.zero;
         Main.localScale = Vector3.one;
+        Main.localRotation = Quaternion.identity;
         return t;
     }
     public virtual void Initial(Transform parent, UIBase ui, object obj = null)

@@ -46,7 +46,7 @@ public class UIBase
     {
         model = HGUIManager.FindModel(asset, name);
         T t = new T();
-        Main = HGUIManager.GameBuffer.Clone(model).transform;
+        Main = HGUIManager.GameBuffer.Clone(model, t).transform;
         Main.SetParent(Parent);
         Main.localPosition = Vector3.zero;
         Main.localScale = Vector3.one;

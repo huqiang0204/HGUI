@@ -406,6 +406,13 @@ namespace huqiang.UI
     {
         public ModelElement Model;
         public virtual void Initial(ModelElement mod) { Model = mod; }
+        public FakeStruct BufferData;
+        public Transform Enity;
+        public virtual void Initial(FakeStruct mod,Transform trans)
+        {
+            BufferData = mod;
+            Enity = trans;
+        }
     }
     public class TypeContext
     {

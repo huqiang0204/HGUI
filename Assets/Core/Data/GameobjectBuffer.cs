@@ -1,8 +1,11 @@
-﻿using huqiang;
+﻿using Assets.Core.HGUI;
+using huqiang;
 using huqiang.Data;
 using huqiang.Pool;
+using huqiang.UI;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 
 namespace huqiang.Data
@@ -37,6 +40,35 @@ namespace huqiang.Data
     }
     public class GameobjectBuffer
     {
+        public class ReflectionModel
+        {
+            public string name;
+            public FieldInfo field;
+            public Type FieldType;
+            public object Value;
+        }
+        public class TempReflection
+        {
+            public int Top;
+            public ReflectionModel[] All;
+        }
+        public static TempReflection ObjectFelds(object obj)
+        {
+            var fs = obj.GetType().GetFields();
+            TempReflection temp = new TempReflection();
+            temp.Top = fs.Length;
+            ReflectionModel[] reflections = new ReflectionModel[temp.Top];
+            for (int i = 0; i < fs.Length; i++)
+            {
+                ReflectionModel r = new ReflectionModel();
+                r.field = fs[i];
+                r.FieldType = fs[i].FieldType;
+                r.name = fs[i].Name;
+                reflections[i] = r;
+            }
+            temp.All = reflections;
+            return temp;
+        }
         Transform CycleBuffer;
         public GameobjectBuffer(Transform buffer)
         {
@@ -239,6 +271,54 @@ namespace huqiang.Data
                     }
                 }
             return null;
+        }
+        TempReflection reflections;
+        public void Reflection(FakeStruct mod, Transform trans)
+        {
+            if (reflections == null)
+                return;
+            for (int i = 0; i < reflections.Top; i++)
+            {
+                var m = reflections.All[i];
+                if (m.name == trans.name)
+                {
+                    if (m.FieldType == typeof(AsyncScript))
+                        m.Value = trans;
+                    else if (typeof(UserEvent).IsAssignableFrom(m.FieldType))
+                    {
+                        var script = trans.GetComponent<AsyncScript>();
+                        script.RegEvent(m.FieldType);
+                        m.Value = script.userEvent;
+                    }
+                    else if (typeof(ModelInital).IsAssignableFrom(m.FieldType))
+                    {
+                        var obj = Activator.CreateInstance(m.FieldType) as ModelInital;
+                        obj.Initial(mod, trans);
+                        m.Value = obj;
+                    }
+                    else if (typeof(DataConversion).IsAssignableFrom(m.FieldType))
+                        m.Value = trans.GetComponent(m.FieldType.Name);
+                    reflections.Top--;
+                    var j = reflections.Top;
+                    var a = reflections.All[j];
+                    reflections.All[i] = a;
+                    reflections.All[j] = m;
+                    break;
+                }
+            }
+        }
+        public GameObject Clone(FakeStruct fake, object o)
+        {
+            if (fake == null)
+                return null;
+            reflections = ObjectFelds(o);
+            long id = fake.GetInt64(0);
+            var go = CreateNew(id);
+            types[0].loader.LoadToObject(fake, go.transform);
+            ReflectionModel[] all = reflections.All;
+            for (int i = 0; i < all.Length; i++)
+                all[i].field.SetValue(o, all[i].Value);
+            return go;
         }
     }
 }

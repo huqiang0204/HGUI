@@ -308,8 +308,8 @@ namespace huqiang.UI
                 {
                     if (m.FieldType == typeof(AsyncScript))
                         m.Value = mod;
-                    else if (typeof(UserEvent).IsAssignableFrom(m.FieldType))
-                        m.Value = UserEvent.RegEvent(mod.Context.GetComponent<AsyncScript>(),m.FieldType);
+                    //else if (typeof(UserEvent).IsAssignableFrom(m.FieldType))
+                    //    m.Value = UserEvent.RegEvent(mod.Context.GetComponent<AsyncScript>(),m.FieldType);
                     else if (typeof(ModelInital).IsAssignableFrom(m.FieldType))
                     {
                         var obj = Activator.CreateInstance(m.FieldType) as ModelInital;

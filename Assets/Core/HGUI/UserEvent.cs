@@ -7,20 +7,6 @@ namespace Assets.Core.HGUI
 {
     public class UserEvent
     {
-        public static T RegEvent<T>(AsyncScript element) where T : UserEvent, new()
-        {
-            var t = new T();
-            t.Context = element;
-            t.Initial();
-            return t;
-        }
-        public static object RegEvent(AsyncScript script, Type type)
-        {
-            UserEvent u = Activator.CreateInstance(type) as UserEvent;
-            u.Context = script;
-            u.Initial();
-            return u;
-        }
         public static long ClickTime = 1800000;
         public static float ClickArea = 400;
         internal static void DispatchEvent(UserAction action, GUIElement[] pipeLine)

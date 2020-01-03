@@ -11,7 +11,7 @@ namespace Assets.Scripts
     {
         class View
         {
-            public HImage img;
+            public UserEvent img;
             public HText t1;
         }
         View view;
@@ -19,7 +19,7 @@ namespace Assets.Scripts
         {
             base.Initial(parent, dat);
             view = LoadUI<View>("baseUI", "start");
-            Debug.Log("ok");
+            //view.img.Click = (o, e) => { Debug.Log("ok"); };
         }
     }
 }

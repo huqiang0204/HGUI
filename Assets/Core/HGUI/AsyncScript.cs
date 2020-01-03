@@ -34,6 +34,7 @@ namespace Assets.Core.HGUI
             var t = new T();
             t.Context = this;
             t.Initial();
+            userEvent = t;
             return t;
         }
         public object RegEvent(Type type)
@@ -41,6 +42,7 @@ namespace Assets.Core.HGUI
             UserEvent u = Activator.CreateInstance(type) as UserEvent;
             u.Context = this;
             u.Initial();
+            userEvent = u;
             return u;
         }
     }

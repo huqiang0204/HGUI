@@ -36,18 +36,23 @@ namespace huqiang.Core.HGUI
             MainTexture = buffer.GetData(src->MainTexture) as string;
             if (MainTexture != null)
                 tar.MainTexture = ElementAsset.FindTexture(asset, MainTexture);
+            else tar.MainTexture = null;
             STexture = buffer.GetData(src->STexture) as string;
             if (STexture != null)
                 tar.STexture = ElementAsset.FindTexture(asset, STexture);
+            else tar.STexture = null;
             TTexture = buffer.GetData(src->TTexture) as string;
             if (TTexture != null)
                 tar.TTexture = ElementAsset.FindTexture(asset, TTexture);
+            else TTexture = null;
             FTexture = buffer.GetData(src->FTexture) as string;
             if (FTexture != null)
                 tar.FTexture = ElementAsset.FindTexture(asset, FTexture);
+            else FTexture = null;
             shader = buffer.GetData(src->shader)as string ;
             if (shader != null)
                 tar.Material = new Material(Shader.Find(shader));
+            else tar.Material = null;
             tar.m_color = src->color;
         }
         protected unsafe void SaveHGraphics(FakeStruct fake, HGraphics src)

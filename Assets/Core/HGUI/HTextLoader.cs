@@ -49,6 +49,7 @@ namespace huqiang.Core.HGUI
             fontName = buffer.GetData(src->font)as string;
             if (fontName != null)
                 tar._font = FindFont(fontName);
+            else tar._font = null;
             tar.TextPivot = src->pivot;
             tar.m_hof = src->m_hof;
             tar.m_vof = src->m_vof;

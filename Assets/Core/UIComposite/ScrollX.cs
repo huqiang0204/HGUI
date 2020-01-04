@@ -1,4 +1,6 @@
-﻿using huqiang.UI;
+﻿using huqiang.Core.HGUI;
+using huqiang.Data;
+using huqiang.UI;
 using huqiang.UIEvent;
 using System;
 using System.Collections.Generic;
@@ -68,10 +70,11 @@ namespace huqiang.UIComposite
         public bool DynamicSize = true;
         Vector2 ctSize;
         float ctScale;
-        public override void Initial(ModelElement model)
+        public override void Initial(FakeStruct mod, Transform trans)
         {
-            base.Initial(model);
-            //eventCall = UserEvent.RegEvent<UserEvent>(model);
+            base.Initial(mod,trans);
+            model = trans.GetComponent<AsyncScript>();
+            eventCall = model.RegEvent<UserEvent>();
             eventCall.Drag = Draging;
             eventCall.DragEnd = (o, e, s) =>
             {
@@ -87,19 +90,11 @@ namespace huqiang.UIComposite
             eventCall.ScrollEndX = OnScrollEnd;
             eventCall.ForceEvent = true;
             eventCall.AutoColor = false;
-            //Size = Model.data.sizeDelta;
             eventCall.CutRect = true;
-            if (model != null)
-            {
-                var item = model.Find("Item");
-                if (item != null)
-                {
-                    item.activeSelf = false;
-                    ItemMod = item.ModData;
-                    ItemSize = item.data.sizeDelta;
-                }
-            }
+            Size = model.SizeDelta;
+            eventCall.CutRect = true;
             model.SizeChanged = (o) => {
+                Size = model.SizeDelta;
                 Refresh(m_point,0);
             };
         }

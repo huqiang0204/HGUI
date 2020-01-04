@@ -65,6 +65,7 @@ namespace huqiang.UIComposite
         public Vector2 ActualSize { get; protected set; }//相当于Content的尺寸
         public Vector2 ItemSize = new Vector2(1,1);
         FakeStruct modData;
+        public AsyncScript model;
         public FakeStruct ItemMod
         {
             set

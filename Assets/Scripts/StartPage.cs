@@ -14,6 +14,7 @@ namespace Assets.Scripts
         class View
         {
             public ScrollY scrolly;
+            public ScrollX scrollx;
         }
         View view;
         class ItemView
@@ -31,6 +32,9 @@ namespace Assets.Scripts
             view.scrolly.BindingData = data;
             view.scrolly.SetItemUpdate<ItemView, string>(ItemUpdate);
             view.scrolly.Refresh();
+            view.scrollx.BindingData = data;
+            view.scrollx.SetItemUpdate<ItemView, string>(ItemUpdate);
+            view.scrollx.Refresh();
         }
         void ItemUpdate(ItemView item,string dat,int index)
         {

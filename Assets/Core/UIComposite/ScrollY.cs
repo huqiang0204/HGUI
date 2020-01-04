@@ -53,7 +53,6 @@ namespace huqiang.UIComposite
         public bool DynamicSize = true;
         Vector2 ctSize;
         float ctScale;
-        public AsyncScript model;
         public override void Initial(FakeStruct mod, Transform trans)
         {
             base.Initial(mod,trans);
@@ -74,9 +73,12 @@ namespace huqiang.UIComposite
             eventCall.ScrollEndY = OnScrollEnd;
             eventCall.ForceEvent = true;
             eventCall.AutoColor = false;
-            Size = model.SizeDelta;
             eventCall.CutRect = true;
-            model.SizeChanged = (o) => { Refresh(0,m_point); };
+            Size = model.SizeDelta;
+            model.SizeChanged = (o) => {
+                Size = model.SizeDelta;
+                Refresh(0,m_point);
+            };
         }
         public Action<ScrollY, Vector2> Scroll;
         public Action<ScrollY> ScrollStart;

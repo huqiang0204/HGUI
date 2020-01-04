@@ -1,4 +1,5 @@
-﻿using huqiang.UI;
+﻿using huqiang.Core.HGUI;
+using huqiang.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -305,6 +306,55 @@ namespace huqiang.UIEvent
                 LastFocus = tmp;
             }
             //UserEvent.DispatchEvent(this, root);
+            if (IsLeftButtonDown | IsRightButtonDown | IsMiddleButtonDown)
+            {
+                for (int i = 0; i < LastFocus.Count; i++)
+                {
+                    var f = LastFocus[i];
+                    for (int j = 0; j < MultiFocus.Count; j++)
+                    {
+                        if (f == MultiFocus[j])
+                            goto label2;
+                    }
+                    if (!f.Pressed)
+                        f.OnLostFocus(this);
+                    label2:;
+                }
+            }
+            else if (IsLeftButtonUp | IsRightButtonUp | IsMiddleButtonUp)
+            {
+                for (int i = 0; i < MultiFocus.Count; i++)
+                {
+                    var f = MultiFocus[i];
+                    f.Pressed = false;
+                    f.OnDragEnd(this);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < MultiFocus.Count; i++)
+                    MultiFocus[i].OnFocusMove(this);
+            }
+            if (IsMouseWheel)
+            {
+                for (int i = 0; i < MultiFocus.Count; i++)
+                {
+                    var f = MultiFocus[i];
+                    f.OnMouseWheel(this);
+                }
+            }
+            CheckMouseLeave();
+        }
+        public void Dispatch(HGUIElement[] pipeLine)
+        {
+            if (IsLeftButtonDown | IsRightButtonDown | IsMiddleButtonDown)
+            {
+                List<UserEvent> tmp = MultiFocus;
+                LastFocus.Clear();
+                MultiFocus = LastFocus;
+                LastFocus = tmp;
+            }
+            UserEvent.DispatchEvent(this, pipeLine);
             if (IsLeftButtonDown | IsRightButtonDown | IsMiddleButtonDown)
             {
                 for (int i = 0; i < LastFocus.Count; i++)

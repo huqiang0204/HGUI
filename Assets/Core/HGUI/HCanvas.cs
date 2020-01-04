@@ -174,7 +174,7 @@ namespace huqiang.Core.HGUI
                     {
 #endif
                         if (inputs[i].IsActive)
-                            UserEvent.DispatchEvent(inputs[i], PipeLine);
+                            inputs[i].Dispatch(PipeLine);
 #if DEBUG
                     }
                     catch (Exception ex)

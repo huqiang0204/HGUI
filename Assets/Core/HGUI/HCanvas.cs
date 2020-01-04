@@ -92,9 +92,12 @@ namespace huqiang.Core.HGUI
                     mesh.uv2 = swapUV1;
                     mesh.uv3 = swapUV2;
                     mesh.colors = swapColors;
-                    mesh.subMeshCount = swapSubmesh.Length;
-                    for (int i = 0; i < swapSubmesh.Length; i++)
-                        mesh.SetTriangles(swapSubmesh[i], i);
+                    if(swapSubmesh!=null)
+                    {
+                        mesh.subMeshCount = swapSubmesh.Length;
+                        for (int i = 0; i < swapSubmesh.Length; i++)
+                            mesh.SetTriangles(swapSubmesh[i], i);
+                    }
                 }
             }
             if (renderer == null)

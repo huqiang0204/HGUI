@@ -25,6 +25,8 @@ namespace huqiang.Core.HGUI
         }
         static void Batch(HGUIElement[] pipeLine, int index, HCanvas canvas, Vector3 pos, Vector3 scale, Quaternion quate,Vector4 clip)
         {
+            if (!pipeLine[index].active)
+                return;
             HGUIElement root = pipeLine[index];
             Vector3 p = quate * pipeLine[index].localPosition;
             Vector3 o = Vector3.zero;

@@ -59,7 +59,7 @@ namespace huqiang.UIComposite
         /// 滚动公差值
         /// </summary>
         public static float Tolerance = 0.25f;
-        public ScrollType scrollType=ScrollType.BounceBack;
+        public ScrollType scrollType = ScrollType.BounceBack;
         public static readonly Vector2 Center = new Vector2(0.5f, 0.5f);
         public Vector2 Size;//scrollView的尺寸
         public Vector2 ActualSize { get; protected set; }//相当于Content的尺寸
@@ -328,14 +328,6 @@ namespace huqiang.UIComposite
             Recycler.Add(it);
             if (ItemRecycle != null)
                 ItemRecycle(it);
-        }
-        protected void RecycleItem(ScrollItem[] items)
-        {
-            Recycler.AddRange(items);
-            for (int i = 0; i < items.Length; i++)
-            {
-                items[i].target.gameObject.SetActive(false);
-            }
         }
         protected Vector2 ScrollNone(UserEvent eventCall,ref Vector2 v,ref float x,ref float y)
         {

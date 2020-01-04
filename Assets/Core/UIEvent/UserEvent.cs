@@ -15,7 +15,7 @@ namespace huqiang.UIEvent
             if (root.script != null)
             {
                  int c = root.childCount;
-                for (int i = c; i >= 0; i--)
+                for (int i = c+1; i >0; i--)
                 {
                     try
                     {
@@ -473,14 +473,13 @@ namespace huqiang.UIEvent
             if (FocusAction != null)
             {
                 Pressed = false;
-                //FocusAction.RemoveFocus(this);
+                FocusAction.RemoveFocus(this);
                 FocusAction = null;
             }
         }
         public void Dispose()
         {
             RemoveFocus();
-            //events.Remove(this);
         }
         internal void Update()
         {

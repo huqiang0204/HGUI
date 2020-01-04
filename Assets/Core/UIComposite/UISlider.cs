@@ -40,15 +40,15 @@ namespace huqiang.UIComposite
             {
                 if (info.direction == Direction.Horizontal)
                 {
-                    float w =Model.data.sizeDelta.x;
-                    Nob.data.sizeDelta.x = value * w;
-                    ApplyValue();
+                    //float w =Model.data.sizeDelta.x;
+                    //Nob.data.sizeDelta.x = value * w;
+                    //ApplyValue();
                 }
                 else
                 {
-                    float w = Model.data.sizeDelta.y;
-                    Nob.data.sizeDelta.y = value * w;
-                    ApplyValue();
+                    //float w = Model.data.sizeDelta.y;
+                    //Nob.data.sizeDelta.y = value * w;
+                    //ApplyValue();
                 }
             }
         }
@@ -69,7 +69,6 @@ namespace huqiang.UIComposite
         }
         public override void Initial(ModelElement mod)
         {
-            Model= mod;
             //callBack = UserEvent.RegEvent<UserEvent>(Model);
             callBack.Drag = callBack.DragEnd = Draging;
             callBack.PointerDown = PointDown;
@@ -109,7 +108,7 @@ namespace huqiang.UIComposite
         }
         void RatioToPos()
         {
-            var size = Model.data.sizeDelta;
+            var size = new Vector2(100, 100); //Model.data.sizeDelta;
             if (info.direction == Direction.Horizontal)
             {
                 float rx = size.x * 0.5f;
@@ -135,7 +134,7 @@ namespace huqiang.UIComposite
         {
             if (Nob == null)
                 return;
-            var size = Model.data.sizeDelta;
+            var size = new Vector2(100, 100); //Model.data.sizeDelta;
             if (info.direction==Direction.Horizontal)
             {
                 float rx = size.x * 0.5f;

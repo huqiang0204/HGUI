@@ -87,7 +87,7 @@ namespace huqiang.UIComposite
             eventCall.ScrollEndX = OnScrollEnd;
             eventCall.ForceEvent = true;
             eventCall.AutoColor = false;
-            Size = Model.data.sizeDelta;
+            //Size = Model.data.sizeDelta;
             eventCall.CutRect = true;
             if (model != null)
             {
@@ -121,7 +121,7 @@ namespace huqiang.UIComposite
         /// <param name="v">移动的实际像素位移</param>
         void Scrolling(UserEvent back, Vector2 v)
         {
-            if (Model == null)
+            if (Main == null)
                 return;
             Vector2 u = v;
             v.x /= eventCall.Context.transform.localScale.x;
@@ -216,7 +216,6 @@ namespace huqiang.UIComposite
         public override void Refresh(float x = 0, float y = 0)
         {
             m_point = x;
-            Size = Model.data.sizeDelta;
          
             ActualSize = Vector2.zero;
             if (DataLength == 0)
@@ -240,7 +239,6 @@ namespace huqiang.UIComposite
         /// <param name="_index"></param>
         public void ShowBxIndex(int _index)
         {
-            Size = Model.data.sizeDelta;
             ActualSize = Vector2.zero;
             if (DataLength == 0)
             {

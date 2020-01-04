@@ -483,6 +483,53 @@ namespace huqiang.UIEvent
             //events.Remove(this);
         }
         internal void Update()
-        { }
+        {
+            if (!forbid)
+                if (!Pressed)
+                    DuringSlide(this);
+        }
+        static void DuringSlide(UserEvent back)
+        {
+            if (back.mVelocity.x == 0 & back.mVelocity.y == 0)
+                return;
+            back.xTime += UserAction.TimeSlice;
+            back.yTime += UserAction.TimeSlice;
+            float x = 0, y = 0;
+            bool endx = false, endy = false;
+            if (back.mVelocity.x != 0)
+            {
+                float t = (float)MathH.PowDistance(back.DecayRateX, back.maxVelocity.x, back.xTime);
+                x = t - back.lastX;
+                back.lastX = t;
+                float vx = Mathf.Pow(back.DecayRateX, back.xTime) * back.maxVelocity.x;
+                if (vx < 0.001f & vx > -0.001f)
+                {
+                    back.mVelocity.x = 0;
+                    endx = true;
+                }
+                else back.mVelocity.x = vx;
+            }
+            if (back.mVelocity.y != 0)
+            {
+                float t = (float)MathH.PowDistance(back.DecayRateY, back.maxVelocity.y, back.yTime);
+                y = t - back.lastY;
+                back.lastY = t;
+                float vy = Mathf.Pow(back.DecayRateY, back.yTime) * back.maxVelocity.y;
+                if (vy < 0.001f & vy > -0.001f)
+                {
+                    back.mVelocity.y = 0;
+                    endy = true;
+                }
+                else back.mVelocity.y = vy;
+            }
+            if (back.Scrolling != null)
+                back.Scrolling(back, new Vector2(x, y));
+            if (endx)
+                if (back.ScrollEndX != null)
+                    back.ScrollEndX(back);
+            if (endy)
+                if (back.ScrollEndY != null)
+                    back.ScrollEndY(back);
+        }
     }
 }

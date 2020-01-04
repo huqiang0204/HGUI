@@ -1,4 +1,6 @@
-﻿using huqiang.UI;
+﻿using huqiang.Core.HGUI;
+using huqiang.Data;
+using huqiang.UI;
 using huqiang.UIEvent;
 using System;
 using System.Collections.Generic;
@@ -51,10 +53,12 @@ namespace huqiang.UIComposite
         public bool DynamicSize = true;
         Vector2 ctSize;
         float ctScale;
-        public override void Initial(ModelElement model)
+        public AsyncScript model;
+        public override void Initial(FakeStruct mod, Transform trans)
         {
-            base.Initial(model);
-            //eventCall = UserEvent.RegEvent<UserEvent>(model);
+            base.Initial(mod,trans);
+            model = trans.GetComponent<AsyncScript>();
+            eventCall = model.RegEvent<UserEvent>();
             eventCall.Drag = Draging;
             eventCall.DragEnd = (o, e, s) =>
             {
@@ -70,7 +74,7 @@ namespace huqiang.UIComposite
             eventCall.ScrollEndY = OnScrollEnd;
             eventCall.ForceEvent = true;
             eventCall.AutoColor = false;
-            Size = Model.data.sizeDelta;
+            Size = model.SizeDelta;
             eventCall.CutRect = true;
             model.SizeChanged = (o) => { Refresh(0,m_point); };
         }
@@ -89,7 +93,7 @@ namespace huqiang.UIComposite
         /// <param name="v">移动的实际像素位移</param>
         void Scrolling(UserEvent back, Vector2 v)
         {
-            if (Model == null)
+            if (Main == null)
                 return;
             Vector2 u = v;
             v.y /= eventCall.Context.transform.localScale.y;
@@ -184,7 +188,6 @@ namespace huqiang.UIComposite
         public override void Refresh(float x = 0, float y = 0)
         {
             m_point = y;
-            Size = Model.data.sizeDelta;
             ActualSize = Vector2.zero;
             if (DataLength == 0)
             {
@@ -207,7 +210,6 @@ namespace huqiang.UIComposite
         /// <param name="_index"></param>
         public void ShowByIndex(int _index)
         {
-            Size = Model.data.sizeDelta;
             ActualSize = Vector2.zero;
             if (DataLength == 0)
             {

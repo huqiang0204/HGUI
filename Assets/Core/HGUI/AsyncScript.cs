@@ -28,7 +28,10 @@ namespace huqiang.Core.HGUI
         public bool Mask;
         public UserEvent userEvent;
         internal int PipelineIndex;
-  
+        /// <summary>
+        /// 禁止自动创建子对象实例
+        /// </summary>
+        public bool ForbidAutoChild;
         public virtual Color Chromatically { get; set; }
         public T RegEvent<T>() where T : UserEvent, new()
         {
@@ -48,5 +51,6 @@ namespace huqiang.Core.HGUI
             u.g_color = Chromatically;
             return u;
         }
+        public Action<AsyncScript> SizeChanged;
     }
 }

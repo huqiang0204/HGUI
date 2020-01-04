@@ -33,7 +33,6 @@ namespace huqiang.UIComposite
         ModelElement ItemParent;
         public override void Initial(ModelElement model)
         {
-            Model = model;
             //eventCall = UserEvent.RegEvent<UserEvent>(model);
             eventCall.Drag = (o, e, s) => { Scrolling(o, s); };
             eventCall.DragEnd = (o, e, s) => { Scrolling(o, s); };
@@ -42,7 +41,7 @@ namespace huqiang.UIComposite
             eventCall.ForceEvent = true;
             eventCall.AutoColor = false;
             model.SizeChanged = (o) => { Refresh(0); };
-            Size = Model.data.sizeDelta;
+            //Size = Model.data.sizeDelta;
             eventCall.CutRect = true;
             ItemParent = ModelElement.CreateNew("Items");
             ItemParent.SetParent(model);
@@ -74,8 +73,8 @@ namespace huqiang.UIComposite
         }
         void Scrolling(UserEvent back, Vector2 v)
         {
-            if ( Model== null)
-                return;
+            //if (main== null)
+            //    return;
             v.y /= eventCall.Context.transform.localScale.y;
             back.VelocityX = 0;
             v.x = 0;
@@ -147,7 +146,6 @@ namespace huqiang.UIComposite
                 return;
             if (ItemSize.y == 0)
                 return;
-            Size = Model.data.sizeDelta;
             CalculSize();
             Order(true);
 
@@ -302,7 +300,6 @@ namespace huqiang.UIComposite
   
         public void SetSize(Vector2 size)
         {
-            Model.data.sizeDelta = size;
             Size = size;
         }
         public void Dispose()
@@ -329,7 +326,7 @@ namespace huqiang.UIComposite
             var m = new Middleware<ModelElement, object>();
             m.Update = action;
             m.hotfix = true;
-            m.reflect = reflect;
+            //m.reflect = reflect;
             TitleCreator = m;
         }
         public void SetTitleUpdate<T, U>(Action<T, U, int> action) where T : class, new()
@@ -349,7 +346,7 @@ namespace huqiang.UIComposite
             var m = new Middleware<ModelElement, object>();
             m.Update = action;
             m.hotfix = true;
-            m.reflect = reflect;
+            //m.reflect = reflect;
             ItemCreator = m;
         }
         public void SetItemUpdate<T, U>(Action<T, U, int> action) where T : class, new()
@@ -369,7 +366,7 @@ namespace huqiang.UIComposite
             var m = new Middleware<ModelElement, object>();
             m.Update = action;
             m.hotfix = true;
-            m.reflect = reflect;
+            //m.reflect = reflect;
             TailCreator = m;
         }
         public void SetTailUpdate<T, U>(Action<T, U, int> action) where T : class, new()
@@ -419,9 +416,9 @@ namespace huqiang.UIComposite
             {
                 if (con.hotfix)
                 {
-                    if (con.reflect != null)
-                        a.obj = con.reflect(me);
-                    else a.obj = me;
+                    //if (con.reflect != null)
+                    //    a.obj = con.reflect(me);
+                    //else a.obj = me;
                 }
                 else
                 {
@@ -445,7 +442,8 @@ namespace huqiang.UIComposite
         }
         ScrollItem CreateBody()
         {
-            return CreateItem(BodyRecycler, null, Body, Model);
+            //return CreateItem(BodyRecycler, null, Body, Model);
+            return null;
         }
         protected void PushItems(List<ScrollItem> tar, List<ScrollItem> src)
         {

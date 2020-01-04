@@ -1,4 +1,5 @@
-﻿using huqiang.Data;
+﻿using huqiang.Core.HGUI;
+using huqiang.Data;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,6 +12,8 @@ namespace huqiang.Data
         public Vector3 localEulerAngles;
         public Vector3 localPosition;
         public Vector3 localScale;
+        public Vector2 size;
+        public Vector2 pivot;
         public Int32 name;
         public Int32 tag;
         /// <summary>
@@ -72,7 +75,7 @@ namespace huqiang.Data
             trans.gameObject.layer = transfrom->layer;
             gameobjectBuffer.Reflection(fake, trans);
         }
-        public override unsafe FakeStruct LoadFromObject(Component com,DataBuffer buffer)
+        public unsafe override FakeStruct LoadFromObject(Component com,DataBuffer buffer)
         {
             var trans =  com as Transform;
             if (trans == null)
@@ -101,6 +104,12 @@ namespace huqiang.Data
                     }
                     else tmp.Add(0);
                     tmp.Add((Int16)type);
+                    var scr = coms[i] as AsyncScript;
+                    if (scr != null)
+                    {
+                        td->size = scr.SizeDelta;
+                        td->pivot = scr.Pivot;
+                    }
                 }
             }
             td->coms = buffer.AddData(tmp.ToArray());

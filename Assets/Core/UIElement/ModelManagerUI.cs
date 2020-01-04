@@ -404,8 +404,8 @@ namespace huqiang.UI
     }
     public abstract class ModelInital
     {
-        public ModelElement Model;
-        public virtual void Initial(ModelElement mod) { Model = mod; }
+        //public ModelElement Model;
+        public virtual void Initial(ModelElement mod) { }
         public FakeStruct BufferData;
         public Transform Enity;
         public virtual void Initial(FakeStruct mod,Transform trans)

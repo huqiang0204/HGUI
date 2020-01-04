@@ -1,4 +1,5 @@
-﻿using huqiang.Data;
+﻿using huqiang.Core.HGUI;
+using huqiang.Data;
 using huqiang.UI;
 using huqiang.UIEvent;
 using System;
@@ -27,7 +28,7 @@ namespace huqiang.UIComposite
         public bool hotfix;
         public bool create;
         public Action<object, object, int> Update;
-        public Func<ModelElement, object> reflect;
+        public Func<Transform, object> reflect;
     }
     public class Middleware<T, U> : Constructor where T : class, new()
     {
@@ -86,7 +87,7 @@ namespace huqiang.UIComposite
             }
             get { return modData; }
         }
-        public ModelElement[] ItemMods;
+        public FakeStruct[] ItemMods;
         IList dataList;
         Array array;
         FakeArray fakeStruct;
@@ -163,21 +164,17 @@ namespace huqiang.UIComposite
         /// 当某个ui超出Mask边界，被回收时调用
         /// </summary>
         public Action<ScrollItem> ItemRecycle;
-        public override void Initial(ModelElement model)
+        public Transform Main;
+        public override  void Initial(FakeStruct mod, Transform trans)
         {
-            Model = model;
-            var child = model.child;
-            int c = child.Count;
-            if(c>0)
+            Main = trans;
+            int c = trans.childCount;
+            if (c > 0)
             {
-                ItemMods = child.ToArray();
-                child.Clear();
-                for (int i = 0; i < ItemMods.Length; i++)
-                {
-                    ItemMods[i].activeSelf = false;
-                }
-                ItemMod = ItemMods[0].ModData;
-                ItemSize = ItemMods[0].data.sizeDelta;
+                ItemMods = HGUIManager.GetAllChild(mod);
+                ItemMod = ItemMods[0];
+                HGUIManager.GameBuffer.RecycleChild(trans.gameObject);
+                unsafe { ItemSize = ((TransfromData*)ItemMods[0].ip)->size; }
             }
         }
         public void SetMod(int index)
@@ -188,8 +185,8 @@ namespace huqiang.UIComposite
                 index = 0;
             if (index >= ItemMods.Length)
                 index = ItemMods.Length - 1;
-            ItemMod = ItemMods[index].ModData;
-            ItemSize = ItemMods[index].data.sizeDelta;
+            ItemMod = ItemMods[index];
+            unsafe { ItemSize = ((TransfromData*)ItemMods[index].ip)->size; }
         }
         public virtual void Refresh(float x = 0, float y = 0)
         {
@@ -210,29 +207,24 @@ namespace huqiang.UIComposite
                 Recycler.RemoveAt(0);
                 return it;
             }
-            ModelElement me = new ModelElement();
-            me.Load(modData);
-            me.data.sizeDelta = ItemSize;
-            me.SetParent(Model);
             ScrollItem a = new ScrollItem();
-            a.target = me;
             if (creator != null)
             {
                 if (creator.hotfix)
                 {
+                    var go = HGUIManager.GameBuffer.Clone(ItemMod);
                     if (creator.reflect != null)
-                        a.obj = creator.reflect(me);
-                    else a.obj = me;
+                        a.obj = creator.reflect(go.transform);
+                    else a.obj = go;
                 }
                 else if (creator.create)
                 {
                     a.obj = creator.Create();
-                    ModelManagerUI.ComponentReflection(me, a.obj);
+                    HGUIManager.GameBuffer.Clone(ItemMod,a.obj);
                 }
-                else a.obj = me;
+                else a.obj = HGUIManager.GameBuffer.Clone(ItemMod);
             }
-            else a.obj = me;
-            me.IsChanged = true;
+            else a.obj = HGUIManager.GameBuffer.Clone(ItemMod);
             return a;
         }
         Constructor creator;
@@ -249,30 +241,21 @@ namespace huqiang.UIComposite
         /// </summary>
         /// <param name="action"></param>
         /// <param name="reflect"></param>
-        public void SetItemUpdate(Action<object,object, int> action,Func<ModelElement,object> reflect)
+        public void SetItemUpdate(Action<object,object, int> action,Func<Transform,object> reflect)
         {
             Clear();
-            var m = new Middleware<ModelElement,object>();
-            m.Update = action;
-            m.hotfix = true;
-            m.reflect = reflect;
-            creator = m;
+            //var m = new Middleware<ModelElement,object>();
+            //m.Update = action;
+            //m.hotfix = true;
+            //m.reflect = reflect;
+            //creator = m;
         }
         public virtual void Order(float os, bool force = false)
         {
         }
         public void Clear()
         {
-            for (int i = 0; i < Items.Count; i++)
-            {
-                var g = Items[i];
-                ModelManagerUI.RecycleElement(g.target);
-            }
-            for (int i = 0; i < Recycler.Count; i++)
-            {
-                var g = Recycler[i];
-                ModelManagerUI.RecycleElement(g.target);
-            }
+            HGUIManager.GameBuffer.RecycleChild(Main.gameObject);
             Items.Clear();
             Recycler.Clear();
         }

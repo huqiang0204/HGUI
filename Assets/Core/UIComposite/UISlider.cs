@@ -24,7 +24,7 @@ namespace huqiang.UIComposite
         {
             Horizontal, Vertical
         }
-        public AsyncScript main;
+        public AsyncScript Main;
         public HImage FillImage;
         public HImage Nob;
         public SliderInfo info;
@@ -70,8 +70,8 @@ namespace huqiang.UIComposite
         }
         public override void Initial(FakeStruct mod, Transform trans)
         {
-            var main = trans.GetComponent<AsyncScript>();
-            callBack = main.RegEvent<UserEvent>();
+            Main = trans.GetComponent<AsyncScript>();
+            callBack = Main.RegEvent<UserEvent>();
             callBack.Drag = callBack.DragEnd = Draging;
             callBack.PointerDown = PointDown;
             callBack.AutoColor = false;
@@ -83,7 +83,8 @@ namespace huqiang.UIComposite
             unsafe
             {
                 var ex = mod.buffer.GetData(((TransfromData*)mod.ip)->Extand) as FakeStruct;
-                info = *(SliderInfo*)ex.ip;
+                if (ex != null)
+                    info = *(SliderInfo*)ex.ip;
             }
         }
         void Draging(UserEvent back, UserAction action, Vector2 v)
@@ -105,7 +106,7 @@ namespace huqiang.UIComposite
         }
         void RatioToPos()
         {
-            var size = new Vector2(100, 100); //Model.data.sizeDelta;
+            var size = Main.SizeDelta;
             if (info.direction == Direction.Horizontal)
             {
                 float rx = size.x * 0.5f;
@@ -131,7 +132,7 @@ namespace huqiang.UIComposite
         {
             if (Nob == null)
                 return;
-            var size = new Vector2(100, 100); //Model.data.sizeDelta;
+            var size = Main.SizeDelta;
             if (info.direction==Direction.Horizontal)
             {
                 float rx = size.x * 0.5f;

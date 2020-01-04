@@ -37,6 +37,7 @@ namespace huqiang.UIEvent
                 for (int i = 0; i < c; i++)
                     vert[i] = info.selectVertex[i].position;
                 m_Caret.tris = info.selectTri.ToArray();
+                m_Caret.m_vertexChange = true;
                 time = 0;
                 m_Caret.gameObject.SetActive(true);
             }

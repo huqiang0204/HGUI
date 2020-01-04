@@ -30,7 +30,7 @@ namespace Assets.Scripts
             view = LoadUI<View>("baseUI", "start");
             List<string> data = new List<string>();
             for (int i = 1000; i < 1200; i++)
-                data.Add(i.ToString());
+                data.Add(i.ToString()+"😄");
             view.scrolly.BindingData = data;
             view.scrolly.SetItemUpdate<ItemView, string>(ItemUpdate);
             view.scrolly.Refresh();

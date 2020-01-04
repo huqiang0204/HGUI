@@ -106,9 +106,9 @@ namespace huqiang.Core.HGUI
                             }
                         }
                         canvas.uv.AddRange(graphics.uv);
-                        int tid = 0;
                         if (graphics.tris != null)
                         {
+                            int tid = 0;
                             var src = graphics.tris;
                             if (src.Length > 0)
                             {
@@ -119,6 +119,7 @@ namespace huqiang.Core.HGUI
                                 }
                                 canvas.MatCollector.CombinationMaterial(graphics, tmp, ref tid, ref clip);
                             }
+                            AddUV1(canvas,tid,vert.Length);
                         }
                         else if (graphics.subTris != null)
                         {
@@ -139,28 +140,17 @@ namespace huqiang.Core.HGUI
                                     buf[i] = tmp;
                                 }
                                 canvas.MatCollector.CombinationMaterial(graphics, buf, ids, ref clip);
+                                AddUV1(canvas,ids,vert.Length,graphics.uvOffset);
+                            }
+                            else
+                            {
+                                AddUV1(canvas, 0, vert.Length);
                             }
                         }
-                        Vector2[] uv1 = new Vector2[vert.Length];
-                        switch (tid)
+                        else
                         {
-                            case 1:
-                                for (int i = 0; i < uv1.Length; i++)
-                                    uv1[i].y = 1;
-                                break;
-                            case 2:
-                                for (int i = 0; i < uv1.Length; i++)
-                                    uv1[i].x = 1;
-                                break;
-                            case 3:
-                                for (int i = 0; i < uv1.Length; i++)
-                                {
-                                    uv1[i].x = 1;
-                                    uv1[i].y = 1;
-                                }
-                                break;
+                            AddUV1(canvas, 0, vert.Length);
                         }
-                        canvas.uv1.AddRange(uv1);
                     }
                 }
             }
@@ -173,6 +163,59 @@ namespace huqiang.Core.HGUI
                 Batch(pipeLine, os, canvas, o, s, q, clip);
                 os++;
             }
+        }
+        static void AddUV1(HCanvas canvas, int tid, int vertCount)
+        {
+            Vector2[] uv1 = new Vector2[vertCount];
+            switch (tid)
+            {
+                case 1:
+                    for (int i = 0; i < uv1.Length; i++)
+                        uv1[i].y = 1;
+                    break;
+                case 2:
+                    for (int i = 0; i < uv1.Length; i++)
+                        uv1[i].x = 1;
+                    break;
+                case 3:
+                    for (int i = 0; i < uv1.Length; i++)
+                    {
+                        uv1[i].x = 1;
+                        uv1[i].y = 1;
+                    }
+                    break;
+            }
+            canvas.uv1.AddRange(uv1);
+        }
+        static Vector2[] UV1 = new Vector2[4];
+        static void AddUV1(HCanvas canvas, int[] ids, int vertCount, int[] offset)
+        {
+            Vector2[] uv1 = new Vector2[vertCount];
+            for (int i = 0; i < ids.Length; i++)
+            {
+                switch (ids[i])
+                {
+                    case 0:
+                        UV1[i].x = 0;
+                        UV1[i].y = 0;
+                        break;
+                    case 1:
+                        UV1[i].x = 0;
+                        UV1[i].y = 1;
+                        break;
+                    case 2:
+                        UV1[i].x = 1;
+                        UV1[i].y = 0;
+                        break;
+                    case 3:
+                        UV1[i].x = 1;
+                        UV1[i].y = 1;
+                        break;
+                }
+            }
+            for (int i = 0; i < vertCount; i++)
+                uv1[i] = UV1[offset[i]];
+            canvas.uv1.AddRange(uv1);
         }
         static Vector4 CutRect(Vector4 v0,Vector4 v1)
         {

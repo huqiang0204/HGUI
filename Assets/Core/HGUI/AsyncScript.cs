@@ -10,6 +10,17 @@ namespace huqiang.Core.HGUI
     public class AsyncScript:MonoBehaviour
     {
         protected static ThreadMission thread = new ThreadMission("async");
+
+        public Vector2 SizeDelta = new Vector2(100, 100);
+        public Vector2 Pivot = new Vector2(0.5f, 0.5f);
+        public Vector2 DesignSize;
+        public ScaleType scaleType;
+        public AnchorType anchorType;
+        public AnchorPointType anchorPointType;
+        public Vector2 anchorOffset;
+        public MarginType marginType;
+        public ParentType parentType;
+        public Margin margin;
         public virtual void MainUpdate()
         {
         }
@@ -20,12 +31,7 @@ namespace huqiang.Core.HGUI
         public virtual void ReSize()
         {
         }
-        public Vector2 SizeDelta = new Vector2(100,100);
-        public Vector2 Pivot = new Vector2(0.5f, 0.5f);
-        internal ScaleType scaleType;
-        internal AnchorType sizeType;
-        internal AnchorPointType anchorType;
-        internal Margin margin;
+
         public bool Mask;
         public UserEvent userEvent;
         internal int PipelineIndex;

@@ -12,9 +12,13 @@ namespace huqiang.Core.HGUI
     {
         public Vector2 SizeDelta;
         public Vector2 Pivot;
+        public Vector2 DesignSize;
         public ScaleType scaleType;
-        public AnchorType sizeType;
-        public AnchorPointType anchorType;
+        public AnchorType anchorType;
+        public AnchorPointType anchorPointType;
+        public Vector2 anchorOffset;
+        public MarginType marginType;
+        public ParentType parentType;
         public Margin margin;
         public bool Mask;
         public static int Size = sizeof(AsyncScriptData);
@@ -27,9 +31,13 @@ namespace huqiang.Core.HGUI
             var src = (AsyncScriptData*)ip;
             tar.SizeDelta = src->SizeDelta;
             tar.Pivot = src->Pivot;
+            tar.DesignSize = src->DesignSize;
             tar.scaleType = src->scaleType;
-            tar.sizeType = src->sizeType;
             tar.anchorType = src->anchorType;
+            tar.anchorPointType = src->anchorPointType;
+            tar.anchorOffset = src->anchorOffset;
+            tar.marginType = src->marginType;
+            tar.parentType = src->parentType;
             tar.margin = src->margin;
             tar.Mask = src->Mask;
         }
@@ -38,9 +46,13 @@ namespace huqiang.Core.HGUI
             AsyncScriptData* tar = (AsyncScriptData*)ip;
             tar->SizeDelta = src.SizeDelta;
             tar->Pivot = src.Pivot;
+            tar->DesignSize = src.DesignSize;
             tar->scaleType = src.scaleType;
-            tar->sizeType = src.sizeType;
             tar->anchorType = src.anchorType;
+            tar->anchorPointType = src.anchorPointType;
+            tar->anchorOffset = src.anchorOffset;
+            tar->marginType = src.marginType;
+            tar->parentType = src.parentType;
             tar->margin = src.margin;
             tar->Mask = src.Mask;
         }

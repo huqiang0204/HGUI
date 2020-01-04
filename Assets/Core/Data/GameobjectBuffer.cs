@@ -288,7 +288,7 @@ namespace huqiang.Data
                     else if (typeof(UserEvent).IsAssignableFrom(m.FieldType))
                     {
                         var script = trans.GetComponent<AsyncScript>();
-                        script.RegEvent(m.FieldType);
+                        script.RegEvent(m.FieldType,mod);
                         m.Value = script.userEvent;
                     }
                     else if (typeof(ModelInital).IsAssignableFrom(m.FieldType))

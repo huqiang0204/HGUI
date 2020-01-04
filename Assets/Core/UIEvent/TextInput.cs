@@ -1,4 +1,5 @@
-﻿using huqiang.Data;
+﻿using huqiang.Core.HGUI;
+using huqiang.Data;
 using huqiang.UI;
 using System;
 using System.Text;
@@ -84,12 +85,12 @@ namespace huqiang.UIEvent
         {
             if (textInfo.text == ""|textInfo.text==null)
             {
-                TextCom.color = TipColor;
+                TextCom.Chromatically = TipColor;
                 TextCom.Text = m_TipString;
             }
             else
             {
-                TextCom.color = textColor;
+                TextCom.Chromatically = textColor;
                 TextCom.Text = textInfo.ShowString.FullString;
             }
         }
@@ -214,28 +215,28 @@ namespace huqiang.UIEvent
             Click = OnClick;
             LostFocus = OnLostFocus;
         }
-        internal override void Initial()
+        internal override void Initial(FakeStruct mod)
         {
-            var txt = TextCom = Context.GetComponent<TextElement>();
+            var txt = TextCom = Context as HText;
             InputString = txt.Text;
-            textColor = txt.data.color;
-            var fake = txt.model.GetExtand() as FakeStruct;
-            if(fake!=null)
+            textColor = txt.m_color;
+            unsafe
             {
-                unsafe
+                var ex = mod.buffer.GetData(((TransfromData*)mod.ip)->Extand) as FakeStruct;
+                if (ex != null)
                 {
-                    TextInputData* tp = (TextInputData*)fake.ip;
+                    TextInputData* tp = (TextInputData*)ex.ip;
                     textColor = tp->inputColor;
                     m_tipColor = tp->tipColor;
-                    InputString =fake.buffer.GetData(tp->inputString)as string;
-                    TipString = fake.buffer.GetData(tp->tipString)as string;
+                    InputString = mod.buffer.GetData(tp->inputString) as string;
+                    TipString = mod.buffer.GetData(tp->tipString) as string;
                     PointColor = tp->pointColor;
                     SelectionColor = tp->selectColor;
                 }
             }
             AutoColor = false;
         }
-        public TextElement TextCom { get; private set; }
+        public HText TextCom { get; private set; }
         public override void OnMouseDown(UserAction action)
         {
             overTime = 0;
@@ -268,7 +269,7 @@ namespace huqiang.UIEvent
                     }else if(!entry)
                     {
                         float oy = action.CanPosition.y - GlobalPosition.y;
-                        float py = GlobalScale.y * TextCom.model.data.sizeDelta.y * 0.5f;
+                        float py = GlobalScale.y * TextCom.SizeDelta.y * 0.5f;
                         if (oy > 0)
                             oy -= py;
                         else oy += py;
@@ -631,14 +632,14 @@ namespace huqiang.UIEvent
             textChanged = true;
             selectChanged = true;
         }
-        void Update()
+        internal override void Update()
         {
             var te = TextCom;
-            if (te.Context != null)
+            if (te != null)
             {
                 if(textChanged)
                 {
-                    textInfo.fontSize = TextCom.data.fontSize;
+                    textInfo.fontSize = TextCom.m_fontSize;
                     textChanged = false;
                     GetPreferredHeight(TextCom,textInfo);
                     textInfo.StartLine += textInfo.LineChange;
@@ -664,12 +665,11 @@ namespace huqiang.UIEvent
                 {
                     lineChanged = false;
                     FilterPopulate(TextCom, textInfo);
-                    TextCom.Text =
-                    TextCom.Context.text = textInfo.ShowString.FullString;
+                    TextCom.Text = textInfo.ShowString.FullString;
                 }
                 if(selectChanged)
                 {
-                    textInfo.fontSize = TextCom.data.fontSize;
+                    textInfo.fontSize = TextCom.m_fontSize;
                     textInfo.caretColor = PointColor;
                     textInfo.areaColor = SelectionColor;
                     selectChanged = false;

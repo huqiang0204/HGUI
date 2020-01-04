@@ -58,13 +58,7 @@ namespace huqiang
                     if (m == null)
                     {
                         subFree = true;
-                        try
-                        {
-                            are.WaitOne(1);
-                        }catch(Exception ex)
-                        {
-                            Debug.Log(ex.StackTrace);
-                        }
+                        are.WaitOne(1);
                     }
                     else
                     {
@@ -72,7 +66,8 @@ namespace huqiang
                         try
                         {
                             m.action(m.data);
-                        }catch (Exception ex)
+                        }
+                        catch (Exception ex)
                         {
 #if DEBUG
                             Debug.LogError(ex.StackTrace);

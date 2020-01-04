@@ -1,5 +1,6 @@
 ﻿using huqiang;
 using huqiang.Core.HGUI;
+using huqiang.Data;
 using System;
 using UnityEngine;
 
@@ -465,7 +466,7 @@ namespace huqiang.UIEvent
             if (MouseWheel != null)
                 MouseWheel(this, action);
         }
-        internal virtual void Initial()
+        internal virtual void Initial(FakeStruct mod)
         {
         }
         public void RemoveFocus()
@@ -481,7 +482,7 @@ namespace huqiang.UIEvent
         {
             RemoveFocus();
         }
-        internal void Update()
+        internal virtual void Update()
         {
             if (!forbid)
                 if (!Pressed)

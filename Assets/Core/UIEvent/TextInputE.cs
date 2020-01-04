@@ -1,4 +1,5 @@
-﻿using huqiang.UI;
+﻿using huqiang.Core.HGUI;
+using huqiang.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -584,7 +585,7 @@ namespace huqiang.UIEvent
             info.CaretStyle = 1;
             return true;
         }
-        static void GetPreferredHeight(TextElement text,TextInfo info)
+        static void GetPreferredHeight(HText text,TextInfo info)
         {
             string str = info.buffer.FilterString;
             TextGenerationSettings settings = new TextGenerationSettings();
@@ -593,11 +594,13 @@ namespace huqiang.UIEvent
             settings.scaleFactor = 1;
             settings.textAnchor = TextAnchor.UpperLeft;
             settings.color = Color.white;
-            settings.generationExtents = new Vector2(text.model.data.sizeDelta.x, 0);
+            settings.generationExtents = new Vector2(text.SizeDelta.x, 0);
             settings.pivot = new Vector2(0.5f, 0.5f);
             settings.richText = true;
-            settings.font = text.Context.font;
-            settings.fontSize = text.data.fontSize;
+            settings.font = text.Font;
+            if (settings.font == null)
+                settings.font = HText.DefaultFont;
+            settings.fontSize = text.m_fontSize;
             settings.fontStyle = FontStyle.Normal;
             settings.alignByGeometry = false;
             settings.updateBounds = false;
@@ -616,11 +619,11 @@ namespace huqiang.UIEvent
             info.LineChange = lc - info.LineCount;
             info.LineCount = lc;
         }
-        static void FilterPopulate(TextElement txt,TextInfo info)
+        static void FilterPopulate(HText txt,TextInfo info)
         {
             if (info.StartLine < 0)
                 info.StartLine = 0;
-            Vector2 size = txt.model.data.sizeDelta;
+            Vector2 size = txt.SizeDelta;
     
             var lines = info.fullLines;
             int max = lines.Length - 1;
@@ -654,9 +657,9 @@ namespace huqiang.UIEvent
             info.EndIndex = endIndex;
             info.ShowString.FullString = info.buffer.SubString(startIndex,endIndex-startIndex);
 
-            var text = txt.Context;
-            var settings = text.GetGenerationSettings(size);
-            var generator = text.cachedTextGenerator;
+            var settings =new TextGenerationSettings() ;
+            txt.GetGenerationSettings(ref size,ref settings);
+            var generator = HText.Generator;
             generator.Populate(info.ShowString.FilterString, settings);
             info.filterVertex = generator.verts.ToArray();
             info.filterLines = generator.lines.ToArray();
@@ -738,7 +741,7 @@ namespace huqiang.UIEvent
                 }
             }
         }
-        static void FilterChoiceArea(TextElement txt,TextInfo info)
+        static void FilterChoiceArea(HText txt,TextInfo info)
         {
             int len = info.ShowString.FilterString.Length;
             int start =info.startSelect - info.StartIndex;

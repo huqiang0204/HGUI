@@ -1,4 +1,5 @@
 ﻿using huqiang;
+using huqiang.Data;
 using huqiang.UIEvent;
 using System;
 using System.Collections.Generic;
@@ -33,16 +34,16 @@ namespace huqiang.Core.HGUI
         {
             var t = new T();
             t.Context = this;
-            t.Initial();
+            t.Initial(null);
             userEvent = t;
             t.g_color = Chromatically;
             return t;
         }
-        public object RegEvent(Type type)
+        public object RegEvent(Type type,FakeStruct fake)
         {
             UserEvent u = Activator.CreateInstance(type) as UserEvent;
             u.Context = this;
-            u.Initial();
+            u.Initial(fake);
             userEvent = u;
             u.g_color = Chromatically;
             return u;

@@ -26,7 +26,7 @@ namespace huqiang.Core.HGUI
             }
         }
         static TextGenerator shareGenerator;
-        static TextGenerator Generator { get {
+        public static TextGenerator Generator { get {
                 if (shareGenerator == null)
                     shareGenerator = new TextGenerator();
                 return shareGenerator;
@@ -133,27 +133,31 @@ namespace huqiang.Core.HGUI
             } }
 
         static TextGenerationSettings settings;
-        public void Populate()
+        public void GetGenerationSettings(ref Vector2 size, ref TextGenerationSettings sett)
         {
             var font = Font;
             emojiString.FullString = m_text;
-            settings.font = font;
-            settings.pivot = TextPivot;
-            settings.generationExtents = SizeDelta;
-            settings.horizontalOverflow = m_hof;
-            settings.verticalOverflow = m_vof;
-            settings.resizeTextMaxSize = resizeTextMaxSize;
-            settings.resizeTextMinSize = resizeTextMinSize;
-            settings.generateOutOfBounds = generateOutOfBounds;
-            settings.resizeTextForBestFit = m_resizeBestFit;
-            settings.textAnchor = anchor;
-            settings.fontStyle = m_fontStyle;
-            settings.scaleFactor = scaleFactor;
-            settings.richText = m_richText;
-            settings.lineSpacing = m_lineSpace;
-            settings.fontSize = m_fontSize;
-            settings.color = m_color;
-            settings.alignByGeometry = m_align;
+            sett.font = font;
+            sett.pivot = TextPivot;
+            sett.generationExtents = size;
+            sett.horizontalOverflow = m_hof;
+            sett.verticalOverflow = m_vof;
+            sett.resizeTextMaxSize = resizeTextMaxSize;
+            sett.resizeTextMinSize = resizeTextMinSize;
+            sett.generateOutOfBounds = generateOutOfBounds;
+            sett.resizeTextForBestFit = m_resizeBestFit;
+            sett.textAnchor = anchor;
+            sett.fontStyle = m_fontStyle;
+            sett.scaleFactor = scaleFactor;
+            sett.richText = m_richText;
+            sett.lineSpacing = m_lineSpace;
+            sett.fontSize = m_fontSize;
+            sett.color = m_color;
+            sett.alignByGeometry = m_align;
+        }
+        public void Populate()
+        {
+            GetGenerationSettings(ref SizeDelta,ref settings);
             var g = Generator;
             g.Populate(emojiString.FilterString, settings);
             verts = g.verts.ToArray();

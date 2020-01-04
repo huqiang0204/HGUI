@@ -148,21 +148,21 @@ namespace huqiang.UIComposite
             for(int i=0;i<items.Count;i++)
             {
                 var mod = items[i].target;
-                float h = mod.data.sizeDelta.y;
-                float y = mod.data.localPosition.y;
-                float angle = y / h * 15f;
-                mod.data.localRotation = Quaternion.Euler(angle, 0, 0);
+                //float h = mod.data.sizeDelta.y;
+                //float y = mod.data.localPosition.y;
+                //float angle = y / h * 15f;
+                //mod.data.localRotation = Quaternion.Euler(angle, 0, 0);
 
-                var v = MathH.Tan2(90 - angle);
-                mod.data.localPosition.y = v.y * 100;
-                mod.IsChanged = true;
-                var txt = (items[i].obj as ItemView).Item;
-                var col = txt.color;
-                angle /= 45;
-                if (angle < 0)
-                    angle = -angle;
-                col.a = 1 - angle;
-                txt.color = col;
+                //var v = MathH.Tan2(90 - angle);
+                //mod.data.localPosition.y = v.y * 100;
+                //mod.IsChanged = true;
+                //var txt = (items[i].obj as ItemView).Item;
+                //var col = txt.color;
+                //angle /= 45;
+                //if (angle < 0)
+                //    angle = -angle;
+                //col.a = 1 - angle;
+                //txt.color = col;
             }
         }
         void YearScrollToEnd(ScrollY scroll)

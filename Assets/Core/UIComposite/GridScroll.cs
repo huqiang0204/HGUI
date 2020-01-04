@@ -203,8 +203,7 @@ namespace huqiang.UIComposite
             x -= Size.x * 0.5f;
             y = Position.y - y;
             y += Size.y * 0.5f;
-            item.target.data.localPosition = new Vector3(x, y, 0);
-            item.target.IsChanged = true;
+            item.target.localPosition = new Vector3(x, y, 0);
         }
         /// <summary>
         /// 刷新到指定位置

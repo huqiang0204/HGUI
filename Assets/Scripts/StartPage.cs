@@ -1,4 +1,5 @@
 ﻿using huqiang.Core.HGUI;
+using huqiang.UIComposite;
 using huqiang.UIEvent;
 using System;
 using System.Collections.Generic;
@@ -12,14 +13,28 @@ namespace Assets.Scripts
     {
         class View
         {
+            public ScrollY scrolly;
+        }
+        View view;
+        class ItemView
+        {
             public UserEvent img;
             public HText t1;
         }
-        View view;
         public override void Initial(Transform parent, object dat = null)
         {
             base.Initial(parent, dat);
             view = LoadUI<View>("baseUI", "start");
+            List<string> data = new List<string>();
+            for (int i = 1000; i < 1200; i++)
+                data.Add(i.ToString());
+            view.scrolly.BindingData = data;
+            view.scrolly.SetItemUpdate<ItemView, string>(ItemUpdate);
+            view.scrolly.Refresh();
+        }
+        void ItemUpdate(ItemView item,string dat,int index)
+        {
+            item.t1.Text = dat;
         }
     }
 }

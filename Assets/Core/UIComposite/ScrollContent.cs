@@ -71,19 +71,7 @@ namespace huqiang.UIComposite
             {
                 modData = value;
                 var c = Items.Count;
-                if (c > 0)
-                {
-                    for (int i = 0; i < Items.Count; i++)
-                        ModelManagerUI.RecycleElement(Items[i].target);
-                    Items.Clear();
-                }
-                c = Recycler.Count;
-                if(c>0)
-                {
-                    for (int i = 0; i < Recycler.Count; i++)
-                        ModelManagerUI.RecycleElement(Recycler[i].target);
-                    Recycler.Clear();
-                }
+                Clear();
             }
             get { return modData; }
         }
@@ -202,7 +190,7 @@ namespace huqiang.UIComposite
             if (Recycler.Count> 0)
             {
                 var it = Recycler[0];
-                it.target.activeSelf = true;
+                it.target.gameObject.SetActive(true);
                 it.index = -1;
                 Recycler.RemoveAt(0);
                 return it;
@@ -262,7 +250,7 @@ namespace huqiang.UIComposite
         protected void PushItems()
         {
             for (int i = 0; i < Items.Count; i++)
-                Items[i].target.activeSelf = false;
+                Items[i].target.gameObject.SetActive(false);
             Buffer.AddRange(Items);
             Items.Clear();
         }
@@ -274,7 +262,7 @@ namespace huqiang.UIComposite
                 if(t.index==index)
                 {
                     Buffer.RemoveAt(i);
-                    t.target.activeSelf = true;
+                    t.target.gameObject.SetActive(true);
                     return t;
                 }
             }
@@ -317,13 +305,13 @@ namespace huqiang.UIComposite
         protected void RecycleRemain()
         {
             for (int i = 0; i < Buffer.Count; i++)
-               Buffer[i].target.activeSelf = false;
+                Buffer[i].target.gameObject.SetActive(false);
             Recycler.AddRange(Buffer);
             Buffer.Clear();
         }
         protected void RecycleItem(ScrollItem it)
         {
-            it.target.activeSelf = false;
+            it.target.gameObject.SetActive(false);
             Recycler.Add(it);
             if (ItemRecycle != null)
                 ItemRecycle(it);
@@ -333,7 +321,7 @@ namespace huqiang.UIComposite
             Recycler.AddRange(items);
             for (int i = 0; i < items.Length; i++)
             {
-                items[i].target.activeSelf = false;
+                items[i].target.gameObject.SetActive(false);
             }
         }
         protected Vector2 ScrollNone(UserEvent eventCall,ref Vector2 v,ref float x,ref float y)

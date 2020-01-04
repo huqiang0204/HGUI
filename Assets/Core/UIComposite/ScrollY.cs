@@ -193,7 +193,7 @@ namespace huqiang.UIComposite
             {
                 for (int i = 0; i < Items.Count; i++)
                 {
-                    Items[i].target.activeSelf = false;
+                    Items[i].target.gameObject.SetActive(false);
                 }
                 return;
             }
@@ -214,7 +214,7 @@ namespace huqiang.UIComposite
             if (DataLength == 0)
             {
                 for (int i = 0; i < Items.Count; i++)
-                    Items[i].target.activeSelf = false;
+                    Items[i].target.gameObject.SetActive(false);
                 return;
             }
             if (ItemMod == null)
@@ -283,8 +283,8 @@ namespace huqiang.UIComposite
             dy = ss - dy;
             float ox = (index%Column) * ctSize.x + ctSize.x * 0.5f + ItemOffset.x - Size.x * 0.5f;
             var a = PopItem(index);
-            a.target.data.localPosition = new Vector3(ox, dy, 0);
-            a.target.data.localScale = new Vector3(ctScale,ctScale,ctScale);
+            a.target.localPosition = new Vector3(ox, dy, 0);
+            a.target.localScale = new Vector3(ctScale,ctScale,ctScale);
             Items.Add(a);
             if (a.index < 0 | force)
             {
@@ -302,7 +302,7 @@ namespace huqiang.UIComposite
             ScrollItem item = items[0];
             for (int i = 1; i < items.Count; i++)
             {
-                float y = items[i].target.data.localPosition.y;
+                float y = items[i].target.localPosition.y;
                 if (y < 0)
                     y = -y;
                 if (y < min)

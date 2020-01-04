@@ -229,8 +229,8 @@ namespace huqiang.UIComposite
                 u = true;
             }
             Titles.Add(t);
-            t.target.data.localPosition = new Vector3(TitleOffset.x,  Size.y*0.5f -os- TitleOffset.y - TitleSize.y*0.5f, 0);
-            t.target.activeSelf = true;
+            t.target.localPosition = new Vector3(TitleOffset.x,  Size.y*0.5f -os- TitleOffset.y - TitleSize.y*0.5f, 0);
+            t.target.gameObject.SetActive(true);
             if(force|u)
             ItemUpdate(t.obj,dat,index,TitleCreator);
         }
@@ -250,12 +250,12 @@ namespace huqiang.UIComposite
                 t.index = index;
             }
             Bodys.Add(t);
-            t.target.data.localPosition.y =  Size.y * 0.5f - os - h * 0.5f;
-            t.target.data.sizeDelta.y = h;
-            t.target.activeSelf = true;
-            if (dat.Data != null)
-                for (int i = 0; i < dat.Data.Count; i++)
-                    OrderItem(os, dat.Data[i], i, force, t.target);
+            //t.target.localPosition.y =  Size.y * 0.5f - os - h * 0.5f;
+            //t.target.sizeDelta.y = h;
+            t.target.gameObject.SetActive(true);
+            //if (dat.Data != null)
+            //    for (int i = 0; i < dat.Data.Count; i++)
+            //        OrderItem(os, dat.Data[i], i, force, t.target);
         }
         void OrderItem(float os, object dat, int index, bool force,ModelElement parent)
         {
@@ -274,9 +274,9 @@ namespace huqiang.UIComposite
             }
             Items.Add(t);
             float h = parent.data.sizeDelta.y*0.5f;
-            t.target.data.localPosition = new Vector3(ItemOffset.x,  h - oy + ItemOffset.y - ItemSize.y * 0.5f, 0);
-            t.target.activeSelf = true;
-            t.target.SetParent(parent);
+            t.target.localPosition = new Vector3(ItemOffset.x,  h - oy + ItemOffset.y - ItemSize.y * 0.5f, 0);
+            t.target.gameObject.SetActive(true);
+            //t.target.SetParent(parent);
             ItemUpdate(t.obj, dat, index, ItemCreator);
         }
         void OrderTail(float os, DataTemplate dat, int index, bool force)
@@ -292,8 +292,8 @@ namespace huqiang.UIComposite
                 u = true;
             }
             Tails.Add(t);
-            t.target.data.localPosition = new Vector3(TailOffset.x, Size.y * 0.5f - os - TailOffset.y - TitleSize.y * 0.5f, 0);
-            t.target.activeSelf = true;
+            t.target.localPosition = new Vector3(TailOffset.x, Size.y * 0.5f - os - TailOffset.y - TitleSize.y * 0.5f, 0);
+            t.target.gameObject.SetActive(true);
             if (force | u)
                 ItemUpdate(t.obj, dat, index, TailCreator);
         }
@@ -304,12 +304,13 @@ namespace huqiang.UIComposite
         }
         public void Dispose()
         {
-            for (int i = 0; i < Titles.Count; i++)
-                ModelManagerUI.RecycleElement(Titles[i].target);
-            for (int i = 0; i < Items.Count; i++)
-                ModelManagerUI.RecycleElement(Items[i].target);
-            for (int i = 0; i < Tails.Count; i++)
-                ModelManagerUI.RecycleElement(Tails[i].target);
+            //for (int i = 0; i < Titles.Count; i++)
+            //    ModelManagerUI.RecycleElement(Titles[i].target);
+            //for (int i = 0; i < Items.Count; i++)
+            //    ModelManagerUI.RecycleElement(Items[i].target);
+            //for (int i = 0; i < Tails.Count; i++)
+            //    ModelManagerUI.RecycleElement(Tails[i].target);
+            
             Titles.Clear();
             Items.Clear();
             Tails.Clear();
@@ -320,63 +321,63 @@ namespace huqiang.UIComposite
         Constructor TailCreator;
         public void SetTitleUpdate(Action<object, object, int> action, Func<ModelElement, object> reflect)
         {
-            for (int i = 0; i < Titles.Count; i++)
-                ModelManagerUI.RecycleElement(Titles[i].target);
-            Titles.Clear();
-            var m = new Middleware<ModelElement, object>();
-            m.Update = action;
-            m.hotfix = true;
-            //m.reflect = reflect;
-            TitleCreator = m;
+            //for (int i = 0; i < Titles.Count; i++)
+            //    ModelManagerUI.RecycleElement(Titles[i].target);
+            //Titles.Clear();
+            //var m = new Middleware<ModelElement, object>();
+            //m.Update = action;
+            //m.hotfix = true;
+            ////m.reflect = reflect;
+            //TitleCreator = m;
         }
         public void SetTitleUpdate<T, U>(Action<T, U, int> action) where T : class, new()
         {
-            for (int i = 0; i < Titles.Count; i++)
-                ModelManagerUI.RecycleElement(Titles[i].target);
-            Titles.Clear();
-            var m = new Middleware<T, U>();
-            m.Invoke = action;
-            TitleCreator = m;
+            //for (int i = 0; i < Titles.Count; i++)
+            //    ModelManagerUI.RecycleElement(Titles[i].target);
+            //Titles.Clear();
+            //var m = new Middleware<T, U>();
+            //m.Invoke = action;
+            //TitleCreator = m;
         }
         public void SetItemUpdate(Action<object, object, int> action, Func<ModelElement, object> reflect)
         {
-            for (int i = 0; i < Items.Count; i++)
-                ModelManagerUI.RecycleElement(Items[i].target);
-            Items.Clear();
-            var m = new Middleware<ModelElement, object>();
-            m.Update = action;
-            m.hotfix = true;
-            //m.reflect = reflect;
-            ItemCreator = m;
+            //for (int i = 0; i < Items.Count; i++)
+            //    ModelManagerUI.RecycleElement(Items[i].target);
+            //Items.Clear();
+            //var m = new Middleware<ModelElement, object>();
+            //m.Update = action;
+            //m.hotfix = true;
+            ////m.reflect = reflect;
+            //ItemCreator = m;
         }
         public void SetItemUpdate<T, U>(Action<T, U, int> action) where T : class, new()
         {
-            for (int i = 0; i < Items.Count; i++)
-                ModelManagerUI.RecycleElement(Items[i].target);
-            Items.Clear();
-            var m = new Middleware<T, U>();
-            m.Invoke = action;
-            ItemCreator = m;
+            //for (int i = 0; i < Items.Count; i++)
+            //    ModelManagerUI.RecycleElement(Items[i].target);
+            //Items.Clear();
+            //var m = new Middleware<T, U>();
+            //m.Invoke = action;
+            //ItemCreator = m;
         }
         public void SetTailUpdate(Action<object, object, int> action, Func<ModelElement, object> reflect)
         {
-            for (int i = 0; i < Items.Count; i++)
-                ModelManagerUI.RecycleElement(Items[i].target);
-            Tails.Clear();
-            var m = new Middleware<ModelElement, object>();
-            m.Update = action;
-            m.hotfix = true;
-            //m.reflect = reflect;
-            TailCreator = m;
+            //for (int i = 0; i < Items.Count; i++)
+            //    ModelManagerUI.RecycleElement(Items[i].target);
+            //Tails.Clear();
+            //var m = new Middleware<ModelElement, object>();
+            //m.Update = action;
+            //m.hotfix = true;
+            ////m.reflect = reflect;
+            //TailCreator = m;
         }
         public void SetTailUpdate<T, U>(Action<T, U, int> action) where T : class, new()
         {
-            for (int i = 0; i < Tails.Count; i++)
-                ModelManagerUI.RecycleElement(Tails[i].target);
-            Tails.Clear();
-            var m = new Middleware<T, U>();
-            m.Invoke = action;
-            TailCreator = m;
+            //for (int i = 0; i < Tails.Count; i++)
+            //    ModelManagerUI.RecycleElement(Tails[i].target);
+            //Tails.Clear();
+            //var m = new Middleware<T, U>();
+            //m.Invoke = action;
+            //TailCreator = m;
         }
         protected void ItemUpdate(object obj, object dat, int index,Constructor con)
         {
@@ -398,7 +399,7 @@ namespace huqiang.UIComposite
             if (buffer.Count > 0)
             {
                 var it = buffer[0];
-                it.target.activeSelf = true;
+                it.target.gameObject.SetActive(true);
                 it.index = -1;
                 buffer.RemoveAt(0);
                 return it;
@@ -407,7 +408,7 @@ namespace huqiang.UIComposite
             me.Load(mod.ModData);
             me.SetParent(parent);
             ScrollItem a = new ScrollItem();
-            a.target = me;
+            //a.target = me;
             if(con==null)
             {
                 a.obj = me;
@@ -448,7 +449,7 @@ namespace huqiang.UIComposite
         protected void PushItems(List<ScrollItem> tar, List<ScrollItem> src)
         {
             for (int i = 0; i < src.Count; i++)
-                src[i].target.activeSelf = false;
+                src[i].target.gameObject.SetActive(false);
             tar.AddRange(src);
             src.Clear();
         }
@@ -474,7 +475,7 @@ namespace huqiang.UIComposite
                 if (t.index == index)
                 {
                     tar.RemoveAt(i);
-                    t.target.activeSelf = true;
+                    t.target.gameObject.SetActive(true);
                     return t;
                 }
             }

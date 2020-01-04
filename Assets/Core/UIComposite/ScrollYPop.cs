@@ -85,7 +85,7 @@ namespace huqiang.UIComposite
             if (DataLength == 0)
             {
                 for (int i = 0; i < Items.Count; i++)
-                    Items[i].target.activeSelf = false;
+                    Items[i].target.gameObject.SetActive(false);
 #if DEBUG
                 Debug.Log("没有绑定的数据");
 #endif
@@ -158,8 +158,7 @@ namespace huqiang.UIComposite
             int c = index % Items.Count;
             var a = Items[c];
             var dat = GetData(index);
-            a.target.data.localPosition = new Vector3(ox, os, 0);
-            a.target.activeSelf = true;
+            a.target.localPosition = new Vector3(ox, os, 0);
             if (force | a.index != index)
             {
                 ItemUpdate(a.obj, dat, index);

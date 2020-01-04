@@ -90,7 +90,12 @@ namespace huqiang.Core.HGUI
             }
             m_vertexChange = true;
         }
-        public SpriteType SprType { get; set; }
+        [SerializeField]
+        internal SpriteType m_spriteType;
+        public SpriteType SprType { get => m_spriteType; set {
+                m_spriteType = value;
+                m_vertexChange = true;
+            } }
         internal FillMethod m_fillMethod;
         public FillMethod FillMethod { get => m_fillMethod;
             set {

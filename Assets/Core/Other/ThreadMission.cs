@@ -58,7 +58,13 @@ namespace huqiang
                     if (m == null)
                     {
                         subFree = true;
-                        are.WaitOne(1);
+                        try
+                        {
+                            are.WaitOne(1);
+                        }catch(Exception ex)
+                        {
+                            Debug.Log(ex.StackTrace);
+                        }
                     }
                     else
                     {
@@ -97,7 +103,7 @@ namespace huqiang
                 catch (Exception ex)
                 {
 #if DEBUG
-                    Debug.Log(ex.StackTrace);
+                    Debug.LogError(ex.StackTrace);
 #endif
                 }
             }

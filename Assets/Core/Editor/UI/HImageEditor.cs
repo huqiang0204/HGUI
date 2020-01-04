@@ -63,7 +63,6 @@ public class HImageEditor:AsyncScriptEditor
                 sprite = img.Sprite;
                 img.Sprite = sprite;
             }
-            img.SprType = (SpriteType)EditorGUILayout.EnumPopup("SpriteType",img.SprType);
             if(img.SprType==SpriteType.Filled)
             {
                 var ori = img.FillMethod;

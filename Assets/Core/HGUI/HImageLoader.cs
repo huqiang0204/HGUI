@@ -8,6 +8,7 @@ namespace huqiang.Core.HGUI
     {
         public HGraphicsData graphicsData;
         public Int32 Sprite;
+        public SpriteType spriteType;
         public float fillAmount;
         public bool fillCenter;
         public bool fillClockwise;
@@ -27,6 +28,7 @@ namespace huqiang.Core.HGUI
             if (Sprite != null)
                 tar.Sprite = ElementAsset.FindSprite(asset, MainTexture, Sprite);
             else tar.Sprite = null;
+            tar.m_spriteType = src->spriteType;
             tar.m_fillAmount = src->fillAmount;
             tar.m_fillCenter = src->fillCenter;
             tar.m_fillClockwise = src->fillClockwise;
@@ -37,6 +39,7 @@ namespace huqiang.Core.HGUI
         protected unsafe void SaveHImage(FakeStruct fake, HImage src)
         {
             HImageData* tar = (HImageData*)fake.ip;
+            tar->spriteType = src.m_spriteType;
             tar->fillAmount = src.m_fillAmount;
             tar->fillCenter = src.m_fillCenter;
             tar->fillClockwise = src.m_fillClockwise;

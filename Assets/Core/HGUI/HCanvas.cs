@@ -67,7 +67,9 @@ namespace huqiang.Core.HGUI
         {
             ApplyMesh();
             UserAction.Update();
+            Keyboard.DispatchEvent();
             DispatchUserAction();
+            TextInput.Dispatch();
             MainMission();
         }
         MeshFilter meshFilter;

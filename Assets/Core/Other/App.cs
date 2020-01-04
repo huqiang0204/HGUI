@@ -52,7 +52,6 @@ namespace huqiang
             InputCaret.UpdateCaret();
             Keyboard.DispatchEvent();
             RenderForm.ApplyAll();
-            TextInput.MainDispath();
             ThreadMission.ExtcuteMain();
             ModelManagerUI.RecycleGameObject();
             AnimationManage.Manage.Update();
@@ -63,7 +62,7 @@ namespace huqiang
         static void SubThread(object obj)
         {
             RenderForm.DispatchAction();
-            TextInput.SubDispatch();
+            TextInput.Dispatch();
             Resize();
             UIPage.Refresh(UserAction.TimeSlice);
             UINotify.Refresh(UserAction.TimeSlice);

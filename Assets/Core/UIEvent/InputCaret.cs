@@ -1,29 +1,28 @@
-﻿using UGUI;
+﻿using huqiang.Core.HGUI;
+using UGUI;
 using UnityEngine;
 
 namespace huqiang.UIEvent
 {
     public class InputCaret
     {
-        static CustomRawImage m_Caret;
-        public static CustomRawImage Caret
+        static HImage m_Caret;
+        public static HImage Caret
         {
             get
             {
                 if (m_Caret == null)
                 {
-                    var g = new GameObject("m_caret",typeof(CustomRawImage));
-                    m_Caret = g.GetComponent<CustomRawImage>();
+                    var g = new GameObject("m_caret",typeof(HImage));
+                    m_Caret = g.GetComponent<HImage>();
                     m_Caret.transform.SetParent(App.UIRoot);
-                    m_Caret.rectTransform.sizeDelta = Vector2.zero;
-                    m_Caret.material = new Material(Shader.Find("UI/Default"));
+                    m_Caret.SizeDelta = Vector2.zero;
                 }
                 else if (m_Caret.name == "buff")
                 {
-                    var g = new GameObject("m_caret", typeof(CustomRawImage));
-                    m_Caret = g.GetComponent<CustomRawImage>();
-                    m_Caret.rectTransform.sizeDelta = Vector2.zero;
-                    m_Caret.material = new Material(Shader.Find("UI/Default"));
+                    var g = new GameObject("m_caret", typeof(HImage));
+                    m_Caret = g.GetComponent<HImage>();
+                    m_Caret.SizeDelta = Vector2.zero;
                 }
                 return m_Caret;
             }
@@ -33,9 +32,11 @@ namespace huqiang.UIEvent
         {
             if (m_Caret != null)
             {
-                m_Caret.uIVertices = info.selectVertex;
-                m_Caret.triangle = info.selectTri;
-                m_Caret.Refresh();
+                int c = info.selectVertex.Count;
+                Vector3[] vert = new Vector3[c];
+                for (int i = 0; i < c; i++)
+                    vert[i] = info.selectVertex[i].position;
+                m_Caret.tris = info.selectTri.ToArray();
                 time = 0;
                 m_Caret.gameObject.SetActive(true);
             }
@@ -69,7 +70,7 @@ namespace huqiang.UIEvent
                     break;
             }
         }
-        public static void SetParent(RectTransform rect)
+        public static void SetParent(Transform rect)
         {
             var t = Caret.transform;
             t.SetParent(rect);

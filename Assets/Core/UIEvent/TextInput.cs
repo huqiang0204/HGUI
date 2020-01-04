@@ -355,12 +355,10 @@ namespace huqiang.UIEvent
             textInfo.endSelect = -1;
             textInfo.CaretStyle = 1;
             selectChanged = true;
-            ThreadMission.InvokeToMain((o) => {
-                bool pass = InputEvent.contentType == ContentType.Password ? true : false;
-                Keyboard.OnInput(textInfo.text, InputEvent.touchType, InputEvent.multiLine, pass, CharacterLimit);
-                //InputCaret.SetParent(Context.Context);
-                InputCaret.ChangeCaret(textInfo);
-            }, null);
+            bool pass = InputEvent.contentType == ContentType.Password ? true : false;
+            Keyboard.OnInput(textInfo.text, InputEvent.touchType, InputEvent.multiLine, pass, CharacterLimit);
+            InputCaret.SetParent(Context.transform);
+            InputCaret.ChangeCaret(textInfo);
         }
         void OnLostFocus(UserEvent eventCall, UserAction action)
         {

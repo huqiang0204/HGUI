@@ -194,7 +194,7 @@ namespace huqiang.UIEvent
             }
             return EditState.Continue;
         }
-        internal static void SubDispatch()
+        internal static void Dispatch()
         {
             if (InputEvent != null)
             {
@@ -232,14 +232,6 @@ namespace huqiang.UIEvent
                     if (InputEvent.LineChanged != null)
                         InputEvent.LineChanged(InputEvent);
                 }
-            }
-        }
-        internal static void MainDispath()
-        {
-            var input = InputEvent;
-            if(input!=null)
-            {
-                input.Update();
             }
         }
         public static bool GetIndexPoint(TextInfo info, int index, ref Vector3 point)

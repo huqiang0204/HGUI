@@ -17,6 +17,7 @@ public class HCanvasEditor:AsyncScriptEditor
     {
         if (canvas == null)
             return;
+
         canvas.Refresh();
     }
 }

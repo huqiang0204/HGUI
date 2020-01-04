@@ -378,6 +378,8 @@ namespace huqiang.Core.HGUI
                 }
             }
             for (int i = 0; i < max; i++)
+                Resize(scripts[i],false);
+            for (int i = 0; i < max; i++)
                 scripts[i].MainUpdate();
             TxtCollector.GenerateTexture();
             if (scripts != null)

@@ -153,7 +153,7 @@ namespace huqiang.Core.HGUI
             float px = rect.localPosition.x;
             rect.localPosition = new Vector3(px, oy, 0);
         }
-        public static void Resize(AsyncScript script)
+        public static void Resize(AsyncScript script,bool child =true)
         {
             Transform rect = script.transform;
             Vector3 loclpos = rect.localPosition;
@@ -161,11 +161,15 @@ namespace huqiang.Core.HGUI
             var pp = Anchors[0];
             if (script.parentType == ParentType.Tranfrom)
             {
-                var t = rect.parent.GetComponent<AsyncScript>();
-                if (t != null)
+                var p = rect.parent;
+                if(p!=null)
                 {
-                    psize = t.SizeDelta;
-                    pp = t.Pivot;
+                    var t = p.GetComponent<AsyncScript>();
+                    if (t != null)
+                    {
+                        psize = t.SizeDelta;
+                        pp = t.Pivot;
+                    }
                 }
             }
             else
@@ -232,12 +236,13 @@ namespace huqiang.Core.HGUI
                 case MarginType.MarginRatioY:
                     break;
             }
-            for (int i = 0; i < rect.childCount; i++)
-            {
-                var ss = rect.GetChild(i).GetComponent<AsyncScript>();
-                if (ss != null)
-                    Resize(ss);
-            }
+            if (child)
+                for (int i = 0; i < rect.childCount; i++)
+                {
+                    var ss = rect.GetChild(i).GetComponent<AsyncScript>();
+                    if (ss != null)
+                        Resize(ss,child);
+                }
             script.ReSized();
         }
         #endregion

@@ -91,6 +91,11 @@ namespace huqiang.Core.HGUI
                     texIds[3] = 0;
             }
         }
+        public override void ReSized()
+        {
+            base.ReSized();
+            m_vertexChange = true;
+        }
         public virtual void UpdateMesh()
         {
         }

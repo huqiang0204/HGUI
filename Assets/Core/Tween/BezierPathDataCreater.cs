@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class BezierPathDataCreater : MonoBehaviour
 {
-    public string name = "Bezier";
+    public string filename = "Bezier";
     public FakeStruct CreateData(DataBuffer db)
     {
         if (db == null)
@@ -21,7 +21,7 @@ public class BezierPathDataCreater : MonoBehaviour
                 paths.Add(path);
         }
         var fake = new FakeStruct(db,2);
-        fake[0] = db.AddData(name);
+        fake[0] = db.AddData(filename);
         FakeStructArray array = new FakeStructArray(db,2,paths.Count);
         for(int i=0;i<paths.Count;i++)
         {

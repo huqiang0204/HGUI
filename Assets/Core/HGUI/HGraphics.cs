@@ -19,7 +19,6 @@ namespace huqiang.Core.HGUI
         public override Color Chromatically { get => m_color; set { m_color = value; } }
         internal Vector3[] vertex;
         internal Vector2[] uv;
-        internal Vector2[] uv2;
         internal Color[] Colors;
 
         internal int[] uvOffset;
@@ -92,10 +91,6 @@ namespace huqiang.Core.HGUI
                     texIds[3] = 0;
             }
         }
-        internal int MainTexID;
-        internal int STexID;
-        internal int TTexID;
-        internal int FTexID;
         public virtual void UpdateMesh()
         {
         }

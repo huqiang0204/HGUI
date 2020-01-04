@@ -133,7 +133,7 @@ namespace huqiang
                 else soc.SendTo(dat, point);
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }

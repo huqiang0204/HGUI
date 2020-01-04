@@ -19,7 +19,7 @@ public class BezierPathDataCreaterEditor:Editor
             var fake = be.CreateData(null);
             fake.buffer.fakeStruct = fake;
             var dat = fake.buffer.ToBytes();
-            string path = Application.dataPath + "/AssetsBundle/"+be.name+".bytes";
+            string path = Application.dataPath + "/AssetsBundle/"+be.filename+".bytes";
             File.WriteAllBytes(path, dat);
             Debug.Log("create done : " + path);
         }

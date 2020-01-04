@@ -32,7 +32,6 @@ namespace huqiang
         }
         public static Transform UIRoot;
         static ThreadMission mission;
-        static ModelElement root;
         public static void Initial(Transform uiRoot)
         {
             ThreadMission.SetMianId();
@@ -100,13 +99,11 @@ namespace huqiang
         }
         public static void Hide()
         {
-            root.activeSelf = false;
-            root.Context.gameObject.SetActive(false);
+            
         }
         public static void Show()
         {
-            root.activeSelf = true;
-            root.Context.gameObject.SetActive(true);
+            
         }
     }
 }

@@ -79,7 +79,7 @@ namespace huqiang
             client.Close();
 #endif
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {
                         }
                         Connect();
@@ -160,7 +160,7 @@ namespace huqiang
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //if (ConnectFaild != null)
                 //    ConnectFaild(ex.StackTrace);
@@ -174,7 +174,7 @@ namespace huqiang
                 try
                 {
                    obj = SelfAnalytical(data, tag);
-                }catch(Exception ex)
+                }catch(Exception)
                 {
                 }
             }
@@ -275,7 +275,7 @@ namespace huqiang
                 }
                 else client.Send(data);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 reConnect = true;
                 return false;

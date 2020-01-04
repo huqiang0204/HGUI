@@ -130,8 +130,9 @@ namespace huqiang
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
+
             }
         }
         public virtual void Dispatch( byte[] dat, byte tag)

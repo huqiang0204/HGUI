@@ -9,7 +9,6 @@ namespace huqiang
     public class KcpLink:NetworkLink
     {
         internal KcpListener kcp;
-        public Int64 id;
         public string uniId;
 
         public KcpEnvelope envelope = new KcpEnvelope();

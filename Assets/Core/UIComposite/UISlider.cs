@@ -1,4 +1,5 @@
-﻿using huqiang.Data;
+﻿using huqiang.Core.HGUI;
+using huqiang.Data;
 using huqiang.UI;
 using huqiang.UIEvent;
 using System;
@@ -23,9 +24,9 @@ namespace huqiang.UIComposite
         {
             Horizontal, Vertical
         }
-        public ModelElement FillImage;
-        ImageElement image;
-        public ModelElement Nob;
+        public AsyncScript main;
+        public HImage FillImage;
+        public HImage Nob;
         public SliderInfo info;
         float ratio;
         UserEvent callBack;
@@ -67,26 +68,22 @@ namespace huqiang.UIComposite
             info.MinScale = 1;
             info.MaxScale = 1;
         }
-        public override void Initial(ModelElement mod)
+        public override void Initial(FakeStruct mod, Transform trans)
         {
-            //callBack = UserEvent.RegEvent<UserEvent>(Model);
+            var main = trans.GetComponent<AsyncScript>();
+            callBack = main.RegEvent<UserEvent>();
             callBack.Drag = callBack.DragEnd = Draging;
             callBack.PointerDown = PointDown;
             callBack.AutoColor = false;
-            var child = mod.child;
-            FillImage = mod.Find("FillImage");
-            if (FillImage != null)
+            var tmp = trans.Find("Fill");
+            if (tmp != null)
+                FillImage = tmp.GetComponent<HImage>();
+            tmp = trans.Find("Nob");
+            Nob = tmp.GetComponent<HImage>();
+            unsafe
             {
-                image = FillImage.GetComponent<ImageElement>();
-            }
-            Nob = mod.Find("Nob");
-            var fake= mod.GetExtand() as FakeStruct;
-            if(fake!=null)
-            {
-                unsafe
-                {
-                    info = *(SliderInfo*)fake.ip;
-                }
+                var ex = mod.buffer.GetData(((TransfromData*)mod.ip)->Extand) as FakeStruct;
+                info = *(SliderInfo*)ex.ip;
             }
         }
         void Draging(UserEvent back, UserAction action, Vector2 v)
@@ -113,7 +110,7 @@ namespace huqiang.UIComposite
             {
                 float rx = size.x * 0.5f;
                 float lx = -rx;
-                float nx = Nob.data.sizeDelta.x * 0.5f;
+                float nx = Nob.SizeDelta.x * 0.5f;
                 Vector2 start = new Vector2(lx + info.StartOffset.x + nx, info.StartOffset.y);
                 Vector2 end = new Vector2(rx - info.EndOffset.x - nx, info.EndOffset.y);
                 float w = end.x - start.x;
@@ -123,7 +120,7 @@ namespace huqiang.UIComposite
             {
                 float ty = size.y * 0.5f;
                 float dy = -ty;
-                float ny = Nob.data.sizeDelta.y * 0.5f;
+                float ny = Nob.SizeDelta.y * 0.5f;
                 Vector2 start = new Vector2(info.StartOffset.x, dy + info.StartOffset.y + ny);
                 Vector2 end = new Vector2(info.EndOffset.x, ty - info.EndOffset.y - ny);
                 float w = end.y - start.y;
@@ -139,7 +136,7 @@ namespace huqiang.UIComposite
             {
                 float rx = size.x * 0.5f;
                 float lx = -rx;
-                float nx = Nob.data.sizeDelta.x * 0.5f;
+                float nx = Nob.SizeDelta.x * 0.5f;
                 Vector2 start = new Vector2(lx + info.StartOffset.x+nx, info.StartOffset.y);
                 Vector2 end = new Vector2(rx - info.EndOffset.x-nx, info.EndOffset.y);
                 if (pos.x < start.x)
@@ -151,19 +148,17 @@ namespace huqiang.UIComposite
                 pos = (end - start) * ratio + start;
                 if(Nob!=null)
                 {
-                    Nob.data.localPosition = pos;
+                    var trans = Nob.transform;
+                    trans.localPosition = pos;
                     float s = (info.MaxScale - info.MinScale) * ratio + info.MinScale;
-                    Nob.data.localScale.x = s;
-                    Nob.data.localScale.y = s;
-                    Nob.data.localScale.z = s;
-                    Nob.IsChanged = true;
+                    trans.localScale = new Vector3(s, s, s);
                 }
             }
             else
             {
                 float ty = size.y * 0.5f;
                 float dy = -ty;
-                float ny = Nob.data.sizeDelta.y * 0.5f;
+                float ny = Nob.SizeDelta.y * 0.5f;
                 Vector2 start = new Vector2( info.StartOffset.x,dy+ info.StartOffset.y+ny);
                 Vector2 end = new Vector2(info.EndOffset.x,ty- info.EndOffset.y-ny);
                 if (pos.y < start.y)
@@ -175,46 +170,16 @@ namespace huqiang.UIComposite
                 pos = (end - start) * ratio + start;
                 if (Nob != null)
                 {
-                    Nob.data.localPosition = pos;
+                    var trans = Nob.transform;
+                    trans.localPosition = pos;
                     float s = (info.MaxScale - info.MinScale) * ratio + info.MinScale;
-                    Nob.data.localScale.x = s;
-                    Nob.data.localScale.y = s;
-                    Nob.data.localScale.z = s;
-                    Nob.IsChanged = true;
+                    trans.localScale = new Vector3(s, s, s);
                 }
             }
-            if(image!=null)
+            if(FillImage!=null)
             {
-                if(image.data.type==Image.Type.Filled)
-                {
-                    image.data.fillAmount = ratio;
-                }
-                else
-                {
-                    var mod = image.model;
-                    if(info.direction==Direction.Horizontal)
-                    {
-                        float w = ratio * size.x;
-                        float rx = size.x * 0.5f;
-                        float lx = w*0.5f - rx;
-                        mod.data.localPosition.x = lx;
-                        mod.data.localPosition.y = 0;
-                        mod.data.sizeDelta.x = w;
-                        mod.data.sizeDelta.y = size.y;
-                    }
-                    else
-                    {
-                        float w = ratio * size.y;
-                        float rx = size.y * 0.5f;
-                        float lx = w*0.5f - rx;
-                        mod.data.localPosition.y = lx;
-                        mod.data.localPosition.x = 0;
-                        mod.data.sizeDelta.y = w;
-                        mod.data.sizeDelta.x= size.x;
-                    }
-                    mod.IsChanged = true;
-                }
-                image.IsChanged = true;
+                FillImage.SprType = SpriteType.Filled;
+                FillImage.FillAmount = ratio;
             }
         }
     }

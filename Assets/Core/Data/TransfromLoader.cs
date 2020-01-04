@@ -25,6 +25,7 @@ namespace huqiang.Data
         /// </summary>
         public Int32 child;
         public int layer;
+        public Int32 Extand;
         public static int Size = sizeof(TransfromData);
         public static int ElementSize = Size / 4;
     }

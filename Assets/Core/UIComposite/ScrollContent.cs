@@ -63,7 +63,7 @@ namespace huqiang.UIComposite
         public static readonly Vector2 Center = new Vector2(0.5f, 0.5f);
         public Vector2 Size;//scrollView的尺寸
         public Vector2 ActualSize { get; protected set; }//相当于Content的尺寸
-        public Vector2 ItemSize;
+        public Vector2 ItemSize = new Vector2(1,1);
         FakeStruct modData;
         public FakeStruct ItemMod
         {
@@ -204,15 +204,28 @@ namespace huqiang.UIComposite
                     if (creator.reflect != null)
                         a.obj = creator.reflect(go.transform);
                     else a.obj = go;
+                    a.target = go.transform;
                 }
                 else if (creator.create)
                 {
                     a.obj = creator.Create();
-                    HGUIManager.GameBuffer.Clone(ItemMod,a.obj);
+                    a.target = HGUIManager.GameBuffer.Clone(ItemMod, a.obj).transform;
                 }
-                else a.obj = HGUIManager.GameBuffer.Clone(ItemMod);
+                else
+                {
+                    var go = HGUIManager.GameBuffer.Clone(ItemMod);
+                    a.obj = go;
+                    a.target = go.transform;
+                }
             }
-            else a.obj = HGUIManager.GameBuffer.Clone(ItemMod);
+            else
+            {
+                var go = HGUIManager.GameBuffer.Clone(ItemMod);
+                a.obj = go;
+                a.target = go.transform;
+            }
+            a.target.SetParent(Main);
+            a.target.localRotation = Quaternion.identity;
             return a;
         }
         Constructor creator;

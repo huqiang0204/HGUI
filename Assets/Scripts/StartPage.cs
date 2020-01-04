@@ -16,7 +16,7 @@ namespace Assets.Scripts
             public ScrollY scrolly;
             public ScrollX scrollx;
             public UISlider slider;
-            public TextInput textInput;
+            public TextInput textinput;
         }
         View view;
         class ItemView

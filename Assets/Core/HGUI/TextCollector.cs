@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace huqiang.Core.HGUI
 {
@@ -59,7 +60,7 @@ namespace huqiang.Core.HGUI
                 {
                     if (buf[j].m_dirty)
                     {
-                       dirty= true;
+                        dirty = true;
                         break;
                     }
                 }

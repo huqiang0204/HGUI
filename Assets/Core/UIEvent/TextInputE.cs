@@ -240,6 +240,8 @@ namespace huqiang.UIEvent
             UIVertex[] vertex = info.filterVertex;
             if (vertex == null)
                 return false;
+            if (vertex.Length == 0)
+                return false;
             var line = info.filterLines;
             int max = line.Length - 1;
             for(int i=max;i>=0;i--)

@@ -258,7 +258,7 @@ namespace huqiang.UIEvent
                     {
                         textInfo.CaretStyle = 2;
                         int end = textInfo.endSelect;
-                        textInfo.endSelect = GetPressIndex(textInfo, this, action, ref textInfo.endDock)+textInfo.StartIndex;
+                        textInfo.endSelect = GetPressIndex(textInfo, this, action, ref textInfo.endDock) + textInfo.StartIndex;
                         if (end != textInfo.endSelect)
                         {
                             Selected();

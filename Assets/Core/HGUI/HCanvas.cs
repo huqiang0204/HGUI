@@ -189,8 +189,8 @@ namespace huqiang.Core.HGUI
 #endif
                 }
             }
-            //if (inputs.Length > 1)
-            //    GestureEvent.Dispatch(new List<UserAction>(inputs));
+            if (inputs.Length > 1)
+                GestureEvent.Dispatch(new List<UserAction>(inputs));
         }
         /// <summary>
         /// 派发鼠标事件

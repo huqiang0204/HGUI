@@ -767,10 +767,10 @@ namespace huqiang.UIEvent
         public int endDock;//光标停靠的索引
         public List<UIVertex> selectVertex=new List<UIVertex>();
         public List<int> selectTri=new List<int>();
-        public Color color;
+        public Color32 color;
         public int CaretStyle;
-        public Color caretColor = new Color(1, 1, 1, 0.8f);
-        public Color areaColor = new Color(0.65882f, 0.8078f, 1, 0.4f);
+        public Color32 caretColor = new Color(1, 1, 1, 0.8f);
+        public Color32 areaColor = new Color(0.65882f, 0.8078f, 1, 0.4f);
         public float PreferredHeight;
         public float HeightChange=0;
         public int LineCount;

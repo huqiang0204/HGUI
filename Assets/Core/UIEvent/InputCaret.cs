@@ -33,9 +33,17 @@ namespace huqiang.UIEvent
             if (m_Caret != null)
             {
                 int c = info.selectVertex.Count;
-                Vector3[] vert = new Vector3[c];
+                Color32 col;
+                if (info.CaretStyle == 1)
+                    col = info.caretColor;
+                else col = info.areaColor;
+                HVertex[] hv = new HVertex[c];
                 for (int i = 0; i < c; i++)
-                    vert[i] = info.selectVertex[i].position;
+                {
+                    hv[i].position = info.selectVertex[i].position;
+                    hv[i].color = col;
+                }
+                m_Caret.vertices = hv;
                 m_Caret.tris = info.selectTri.ToArray();
                 time = 0;
                 m_Caret.gameObject.SetActive(true);

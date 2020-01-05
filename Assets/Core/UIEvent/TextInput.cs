@@ -82,7 +82,8 @@ namespace huqiang.UIEvent
         public EmojiString emojiString { get { return textInfo.buffer; } }
         void SetShowText()
         {
-            if (textInfo.text == ""|textInfo.text==null)
+            
+            if (textInfo.text == ""| textInfo.text==null)
             {
                 TextCom.Chromatically = TipColor;
                 TextCom.Text = m_TipString;
@@ -216,9 +217,7 @@ namespace huqiang.UIEvent
         }
         internal override void Initial(FakeStruct mod)
         {
-            Debug.Log(Context.name);
             var txt = TextCom = Context as HText;
-            InputString = txt.Text;
             textColor = txt.m_color;
             unsafe
             {
@@ -228,15 +227,14 @@ namespace huqiang.UIEvent
                     TextInputData* tp = (TextInputData*)ex.ip;
                     textColor = tp->inputColor;
                     m_tipColor = tp->tipColor;
-                    InputString = mod.buffer.GetData(tp->inputString) as string;
-                    TipString = mod.buffer.GetData(tp->tipString) as string;
                     PointColor = tp->pointColor;
                     SelectionColor = tp->selectColor;
-                    txt.Text = TipString;
+                    m_TipString = mod.buffer.GetData(tp->tipString) as string;
+                    InputString = mod.buffer.GetData(tp->inputString) as string;
                 }
+                else InputString = txt.Text;
             }
             AutoColor = false;
-            SetShowText();
         }
         public HText TextCom { get; private set; }
         public override void OnMouseDown(UserAction action)
@@ -664,7 +662,7 @@ namespace huqiang.UIEvent
                 {
                     lineChanged = false;
                     FilterPopulate(TextCom, textInfo);
-                    TextCom.Text = textInfo.ShowString.FullString;
+                    SetShowText();
                 }
                 if(selectChanged)
                 {

@@ -253,6 +253,8 @@ namespace huqiang.UIEvent
             index *= 4;
             if (index >= vertex.Length)
                 index -= 2;
+            if (index < 0)
+                index = 0;
             point.x = vertex[index].position.x;
             point.y = line[max].topY - 0.5f * line[max].height;
             point.z = line[max].height;

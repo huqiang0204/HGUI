@@ -1,6 +1,5 @@
 ﻿using huqiang.Core.HGUI;
 using huqiang.Data;
-using huqiang.UI;
 using System;
 using System.Text;
 using UGUI;

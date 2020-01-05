@@ -1,11 +1,9 @@
 ﻿using huqiang.Core.HGUI;
-using huqiang.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UGUI;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace huqiang.UIEvent
 {

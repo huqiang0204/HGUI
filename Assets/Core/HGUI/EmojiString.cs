@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace UGUI
+namespace huqiang.Core.HGUI
 {
     public class EmojiString
     {

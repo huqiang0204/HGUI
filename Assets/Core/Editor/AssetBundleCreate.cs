@@ -8,6 +8,7 @@ using huqiang.Data;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Linq;
+using huqiang.Core.HGUI;
 
 public class AssetBundleCreate : Editor {
 

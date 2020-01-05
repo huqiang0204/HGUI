@@ -4,7 +4,7 @@ using System.Text;
 using UnityEngine;
 using huqiang.Data;
 
-namespace UGUI
+namespace huqiang.Core.HGUI
 {
     public struct CharUV
     {

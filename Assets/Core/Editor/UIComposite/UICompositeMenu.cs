@@ -465,7 +465,7 @@ public static class UICompositeMenu
         label.transform.SetParent(Item.transform);
         (label.transform as RectTransform).sizeDelta = new Vector2(100, 50);
         label.transform.localPosition = new Vector3(-20, 0, 0);
-        var txt = label.AddComponent<EmojiText>();
+        var txt = label.AddComponent<Text>();
         txt.alignment = TextAnchor.MiddleLeft;
         txt.fontSize = 30;
 
@@ -539,22 +539,6 @@ public static class UICompositeMenu
 
         dt.localPosition = Vector3.zero;
         dt.localScale = Vector3.one;
-    }
-    [MenuItem("GameObject/UIComposite/EmojiText", false, 12)]
-    static public void AddEmojiText(MenuCommand menuCommand)
-    {
-        GameObject parent = menuCommand.context as GameObject;
-        var ss = new GameObject("EText", typeof(RectTransform));
-        RectTransform rect = ss.transform as RectTransform;
-        rect.sizeDelta = new Vector2(200, 40);
-        if (parent != null)
-            rect.SetParent(parent.transform);
-        rect.localPosition = Vector3.zero;
-        rect.localScale = Vector3.one;
-        var et = ss.AddComponent<EmojiText>();
-        et.raycastTarget = false;
-        et.material = new Material(Shader.Find("Custom/UIEmoji"));
-        et.material.SetTexture("_emoji", Resources.Load<Texture>("emoji"));
     }
     [MenuItem("GameObject/UIComposite/DockPanel", false, 13)]
     static public void AddDockPanel(MenuCommand menuCommand)
@@ -711,7 +695,7 @@ public static class UICompositeMenu
         label.transform.SetParent(Item.transform);
         (label.transform as RectTransform).sizeDelta = new Vector2(60,50);
         label.transform.localPosition = new Vector3(-20,0,0);
-        var txt = label.AddComponent<EmojiText>();
+        var txt = label.AddComponent<Text>();
         txt.alignment = TextAnchor.MiddleLeft;
         txt.fontSize = 30;
 
@@ -762,31 +746,5 @@ public static class UICompositeMenu
         rect.localPosition = Vector3.zero;
         rect.localScale = Vector3.one;
         ss.AddComponent<ShareImageChild>();
-    }
-    [MenuItem("GameObject/UIComposite/ShareText", false, 17)]
-    static public void AddShareText(MenuCommand menuCommand)
-    {
-        GameObject parent = menuCommand.context as GameObject;
-        var ss = new GameObject("ShareText", typeof(RectTransform));
-        RectTransform rect = ss.transform as RectTransform;
-        rect.sizeDelta = new Vector2(100, 100);
-        if (parent != null)
-            rect.SetParent(parent.transform);
-        rect.localPosition = Vector3.zero;
-        rect.localScale = Vector3.one;
-        ss.AddComponent<ShareText>();
-    }
-    [MenuItem("GameObject/UIComposite/ShareTextChild", false, 18)]
-    static public void AddShareTextChild(MenuCommand menuCommand)
-    {
-        GameObject parent = menuCommand.context as GameObject;
-        var ss = new GameObject("Element", typeof(RectTransform));
-        RectTransform rect = ss.transform as RectTransform;
-        rect.sizeDelta = new Vector2(100, 100);
-        if (parent != null)
-            rect.SetParent(parent.transform);
-        rect.localPosition = Vector3.zero;
-        rect.localScale = Vector3.one;
-        ss.AddComponent<ShareText>();
     }
 }

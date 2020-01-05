@@ -11,7 +11,7 @@ namespace huqiang.UIComposite
     {
         class ItemView
         {
-            public ShareTextChildElement Item;
+            public TextElement Item;
         }
         ModelElement model;
         UserEvent callBack;
@@ -75,7 +75,7 @@ namespace huqiang.UIComposite
             var y= mask.Find("Year");
             Year = new ScrollY();
             Year.Initial(y);
-            Year.SetItemUpdate<ItemView,int>((o,e,i)=> { o.Item.text = e.ToString()+unitY; });
+            Year.SetItemUpdate<ItemView,int>((o,e,i)=> { o.Item.Text = e.ToString()+unitY; });
             Year.Scroll = Scrolling;
             Year.ScrollEnd = YearScrollToEnd;
             Year.ItemDockCenter = true;
@@ -86,7 +86,7 @@ namespace huqiang.UIComposite
             var m = mask.Find("Month");
             Month = new ScrollY();
             Month.Initial(m);
-            Month.SetItemUpdate<ItemView,string>((o,e,i)=> { o.Item.text = e+unitM; });
+            Month.SetItemUpdate<ItemView,string>((o,e,i)=> { o.Item.Text = e+unitM; });
             Month.Scroll = Scrolling;
             Month.ScrollEnd = MonthScrollToEnd;
             Month.ItemDockCenter = true;
@@ -97,7 +97,7 @@ namespace huqiang.UIComposite
             var d = mask.Find("Day");
             Day = new ScrollY();
             Day.Initial(d);
-            Day.SetItemUpdate<ItemView, string>((o,e,i)=> { o.Item.text = e+unitD; });
+            Day.SetItemUpdate<ItemView, string>((o,e,i)=> { o.Item.Text = e+unitD; });
             Day.Scroll = Scrolling;
             Day.ScrollEnd = DayScrollToEnd;
             Day.ItemDockCenter = true;

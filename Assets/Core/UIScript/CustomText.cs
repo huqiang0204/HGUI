@@ -1,4 +1,5 @@
-﻿using System;
+﻿using huqiang.Core.HGUI;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -153,16 +154,16 @@ namespace UGUI
                 }
             }
         }
-        public void Apply(CustomRawImage image)
+        public void Apply(HImage image)
         {
             if (image == null)
                 return;
-            image.texture = texture;
-            image.uIVertices.Clear();
-            image.uIVertices.AddRange(vert);
-            image.triangle.Clear();
-            image.triangle.AddRange(tri);
-            image.Refresh();
+            //image.texture = texture;
+            //image.uIVertices.Clear();
+            //image.uIVertices.AddRange(vert);
+            //image.triangle.Clear();
+            //image.triangle.AddRange(tri);
+            //image.Refresh();
         }
         float GetLineStart(char[] tmp, int index, float w)
         {

@@ -55,7 +55,11 @@ namespace huqiang.Core.HGUI
         }
         static void CreateSimpleVertex(HImage image)
         {
-            var hv = new HVertex[4];
+            HVertex[] hv = image.vertices;
+            if (hv == null)
+                hv = new HVertex[4];
+            else if (hv.Length != 4)
+                hv = new HVertex[4];
             float x = image.SizeDelta.x;
             float lx = -0.5f * x;
             float rx = 0.5f * x;
@@ -77,7 +81,11 @@ namespace huqiang.Core.HGUI
         {
             float px = image.m_pivot.x / image.m_rect.width;
             float py = image.m_pivot.y / image.m_rect.height;
-            var hv = new HVertex[4];
+            HVertex[] hv = image.vertices;
+            if (hv == null)
+                hv = new HVertex[4];
+            else if (hv.Length != 4)
+                hv = new HVertex[4];
             float x = image.SizeDelta.x;
             float lx = -px * x;
             float rx = (1 - px) * x;

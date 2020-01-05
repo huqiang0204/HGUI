@@ -117,7 +117,7 @@ namespace huqiang.Core.HGUI
                                     buf[i] = tmp;
                                 }
                                 canvas.MatCollector.CombinationMaterial(graphics, buf, ids, ref clip);
-                                //AddUV1(canvas,ids,vert.Length,graphics.uvOffset);
+                                AddUV1(canvas,ids,vert);
                             }
                             else
                             {
@@ -165,9 +165,10 @@ namespace huqiang.Core.HGUI
             canvas.uv1.AddRange(uv1);
         }
         static Vector2[] UV1 = new Vector2[4];
-        static void AddUV1(HCanvas canvas, int[] ids, int vertCount, int[] offset)
+        static void AddUV1(HCanvas canvas, int[] ids, HVertex[] vertices)
         {
-            Vector2[] uv1 = new Vector2[vertCount];
+            int len = vertices.Length;
+            Vector2[] uv1 = new Vector2[len];
             for (int i = 0; i < ids.Length; i++)
             {
                 switch (ids[i])
@@ -190,8 +191,8 @@ namespace huqiang.Core.HGUI
                         break;
                 }
             }
-            for (int i = 0; i < vertCount; i++)
-                uv1[i] = UV1[offset[i]];
+            for (int i = 0; i < len; i++)
+                uv1[i] = UV1[vertices[i].picture];
             canvas.uv1.AddRange(uv1);
         }
         static Vector4 CutRect(Vector4 v0,Vector4 v1)

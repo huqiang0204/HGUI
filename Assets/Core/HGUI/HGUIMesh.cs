@@ -27,7 +27,7 @@ namespace huqiang.Core.HGUI
             if (image.texIds[0] ==0)
             {
                 CreateSimpleVertex(image);
-                return;
+                goto label;
             }
             switch (image.SprType)
             {
@@ -44,6 +44,7 @@ namespace huqiang.Core.HGUI
                     //CreateFilledMesh(image);
                     break;
             }
+        label:;
             var hv = image.vertices;
             var col = image.m_color;
             if(hv!=null)

@@ -1,12 +1,8 @@
-﻿using huqiang.Core.HGUI;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
-namespace UGUI
+namespace huqiang.Core.HGUI
 {
     public class CustomText
     {
@@ -45,10 +41,10 @@ namespace UGUI
             width = t2d.width;
             height = t2d.height;
             buffer = new Dictionary<char, UVRect>();
-            vert = new List<UIVertex>();
+            vert = new List<HVertex>();
             tri = new List<int>();
         }
-        List<UIVertex> vert;
+        List<HVertex> vert;
         List<int> tri;
         public Texture texture { get; private set; }
         Dictionary<char, UVRect> buffer;
@@ -101,7 +97,7 @@ namespace UGUI
             float starty = size.y * 0.5f;
             float endy = -starty;
             char[] tmp = text.ToArray();
-            vert = new List<UIVertex>();
+            vert = new List<HVertex>();
             tri = new List<int>();
             float dx = GetLineStart(tmp, 0, size.x);
             float dy = starty;
@@ -127,22 +123,22 @@ namespace UGUI
                         goto label;
                     }
                     int start = vert.Count;
-                    var v = new UIVertex();
+                    var v = new HVertex();
                     v.position.x = x0;
                     v.position.y = y0;
-                    v.uv0 = uv.uv0;
+                    v.uv = uv.uv0;
                     vert.Add(v);
                     v.position.x = x0;
                     v.position.y = y1;
-                    v.uv0 = uv.uv1;
+                    v.uv = uv.uv1;
                     vert.Add(v);
                     v.position.x = x1;
                     v.position.y = y0;
-                    v.uv0 = uv.uv2;
+                    v.uv = uv.uv2;
                     vert.Add(v);
                     v.position.x = x1;
                     v.position.y = y1;
-                    v.uv0 = uv.uv3;
+                    v.uv = uv.uv3;
                     vert.Add(v);
                     tri.Add(start);
                     tri.Add(start + 1);
@@ -158,12 +154,14 @@ namespace UGUI
         {
             if (image == null)
                 return;
-            //image.texture = texture;
-            //image.uIVertices.Clear();
-            //image.uIVertices.AddRange(vert);
-            //image.triangle.Clear();
-            //image.triangle.AddRange(tri);
-            //image.Refresh();
+            image.MainTexture = texture;
+            image.fillColors[0] = true;
+            var v = vert.ToArray();
+            var col = image.m_color;
+            for (int i = 0; i < v.Length; i++)
+                v[i].color = col;
+            image.vertices = v;
+            image.tris = tri.ToArray();
         }
         float GetLineStart(char[] tmp, int index, float w)
         {

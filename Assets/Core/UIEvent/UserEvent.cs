@@ -466,8 +466,13 @@ namespace huqiang.UIEvent
             if (MouseWheel != null)
                 MouseWheel(this, action);
         }
+        public void Initi(FakeStruct mod)
+        {
+            Initial(mod);
+        }
         internal virtual void Initial(FakeStruct mod)
         {
+            
         }
         public void RemoveFocus()
         {

@@ -282,11 +282,11 @@ namespace huqiang.Core.HGUI
             t.g_color = Chromatically;
             return t;
         }
-        public object RegEvent(Type type,FakeStruct fake)
+        public object RegEvent(Type type, FakeStruct fake)
         {
             UserEvent u = Activator.CreateInstance(type) as UserEvent;
             u.Context = this;
-            u.Initial(fake);
+            u.Initi(fake);
             userEvent = u;
             u.g_color = Chromatically;
             return u;

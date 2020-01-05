@@ -216,6 +216,7 @@ namespace huqiang.UIEvent
         }
         internal override void Initial(FakeStruct mod)
         {
+            Debug.Log(Context.name);
             var txt = TextCom = Context as HText;
             InputString = txt.Text;
             textColor = txt.m_color;
@@ -231,9 +232,11 @@ namespace huqiang.UIEvent
                     TipString = mod.buffer.GetData(tp->tipString) as string;
                     PointColor = tp->pointColor;
                     SelectionColor = tp->selectColor;
+                    txt.Text = TipString;
                 }
             }
             AutoColor = false;
+            SetShowText();
         }
         public HText TextCom { get; private set; }
         public override void OnMouseDown(UserAction action)
@@ -370,10 +373,9 @@ namespace huqiang.UIEvent
             }
             Editing = false;
             SetShowText();
-            ThreadMission.InvokeToMain((o) => {
-                Keyboard.EndInput();
-                InputCaret.Hide();
-            }, null);
+
+            InputCaret.Hide();
+            Keyboard.EndInput();
         }
         string ValidateString(string input)
         {
@@ -435,7 +437,7 @@ namespace huqiang.UIEvent
             textInfo.text = textInfo.buffer.FullString;
             SetShowText();
             textInfo.CaretStyle = 1;
-            //ChangePoint(textInfo);
+            ChangePoint(textInfo,this);
             selectChanged = true;
             textChanged = true;
             return input;

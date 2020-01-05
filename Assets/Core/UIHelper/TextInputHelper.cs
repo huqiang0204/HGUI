@@ -1,10 +1,10 @@
 ﻿using System;
+using huqiang.Core.HGUI;
 using huqiang.Data;
 using huqiang.UIEvent;
 using UnityEngine;
-using UnityEngine.UI;
 
-[RequireComponent(typeof(Text))]
+[RequireComponent(typeof(HText))]
 public class TextInputHelper:UICompositeHelp
 {
     public Color inputColor = Color.white;
@@ -29,15 +29,15 @@ public class TextInputHelper:UICompositeHelp
     {
         if(InputString==null|InputString=="")
         {
-            var txt = GetComponent<Text>();
-            txt.text = TipString;
-            txt.color = tipColor;
+            var txt = GetComponent<HText>();
+            txt.Text = TipString;
+            txt.Chromatically = tipColor;
         }
         else
         {
-            var txt = GetComponent<Text>();
-            txt.text = InputString;
-            txt.color = inputColor;
+            var txt = GetComponent<HText>();
+            txt.Text = InputString;
+            txt.Chromatically = inputColor;
         }
     }
 }

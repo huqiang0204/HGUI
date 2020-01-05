@@ -82,7 +82,7 @@ namespace huqiang.UIComposite
             Nob = tmp.GetComponent<HImage>();
             unsafe
             {
-                var ex = mod.buffer.GetData(((TransfromData*)mod.ip)->Extand) as FakeStruct;
+                var ex = mod.buffer.GetData(((TransfromData*)mod.ip)->ex) as FakeStruct;
                 if (ex != null)
                     info = *(SliderInfo*)ex.ip;
             }

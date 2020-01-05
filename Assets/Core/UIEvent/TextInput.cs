@@ -221,7 +221,7 @@ namespace huqiang.UIEvent
             textColor = txt.m_color;
             unsafe
             {
-                var ex = mod.buffer.GetData(((TransfromData*)mod.ip)->Extand) as FakeStruct;
+                var ex = mod.buffer.GetData(((TransfromData*)mod.ip)->ex) as FakeStruct;
                 if (ex != null)
                 {
                     TextInputData* tp = (TextInputData*)ex.ip;

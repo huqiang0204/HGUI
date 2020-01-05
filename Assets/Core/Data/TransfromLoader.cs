@@ -25,7 +25,7 @@ namespace huqiang.Data
         /// </summary>
         public Int32 child;
         public int layer;
-        public Int32 Extand;
+        public Int32 ex;
         public static int Size = sizeof(TransfromData);
         public static int ElementSize = Size / 4;
     }
@@ -94,7 +94,11 @@ namespace huqiang.Data
             List<Int16> tmp = new List<short>();
             for(int i=0;i<coms.Length;i++)
             {
-                if(!(coms[i] is Transform))
+                if (coms[i] is UICompositeHelp)
+                {
+                    td->ex = buffer.AddData((coms[i] as UICompositeHelp).ToBufferData(buffer));
+                }else
+                if (!(coms[i] is Transform))
                 {
                     Int32 type = gameobjectBuffer.GetTypeIndex(coms[i]);
                     var loader = gameobjectBuffer.GetDataLoader(type);

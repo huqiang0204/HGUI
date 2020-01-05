@@ -65,47 +65,24 @@ namespace huqiang.Core.HGUI
                 {
                     var vs = canvas.vertex;
                     var vc = vs.Count;
-                    var vert = graphics.vertex;
+                    var vert = graphics.vertices;
                     if (vert != null)
                     {
-                        Vector2[] uv2 = new Vector2[vert.Length];
+                        Vector2 uv2 = Vector2.zero;
                         for (int j = 0; j < vert.Length; j++)
                         {
-                            var t = q * vert[j];
+                            var t = q * vert[j].position;
                             t.x *= s.x;
                             t.y *= s.y;
                             t += o;
                             t.z = 0;
-                            vs.Add( t);
-                            uv2[j].x = (t.x + 10000) / 20000;
-                            uv2[j].y = (t.y + 10000) / 20000;
+                            uv2.x = (t.x + 10000) / 20000;
+                            uv2.y = (t.y + 10000) / 20000;
+                            canvas.vertex.Add(t);
+                            canvas.colors.Add(vert[j].color);
+                            canvas.uv.Add(vert[j].uv);
+                            canvas.uv2.Add(uv2);
                         }
-                        canvas.uv2.AddRange(uv2);
-                        if (graphics.Colors == null)
-                        {
-                            var col = graphics.m_color;
-                            for (int j = 0; j < vert.Length; j++)
-                            {
-                                canvas.colors.Add(col);
-                            }
-                        }
-                        else
-                        {
-                            if (graphics.Colors.Length == 0)
-                            {
-                                var col = graphics.m_color;
-                                for (int j = 0; j < vert.Length; j++)
-                                {
-                                    canvas.colors.Add(col);
-                                }
-                            }
-                            else
-                            {
-                                for (int j = 0; j < graphics.Colors.Length; j++)
-                                    canvas.colors.Add(graphics.Colors[j]);
-                            }
-                        }
-                        canvas.uv.AddRange(graphics.uv);
                         if (graphics.tris != null)
                         {
                             int tid = 0;
@@ -140,7 +117,7 @@ namespace huqiang.Core.HGUI
                                     buf[i] = tmp;
                                 }
                                 canvas.MatCollector.CombinationMaterial(graphics, buf, ids, ref clip);
-                                AddUV1(canvas,ids,vert.Length,graphics.uvOffset);
+                                //AddUV1(canvas,ids,vert.Length,graphics.uvOffset);
                             }
                             else
                             {

@@ -182,13 +182,11 @@ namespace huqiang.Core.HGUI
             int c = verts.Length;
             if (c == 0)
             {
+                text.vertices = null;
                 text.tris = null;
-                text.Colors = null;
                 return;
             }
-            Vector3[] vertex = new Vector3[c];
-            Color[] colors = new Color[c];
-            Vector2[] uv = new Vector2[c];
+            HVertex[] hv = new HVertex[c];
            
             int e = c / 4;
             int all = e * 6;
@@ -198,9 +196,9 @@ namespace huqiang.Core.HGUI
             int[] triB = new int[b];
             for (int i = 0; i < c; i++)
             {
-                vertex[i] = verts[i].position;
-                colors[i] = verts[i].color;
-                uv[i] = verts[i].uv0;
+                hv[i].position = verts[i].position;
+                hv[i].color = verts[i].color;
+                hv[i].uv = verts[i].uv0;
             }
 
             int ec = emojis.Count;
@@ -212,26 +210,27 @@ namespace huqiang.Core.HGUI
                 int ap = 0;
                 int bp = 0;
                 Color col = Color.white;
+                col.a = text.m_color.a;
                 for (int i = 0; i < e; i++)
                 {
                     if (i == info.pos)
                     {
                         int o = i * 4;
-                        uv[o] = info.uv[0];
-                        colors[o] = col;
-                        offset[o] = 1;
+                        hv[o].uv = info.uv[0];
+                        hv[o].color = col;
+                        hv[o].picture = 1;
                         o++;
-                        uv[o] = info.uv[1];
-                        colors[o] = col;
-                        offset[o] = 1;
+                        hv[o].uv = info.uv[1];
+                        hv[o].color = col;
+                        hv[o].picture = 1;
                         o++;
-                        uv[o] = info.uv[2];
-                        colors[o] = col;
-                        offset[o] = 1;
+                        hv[o].uv = info.uv[2];
+                        hv[o].color = col;
+                        hv[o].picture = 1;
                         o++;
-                        uv[o] = info.uv[3];
-                        colors[o] = col;
-                        offset[o] = 1;
+                        hv[o].uv = info.uv[3];
+                        hv[o].color = col;
+                        hv[o].picture = 1;
                         if (si < ec)
                             info = emojis[si];
                         si++;
@@ -271,17 +270,13 @@ namespace huqiang.Core.HGUI
                 text.subTris[0] = triA;
                 text.subTris[1] = triB;
                 text.tris = null;
-                text.uvOffset = offset;
             }
             else
             {
                 text.tris = CreateTri(c);
                 text.subTris = null;
-                text.uvOffset = null;
             }
-            text.vertex = vertex;
-            text.uv = uv;
-            text.Colors = colors;
+            text.vertices = hv;
         }
         static int[] CreateTri(int len)
         {

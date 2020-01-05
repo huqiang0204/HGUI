@@ -69,7 +69,7 @@ namespace huqiang.Core.HGUI
             UserAction.Update();
             Keyboard.DispatchEvent();
             DispatchUserAction();
-            TextInput.Dispatch();
+            InputCaret.UpdateCaret();
             MainMission();
         }
         MeshFilter meshFilter;
@@ -304,6 +304,8 @@ namespace huqiang.Core.HGUI
                     scr.userEvent.Update();
                 scripts[i].MainUpdate();
             }
+            TextInput.Dispatch();
+            InputCaret.UpdateCaret();
             TxtCollector.GenerateTexture();
             thread.AddSubMission(SubMission, null);
         }

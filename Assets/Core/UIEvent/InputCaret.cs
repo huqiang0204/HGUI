@@ -37,7 +37,6 @@ namespace huqiang.UIEvent
                 for (int i = 0; i < c; i++)
                     vert[i] = info.selectVertex[i].position;
                 m_Caret.tris = info.selectTri.ToArray();
-                m_Caret.m_vertexChange = true;
                 time = 0;
                 m_Caret.gameObject.SetActive(true);
             }
@@ -50,11 +49,11 @@ namespace huqiang.UIEvent
             {
                 case 1:
                     time += Time.deltaTime;
-                    if (time > 1.6f)
+                    if (time > 2f)
                     {
                         time = 0;
                     }
-                    else if (time > 0.8f)
+                    else if (time > 1f)
                     {
                         Caret.gameObject.SetActive(false);
                     }

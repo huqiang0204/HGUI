@@ -272,7 +272,7 @@ namespace huqiang.Core.HGUI
         public bool Mask;
         public UserEvent userEvent;
         internal int PipelineIndex;
-        public virtual Color Chromatically { get; set; }
+        public virtual Color32 Chromatically { get; set; }
         public T RegEvent<T>() where T : UserEvent, new()
         {
             var t = new T();

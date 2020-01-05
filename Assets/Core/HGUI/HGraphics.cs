@@ -6,6 +6,18 @@ using UnityEngine;
 
 namespace huqiang.Core.HGUI
 {
+    public struct HVertex
+    {
+        public Vector3 position;
+        public Vector3 normal;
+        public Vector4 tangent;
+        public Color32 color;
+        public Vector2 uv;
+        public Vector2 uv1;
+        public Vector2 uv2;
+        public Vector2 uv3;
+        public int picture;
+    }
     public class HGraphics:AsyncScript
     {
         internal static Shader DefShader { get {
@@ -15,13 +27,9 @@ namespace huqiang.Core.HGUI
             } }
         public static Shader shader;
         [SerializeField]
-        internal Color m_color = Color.white;
-        public override Color Chromatically { get => m_color; set { m_color = value; } }
-        internal Vector3[] vertex;
-        internal Vector2[] uv;
-        internal Color[] Colors;
-
-        internal int[] uvOffset;
+        internal Color32 m_color = Color.white;
+        public override Color32 Chromatically { get => m_color; set { m_color = value; m_colorChanged = true; } }
+        internal HVertex[] vertices;
         internal int[] tris;
         internal int[][] subTris;
         [SerializeField]
@@ -35,6 +43,7 @@ namespace huqiang.Core.HGUI
         internal int MatID;
         internal bool m_dirty = true;
         internal bool m_vertexChange = true;
+        internal bool m_colorChanged = true;
         [HideInInspector]
         [SerializeField]
         internal Texture[] textures = new Texture[4];
@@ -98,6 +107,15 @@ namespace huqiang.Core.HGUI
         }
         public virtual void UpdateMesh()
         {
+            if(m_colorChanged)
+            {
+                if (vertices != null)
+                {
+                    for (int i = 0; i < vertices.Length; i++)
+                        vertices[i].color = m_color;
+                }
+                m_colorChanged = false;
+            }
         }
         private void Start()
         {

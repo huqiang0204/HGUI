@@ -60,7 +60,6 @@ public class CreateTestHelper: UICompositeHelp
         Initital();
         CreateTestPage(UIPage.Root);
         RenderForm.VertexCalculationAll();
-        App.Update();
     }
     public virtual void CreateTestPage(Transform parent)
     {

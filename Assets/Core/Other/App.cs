@@ -61,7 +61,6 @@ namespace huqiang
         static void SubThread(object obj)
         {
             RenderForm.DispatchAction();
-            TextInput.Dispatch();
             Resize();
             UIPage.Refresh(UserAction.TimeSlice);
             UINotify.Refresh(UserAction.TimeSlice);

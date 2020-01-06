@@ -21,7 +21,6 @@ namespace Assets.Scripts
         {
             base.Initial(parent, dat);
             view = LoadUI<View>("baseUI", "test");
-
         }
     }
 }

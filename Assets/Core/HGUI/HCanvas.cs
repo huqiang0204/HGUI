@@ -93,7 +93,7 @@ namespace huqiang.Core.HGUI
                     mesh.uv = swapUV;
                     mesh.uv2 = swapUV1;
                     mesh.uv3 = swapUV2;
-                    mesh.colors = swapColors;
+                    mesh.colors32 = swapColors;
                     if(swapSubmesh!=null)
                     {
                         mesh.subMeshCount = swapSubmesh.Length;
@@ -338,13 +338,13 @@ namespace huqiang.Core.HGUI
         internal List<Vector2> uv = new List<Vector2>();
         internal List<Vector2> uv1 = new List<Vector2>();
         internal List<Vector2> uv2 = new List<Vector2>();
-        internal List<Color> colors = new List<Color>();
+        internal List<Color32> colors = new List<Color32>();
         
         Vector3[] swapVertex;
         Vector2[] swapUV;
         Vector2[] swapUV1;
         Vector2[] swapUV2;
-        Color[] swapColors;
+        Color32[] swapColors;
         Material[] swapMaterials;
         internal MaterialCollector MatCollector = new MaterialCollector();
         int[][] swapSubmesh;
@@ -413,7 +413,7 @@ namespace huqiang.Core.HGUI
                 mesh.uv = uv.ToArray();
                 mesh.uv2 = uv1.ToArray();
                 mesh.uv3 = uv2.ToArray();
-                mesh.colors = colors.ToArray();
+                mesh.colors32 = colors.ToArray();
                 swapSubmesh = MatCollector.submesh.ToArray();
                 mesh.subMeshCount = swapSubmesh.Length;
                 for (int i = 0; i < swapSubmesh.Length; i++)

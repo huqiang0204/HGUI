@@ -109,7 +109,7 @@
 							if(_FillColor.x==0)
 								color *= IN.color;
 							else { 
-								color.xyz = IN.color.xyz; 
+								color.xyz = IN.color.xyz;
 								color.a *= IN.color.a;
 							}
 						}

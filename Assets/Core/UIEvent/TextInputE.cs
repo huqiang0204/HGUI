@@ -251,8 +251,9 @@ namespace huqiang.UIEvent
                 }
             }
             index *= 4;
-            if (index >= vertex.Length)
-                index -= 2;
+            int len = vertex.Length;
+            if (index >= len)
+                index = len - 2;
             if (index < 0)
                 index = 0;
             point.x = vertex[index].position.x;

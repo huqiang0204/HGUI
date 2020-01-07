@@ -42,6 +42,7 @@ namespace Assets.Core.HGUI
         float ShowOffset;
         Vector2 BoxSize;
         int Style = 0;
+        int LineOffset;
         EmojiString Text;
         public void SetFullString(TextGenerator generator,EmojiString emojiString)
         {
@@ -146,7 +147,7 @@ namespace Assets.Core.HGUI
                 e2 = e1;
             return 1;
         }
-        public void GetSelectArea(Color32 color)
+        public void GetSelectArea(Color32 color, List<int> tri, List<HVertex> vert)
         {
             if (uchars == null)
                 return;
@@ -159,9 +160,7 @@ namespace Assets.Core.HGUI
                 e = t;
             }
             int c = e - s;
-            List<HVertex> vert = new List<HVertex>();
             vert.Clear();
-            List<int> tri = new List<int>();
             tri.Clear();
             int len = EndLine + 1;
             for (int i = StartLine; i < len; i++)
@@ -206,22 +205,59 @@ namespace Assets.Core.HGUI
                     tri.Add(st + 1);
                 }
             }
+
         }
         public void MoveLeft()
         {
-
+            if(StartIndex>0)
+            {
+                StartIndex--;
+                if(StartIndex<lines[StartLine].startCharIdx)
+                {
+                    StartLine--;
+                }
+                LineOffset = StartIndex - lines[StartLine].startCharIdx;
+            }
         }
         public void MoveRight()
         {
-
+            if(StartIndex<uchars.Length-1)
+            {
+                StartIndex++;
+                if (StartLine < lines.Length - 1)
+                {
+                    if(lines[StartLine+1].startCharIdx<=StartIndex)
+                    {
+                        StartLine++;
+                    }
+                }
+                LineOffset = StartIndex - lines[StartLine].startCharIdx;
+            }
         }
         public void MoveUp()
         {
-
+            if (StartLine > 0)
+            {
+                int e = StartLine;
+                StartLine--;
+                int l = lines[e].startCharIdx - lines[StartLine].startCharIdx;
+                if (LineOffset > l)
+                    StartIndex = lines[StartLine].startCharIdx + l;
+                else StartLine = lines[StartLine].startCharIdx + LineOffset;
+            }
         }
         public void MoveDown()
         {
-
+            if (StartLine < lines.Length - 1)
+            {
+                StartLine++;
+                int l = uchars.Length - lines[StartLine].startCharIdx;
+                if (StartLine < lines.Length - 1)
+                    l = lines[StartLine + 1].startCharIdx - lines[StartLine].startCharIdx;
+                if (LineOffset > l)
+                    StartIndex = lines[StartLine].startCharIdx + l;
+                else StartLine = lines[StartLine].startCharIdx + LineOffset;
+            }
         }
         public void AddString(string str)
         {

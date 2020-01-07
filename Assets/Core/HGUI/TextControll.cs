@@ -301,6 +301,9 @@ namespace Assets.Core.HGUI
         {
 
         }
+        /// <summary>
+        /// 当前显示区域的百分比
+        /// </summary>
         public float Percentage
         {
             get

@@ -821,24 +821,44 @@ namespace huqiang.UIEvent
                 }
             }
             int s = lines[r].startCharIdx;
-            int os = 0;
-            for (int i = 0; i < count; i++)
+            float lx = verts[s].cursorPos.x;
+            if (mx < lx)//最左边
             {
-                if (mx > verts[s].cursorPos.x)
+                return s;
+            }
+            else
+            {
+                int e = s + count;
+                float rx = verts[e].cursorPos.x;
+                if (mx > rx)//最右边
                 {
-                    if (i > 0)
+                    dock = 1;
+                    return e;
+                }
+                else
+                {
+                    s++;
+                    for (int i = 1; i < count; i++)
                     {
-                        os = i - 1;
-                        float lx = verts[s - 1].cursorPos.x;
-                        float rx = verts[s].cursorPos.x;
-                        if (os - lx > rx - os)
+                        if (mx > verts[s].cursorPos.x)
                         {
-
+                            lx = verts[s - 1].cursorPos.x;
+                            rx = verts[s].cursorPos.x;
+                            if (mx - lx > rx - mx)
+                            {
+                                return s;
+                            }
+                            else
+                            {
+                                dock = 1;
+                                return s - 1;
+                            }
                         }
+                        s++;
                     }
                 }
-                s++;
             }
+
             return 0;
         }
     }

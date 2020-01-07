@@ -870,7 +870,7 @@ namespace huqiang.UIEvent
             }
             return 0;
         }
-        static void GetChoiceArea(TextInfo info, int startSelect, int endSelect)
+        public static void GetChoiceArea(TextInfo info, int startSelect, int endSelect)
         {
             if (info == null)
                 return;

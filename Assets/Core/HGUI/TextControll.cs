@@ -47,12 +47,9 @@ namespace Assets.Core.HGUI
         int Style = 0;
         int LineOffset;
         EmojiString Text;
-        public void SetFullString(TextGenerator generator,EmojiString emojiString)
+        public void SetFullString(EmojiString emojiString)
         {
-            uchars = generator.characters.ToArray();
-            lines = generator.lines.ToArray();
             Text = emojiString;
-            LineCount = lines.Length;
         }
         int GetPressIndex(UserEvent callBack, UserAction action)
         {

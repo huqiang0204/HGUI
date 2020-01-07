@@ -243,9 +243,9 @@ namespace huqiang.UIEvent
                 return false;
             var line = info.filterLines;
             int max = line.Length - 1;
-            for(int i=max;i>=0;i--)
+            for (int i = max; i >= 0; i--)
             {
-                if(line[i].startCharIdx<=index)
+                if (line[i].startCharIdx <= index)
                 {
                     max = i;
                     break;
@@ -609,6 +609,7 @@ namespace huqiang.UIEvent
             info.PreferredHeight = h;
             info.fullVertex = generator.verts.ToArray();
             info.fullLines = generator.lines.ToArray();
+            info.charInfos = generator.characters.ToArray();
             info.characterCount = generator.characterCount;
      
             int lc = info.fullLines.Length;
@@ -760,8 +761,10 @@ namespace huqiang.UIEvent
         public float fontSize;
         public UILineInfo[] fullLines;//所有文本行
         public UIVertex[] fullVertex;//所有文本顶点
+        public UICharInfo[] charInfos;
         public UILineInfo[] filterLines;//文本框内可显示的文本行
-        public UIVertex[] filterVertex;//文本框内可显示的顶点
+        public UIVertex[] filterVertex;//文本框内可显示的顶点 
+        public UICharInfo[] filtercharInfos;
         public int characterCount;
         public int visibleCount;
         public int lineIndex;
@@ -784,21 +787,59 @@ namespace huqiang.UIEvent
         public int StartIndex;
         public int EndIndex;
         public EmojiString ShowString = new EmojiString();
-        public void MoveLeft()
+        public int GetPressIndex(UserEvent callBack, UserAction action, ref int dock)
         {
+            dock = 0;
+            if (text == "" | text == null)
+                return 0;
+            UILineInfo[] lines = filterLines;
+            if (lines == null)
+                return 0;
 
-        }
-        public void MoveRight()
-        {
+            UICharInfo[] verts = filtercharInfos;
+            var pos = callBack.GlobalPosition;
+            var scale = callBack.GlobalScale;
+            float mx = action.CanPosition.x - pos.x;
+            mx *= scale.x;
+            float my = action.CanPosition.y - pos.y;
+            my *= scale.y;
+            int r = 0;//行
+            int count = 1;
+            for (int i = 0; i < lines.Length; i++)
+            {
+                if (my > lines[i].topY)
+                {
+                    if (i == 0)
+                    {
+                        count = verts.Length;
+                    }
+                    else
+                    {
+                        r = i - 1;
+                        count = lines[i].startCharIdx - lines[r].startCharIdx;
+                    }
+                }
+            }
+            int s = lines[r].startCharIdx;
+            int os = 0;
+            for (int i = 0; i < count; i++)
+            {
+                if (mx > verts[s].cursorPos.x)
+                {
+                    if (i > 0)
+                    {
+                        os = i - 1;
+                        float lx = verts[s - 1].cursorPos.x;
+                        float rx = verts[s].cursorPos.x;
+                        if (os - lx > rx - os)
+                        {
 
-        }
-        public void MoveUp()
-        {
-
-        }
-        public void MoveDown()
-        {
-
+                        }
+                    }
+                }
+                s++;
+            }
+            return 0;
         }
     }
 }

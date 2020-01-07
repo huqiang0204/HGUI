@@ -674,7 +674,7 @@ namespace huqiang.UIEvent
                         FilterChoiceArea(TextCom, textInfo);
                     else ChangePoint(textInfo,this);
                     InputCaret.ChangeCaret(textInfo);
-                }
+                }  
             }
         }
         public void SizeChanged()

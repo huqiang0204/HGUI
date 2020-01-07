@@ -783,5 +783,21 @@ namespace huqiang.UIEvent
         public int StartIndex;
         public int EndIndex;
         public EmojiString ShowString = new EmojiString();
+        public void MoveLeft()
+        {
+
+        }
+        public void MoveRight()
+        {
+
+        }
+        public void MoveUp()
+        {
+
+        }
+        public void MoveDown()
+        {
+
+        }
     }
 }

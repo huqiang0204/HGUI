@@ -36,6 +36,8 @@ namespace Assets.Core.HGUI
         /// 选中的结束索引
         /// </summary>
         public int EndIndex;
+        int ShowStart;
+        int ShowRow;
         /// <summary>
         /// 当前滚动偏移
         /// </summary>
@@ -50,6 +52,7 @@ namespace Assets.Core.HGUI
             lines = generator.lines.ToArray();
             fullVertex = generator.verts.ToArray();
             Text = emojiString;
+            LineCount = lines.Length;
         }
         public int GetPressIndex(UserEvent callBack, UserAction action)
         {
@@ -127,12 +130,17 @@ namespace Assets.Core.HGUI
             EndIndex = GetPressIndex(userEvent,action);
             Style = 1;
         }
-        public string GetFilterString()
+        /// <summary>
+        /// 获取当前需要显示的字符串
+        /// </summary>
+        /// <returns></returns>
+        public string GetShowString()
         {
-            int s = lines[StartLine].startCharIdx;
+            int s = lines[ShowStart].startCharIdx;
+            int end = ShowStart + ShowRow + 1;
             int e = uchars.Length;
-            if (EndLine < LineCount - 1)
-                e = lines[EndLine + 1].startCharIdx - 1;
+            if (end < LineCount)
+                e = lines[end].startCharIdx - 1;
             return Text.SubString(s, e - s);
         }
         int CommonArea(int s1, int e1, ref int s2, ref int e2)
@@ -147,6 +155,12 @@ namespace Assets.Core.HGUI
                 e2 = e1;
             return 1;
         }
+        /// <summary>
+        /// 获取当前选中的区域
+        /// </summary>
+        /// <param name="color"></param>
+        /// <param name="tri"></param>
+        /// <param name="vert"></param>
         public void GetSelectArea(Color32 color, List<int> tri, List<HVertex> vert)
         {
             if (uchars == null)
@@ -217,6 +231,10 @@ namespace Assets.Core.HGUI
                     StartLine--;
                 }
                 LineOffset = StartIndex - lines[StartLine].startCharIdx;
+                if (StartLine < ShowStart)
+                {
+                    ChangeLine(StartLine);
+                }
             }
         }
         public void MoveRight()
@@ -232,6 +250,10 @@ namespace Assets.Core.HGUI
                     }
                 }
                 LineOffset = StartIndex - lines[StartLine].startCharIdx;
+                if (StartLine - ShowRow > ShowStart)
+                {
+                    ChangeLine(StartLine - ShowRow);
+                }
             }
         }
         public void MoveUp()
@@ -244,6 +266,10 @@ namespace Assets.Core.HGUI
                 if (LineOffset > l)
                     StartIndex = lines[StartLine].startCharIdx + l;
                 else StartLine = lines[StartLine].startCharIdx + LineOffset;
+                if(StartLine<ShowStart)
+                {
+                    ChangeLine(StartLine);
+                }
             }
         }
         public void MoveDown()
@@ -257,11 +283,45 @@ namespace Assets.Core.HGUI
                 if (LineOffset > l)
                     StartIndex = lines[StartLine].startCharIdx + l;
                 else StartLine = lines[StartLine].startCharIdx + LineOffset;
+                if (StartLine - ShowRow > ShowStart)
+                {
+                    ChangeLine(StartLine - ShowRow);
+                }
             }
+        }
+        public void ChangeLine(int index)
+        {
+            if(ShowStart!=index)
+            {
+
+            }
+            StartLine = index;
         }
         public void AddString(string str)
         {
 
+        }
+        public float Percentage
+        {
+            get
+            {
+                float r = (float)ShowStart/ ((float)LineCount - (float)ShowRow);
+                if (r < 0)
+                    r = 0;
+                else if (r > 1)
+                    r = 1;
+                return r;
+            }
+            set
+            {
+                if (value < 0)
+                    value = 0;
+                else if (value > 1)
+                    value = 1;
+                float a = (float)LineCount - (float)ShowRow;
+                int c = (int)(a * value);
+                ChangeLine(c);
+            }
         }
     }
 }

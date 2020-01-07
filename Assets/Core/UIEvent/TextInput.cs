@@ -561,7 +561,7 @@ namespace huqiang.UIEvent
             {
                 int start = textInfo.startSelect;
                 int c= lines.Length - 1;
-                for (int i=c-1; i >= 0; i--)
+                for (int i = c-1; i >= 0; i--)
                 {
                     int t = lines[i].startCharIdx;
                     if (t <= start)

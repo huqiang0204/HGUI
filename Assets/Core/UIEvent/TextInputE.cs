@@ -769,11 +769,12 @@ namespace huqiang.UIEvent
         public int visibleCount;
         public int lineIndex;
         public int startSelect;
-        public int startDock;//光标停靠的索引
+        public int startDock;//光标停靠的索引,0为左边,1为右边
         public int endSelect;
-        public int endDock;//光标停靠的索引
+        public int endDock;//光标停靠的索引,0为左边,1为右边
         public List<UIVertex> selectVertex=new List<UIVertex>();
         public List<int> selectTri=new List<int>();
+        public List<HVertex> vert = new List<HVertex>();
         public Color32 color;
         public int CaretStyle;
         public Color32 caretColor = new Color(1, 1, 1, 0.8f);
@@ -787,16 +788,27 @@ namespace huqiang.UIEvent
         public int StartIndex;
         public int EndIndex;
         public EmojiString ShowString = new EmojiString();
-        public int GetPressIndex(UserEvent callBack, UserAction action, ref int dock)
+        static int CommonArea(int s1, int e1, ref int s2, ref int e2)
         {
-            dock = 0;
-            if (text == "" | text == null)
+            if (s1 > e2)
                 return 0;
-            UILineInfo[] lines = filterLines;
+            if (s2 > e1)
+                return 2;
+            if (s2 < s1)
+                s2 = s1;
+            if (e2 > e1)
+                e2 = e1;
+            return 1;
+        }
+        public static int GetPressIndex(TextInfo info, UserEvent callBack, UserAction action)
+        {
+            if (info.text == "" | info.text == null)
+                return 0;
+            UILineInfo[] lines = info.filterLines;
             if (lines == null)
                 return 0;
 
-            UICharInfo[] verts = filtercharInfos;
+            UICharInfo[] verts = info.filtercharInfos;
             var pos = callBack.GlobalPosition;
             var scale = callBack.GlobalScale;
             float mx = action.CanPosition.x - pos.x;
@@ -832,7 +844,6 @@ namespace huqiang.UIEvent
                 float rx = verts[e].cursorPos.x;
                 if (mx > rx)//最右边
                 {
-                    dock = 1;
                     return e;
                 }
                 else
@@ -840,7 +851,7 @@ namespace huqiang.UIEvent
                     s++;
                     for (int i = 1; i < count; i++)
                     {
-                        if (mx > verts[s].cursorPos.x)
+                        if (mx >= verts[s].cursorPos.x)
                         {
                             lx = verts[s - 1].cursorPos.x;
                             rx = verts[s].cursorPos.x;
@@ -850,7 +861,6 @@ namespace huqiang.UIEvent
                             }
                             else
                             {
-                                dock = 1;
                                 return s - 1;
                             }
                         }
@@ -858,8 +868,75 @@ namespace huqiang.UIEvent
                     }
                 }
             }
-
             return 0;
+        }
+        static void GetChoiceArea(TextInfo info, int startSelect, int endSelect)
+        {
+            if (info == null)
+                return;
+            UILineInfo[] lines = info.filterLines;
+            if (lines == null)
+                return;
+            UICharInfo[] uchars = info.filtercharInfos;
+            if (uchars == null)
+                return;
+            var color = info.areaColor;
+            int s = startSelect;
+            int e = endSelect;
+            if (e < s)
+            {
+                int t = s;
+                s = e;
+                e = t;
+            }
+            int c = e - s;
+            List<HVertex> vert = info.vert;
+            vert.Clear();
+            List<int> tri = info.selectTri;
+            tri.Clear();
+            int len = lines.Length;
+            for (int i = 0; i < lines.Length; i++)
+            {
+                int os = lines[i].startCharIdx;
+                int oe = uchars.Length;
+                if (i < len - 1)
+                    oe = lines[i + 1].startCharIdx - 1;
+                int state = CommonArea(s, e, ref os, ref oe);
+                if (state == 2)//结束
+                    break;
+                if (state == 1)//包含公共区域
+                {
+                    float lx = uchars[os].cursorPos.x - uchars[os].charWidth * 0.5f;
+                    float rx = uchars[oe].cursorPos.x + uchars[oe].charWidth * 0.5f;
+                    float h = lines[i].height;
+                    float top = lines[i].topY;
+                    float down = top - h;
+                    int st = vert.Count;
+                    var v = new HVertex();
+                    v.position.x = lx;
+                    v.position.y = down;
+                    v.color = color;
+                    vert.Add(v);
+                    v.position.x = rx;
+                    v.position.y = down;
+                    v.color = color;
+                    vert.Add(v);
+                    v.position.x = lx;
+                    v.position.y = top;
+                    v.color = color;
+                    vert.Add(v);
+                    v.position.x = rx;
+                    v.position.y = top;
+                    v.color = color;
+                    vert.Add(v);
+                    tri.Add(st);
+                    tri.Add(st + 2);
+                    tri.Add(st + 3);
+                    tri.Add(st );
+                    tri.Add(st + 3);
+                    tri.Add(st + 1);
+                }
+            }
         }
     }
 }

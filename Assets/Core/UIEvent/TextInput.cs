@@ -529,10 +529,10 @@ namespace huqiang.UIEvent
             {
                 int start = textInfo.startSelect;
                 int i = lines.Length - 1;
-                for (; i >=1; i--)
+                for (; i >= 1; i--)
                 {
                     int t = lines[i].startCharIdx;
-                    if (t<=start)
+                    if (t <= start)
                     {
                         if (i > 0)
                         {
@@ -629,7 +629,7 @@ namespace huqiang.UIEvent
             textChanged = true;
             selectChanged = true;
         }
-        internal override void Update()
+        void Refresh()
         {
             var te = TextCom;
             if (te != null)

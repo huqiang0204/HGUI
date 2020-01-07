@@ -230,6 +230,7 @@ namespace huqiang.UIEvent
                     if (InputEvent.LineChanged != null)
                         InputEvent.LineChanged(InputEvent);
                 }
+                InputEvent.Refresh();
             }
         }
         public static bool GetIndexPoint(TextInfo info, int index, ref Vector3 point)
@@ -757,10 +758,10 @@ namespace huqiang.UIEvent
         public EmojiString buffer = new EmojiString();
         public string text;
         public float fontSize;
-        public UILineInfo[] fullLines;
-        public UIVertex[] fullVertex;
-        public UILineInfo[] filterLines;
-        public UIVertex[] filterVertex;
+        public UILineInfo[] fullLines;//所有文本行
+        public UIVertex[] fullVertex;//所有文本顶点
+        public UILineInfo[] filterLines;//文本框内可显示的文本行
+        public UIVertex[] filterVertex;//文本框内可显示的顶点
         public int characterCount;
         public int visibleCount;
         public int lineIndex;

@@ -781,11 +781,29 @@ namespace huqiang.UIEvent
         public Color32 areaColor = new Color(0.65882f, 0.8078f, 1, 0.4f);
         public float PreferredHeight;
         public float HeightChange=0;
+        /// <summary>
+        /// 总计行数
+        /// </summary>
         public int LineCount;
+        /// <summary>
+        /// 变动的行数，增加或减少
+        /// </summary>
         public int LineChange = 0;
+        /// <summary>
+        /// 选中的开始行数
+        /// </summary>
         public int StartLine;
+        /// <summary>
+        /// 选中的结束行数
+        /// </summary>
         public int EndLine;
+        /// <summary>
+        /// 选中的开始索引
+        /// </summary>
         public int StartIndex;
+        /// <summary>
+        /// 选中的结束索引
+        /// </summary>
         public int EndIndex;
         public EmojiString ShowString = new EmojiString();
         static int CommonArea(int s1, int e1, ref int s2, ref int e2)

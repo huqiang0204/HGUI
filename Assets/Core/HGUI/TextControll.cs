@@ -10,7 +10,6 @@ namespace Assets.Core.HGUI
     public class TextControll
     {
         UILineInfo[] lines;//所有文本行
-        UIVertex[] fullVertex;//所有文本顶点
         UICharInfo[] uchars;
         /// <summary>
         /// 总计行数
@@ -42,6 +41,8 @@ namespace Assets.Core.HGUI
         /// 当前滚动偏移
         /// </summary>
         float ShowOffset;
+        float PreferredHeight;
+        float HeightChange;
         Vector2 BoxSize;
         int Style = 0;
         int LineOffset;
@@ -50,11 +51,10 @@ namespace Assets.Core.HGUI
         {
             uchars = generator.characters.ToArray();
             lines = generator.lines.ToArray();
-            fullVertex = generator.verts.ToArray();
             Text = emojiString;
             LineCount = lines.Length;
         }
-        public int GetPressIndex(UserEvent callBack, UserAction action)
+        int GetPressIndex(UserEvent callBack, UserAction action)
         {
             if (uchars == null)
                 return 0;
@@ -141,6 +141,26 @@ namespace Assets.Core.HGUI
             int e = uchars.Length;
             if (end < LineCount)
                 e = lines[end].startCharIdx - 1;
+            return Text.SubString(s, e - s);
+        }
+        /// <summary>
+        /// 获取当前选中字符串
+        /// </summary>
+        /// <returns></returns>
+        public string GetSelectString()
+        {
+            if (Style == 0)
+                return "";
+            int s = StartIndex;
+            int e = EndIndex;
+            if (s == e)
+                return "";
+            if (s > e)
+            {
+                int a = e;
+                e = s;
+                s = a;
+            }
             return Text.SubString(s, e - s);
         }
         int CommonArea(int s1, int e1, ref int s2, ref int e2)
@@ -297,9 +317,51 @@ namespace Assets.Core.HGUI
             }
             StartLine = index;
         }
-        public void AddString(string str)
+        public void InsertString(string str)
         {
-
+            DeleteString();
+            var es = new EmojiString(str);
+            int c = es.Length;
+            Text.Insert(StartIndex, es);
+            StartIndex += c;
+        }
+        public bool DeleteString()
+        {
+            if (Style == 1)
+            {
+                Style = 0;
+                int s = StartIndex;
+                int e = EndIndex;
+                if (s == e)
+                    return false;
+                Text.Remove(s, e - s);
+                if (StartIndex < EndIndex)
+                    StartIndex = EndIndex;
+                return true;
+            }
+            return false;
+        }
+        public bool DeleteLast()
+        {
+            if (DeleteString())
+                return true;
+            return Text.Remove(StartIndex);
+        }
+        public bool DeleteNext()
+        {
+            if (DeleteString())
+                return true;
+            if (StartIndex < 1)
+                return false;
+            StartIndex--;
+            return Text.Remove(StartIndex);
+        }
+        /// <summary>
+        /// 重新计算
+        /// </summary>
+        public void ReCalcul(HText text)
+        {
+            GetPreferredHeight(text);
         }
         /// <summary>
         /// 当前显示区域的百分比
@@ -325,6 +387,38 @@ namespace Assets.Core.HGUI
                 int c = (int)(a * value);
                 ChangeLine(c);
             }
+        }
+        void GetPreferredHeight(HText text)
+        {
+            string str = Text.FilterString;
+            TextGenerationSettings settings = new TextGenerationSettings();
+            settings.resizeTextMinSize = 2;
+            settings.resizeTextMaxSize = 40;
+            settings.scaleFactor = 1;
+            settings.textAnchor = TextAnchor.UpperLeft;
+            settings.color = Color.white;
+            settings.generationExtents = new Vector2(text.SizeDelta.x, 0);
+            settings.pivot = new Vector2(0.5f, 0.5f);
+            settings.richText = true;
+            settings.font = text.Font;
+            if (settings.font == null)
+                settings.font = HText.DefaultFont;
+            settings.fontSize = text.m_fontSize;
+            settings.fontStyle = FontStyle.Normal;
+            settings.alignByGeometry = false;
+            settings.updateBounds = false;
+            settings.lineSpacing = 1;
+            settings.horizontalOverflow = HorizontalWrapMode.Wrap;
+            settings.verticalOverflow = VerticalWrapMode.Overflow;
+            TextGenerator generator = HText.Generator;
+            float h = generator.GetPreferredHeight(str, settings);
+            HeightChange = PreferredHeight - h;
+            PreferredHeight = h;
+            lines= generator.lines.ToArray();
+            uchars= generator.characters.ToArray();
+            int lc = lines.Length;
+            LineChange = lc - LineCount;
+            LineCount = lc;
         }
     }
 }

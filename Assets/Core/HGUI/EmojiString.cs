@@ -49,12 +49,12 @@ namespace huqiang.Core.HGUI
             builder.Append(m_str);
             f_str = str;
         }
-        public void Remove(int index,int count = 1)
+        public bool Remove(int index,int count = 1)
         {
             if (index + count > builder.Length)
                 count = builder.Length - index;
             if (count < 1)
-                return;
+                return false ;
             int start = index;
             int end = index + count;
             emojis.RemoveAll((o) => { return o.pos >= start & o.pos <= end; });
@@ -66,6 +66,7 @@ namespace huqiang.Core.HGUI
             builder.Remove(index,count);
             m_str = builder.ToString();
             f_str = EmojiMap.EmojiToFullString(m_str,emojis);
+            return true;
         }
         public String SubString(int index,int count=1)
         {

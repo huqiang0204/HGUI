@@ -347,7 +347,7 @@ namespace huqiang.Core.HGUI
             settings.color = Color.white;
             settings.generationExtents = new Vector2(Context.SizeDelta.x, 0);
             settings.pivot = new Vector2(0.5f, 0.5f);
-            settings.richText = true;
+            settings.richText = false;
             settings.font = Context.Font;
             if (settings.font == null)
                 settings.font = HText.DefaultFont;

@@ -1,6 +1,7 @@
 ﻿using huqiang.Core.HGUI;
 using huqiang.Data;
 using System;
+using System.Collections.Generic;
 using System.Text;
 using UGUI;
 using UnityEngine;
@@ -904,6 +905,83 @@ namespace huqiang.UIEvent
                 }
             }
             return v3;
+        }
+        int CommonArea(int s1, int e1, ref int s2, ref int e2)
+        {
+            if (s1 > e2)
+                return 0;
+            if (s2 > e1)
+                return 2;
+            if (s2 < s1)
+                s2 = s1;
+            if (e2 > e1)
+                e2 = e1;
+            return 1;
+        }
+        /// <summary>
+        /// 获取当前选中的区域
+        /// </summary>
+        /// <param name="color"></param>
+        /// <param name="tri"></param>
+        /// <param name="vert"></param>
+        public void GetSelectArea(Color32 color, List<int> tri, List<HVertex> vert)
+        {
+            if (TextCom == null)
+                return;
+            //int s = StartIndex;
+            //int e = EndIndex;
+            //if (e < s)
+            //{
+            //    int t = s;
+            //    s = e;
+            //    e = t;
+            //}
+            //int c = e - s;
+            //vert.Clear();
+            //tri.Clear();
+            //int len = EndLine + 1;
+            //for (int i = StartLine; i < len; i++)
+            //{
+            //    int os = lines[i].startCharIdx;
+            //    int oe = uchars.Length;
+            //    if (i < len - 1)
+            //        oe = lines[i + 1].startCharIdx - 1;
+            //    int state = CommonArea(s, e, ref os, ref oe);
+            //    if (state == 2)//结束
+            //        break;
+            //    if (state == 1)//包含公共区域
+            //    {
+            //        float lx = uchars[os].cursorPos.x - uchars[os].charWidth * 0.5f;
+            //        float rx = uchars[oe].cursorPos.x + uchars[oe].charWidth * 0.5f;
+            //        float h = lines[i].height;
+            //        float top = lines[i].topY;
+            //        float down = top - h;
+            //        int st = vert.Count;
+            //        var v = new HVertex();
+            //        v.position.x = lx;
+            //        v.position.y = down;
+            //        v.color = color;
+            //        vert.Add(v);
+            //        v.position.x = rx;
+            //        v.position.y = down;
+            //        v.color = color;
+            //        vert.Add(v);
+            //        v.position.x = lx;
+            //        v.position.y = top;
+            //        v.color = color;
+            //        vert.Add(v);
+            //        v.position.x = rx;
+            //        v.position.y = top;
+            //        v.color = color;
+            //        vert.Add(v);
+            //        tri.Add(st);
+            //        tri.Add(st + 2);
+            //        tri.Add(st + 3);
+            //        tri.Add(st);
+            //        tri.Add(st + 3);
+            //        tri.Add(st + 1);
+            //    }
+            //}
         }
     }
 }

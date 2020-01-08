@@ -337,7 +337,7 @@ namespace huqiang.Core.HGUI
             {
 
             }
-            StartLine = index;
+            ShowStart = index;
         }
         public void InsertString(string str)
         {

@@ -41,7 +41,6 @@ namespace huqiang.Core.HGUI
             } }
         EmojiString emojiString = new EmojiString();
         UILineInfo[] lines;
-        UICharInfo[] characters;
         UIVertex[] verts;
         [SerializeField]
         internal Font _font;

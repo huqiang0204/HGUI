@@ -871,6 +871,7 @@ namespace huqiang.UIEvent
             else count = uchars.Count - lines[r].startCharIdx;
             int s = lines[r].startCharIdx;
             float lx = uchars[s].cursorPos.x;
+            v3.y = s;
             if (mx < lx)//最左边
             {
                 v3.y = s;
@@ -891,7 +892,7 @@ namespace huqiang.UIEvent
                     s++;
                     for (int i = 1; i < count; i++)
                     {
-                        if (mx >= uchars[s].cursorPos.x)
+                        if (mx < uchars[s].cursorPos.x)
                         {
                             lx = uchars[s - 1].cursorPos.x;
                             rx = uchars[s].cursorPos.x;

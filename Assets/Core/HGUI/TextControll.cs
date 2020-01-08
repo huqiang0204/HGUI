@@ -374,5 +374,9 @@ namespace huqiang.Core.HGUI
         {
             return StartIndex - lines[ShowStart].startCharIdx;
         }
+        public int GetPressLine()
+        {
+            return StartLine - ShowStart;
+        }
     }
 }

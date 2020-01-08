@@ -139,8 +139,8 @@ namespace huqiang.Core.HGUI
         {
             if(m_sprite!=null)
             {
-                SizeDelta.x = m_sprite.rect.width;
-                SizeDelta.y = m_sprite.rect.height;
+                m_sizeDelta.x = m_sprite.rect.width;
+                m_sizeDelta.y = m_sprite.rect.height;
             }
         }
         public override void MainUpdate()

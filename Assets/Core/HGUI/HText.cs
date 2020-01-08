@@ -158,7 +158,7 @@ namespace huqiang.Core.HGUI
         internal IList<UICharInfo> uIChars;
         public void Populate()
         {
-            GetGenerationSettings(ref SizeDelta,ref settings);
+            GetGenerationSettings(ref m_sizeDelta,ref settings);
             var g = Generator;
             g.Populate(emojiString.FilterString, settings);
             verts = g.verts.ToArray();

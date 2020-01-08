@@ -130,8 +130,8 @@ namespace huqiang.Core.HGUI
             {
                 int w = cam.pixelWidth;
                 int h = cam.pixelHeight;
-                SizeDelta.x = w;
-                SizeDelta.y = h;
+                m_sizeDelta.x = w;
+                m_sizeDelta.y = h;
                 if(cam.orthographic)
                 {
 

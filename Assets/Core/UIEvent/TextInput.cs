@@ -997,13 +997,21 @@ namespace huqiang.UIEvent
             int index = textControll.GetPressIndex();
             if (index > -1)
             {
-                if (TextCom.uIChars != null)
-                    if (index < TextCom.uIChars.Count)
+                var uc = TextCom.uIChars;
+                if (uc != null)
+                {
+                    if (index < uc.Count)
                     {
+                        int line = textControll.GetPressLine();
+                        float h = TextCom.uILines[line].height;
                         var ch = TextCom.uIChars[index];
                         float x = ch.cursorPos.x - 1;
-                        InputCaret.Caret.transform.localPosition = new Vector3(x, ch.cursorPos.y-12, 0);
+                        var pos = new Vector3(x, ch.cursorPos.y - 0.5f * h, 0);
+                        var trans = InputCaret.Caret.transform;
+                        trans.localPosition = pos;
+                        InputCaret.Caret.SizeDelta = new Vector2(2,h);
                     }
+                }
             }
         }
     }

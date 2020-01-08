@@ -10,7 +10,7 @@ namespace huqiang.Core.HGUI
 {
     public unsafe struct AsyncScriptData
     {
-        public Vector2 SizeDelta;
+        public Vector2 m_sizeDelta;
         public Vector2 Pivot;
         public Vector2 DesignSize;
         public ScaleType scaleType;
@@ -29,7 +29,7 @@ namespace huqiang.Core.HGUI
         protected unsafe void LoadScript(byte* ip, AsyncScript tar)
         {
             var src = (AsyncScriptData*)ip;
-            tar.SizeDelta = src->SizeDelta;
+            tar.m_sizeDelta = src->m_sizeDelta;
             tar.Pivot = src->Pivot;
             tar.DesignSize = src->DesignSize;
             tar.scaleType = src->scaleType;
@@ -44,7 +44,7 @@ namespace huqiang.Core.HGUI
         protected unsafe void SaveScript(byte* ip, AsyncScript src)
         {
             AsyncScriptData* tar = (AsyncScriptData*)ip;
-            tar->SizeDelta = src.SizeDelta;
+            tar->m_sizeDelta = src.m_sizeDelta;
             tar->Pivot = src.Pivot;
             tar->DesignSize = src.DesignSize;
             tar->scaleType = src.scaleType;

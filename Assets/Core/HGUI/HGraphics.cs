@@ -29,6 +29,7 @@ namespace huqiang.Core.HGUI
         [SerializeField]
         internal Color32 m_color = Color.white;
         public override Color32 Chromatically { get => m_color; set { m_color = value; m_colorChanged = true; } }
+        public override Vector2 SizeDelta { get => m_sizeDelta; set { m_sizeDelta = value; m_vertexChange = true; } }
         internal HVertex[] vertices;
         internal int[] tris;
         internal int[][] subTris;

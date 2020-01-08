@@ -421,10 +421,8 @@ namespace huqiang.UIEvent
                 m_inputString = value;
                 value = ValidateString(value);
                 textControll.SetFullString(new EmojiString(value));
-                textControll.ReCalcul(TextCom);
+                textControll.ReCalcul();
                 textControll.MoveToEnd();
-                textChanged = true;
-                selectChanged = true;
             } }
         public string TipString
         {
@@ -597,6 +595,7 @@ namespace huqiang.UIEvent
             overTime = 0;
             if (TextCom != null)
             {
+                textControll.Context = TextCom;
                 textControll.SetStartSelect(this,action);
                 Editing = true;
             }
@@ -666,8 +665,9 @@ namespace huqiang.UIEvent
             if (input == null)
                 return;
             InputEvent = input;
+            textControll.Context = TextCom;
             textControll.SetFullString(new EmojiString(m_inputString));
-            textControll.ReCalcul(input.TextCom);
+            textControll.ReCalcul();
             textControll.MoveToEnd();
             TextCom.Text = textControll.GetShowString();
             bool pass = InputEvent.contentType == ContentType.Password ? true : false;
@@ -729,7 +729,9 @@ namespace huqiang.UIEvent
             //    if (ValidateChar(this, textInfo.startSelect, str[0]) == 0)
             //        return "";
             textControll.InsertString(str);
-            textControll.ReCalcul(TextCom);
+            textControll.ReCalcul();
+            textControll.AdjustToPoint();
+            textControll.AdjustStartLine();
             SetShowText();
             return input;
         }
@@ -744,8 +746,6 @@ namespace huqiang.UIEvent
             //SetShowText();
             //textInfo.CaretStyle = 1;
             //ChangePoint(textInfo,this);
-            selectChanged = true;
-            textChanged = true;
             return input;
         }
         public bool Editing;
@@ -761,9 +761,6 @@ namespace huqiang.UIEvent
             InputEvent.Editing = true;
         }
 
-        bool textChanged;
-        bool selectChanged;
-        bool lineChanged;
         public string SelectString { get => textControll.GetSelectString(); }
 
         void Refresh()
@@ -813,11 +810,6 @@ namespace huqiang.UIEvent
                 //    InputCaret.ChangeCaret(textInfo);
                 //}  
             }
-        }
-        public void SizeChanged()
-        {
-            textChanged = true;
-            selectChanged = true;
         }
         public float Percentage { get => textControll.Percentage;
             set => textControll.Percentage = value; }

@@ -46,6 +46,7 @@ namespace huqiang.Core.HGUI
         int Style = 0;
         int LineOffset;
         EmojiString Text;
+        public HText Context;
         public void SetFullString(EmojiString emojiString)
         {
             Text = emojiString;
@@ -259,12 +260,12 @@ namespace huqiang.Core.HGUI
         }
         public void PointerMoveRight()
         {
-            if(StartIndex<uchars.Length-1)
+            if (StartIndex < uchars.Length - 1)
             {
                 StartIndex++;
                 if (StartLine < lines.Length - 1)
                 {
-                    if(lines[StartLine+1].startCharIdx<=StartIndex)
+                    if (lines[StartLine + 1].startCharIdx <= StartIndex)
                     {
                         StartLine++;
                     }
@@ -285,7 +286,7 @@ namespace huqiang.Core.HGUI
                 int l = lines[e].startCharIdx - lines[StartLine].startCharIdx;
                 if (LineOffset > l)
                     StartIndex = lines[StartLine].startCharIdx + l;
-                else StartLine = lines[StartLine].startCharIdx + LineOffset;
+                else StartIndex = lines[StartLine].startCharIdx + LineOffset;
                 if(StartLine<ShowStart)
                 {
                     ChangeShowLine(StartLine);
@@ -302,7 +303,7 @@ namespace huqiang.Core.HGUI
                     l = lines[StartLine + 1].startCharIdx - lines[StartLine].startCharIdx;
                 if (LineOffset > l)
                     StartIndex = lines[StartLine].startCharIdx + l;
-                else StartLine = lines[StartLine].startCharIdx + LineOffset;
+                else StartIndex = lines[StartLine].startCharIdx + LineOffset;
                 if (StartLine - ShowRow > ShowStart)
                 {
                     ChangeShowLine(StartLine - ShowRow);
@@ -341,10 +342,12 @@ namespace huqiang.Core.HGUI
                     if(lines[i].startCharIdx<=StartIndex)
                     {
                         ShowStart = i;
+                        StartLine = i;
                         return;
                     }
                 }
                 ShowStart = 0;
+                StartLine = 0;
                 return;
             }
             int e = uchars.Length;
@@ -353,23 +356,34 @@ namespace huqiang.Core.HGUI
                 e = lines[l].startCharIdx - 1;
             if (StartIndex > e)
             {
-                for (int i = ShowStart; i <LineCount; i--)
+                for (int i = ShowStart; i <LineCount; i++)
                 {
                     if (lines[i].startCharIdx > StartIndex)
                     {
                         ShowStart = i - ShowRow;
+                        StartLine = i - 1;
                         return;
                     }
                 }
                 ShowStart = LineCount - ShowRow;
+                StartLine = LineCount - 1;
+                return;
+            }
+        }
+        public void AdjustStartLine()
+        {
+            int a = lines.Length - 1;
+            for (int i = ShowStart; i < lines.Length; i++)
+            {
+                if (lines[i].startCharIdx > StartIndex)
+                {
+                    StartLine = i - 1;
+                    break;
+                }
             }
         }
         public void ChangeShowLine(int index)
         {
-            if (ShowStart != index)
-            {
-
-            }
             ShowStart = index;
         }
         public void InsertString(string str)
@@ -414,11 +428,10 @@ namespace huqiang.Core.HGUI
         /// <summary>
         /// 重新计算
         /// </summary>
-        public void ReCalcul(HText text)
+        public void ReCalcul()
         {
-            GetPreferredHeight(text);
+            GetPreferredHeight();
         }
-        
         /// <summary>
         /// 当前显示区域的百分比
         /// </summary>
@@ -444,7 +457,7 @@ namespace huqiang.Core.HGUI
                 ChangeShowLine(c);
             }
         }
-        void GetPreferredHeight(HText text)
+        void GetPreferredHeight()
         {
             string str = Text.FilterString;
             TextGenerationSettings settings = new TextGenerationSettings();
@@ -453,17 +466,17 @@ namespace huqiang.Core.HGUI
             settings.scaleFactor = 1;
             settings.textAnchor = TextAnchor.UpperLeft;
             settings.color = Color.white;
-            settings.generationExtents = new Vector2(text.SizeDelta.x, 0);
+            settings.generationExtents = new Vector2(Context.SizeDelta.x, 0);
             settings.pivot = new Vector2(0.5f, 0.5f);
             settings.richText = true;
-            settings.font = text.Font;
+            settings.font = Context.Font;
             if (settings.font == null)
                 settings.font = HText.DefaultFont;
-            settings.fontSize = text.m_fontSize;
+            settings.fontSize = Context.m_fontSize;
             settings.fontStyle = FontStyle.Normal;
             settings.alignByGeometry = false;
             settings.updateBounds = false;
-            settings.lineSpacing = text.m_lineSpace;
+            settings.lineSpacing = Context.m_lineSpace;
             settings.horizontalOverflow = HorizontalWrapMode.Wrap;
             settings.verticalOverflow = VerticalWrapMode.Overflow;
             TextGenerator generator = HText.Generator;
@@ -476,7 +489,7 @@ namespace huqiang.Core.HGUI
             LineChange = lc - LineCount;
             LineCount = lc;
             float per = h / lc;
-            ShowRow =(int)(text.SizeDelta.y / per);
+            ShowRow =(int)(Context.SizeDelta.y / per);
         }
     }
 }

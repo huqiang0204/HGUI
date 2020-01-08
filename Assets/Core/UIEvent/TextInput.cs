@@ -57,16 +57,18 @@ namespace huqiang.UIEvent
             EmailAddress,
             Custom
         }
-
+        static TextControll textControll = new TextControll();
         string m_TipString = "";
-        public string InputString { get { return textInfo.text; }
+        string m_inputString="";
+        public string InputString { get { return m_inputString; }
             set {
+                m_inputString = value;
                 value = ValidateString(value);
-                textInfo.buffer.FullString = value;
-                textInfo.text = value;
-                textInfo.startSelect = 0;
-                textInfo.endSelect = -1;
-                SetShowText();
+                //textInfo.buffer.FullString = value;
+                //textInfo.text = value;
+                //textInfo.startSelect = 0;
+                //textInfo.endSelect = -1;
+                //SetShowText();
                 textChanged = true;
                 selectChanged = true;
             } }
@@ -79,20 +81,18 @@ namespace huqiang.UIEvent
                 SetShowText();
             }
         }
-        public EmojiString emojiString { get { return textInfo.buffer; } }
         void SetShowText()
         {
-            
-            if (textInfo.text == ""| textInfo.text==null)
-            {
-                TextCom.Chromatically = TipColor;
-                TextCom.Text = m_TipString;
-            }
-            else
-            {
-                TextCom.Chromatically = textColor;
-                TextCom.Text = textInfo.ShowString.FullString;
-            }
+            //if (textInfo.text == ""| textInfo.text==null)
+            //{
+            //    TextCom.Chromatically = TipColor;
+            //    TextCom.Text = m_TipString;
+            //}
+            //else
+            //{
+            //    TextCom.Chromatically = textColor;
+            //    TextCom.Text = textInfo.ShowString.FullString;
+            //}
         }
         public bool ReadOnly;
         Color textColor=Color.black;
@@ -242,10 +242,8 @@ namespace huqiang.UIEvent
             overTime = 0;
             if (TextCom != null)
             {
-                textInfo.startSelect = GetPressIndex(textInfo, this, action,ref textInfo.startDock)+textInfo.StartIndex;
+                textControll.SetStartSelect(this,action);
                 Editing = true;
-                selectChanged = true;
-                textInfo.CaretStyle = 0;
             }
             base.OnMouseDown(action);
         }
@@ -256,16 +254,17 @@ namespace huqiang.UIEvent
                 {
                     if (action.Motion != Vector2.zero)
                     {
-                        textInfo.CaretStyle = 2;
-                        int end = textInfo.endSelect;
-                        textInfo.endSelect = GetPressIndex(textInfo, this, action, ref textInfo.endDock) + textInfo.StartIndex;
-                        if (end != textInfo.endSelect)
-                        {
-                            Selected();
-                            if (OnSelectChanged != null)
-                                OnSelectChanged(this, action);
-                            selectChanged = true;
-                        }
+                        textControll.SetEndSelect(this,action);
+                        //textInfo.CaretStyle = 2;
+                        //int end = textInfo.endSelect;
+                        //textInfo.endSelect = GetPressIndex(textInfo, this, action, ref textInfo.endDock) + textInfo.StartIndex;
+                        //if (end != textInfo.endSelect)
+                        //{
+                        //    Selected();
+                        //    if (OnSelectChanged != null)
+                        //        OnSelectChanged(this, action);
+                        //    selectChanged = true;
+                        //}
                     }else if(!entry)
                     {
                         float oy = action.CanPosition.y - GlobalPosition.y;
@@ -284,24 +283,12 @@ namespace huqiang.UIEvent
                             overTime -= per;
                             if(oy>0)
                             {
-                                textInfo.StartLine--;
+                                textControll.PointerMoveUp();
                             }
                             else
                             {
-                                textInfo.StartLine++;
+                                textControll.PointerMoveDown();
                             }
-                            int end = textInfo.endSelect;
-                            textInfo.endSelect = GetPressIndex(textInfo, this, action, ref textInfo.endDock) + textInfo.StartIndex;
-                            if (end != textInfo.endSelect)
-                            {
-                                Selected();
-                                if (OnSelectChanged != null)
-                                    OnSelectChanged(this, action);
-                                selectChanged = true;
-                            }
-                            lineChanged = true;
-                            if (LineChanged != null)
-                                LineChanged(this);
                         }
                     }
                 }
@@ -312,15 +299,12 @@ namespace huqiang.UIEvent
             float oy = action.MouseWheelDelta;
             if (oy > 0)
             {
-                textInfo.StartLine--;
+                textControll.PointerMoveUp();
             }
             else
             {
-                textInfo.StartLine++;
+                textControll.PointerMoveDown();
             }
-            lineChanged = true;
-            if (LineChanged != null)
-                LineChanged(this);
             base.OnMouseWheel(action);
         }
         internal override void OnDragEnd(UserAction action)
@@ -338,11 +322,7 @@ namespace huqiang.UIEvent
                 if (x < ClickArea)
                     return;
             }
-            textInfo.endSelect = GetPressIndex(textInfo, this, action, ref textInfo.endDock)+textInfo.StartIndex;
-            Selected();
-            selectChanged = true;
-            if (OnSelectEnd != null)
-                OnSelectEnd(this, action);
+            textControll.SetEndSelect(this,action);
             base.OnDragEnd(action);
         }
         void OnClick(UserEvent eventCall, UserAction action)
@@ -351,14 +331,13 @@ namespace huqiang.UIEvent
             if (input == null)
                 return;
             InputEvent = input;
-            textInfo.startSelect = GetPressIndex(textInfo, this, action, ref textInfo.startDock)+textInfo.StartIndex;
-            textInfo.endSelect = -1;
-            textInfo.CaretStyle = 1;
-            selectChanged = true;
+            textControll.SetFullString(new EmojiString(m_inputString));
+            textControll.ReCalcul(input.TextCom);
+            textControll.MoveToEnd();
+            TextCom.Text = textControll.GetShowString();
             bool pass = InputEvent.contentType == ContentType.Password ? true : false;
-            Keyboard.OnInput(textInfo.text, InputEvent.touchType, InputEvent.multiLine, pass, CharacterLimit);
+            Keyboard.OnInput(m_inputString, InputEvent.touchType, InputEvent.multiLine, pass, CharacterLimit);
             InputCaret.SetParent(Context.transform);
-            InputCaret.ChangeCaret(textInfo);
         }
         void OnLostFocus(UserEvent eventCall, UserAction action)
         {
@@ -395,7 +374,7 @@ namespace huqiang.UIEvent
             if (input == "")
                 return "";
             EmojiString es = new EmojiString(input);
-            string str = textInfo.buffer.FilterString;
+            string str = textControll.GetFullString();
             if (CharacterLimit > 0)
             {
                 string fs = es.FilterString;
@@ -408,34 +387,34 @@ namespace huqiang.UIEvent
                 }
             }
             str = es.FullString;
-            if (Validate(characterValidation, textInfo.text, textInfo.startSelect, str[0]) == 0)
-                return "";
-            if (ValidateChar != null)
-                if (ValidateChar(this, textInfo.startSelect, str[0]) == 0)
-                    return "";
-            DeleteSelected(textInfo);
-            textInfo.buffer.Insert(textInfo.startSelect,es);
-            textInfo.startSelect += es.FilterString.Length;
-            if (OnValueChanged != null)
-                OnValueChanged(this);
-            textInfo.text = textInfo.buffer.FullString;
-            SetShowText();
-            textInfo.CaretStyle = 1;
-            selectChanged = true;
-            textChanged = true;
+            //if (Validate(characterValidation, textInfo.text, textInfo.startSelect, str[0]) == 0)
+            //    return "";
+            //if (ValidateChar != null)
+            //    if (ValidateChar(this, textInfo.startSelect, str[0]) == 0)
+            //        return "";
+            //DeleteSelected(textInfo);
+            //textInfo.buffer.Insert(textInfo.startSelect,es);
+            //textInfo.startSelect += es.FilterString.Length;
+            //if (OnValueChanged != null)
+            //    OnValueChanged(this);
+            //textInfo.text = textInfo.buffer.FullString;
+            //SetShowText();
+            //textInfo.CaretStyle = 1;
+            //selectChanged = true;
+            //textChanged = true;
             return input;
         }
         string TouchInputChanged(string input)
         {
             if (input == "")
                 return "";
-            textInfo.buffer= new EmojiString(input);
-            if (OnValueChanged != null)
-                OnValueChanged(this);
-            textInfo.text = textInfo.buffer.FullString;
-            SetShowText();
-            textInfo.CaretStyle = 1;
-            ChangePoint(textInfo,this);
+            //textInfo.buffer= new EmojiString(input);
+            //if (OnValueChanged != null)
+            //    OnValueChanged(this);
+            //textInfo.text = textInfo.buffer.FullString;
+            //SetShowText();
+            //textInfo.CaretStyle = 1;
+            //ChangePoint(textInfo,this);
             selectChanged = true;
             textChanged = true;
             return input;
@@ -453,228 +432,57 @@ namespace huqiang.UIEvent
             InputEvent.Editing = true;
         }
 
-        void Selected()
-        {
-            textInfo.selectVertex.Clear();
-            textInfo.selectTri.Clear();
-            textInfo.CaretStyle = 2;
-            selectChanged = true;
-        }
         bool textChanged;
         bool selectChanged;
         bool lineChanged;
-        public string SelectString { get  {
-                if (textInfo.endSelect == -1)
-                    return "";
-                int s = textInfo.startSelect;
-                int e = textInfo.endSelect;
-                if(s>e)
-                {
-                    var t = e;
-                    e = s;
-                    s = t;
-                }
-                int c = e - s;
-                return textInfo.buffer.SubString(s,c);
-            } }
-        TextInfo textInfo = new TextInfo();
-        void SetSelectPoint(int index)
-        {
-            if (index != 0)
-            {
-                index += textInfo.startSelect;
-                if (index < 0)
-                    index = 0;
-                if (index > textInfo.text.Length)
-                    index = textInfo.text.Length;
-            }
-            textInfo.startSelect = index;
-            textInfo.endSelect = -1;
-            textInfo.CaretStyle = 1;
-            if (index < textInfo.StartIndex)
-            {
-                textInfo.StartLine--;
-                lineChanged = true;
-                if (LineChanged != null)
-                    LineChanged(this);
-            }
-            else if(index > textInfo.EndIndex)
-            {
-                textInfo.StartLine++;
-                lineChanged = true;
-                if (LineChanged != null)
-                    LineChanged(this);
-            }
-            selectChanged = true;
-            var lines = textInfo.fullLines;
-            if(lines!=null)
-            {
-                int i = lines.Length - 1;
-                int start = textInfo.startSelect;
-                for (; i >= 0; i--)
-                {
-                    int t = lines[i].startCharIdx;
-                    if (t <= start)
-                    {
-                        textInfo.lineIndex = start - t;
-                        break;
-                    }
-                }
-            }
-        }
-        void MoveUp()
-        {
-            var lines = textInfo.fullLines;
-            if (lines != null)
-            {
-                int start = textInfo.startSelect;
-                int i = lines.Length - 1;
-                for (; i >= 1; i--)
-                {
-                    int t = lines[i].startCharIdx;
-                    if (t <= start)
-                    {
-                        if (i > 0)
-                        {
-                            int a = lines[i - 1].startCharIdx + textInfo.lineIndex;
-                            if (a >= t)
-                                a = t - 1;
-                            if (a < textInfo.StartIndex)
-                            {
-                                textInfo.StartLine--;
-                                lineChanged = true;
-                                if (LineChanged != null)
-                                    LineChanged(this);
-                            }
-                            textInfo.startSelect = a;
-                            selectChanged = true;
-                        }
-                        break;
-                    }
-                }
-            }
-        }
-        void MoveDown()
-        {
-            var lines = textInfo.fullLines;
-            if (lines != null)
-            {
-                int start = textInfo.startSelect;
-                int c= lines.Length - 1;
-                for (int i = c-1; i >= 0; i--)
-                {
-                    int t = lines[i].startCharIdx;
-                    if (t <= start)
-                    {
-                        if (i <c)
-                        {
-                            int a = lines[i + 1].startCharIdx + textInfo.lineIndex;
-                            if (a >= textInfo.buffer.Length)
-                                a = textInfo.buffer.Length;
-                            else if (i < c - 1)
-                            {
-                                int s = lines[i + 2].startCharIdx;
-                                if (a >= s)
-                                    a = s - 1;
-                            }
-                            if (a > textInfo.EndIndex)
-                            {
-                                textInfo.StartLine++;
-                                lineChanged = true;
-                                if (LineChanged != null)
-                                    LineChanged(this);
-                            }
-                            textInfo.startSelect = a;
-                            selectChanged = true;
-                        }
-                        else
-                        {
-                            textInfo.StartLine++;
-                            lineChanged = true;
-                            textInfo.startSelect = textInfo.buffer.Length;
-                            selectChanged = true;
-                        }
-                        break;
-                    }
-                }
-            }
-        }
-        void Delete(int dir)
-        {
-            if (DeleteSelected(textInfo))
-                goto label;
-            if (dir<0)
-            {
-                int index = textInfo.startSelect;
-                if(index>0)
-                {
-                    index--;
-                    textInfo.buffer.Remove(index,1);
-                    textInfo.startSelect = index;
-                }
-            }
-            else
-            {
-                int index = textInfo.startSelect;
-                if(index<textInfo.buffer.Length)
-                {
-                    textInfo.buffer.Remove(index, 1);
-                }
-            }
-            label:;
-            if (OnValueChanged != null)
-                OnValueChanged(this);
-            textInfo.text = textInfo.buffer.FullString;
-            textInfo.CaretStyle = 1;
-            textChanged = true;
-            selectChanged = true;
-        }
+        public string SelectString { get => textControll.GetSelectString(); }
+
         void Refresh()
         {
             var te = TextCom;
             if (te != null)
             {
-                if(textChanged)
-                {
-                    textInfo.fontSize = TextCom.m_fontSize;
-                    textChanged = false;
-                    GetPreferredHeight(TextCom,textInfo);
-                    textInfo.StartLine += textInfo.LineChange;
-                    textInfo.EndLine += textInfo.LineChange;
-                    lineChanged = true;
-                    var lines = textInfo.fullLines;
-                    if (lines != null)
-                    {
-                        int i = lines.Length - 1;
-                        int start = textInfo.startSelect;
-                        for (; i >= 0; i--)
-                        {
-                            int t = lines[i].startCharIdx;
-                            if (t <= start)
-                            {
-                                textInfo.lineIndex = start - t;
-                                break;
-                            }
-                        }
-                    }
-                }
-                if(lineChanged)
-                {
-                    lineChanged = false;
-                    FilterPopulate(TextCom, textInfo);
-                    SetShowText();
-                }
-                if(selectChanged)
-                {
-                    textInfo.fontSize = TextCom.m_fontSize;
-                    textInfo.caretColor = PointColor;
-                    textInfo.areaColor = SelectionColor;
-                    selectChanged = false;
-                    if (textInfo.CaretStyle == 2)
-                        FilterChoiceArea(TextCom, textInfo);
-                    else ChangePoint(textInfo,this);
-                    InputCaret.ChangeCaret(textInfo);
-                }  
+                //if(textChanged)
+                //{
+                //    textInfo.fontSize = TextCom.m_fontSize;
+                //    textChanged = false;
+                //    GetPreferredHeight(TextCom,textInfo);
+                //    textInfo.StartLine += textInfo.LineChange;
+                //    textInfo.EndLine += textInfo.LineChange;
+                //    lineChanged = true;
+                //    var lines = textInfo.fullLines;
+                //    if (lines != null)
+                //    {
+                //        int i = lines.Length - 1;
+                //        int start = textInfo.startSelect;
+                //        for (; i >= 0; i--)
+                //        {
+                //            int t = lines[i].startCharIdx;
+                //            if (t <= start)
+                //            {
+                //                textInfo.lineIndex = start - t;
+                //                break;
+                //            }
+                //        }
+                //    }
+                //}
+                //if(lineChanged)
+                //{
+                //    lineChanged = false;
+                //    FilterPopulate(TextCom, textInfo);
+                //    SetShowText();
+                //}
+                //if(selectChanged)
+                //{
+                //    textInfo.fontSize = TextCom.m_fontSize;
+                //    textInfo.caretColor = PointColor;
+                //    textInfo.areaColor = SelectionColor;
+                //    selectChanged = false;
+                //    if (textInfo.CaretStyle == 2)
+                //        FilterChoiceArea(TextCom, textInfo);
+                //    else ChangePoint(textInfo,this);
+                //    InputCaret.ChangeCaret(textInfo);
+                //}  
             }
         }
         public void SizeChanged()
@@ -682,27 +490,7 @@ namespace huqiang.UIEvent
             textChanged = true;
             selectChanged = true;
         }
-        public float Percentage { get {
-                float a = textInfo.LineCount;
-                float b = textInfo.EndLine - textInfo.StartLine;
-                float c = a - b;
-                return b / c; }
-            set {
-                if (value < 0)
-                    value = 0;
-                else if (value > 1)
-                    value = 1;
-                float a = textInfo.LineCount;
-                float b = textInfo.EndLine - textInfo.StartLine;
-                float c = a - b;
-                if (c < 0)
-                    c = 0;
-                int i = (int)(c * value);
-                textInfo.StartLine = i;
-                if(textInfo.StartLine!=i)
-                {
-                    lineChanged = true;
-                }
-            } }
+        public float Percentage { get => textControll.Percentage;
+            set => textControll.Percentage = value; }
     }
 }

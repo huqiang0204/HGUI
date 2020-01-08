@@ -28,27 +28,27 @@ namespace huqiang.UIEvent
             }
         }
         static float time;
-        public static void ChangeCaret(TextInfo info)
+        public static void ChangeCaret(TextControll info)
         {
-            if (m_Caret != null)
-            {
-                int c = info.selectVertex.Count;
-                Color32 col;
-                if (info.CaretStyle == 1)
-                    col = info.caretColor;
-                else col = info.areaColor;
-                HVertex[] hv = new HVertex[c];
-                for (int i = 0; i < c; i++)
-                {
-                    hv[i].position = info.selectVertex[i].position;
-                    hv[i].color = col;
-                }
-                m_Caret.vertices = hv;
-                m_Caret.tris = info.selectTri.ToArray();
-                time = 0;
-                m_Caret.gameObject.SetActive(true);
-            }
-            CaretStyle = info.CaretStyle;
+            //if (m_Caret != null)
+            //{
+            //    int c = info.selectVertex.Count;
+            //    Color32 col;
+            //    if (info.CaretStyle == 1)
+            //        col = info.caretColor;
+            //    else col = info.areaColor;
+            //    HVertex[] hv = new HVertex[c];
+            //    for (int i = 0; i < c; i++)
+            //    {
+            //        hv[i].position = info.selectVertex[i].position;
+            //        hv[i].color = col;
+            //    }
+            //    m_Caret.vertices = hv;
+            //    m_Caret.tris = info.selectTri.ToArray();
+            //    time = 0;
+            //    m_Caret.gameObject.SetActive(true);
+            //}
+            //CaretStyle = info.CaretStyle;
         }
         public static int CaretStyle;
         public static void UpdateCaret()

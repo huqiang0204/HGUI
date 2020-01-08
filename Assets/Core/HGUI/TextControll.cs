@@ -1,11 +1,10 @@
-﻿using huqiang.Core.HGUI;
-using huqiang.UIEvent;
+﻿using huqiang.UIEvent;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Assets.Core.HGUI
+namespace huqiang.Core.HGUI
 {
     public class TextControll
     {
@@ -127,6 +126,10 @@ namespace Assets.Core.HGUI
             EndIndex = GetPressIndex(userEvent,action);
             Style = 1;
         }
+        public string GetFullString()
+        {
+            return Text.FullString;
+        }
         /// <summary>
         /// 获取当前需要显示的字符串
         /// </summary>
@@ -238,7 +241,7 @@ namespace Assets.Core.HGUI
             }
 
         }
-        public void MoveLeft()
+        public void PointerMoveLeft()
         {
             if(StartIndex>0)
             {
@@ -250,11 +253,11 @@ namespace Assets.Core.HGUI
                 LineOffset = StartIndex - lines[StartLine].startCharIdx;
                 if (StartLine < ShowStart)
                 {
-                    ChangeLine(StartLine);
+                    ChangeShowLine(StartLine);
                 }
             }
         }
-        public void MoveRight()
+        public void PointerMoveRight()
         {
             if(StartIndex<uchars.Length-1)
             {
@@ -269,11 +272,11 @@ namespace Assets.Core.HGUI
                 LineOffset = StartIndex - lines[StartLine].startCharIdx;
                 if (StartLine - ShowRow > ShowStart)
                 {
-                    ChangeLine(StartLine - ShowRow);
+                    ChangeShowLine(StartLine - ShowRow);
                 }
             }
         }
-        public void MoveUp()
+        public void PointerMoveUp()
         {
             if (StartLine > 0)
             {
@@ -285,11 +288,11 @@ namespace Assets.Core.HGUI
                 else StartLine = lines[StartLine].startCharIdx + LineOffset;
                 if(StartLine<ShowStart)
                 {
-                    ChangeLine(StartLine);
+                    ChangeShowLine(StartLine);
                 }
             }
         }
-        public void MoveDown()
+        public void PointerMoveDown()
         {
             if (StartLine < lines.Length - 1)
             {
@@ -302,11 +305,33 @@ namespace Assets.Core.HGUI
                 else StartLine = lines[StartLine].startCharIdx + LineOffset;
                 if (StartLine - ShowRow > ShowStart)
                 {
-                    ChangeLine(StartLine - ShowRow);
+                    ChangeShowLine(StartLine - ShowRow);
                 }
             }
         }
-        public void ChangeLine(int index)
+        public void PointerMoveStart()
+        {
+            Style = 0;
+            StartIndex = 0;
+        }
+        public void PointerMoveEnd()
+        {
+            Style = 0;
+            StartIndex= uchars.Length;
+        }
+        public void SelectAll()
+        {
+            Style = 1;
+            StartIndex = 0;
+            EndIndex = uchars.Length;
+        }
+        public void MoveToEnd()
+        {
+            ShowStart = LineCount - ShowRow;
+            if (ShowStart < 0)
+                ShowStart = 0;
+        }
+        public void ChangeShowLine(int index)
         {
             if(ShowStart!=index)
             {
@@ -316,13 +341,13 @@ namespace Assets.Core.HGUI
         }
         public void InsertString(string str)
         {
-            DeleteString();
+            DeleteSelectString();
             var es = new EmojiString(str);
             int c = es.Length;
             Text.Insert(StartIndex, es);
             StartIndex += c;
         }
-        public bool DeleteString()
+        public bool DeleteSelectString()
         {
             if (Style == 1)
             {
@@ -340,13 +365,13 @@ namespace Assets.Core.HGUI
         }
         public bool DeleteLast()
         {
-            if (DeleteString())
+            if (DeleteSelectString())
                 return true;
             return Text.Remove(StartIndex);
         }
         public bool DeleteNext()
         {
-            if (DeleteString())
+            if (DeleteSelectString())
                 return true;
             if (StartIndex < 1)
                 return false;
@@ -360,6 +385,7 @@ namespace Assets.Core.HGUI
         {
             GetPreferredHeight(text);
         }
+        
         /// <summary>
         /// 当前显示区域的百分比
         /// </summary>
@@ -382,7 +408,7 @@ namespace Assets.Core.HGUI
                     value = 1;
                 float a = (float)LineCount - (float)ShowRow;
                 int c = (int)(a * value);
-                ChangeLine(c);
+                ChangeShowLine(c);
             }
         }
         void GetPreferredHeight(HText text)

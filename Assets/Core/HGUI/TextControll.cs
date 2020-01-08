@@ -367,15 +367,15 @@ namespace huqiang.Core.HGUI
         {
             if (DeleteSelectString())
                 return true;
+            if (StartIndex < 1)
+                return false;
+            StartIndex--;
             return Text.Remove(StartIndex);
         }
         public bool DeleteNext()
         {
             if (DeleteSelectString())
                 return true;
-            if (StartIndex < 1)
-                return false;
-            StartIndex--;
             return Text.Remove(StartIndex);
         }
         /// <summary>
@@ -442,7 +442,8 @@ namespace huqiang.Core.HGUI
             int lc = lines.Length;
             LineChange = lc - LineCount;
             LineCount = lc;
-            ShowRow =(int)(text.SizeDelta.y / (float)text.m_fontSize/text.m_lineSpace);
+            float per = h / lc;
+            ShowRow =(int)(text.SizeDelta.y / per);
         }
     }
 }

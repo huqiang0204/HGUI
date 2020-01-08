@@ -85,6 +85,7 @@ namespace huqiang.UIEvent
                     if (InputEvent != null)
                     {
                         textControll.DeleteLast();
+                        InputEvent.SetShowText();
                     }
                     KeySpeed *= 0.8f;
                     if (KeySpeed < MaxSpeed)
@@ -100,6 +101,7 @@ namespace huqiang.UIEvent
                     if (InputEvent != null)
                     {
                         textControll.DeleteNext();
+                        InputEvent.SetShowText();
                     }
                     KeySpeed *= 0.7f;
                     if (KeySpeed < MaxSpeed)
@@ -199,6 +201,7 @@ namespace huqiang.UIEvent
                         string str = textControll.GetSelectString();
                         textControll.DeleteSelectString();
                         GUIUtility.systemCopyBuffer = str;
+                        InputEvent.SetShowText();
                     }
                     return EditState.Done;
                 }
@@ -276,12 +279,6 @@ namespace huqiang.UIEvent
                             InputEvent.OnInputChanged(Environment.NewLine);
                         }
                     }
-                //if(InputEvent.textInfo.LineChange>0)
-                //{
-                //    InputEvent.textInfo.LineChange = 0;
-                //    if (InputEvent.LineChanged != null)
-                //        InputEvent.LineChanged(InputEvent);
-                //}
                 InputEvent.Refresh();
             }
         }
@@ -725,21 +722,15 @@ namespace huqiang.UIEvent
                 }
             }
             str = es.FullString;
+
             //if (Validate(characterValidation, textInfo.text, textInfo.startSelect, str[0]) == 0)
             //    return "";
             //if (ValidateChar != null)
             //    if (ValidateChar(this, textInfo.startSelect, str[0]) == 0)
             //        return "";
-            //DeleteSelected(textInfo);
-            //textInfo.buffer.Insert(textInfo.startSelect,es);
-            //textInfo.startSelect += es.FilterString.Length;
-            //if (OnValueChanged != null)
-            //    OnValueChanged(this);
-            //textInfo.text = textInfo.buffer.FullString;
-            //SetShowText();
-            //textInfo.CaretStyle = 1;
-            //selectChanged = true;
-            //textChanged = true;
+            textControll.InsertString(str);
+            textControll.ReCalcul(TextCom);
+            SetShowText();
             return input;
         }
         string TouchInputChanged(string input)

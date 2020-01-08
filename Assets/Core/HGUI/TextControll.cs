@@ -370,5 +370,9 @@ namespace huqiang.Core.HGUI
             float per = h / lc;
             ShowRow =(int)(Context.SizeDelta.y / per);
         }
+        public int GetPressIndex()
+        {
+            return StartIndex - lines[ShowStart].startCharIdx;
+        }
     }
 }

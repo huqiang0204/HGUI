@@ -16,13 +16,13 @@ namespace huqiang.UIEvent
                     var g = new GameObject("m_caret",typeof(HImage));
                     m_Caret = g.GetComponent<HImage>();
                     m_Caret.transform.SetParent(App.UIRoot);
-                    m_Caret.SizeDelta = Vector2.zero;
+                    m_Caret.SizeDelta = new Vector2(2,24);
                 }
                 else if (m_Caret.name == "buff")
                 {
                     var g = new GameObject("m_caret", typeof(HImage));
                     m_Caret = g.GetComponent<HImage>();
-                    m_Caret.SizeDelta = Vector2.zero;
+                    m_Caret.SizeDelta = new Vector2(2, 24);
                 }
                 return m_Caret;
             }
@@ -50,7 +50,7 @@ namespace huqiang.UIEvent
             //}
             //CaretStyle = info.CaretStyle;
         }
-        public static int CaretStyle;
+        public static int CaretStyle = 1;
         public static void UpdateCaret()
         {
             switch (CaretStyle)

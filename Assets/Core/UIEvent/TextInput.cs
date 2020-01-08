@@ -277,7 +277,7 @@ namespace huqiang.UIEvent
                         }
                         else if (state == EditState.NewLine)
                         {
-                            InputEvent.OnInputChanged(Environment.NewLine);
+                            InputEvent.OnInputChanged("\r");
                         }
                     }
                 InputEvent.Refresh();
@@ -727,7 +727,7 @@ namespace huqiang.UIEvent
                 }
             }
             str = es.FullString;
-
+            
             //if (Validate(characterValidation, textInfo.text, textInfo.startSelect, str[0]) == 0)
             //    return "";
             //if (ValidateChar != null)
@@ -814,6 +814,7 @@ namespace huqiang.UIEvent
                 //    else ChangePoint(textInfo,this);
                 //    InputCaret.ChangeCaret(textInfo);
                 //}  
+                SetPressPointer();
             }
         }
         public float Percentage { get => textControll.Percentage;
@@ -989,6 +990,20 @@ namespace huqiang.UIEvent
             //        tri.Add(st + 1);
             //    }
             //}
+        }
+        public void SetPressPointer()
+        {
+            int index = textControll.GetPressIndex();
+            if (index > -1)
+            {
+                if (TextCom.uIChars != null)
+                    if (index < TextCom.uIChars.Count)
+                    {
+                        var ch = TextCom.uIChars[index];
+                        float x = ch.cursorPos.x - 1;
+                        InputCaret.Caret.transform.localPosition = new Vector3(x, ch.cursorPos.y-12, 0);
+                    }
+            }
         }
     }
 }

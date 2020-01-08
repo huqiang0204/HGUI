@@ -971,11 +971,10 @@ namespace huqiang.UIEvent
                         int line = textControll.GetPressLine();
                         float h = TextCom.uILines[line].height;
                         var ch = TextCom.uIChars[index];
-                        float x = ch.cursorPos.x - 1;
-                        var pos = new Vector3(x, ch.cursorPos.y - 0.5f * h, 0);
-                        var trans = InputCaret.Caret.transform;
-                        trans.localPosition = pos;
-                        InputCaret.Caret.SizeDelta = new Vector2(2,h);
+                        float rx = ch.cursorPos.x - 0.5f;
+                        float lx = rx - 2f;
+                        float ty = ch.cursorPos.y;
+                        float dy = ty - h;
                     }
                 }
             }

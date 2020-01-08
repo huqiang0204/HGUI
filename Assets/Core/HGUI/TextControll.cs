@@ -62,7 +62,7 @@ namespace huqiang.Core.HGUI
             my *= scale.y;
             my += ShowOffset;
             int r = 0;//行
-            int count = 1;
+            int count = 0;
             for (int i = 0; i < lines.Length; i++)
             {
                 if (my > lines[i].topY)
@@ -86,7 +86,7 @@ namespace huqiang.Core.HGUI
             }
             else
             {
-                int e = s + count;
+                int e = s + count - 1;
                 float rx = uchars[e].cursorPos.x;
                 if (mx > rx)//最右边
                 {
@@ -138,7 +138,7 @@ namespace huqiang.Core.HGUI
         {
             int s = lines[ShowStart].startCharIdx;
             int end = ShowStart + ShowRow + 1;
-            int e = uchars.Length;
+            int e = uchars.Length ;
             if (end < LineCount)
                 e = lines[end].startCharIdx - 1;
             return Text.SubString(s, e - s);
@@ -430,7 +430,7 @@ namespace huqiang.Core.HGUI
             settings.fontStyle = FontStyle.Normal;
             settings.alignByGeometry = false;
             settings.updateBounds = false;
-            settings.lineSpacing = 1;
+            settings.lineSpacing = text.m_lineSpace;
             settings.horizontalOverflow = HorizontalWrapMode.Wrap;
             settings.verticalOverflow = VerticalWrapMode.Overflow;
             TextGenerator generator = HText.Generator;
@@ -442,6 +442,7 @@ namespace huqiang.Core.HGUI
             int lc = lines.Length;
             LineChange = lc - LineCount;
             LineCount = lc;
+            ShowRow =(int)(text.SizeDelta.y / (float)text.m_fontSize/text.m_lineSpace);
         }
     }
 }

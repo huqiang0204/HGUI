@@ -68,15 +68,20 @@ namespace huqiang.Core.HGUI
             f_str = EmojiMap.EmojiToFullString(m_str,emojis);
             return true;
         }
-        public String SubString(int index,int count=1)
+        public String SubString(int index,int count = 1)
         {
             if (count < 1)
                 return "";
+            int len = m_str.Length;
+            if (index > len)
+                return "";
             StringBuilder tmp = new StringBuilder();
-            for(int i=0;i<count;i++)
+            for (int i = 0; i < count; i++)
             {
+                if (index >= len)
+                    break;
                 string chr = null;
-                for(int j=0;j<emojis.Count;j++)
+                for (int j = 0; j < emojis.Count; j++)
                 {
                     if (emojis[j].pos == index)
                         chr = emojis[j].chr;

@@ -378,5 +378,27 @@ namespace huqiang.Core.HGUI
         {
             return StartLine - ShowStart;
         }
+        public int GetStartLine()
+        {
+            if (StartLine > EndLine)
+                return EndLine - ShowStart;
+            else return StartLine - ShowStart;
+        }
+        public Vector2Int GetShowSelect()
+        {
+            Vector2Int vector = Vector2Int.zero;
+            vector.x = StartIndex;
+            vector.y = EndIndex;
+            if (vector.x > vector.y)
+            {
+                int t = vector.x;
+                vector.x = vector.y;
+                vector.y = t;
+            }
+            int s = lines[ShowStart].startCharIdx;
+            vector.x -= s;
+            vector.y -= s;
+            return vector;
+        }
     }
 }

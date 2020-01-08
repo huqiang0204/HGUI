@@ -773,47 +773,7 @@ namespace huqiang.UIEvent
             var te = TextCom;
             if (te != null)
             {
-                //if(textChanged)
-                //{
-                //    textInfo.fontSize = TextCom.m_fontSize;
-                //    textChanged = false;
-                //    GetPreferredHeight(TextCom,textInfo);
-                //    textInfo.StartLine += textInfo.LineChange;
-                //    textInfo.EndLine += textInfo.LineChange;
-                //    lineChanged = true;
-                //    var lines = textInfo.fullLines;
-                //    if (lines != null)
-                //    {
-                //        int i = lines.Length - 1;
-                //        int start = textInfo.startSelect;
-                //        for (; i >= 0; i--)
-                //        {
-                //            int t = lines[i].startCharIdx;
-                //            if (t <= start)
-                //            {
-                //                textInfo.lineIndex = start - t;
-                //                break;
-                //            }
-                //        }
-                //    }
-                //}
-                //if(lineChanged)
-                //{
-                //    lineChanged = false;
-                //    FilterPopulate(TextCom, textInfo);
-                //    SetShowText();
-                //}
-                //if(selectChanged)
-                //{
-                //    textInfo.fontSize = TextCom.m_fontSize;
-                //    textInfo.caretColor = PointColor;
-                //    textInfo.areaColor = SelectionColor;
-                //    selectChanged = false;
-                //    if (textInfo.CaretStyle == 2)
-                //        FilterChoiceArea(TextCom, textInfo);
-                //    else ChangePoint(textInfo,this);
-                //    InputCaret.ChangeCaret(textInfo);
-                //}  
+   
                 SetPressPointer();
             }
         }
@@ -937,60 +897,66 @@ namespace huqiang.UIEvent
         {
             if (TextCom == null)
                 return;
-            //int s = StartIndex;
-            //int e = EndIndex;
-            //if (e < s)
-            //{
-            //    int t = s;
-            //    s = e;
-            //    e = t;
-            //}
-            //int c = e - s;
-            //vert.Clear();
-            //tri.Clear();
-            //int len = EndLine + 1;
-            //for (int i = StartLine; i < len; i++)
-            //{
-            //    int os = lines[i].startCharIdx;
-            //    int oe = uchars.Length;
-            //    if (i < len - 1)
-            //        oe = lines[i + 1].startCharIdx - 1;
-            //    int state = CommonArea(s, e, ref os, ref oe);
-            //    if (state == 2)//结束
-            //        break;
-            //    if (state == 1)//包含公共区域
-            //    {
-            //        float lx = uchars[os].cursorPos.x - uchars[os].charWidth * 0.5f;
-            //        float rx = uchars[oe].cursorPos.x + uchars[oe].charWidth * 0.5f;
-            //        float h = lines[i].height;
-            //        float top = lines[i].topY;
-            //        float down = top - h;
-            //        int st = vert.Count;
-            //        var v = new HVertex();
-            //        v.position.x = lx;
-            //        v.position.y = down;
-            //        v.color = color;
-            //        vert.Add(v);
-            //        v.position.x = rx;
-            //        v.position.y = down;
-            //        v.color = color;
-            //        vert.Add(v);
-            //        v.position.x = lx;
-            //        v.position.y = top;
-            //        v.color = color;
-            //        vert.Add(v);
-            //        v.position.x = rx;
-            //        v.position.y = top;
-            //        v.color = color;
-            //        vert.Add(v);
-            //        tri.Add(st);
-            //        tri.Add(st + 2);
-            //        tri.Add(st + 3);
-            //        tri.Add(st);
-            //        tri.Add(st + 3);
-            //        tri.Add(st + 1);
-            //    }
-            //}
+            var ss = textControll.GetShowSelect();
+            int s = ss.x;
+            int e = ss.y;
+            int c = TextCom.uIChars.Count;
+            int state = CommonArea(0, c, ref s, ref e);
+            if (state == 1)
+                if (s != e)
+                {
+                    vert.Clear();
+                    tri.Clear();
+                    int sl = textControll.GetStartLine();
+                    if (sl < 0)
+                        sl = 0;
+                    var lines = TextCom.uILines;
+                    int len = lines.Count;
+                    var uchars = TextCom.uIChars;
+                    int clen = uchars.Count;
+                    for (int i = sl; i < len; i++)
+                    {
+                        int os = lines[i].startCharIdx;
+                        int oe = clen;
+                        if (i < len - 1)
+                            oe = lines[i + 1].startCharIdx - 1;
+                        state = CommonArea(s, e, ref os, ref oe);
+                        if (state == 2)//结束
+                            break;
+                        if (state == 1)//包含公共区域
+                        {
+                            float lx = uchars[os].cursorPos.x - uchars[os].charWidth * 0.5f;
+                            float rx = uchars[oe].cursorPos.x + uchars[oe].charWidth * 0.5f;
+                            float h = lines[i].height;
+                            float top = lines[i].topY;
+                            float down = top - h;
+                            int st = vert.Count;
+                            var v = new HVertex();
+                            v.position.x = lx;
+                            v.position.y = down;
+                            v.color = color;
+                            vert.Add(v);
+                            v.position.x = rx;
+                            v.position.y = down;
+                            v.color = color;
+                            vert.Add(v);
+                            v.position.x = lx;
+                            v.position.y = top;
+                            v.color = color;
+                            vert.Add(v);
+                            v.position.x = rx;
+                            v.position.y = top;
+                            v.color = color;
+                            vert.Add(v);
+                            tri.Add(st);
+                            tri.Add(st + 2);
+                            tri.Add(st + 3);
+                            tri.Add(st);
+                            tri.Add(st + 3);
+                            tri.Add(st + 1);
+                        }
+                    }
+                }
         }
         public void SetPressPointer()
         {

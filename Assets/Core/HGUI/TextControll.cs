@@ -50,6 +50,7 @@ namespace huqiang.Core.HGUI
         public void SetFullString(EmojiString emojiString)
         {
             Text = emojiString;
+            textChanged = true;
         }
         int GetPressIndex(UserEvent callBack, UserAction action)
         {
@@ -393,6 +394,7 @@ namespace huqiang.Core.HGUI
             int c = es.Length;
             Text.Insert(StartIndex, es);
             StartIndex += c;
+            textChanged = true;
         }
         public bool DeleteSelectString()
         {
@@ -406,6 +408,7 @@ namespace huqiang.Core.HGUI
                 Text.Remove(s, e - s);
                 if (StartIndex < EndIndex)
                     StartIndex = EndIndex;
+                textChanged = true;
                 return true;
             }
             return false;
@@ -417,20 +420,35 @@ namespace huqiang.Core.HGUI
             if (StartIndex < 1)
                 return false;
             StartIndex--;
-            return Text.Remove(StartIndex);
+            if (Text.Remove(StartIndex))
+            {
+                textChanged = true;
+                return true;
+            }
+            return false;
         }
         public bool DeleteNext()
         {
             if (DeleteSelectString())
                 return true;
-            return Text.Remove(StartIndex);
+            if(Text.Remove(StartIndex))
+            {
+                textChanged = true;
+                return true;
+            }
+            return false;
         }
+        bool textChanged;
         /// <summary>
         /// 重新计算
         /// </summary>
         public void ReCalcul()
         {
-            GetPreferredHeight();
+            if(textChanged)
+            {
+                GetPreferredHeight();
+                textChanged = false;
+            }
         }
         /// <summary>
         /// 当前显示区域的百分比

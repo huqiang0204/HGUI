@@ -420,9 +420,6 @@ namespace huqiang.UIEvent
             set {
                 m_inputString = value;
                 value = ValidateString(value);
-                textControll.SetFullString(new EmojiString(value));
-                textControll.ReCalcul();
-                textControll.MoveToEnd();
             } }
         public string TipString
         {
@@ -596,7 +593,7 @@ namespace huqiang.UIEvent
             if (TextCom != null)
             {
                 textControll.Context = TextCom;
-                textControll.SetStartSelect(this,action);
+                textControll.SetStartSelect(GetPressIndex(action,0));
                 Editing = true;
             }
             base.OnMouseDown(action);
@@ -608,8 +605,11 @@ namespace huqiang.UIEvent
                 {
                     if (action.Motion != Vector2.zero)
                     {
-                        textControll.SetEndSelect(this,action);
-                    }else if(!entry)
+                        if (action.CanPosition.y < RawPosition.y)
+                            textControll.SetEndSelect(GetPressIndex(action, 0.2f));
+                        else textControll.SetEndSelect(GetPressIndex(action, -0.8f));
+                    }
+                    else if(!entry)
                     {
                         float oy = action.CanPosition.y - GlobalPosition.y;
                         float py = GlobalScale.y * TextCom.SizeDelta.y * 0.5f;
@@ -656,7 +656,9 @@ namespace huqiang.UIEvent
                 if (x < ClickArea)
                     return;
             }
-            textControll.SetEndSelect(this, action);
+            if (action.CanPosition.y < RawPosition.y)
+                textControll.SetEndSelect(GetPressIndex(action, 0.2f));
+            else textControll.SetEndSelect(GetPressIndex(action, -0.8f));
             base.OnDragEnd(action);
         }
         void OnClick(UserEvent eventCall, UserAction action)
@@ -813,5 +815,95 @@ namespace huqiang.UIEvent
         }
         public float Percentage { get => textControll.Percentage;
             set => textControll.Percentage = value; }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="callBack"></param>
+        /// <param name="action"></param>
+        /// <param name="dir">从上往下0.2,从下网上为-0.8<</param>
+        /// <returns>x=行,y=索引,z=行偏移</returns>
+        Vector3Int GetPressIndex(UserAction action, float dir)
+        {
+            Vector3Int v3 = Vector3Int.zero;
+            if (TextCom == null)
+                return v3;
+            var lines = TextCom.uILines;
+            if (lines == null)
+                return v3;
+            var uchars = TextCom.uIChars;
+            var pos = GlobalPosition;
+            var scale = GlobalScale;
+            float mx = action.CanPosition.x - pos.x;
+            mx *= scale.x;
+            float my = action.CanPosition.y - pos.y;
+            my *= scale.y;
+            int len = lines.Count;
+            int end = len - 1;
+            int r = 0;//行
+            v3.x = r;
+            if (my < lines[0].topY)
+            {
+                if (my < lines[end].topY)
+                {
+                    r = end;
+                }
+                else
+                {
+                    for (int i = 0; i < len; i++)
+                    {
+                        if (lines[i].topY + dir* lines[i].height < my)
+                        {
+                            r = i;
+                            break;
+                        }
+                    }
+                }
+            }
+            int count = 0;
+            int s = lines[r].startCharIdx;
+            float lx = uchars[s].cursorPos.x;
+            if (mx < lx)//最左边
+            {
+                v3.y = s;
+                return v3;
+            }
+            else
+            {
+                int e = s + count - 1;
+                float rx = uchars[e].cursorPos.x;
+                if (mx > rx)//最右边
+                {
+                    v3.y = e;
+                    v3.z = count - 1;
+                    return v3;
+                }
+                else
+                {
+                    s++;
+                    for (int i = 1; i < count; i++)
+                    {
+                        if (mx >= uchars[s].cursorPos.x)
+                        {
+                            lx = uchars[s - 1].cursorPos.x;
+                            rx = uchars[s].cursorPos.x;
+                            if (mx - lx > rx - mx)
+                            {
+                                v3.y = s;
+                                v3.z = i;
+                                return v3;
+                            }
+                            else
+                            {
+                                v3.y = s - 1;
+                                v3.z = i - 1;
+                                return v3;
+                            }
+                        }
+                        s++;
+                    }
+                }
+            }
+            return v3;
+        }
     }
 }

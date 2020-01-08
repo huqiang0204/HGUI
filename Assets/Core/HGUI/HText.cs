@@ -154,12 +154,16 @@ namespace huqiang.Core.HGUI
             sett.color = m_color;
             sett.alignByGeometry = m_align;
         }
+        internal IList<UILineInfo> uILines;
+        internal IList<UICharInfo> uIChars;
         public void Populate()
         {
             GetGenerationSettings(ref SizeDelta,ref settings);
             var g = Generator;
             g.Populate(emojiString.FilterString, settings);
             verts = g.verts.ToArray();
+            uILines = g.lines;
+            uIChars = g.characters;
             m_dirty = false;
             m_vertexChange = true;
             fillColors[0] = true;

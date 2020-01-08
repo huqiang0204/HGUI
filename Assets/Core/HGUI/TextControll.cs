@@ -52,80 +52,19 @@ namespace huqiang.Core.HGUI
             Text = emojiString;
             textChanged = true;
         }
-        int GetPressIndex(UserEvent callBack, UserAction action)
+        public void SetStartSelect(Vector3Int vector)
         {
-            if (uchars == null)
-                return 0;
-            var pos = callBack.GlobalPosition;
-            var scale = callBack.GlobalScale;
-            float mx = action.CanPosition.x - pos.x;
-            mx *= scale.x;
-            float my = action.CanPosition.y - pos.y;
-            my *= scale.y;
-            my += ShowOffset;
-            int r = 0;//行
-            int count = 0;
-            for (int i = 0; i < lines.Length; i++)
-            {
-                if (my > lines[i].topY)
-                {
-                    if (i == 0)
-                    {
-                        count = uchars.Length;
-                    }
-                    else
-                    {
-                        r = i - 1;
-                        count = lines[i].startCharIdx - lines[r].startCharIdx;
-                    }
-                }
-            }
-            int s = lines[r].startCharIdx;
-            float lx = uchars[s].cursorPos.x;
-            if (mx < lx)//最左边
-            {
-                return s;
-            }
-            else
-            {
-                int e = s + count - 1;
-                float rx = uchars[e].cursorPos.x;
-                if (mx > rx)//最右边
-                {
-                    return e;
-                }
-                else
-                {
-                    s++;
-                    for (int i = 1; i < count; i++)
-                    {
-                        if (mx >= uchars[s].cursorPos.x)
-                        {
-                            lx = uchars[s - 1].cursorPos.x;
-                            rx = uchars[s].cursorPos.x;
-                            if (mx - lx > rx - mx)
-                            {
-                                return s;
-                            }
-                            else
-                            {
-                                return s - 1;
-                            }
-                        }
-                        s++;
-                    }
-                }
-            }
-            return 0;
-        }
-        public void SetStartSelect(UserEvent userEvent, UserAction action)
-        {
-            StartIndex = GetPressIndex(userEvent,action);
+            int s = lines[ShowStart].startCharIdx;
+            StartIndex = s + vector.y;
+            StartLine = ShowStart + vector.x;
+            LineOffset = vector.z;
             Style = 0;
         }
-        public void SetEndSelect(UserEvent userEvent, UserAction action)
+        public void SetEndSelect(Vector3Int vector)
         {
-            EndIndex = GetPressIndex(userEvent,action);
+            int s = lines[ShowStart].startCharIdx;
+            EndIndex = s + vector.y;
+            EndLine = ShowStart + vector.x;
             Style = 1;
         }
         public string GetFullString()

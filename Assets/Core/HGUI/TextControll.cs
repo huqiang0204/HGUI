@@ -331,9 +331,42 @@ namespace huqiang.Core.HGUI
             if (ShowStart < 0)
                 ShowStart = 0;
         }
+        public void AdjustToPoint()
+        {
+            int s = lines[ShowStart].startCharIdx;
+            if (StartIndex < s)
+            {
+                for (int i = ShowStart; i >= 0; i--)
+                {
+                    if(lines[i].startCharIdx<=StartIndex)
+                    {
+                        ShowStart = i;
+                        return;
+                    }
+                }
+                ShowStart = 0;
+                return;
+            }
+            int e = uchars.Length;
+            int l = ShowStart + ShowRow + 1;
+            if (l < LineCount)
+                e = lines[l].startCharIdx - 1;
+            if (StartIndex > e)
+            {
+                for (int i = ShowStart; i <LineCount; i--)
+                {
+                    if (lines[i].startCharIdx > StartIndex)
+                    {
+                        ShowStart = i - ShowRow;
+                        return;
+                    }
+                }
+                ShowStart = LineCount - ShowRow;
+            }
+        }
         public void ChangeShowLine(int index)
         {
-            if(ShowStart!=index)
+            if (ShowStart != index)
             {
 
             }

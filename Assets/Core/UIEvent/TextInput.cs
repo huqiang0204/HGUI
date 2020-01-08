@@ -428,11 +428,11 @@ namespace huqiang.UIEvent
             set
             {
                 m_TipString = value;
-                SetShowText();
             }
         }
         void SetShowText()
         {
+            m_inputString = textControll.GetFullString();
             string str = textControll.GetShowString();
             if (str== "" )
             {
@@ -594,6 +594,8 @@ namespace huqiang.UIEvent
             if (TextCom != null)
             {
                 textControll.Context = TextCom;
+                textControll.SetFullString(new EmojiString(m_inputString));
+                textControll.ReCalcul();
                 textControll.SetStartSelect(GetPressIndex(action,0));
                 Editing = true;
             }
@@ -828,6 +830,8 @@ namespace huqiang.UIEvent
             Vector3Int v3 = Vector3Int.zero;
             if (TextCom == null)
                 return v3;
+            if (m_inputString == "")
+                return v3;
             var lines = TextCom.uILines;
             if (lines == null)
                 return v3;
@@ -860,7 +864,10 @@ namespace huqiang.UIEvent
                     }
                 }
             }
-            int count = 0;
+            int count =0;
+            if (r + 1 < lines.Count)
+                count = lines[r + 1].startCharIdx - lines[r].startCharIdx;
+            else count = uchars.Count - lines[r].startCharIdx;
             int s = lines[r].startCharIdx;
             float lx = uchars[s].cursorPos.x;
             if (mx < lx)//最左边

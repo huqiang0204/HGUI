@@ -196,72 +196,98 @@ namespace huqiang.UIEvent
             offset.y /= scale.y;
             float ox = -offset.x;
             float oy = -offset.y - TextCom.SizeDelta.y * 0.5f;
-            oy -= lines[ShowStart].topY;//显示文字的起始坐标
+            int r = GetPressLine(oy,dir.y);
+            info.Row = r;
+            int os = GetPressOffset(r,ox,dir.x);
+            info.Offset = os;
+            if (os >= lines[r].height)
+                os--;
+            info.Index= lines[r].startCharIdx + os;
+            return info;
+        }
+        int GetPressLine(float y,float dir)
+        {
             int r = ShowStart;
-            if (oy < lines[ShowStart].topY)
+            if (y < lines[ShowStart].topY)
             {
                 int end = ShowStart + ShowRow;
                 if (end > lines.Length)
                     end = lines.Length;
-                for (int i = ShowStart; i < end; i++)
+                for (int i = ShowStart; i < end - 1; i++)
                 {
-                    if (lines[i].topY < oy)
+                    float e = lines[i + 1].topY;
+                    if (e < y)
                     {
-                        r = i - 1;
-                        if (r < 0)
-                            r = 0;
-                        goto label;
-                    }
-                }
-                r = end - 1;
-            }
-        label:;
-            info.Row = r;
-            int count = lines[r].height;
-            int s = lines[r].startCharIdx;
-            float lx = uchars[s].cursorPos.x;
-            if (ox < lx)//最左边
-            {
-                info.Index = s;
-                return info;
-            }
-            else
-            {
-                int e = s + count - 1;
-                float rx = uchars[e].cursorPos.x;
-                if (ox > rx)//最右边
-                {
-                    info.Index = e;
-                    info.Offset = count;
-                    return info;
-                }
-                else
-                {
-                    s++;
-                    for (int i = 1; i < count; i++)
-                    {
-                        if (ox < uchars[s].cursorPos.x)
+                        if (dir==0)
                         {
-                            lx = uchars[s - 1].cursorPos.x;
-                            rx = uchars[s].cursorPos.x;
-                            if (ox - lx > rx - ox)
-                            {
-                                info.Index = s;
-                                info.Offset = i;
-                                return info;
-                            }
-                            else
-                            {
-                                info.Index = s - 1;
-                                info.Offset = i - 1;
-                                return info;
-                            }
+                            return i;
                         }
-                        s++;
+                        else if(dir<0)//向下
+                        {
+                            float s = lines[i].topY;
+                            float p = (y - s) / (e - s);
+                            if (p < 0.5f)
+                                r = i - 1;
+                            else r = i;
+                            if (r < 0)
+                                r = 0;
+                            return r;
+                        }
+                        else//向上
+                        {
+                            float s = lines[i].topY;
+                            float p = (y - s) / (e - s);
+                            if (p < 0.5f)
+                                r = i ;
+                            else r = i + 1 ;
+                            return r;
+                        }
                     }
                 }
+                return end - 1;
             }
-            return info;
+            return r;
+        }
+        int GetPressOffset(int line,float x,float dir)
+        {
+            int s = lines[line].startCharIdx;
+            int c = lines[line].height;
+            int e = s + c - 1;
+            if (x < uchars[s].cursorPos.x)
+                return 0;
+            if (x > uchars[e].cursorPos.x + uchars[e].charWidth)
+                return c;
+            for (int i = 0; i < c - 1; i++)
+            {
+                float r = uchars[s + 1].cursorPos.x;
+                if (x < uchars[s+1].cursorPos.x)
+                {
+                   if(dir>0)//向左
+                    {
+                        float l = uchars[s].cursorPos.x;
+                        float p = (x - l) / (r - l);
+                        if (p < 0.5f)
+                            c = i - 1;
+                        else c = i;
+                        if (c < 0)
+                            c = 0;
+                        return c;
+                    }
+                    else//向右
+                    {
+                        float l = uchars[s].cursorPos.x;
+                        float p = (x - l) / (r - l);
+                        if (p < 0.5f)
+                            c = i ;
+                        else c = i + 1;
+                        if (c < 0)
+                            c = 0;
+                        return c;
+                    }
+                }
+                s++;
+            }
+            return c;
         }
         internal override void Update()
         {

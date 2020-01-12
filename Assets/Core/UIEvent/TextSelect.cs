@@ -11,7 +11,7 @@ namespace huqiang.UIEvent
 {
     public class TextSelect:UserEvent
     {
-        public HText TextCom;
+        public HLabel TextCom;
         EmojiString Text;
         protected float overDistance = 500;
         protected float overTime = 0;
@@ -45,10 +45,23 @@ namespace huqiang.UIEvent
         float HeightChange;
         int ShowStart;
         int ShowRow;
+        public int Style = 0;
+        public Color32 PointColor = Color.white;
+        public Color32 SelectionColor = new Color(0.65882f, 0.8078f, 1, 0.2f);
         internal override void Initial(FakeStruct mod)
         {
-            TextCom = Context as HText;
+            TextCom = Context as HLabel;
             AutoColor = false;
+            unsafe
+            {
+                var ex = mod.buffer.GetData(((TransfromData*)mod.ip)->ex) as FakeStruct;
+                if (ex != null)
+                {
+                    TextInputData* tp = (TextInputData*)ex.ip;
+                    PointColor = tp->pointColor;
+                    SelectionColor = tp->selectColor;
+                }
+            }
         }
         public override void OnMouseDown(UserAction action)
         {
@@ -254,5 +267,38 @@ namespace huqiang.UIEvent
             float per = h / lc;
             ShowRow = (int)(Context.SizeDelta.y / per);
         }
+        internal override void Update()
+        {
+            base.Update();
+            switch(Style)
+            {
+                case 0:
+                    InputCaret.Hide();
+                    break;
+                case 1:
+                    InputCaret.CaretStyle = 1;
+                    break;
+                case 2:
+                    InputCaret.CaretStyle = 2;
+                    break;
+            }
+        }
+        protected void PointerMoveLeft()
+        {
+
+        }
+        protected void PointerMoveRight()
+        {
+
+        }
+        protected void PointerMoveUp()
+        {
+
+        }
+        protected void PointerMoveDown()
+        {
+
+        }
+   
     }
 }

@@ -7,6 +7,14 @@ using UnityEngine;
 
 namespace huqiang.Core.HGUI
 {
+    public enum EventType
+    {
+        None,
+        UserEvent,
+        TextSelect,
+        TextInput,
+        GestureEvent
+    }
     public class AsyncScript:MonoBehaviour
     {
         #region static method
@@ -258,6 +266,7 @@ namespace huqiang.Core.HGUI
         public MarginType marginType;
         public ParentType parentType;
         public Margin margin;
+        public EventType eventType;
         public virtual void MainUpdate()
         {
         }

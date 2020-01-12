@@ -20,6 +20,7 @@ namespace huqiang.Core.HGUI
         public MarginType marginType;
         public ParentType parentType;
         public Margin margin;
+        public EventType eventType;
         public bool Mask;
         public static int Size = sizeof(AsyncScriptData);
         public static int ElementSize = Size / 4;
@@ -40,6 +41,7 @@ namespace huqiang.Core.HGUI
             tar.parentType = src->parentType;
             tar.margin = src->margin;
             tar.Mask = src->Mask;
+            tar.eventType = src->eventType;
         }
         protected unsafe void SaveScript(byte* ip, AsyncScript src)
         {
@@ -55,6 +57,7 @@ namespace huqiang.Core.HGUI
             tar->parentType = src.parentType;
             tar->margin = src.margin;
             tar->Mask = src.Mask;
+            tar->eventType = src.eventType;
         }
         public unsafe override void LoadToObject(FakeStruct fake, Component com)
         {

@@ -9,10 +9,5 @@ namespace huqiang.Core.HGUI
     {
         public Color32 PointColor = Color.white;
         public Color32 SelectionColor = new Color(0.65882f, 0.8078f, 1, 0.2f);
-
-        public void GetPressIndex(UserEvent userEvent)
-        {
-
-        }
     }
 }

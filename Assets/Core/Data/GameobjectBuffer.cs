@@ -274,10 +274,13 @@ namespace huqiang.Data
             return null;
         }
         TempReflection reflections;
-        public void Reflection(FakeStruct mod, Transform trans)
+        public void CloneComplete(FakeStruct mod, Transform trans)
         {
             if (reflections == null)
                 return;
+            var scr = trans.GetComponent<AsyncScript>();
+            if (scr != null)
+                scr.Initial(mod);
             for (int i = 0; i < reflections.Top; i++)
             {
                 var m = reflections.All[i];
@@ -285,20 +288,6 @@ namespace huqiang.Data
                 {
                     if (typeof(Component).IsAssignableFrom(m.FieldType))
                         m.Value = trans.GetComponent(m.FieldType);
-                    else if (typeof(UserEvent).IsAssignableFrom(m.FieldType))
-                    {
-                        var script = trans.GetComponent<AsyncScript>();
-                        script.RegEvent(m.FieldType,mod);
-                        m.Value = script.userEvent;
-                    }
-                    else if (typeof(ModelInital).IsAssignableFrom(m.FieldType))
-                    {
-                        var obj = Activator.CreateInstance(m.FieldType) as ModelInital;
-                        obj.Initial(mod, trans);
-                        m.Value = obj;
-                    }
-                    else if (typeof(DataConversion).IsAssignableFrom(m.FieldType))
-                        m.Value = trans.GetComponent(m.FieldType.Name);
                     reflections.Top--;
                     var j = reflections.Top;
                     var a = reflections.All[j];

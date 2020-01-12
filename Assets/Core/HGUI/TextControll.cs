@@ -43,7 +43,7 @@ namespace huqiang.Core.HGUI
         float PreferredHeight;
         float HeightChange;
         Vector2 BoxSize;
-        int Style = 0;
+        public int Style = 0;
         int LineOffset;
         EmojiString Text;
         public HText Context;
@@ -345,8 +345,8 @@ namespace huqiang.Core.HGUI
             settings.scaleFactor = 1;
             settings.textAnchor = TextAnchor.UpperLeft;
             settings.color = Color.white;
-            settings.generationExtents = new Vector2(Context.SizeDelta.x, 0);
-            settings.pivot = new Vector2(0.5f, 0.5f);
+            settings.generationExtents = new Vector2(Context.SizeDelta.x, Context.SizeDelta.y);
+            settings.pivot = new Vector2(0.5f, 0);
             settings.richText = false;
             settings.font = Context.Font;
             if (settings.font == null)

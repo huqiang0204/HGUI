@@ -7,6 +7,21 @@ using UnityEngine;
 
 namespace huqiang.Core.HGUI
 {
+    public enum EventType
+    {
+        None,
+        UserEvent,
+        TextSelect,
+        TextInput,
+        GestureEvent
+    }
+    public enum CompositeType
+    {
+        None,
+        Slider,
+        ScrollX,
+        ScrollY,
+    }
     public class AsyncScript:MonoBehaviour
     {
         #region static method
@@ -258,6 +273,8 @@ namespace huqiang.Core.HGUI
         public MarginType marginType;
         public ParentType parentType;
         public Margin margin;
+        public EventType eventType;
+        public CompositeType compositeType;
         public virtual void MainUpdate()
         {
         }
@@ -275,24 +292,27 @@ namespace huqiang.Core.HGUI
         public UserEvent userEvent;
         internal int PipelineIndex;
         public virtual Color32 Chromatically { get; set; }
-        public T RegEvent<T>() where T : UserEvent, new()
+        public T RegEvent<T>(FakeStruct fake = null) where T : UserEvent, new()
         {
             var t = new T();
             t.Context = this;
-            t.Initial(null);
+            t.Initial(fake);
             userEvent = t;
             t.g_color = Chromatically;
             return t;
         }
-        public object RegEvent(Type type, FakeStruct fake)
-        {
-            UserEvent u = Activator.CreateInstance(type) as UserEvent;
-            u.Context = this;
-            u.Initi(fake);
-            userEvent = u;
-            u.g_color = Chromatically;
-            return u;
-        }
+
         public Action<AsyncScript> SizeChanged;
+        public void Initial(FakeStruct ex)
+        {
+            switch(eventType)
+            {
+                case EventType.None: break;
+                case EventType.UserEvent:RegEvent<UserEvent>(ex); break;
+                case EventType.TextSelect: RegEvent<TextSelect>(ex); break;
+                case EventType.TextInput: RegEvent<TextInput>(ex); break;
+                case EventType.GestureEvent: RegEvent<GestureEvent>(ex); break;
+            }
+        }
     }
 }

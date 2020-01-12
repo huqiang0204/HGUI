@@ -74,7 +74,7 @@ namespace huqiang.Data
             trans.localPosition = transfrom->localPosition;
             trans.localScale = transfrom->localScale;
             trans.gameObject.layer = transfrom->layer;
-            gameobjectBuffer.Reflection(fake, trans);
+            gameobjectBuffer.CloneComplete(fake, trans);
         }
         public unsafe override FakeStruct LoadFromObject(Component com,DataBuffer buffer)
         {

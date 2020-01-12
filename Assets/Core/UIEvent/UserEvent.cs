@@ -202,7 +202,7 @@ namespace huqiang.UIEvent
         Vector2 maxVelocity;
         Vector2 sDistance;
         Vector2 mVelocity;
-        Vector3 pgs = Vector3.one;
+        protected Vector3 pgs = Vector3.one;
         public Vector3 GlobalScale = Vector3.one;
         public Vector3 GlobalPosition;
         public Quaternion GlobalRotation;

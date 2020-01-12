@@ -17,6 +17,7 @@ namespace huqiang.UIEvent
     }
     struct LineInfo
     {
+        public float top;
         public int StartIndex;
         public int Count;
         public float y;

@@ -70,6 +70,7 @@ namespace huqiang.UIEvent
             {
                 StartPress = GetPressIndex(action, Vector2.zero);
                 InputCaret.SetParent(TextCom.transform);
+                InputCaret.Active();
             }
             base.OnMouseDown(action);
         }
@@ -228,38 +229,46 @@ namespace huqiang.UIEvent
                 int end = ShowStart + ShowRow;
                 if (end > lines.Length)
                     end = lines.Length;
-                for (int i = ShowStart; i < end - 1; i++)
+                if (y < lines[end].y)
+                    return end - 1;
+                float oy = 1000000;
+                int index = ShowStart;
+                for (int i = ShowStart; i < end ; i++)
                 {
-                    float e = lines[i + 1].y;
-                    if (e < y)
+                    float ty = lines[i].y - y;
+                    if (ty < 0)
                     {
-                        if (dir==0)
-                        {
-                            return i;
-                        }
-                        else if(dir<0)//向下
-                        {
-                            float s = lines[i].y;
-                            float p = (y - s) / (e - s);
-                            if (p < 0.5f)
-                                r = i - 1;
-                            else r = i;
-                            if (r < 0)
-                                r = 0;
-                            return r;
-                        }
-                        else//向上
-                        {
-                            float s = lines[i].y;
-                            float p = (y - s) / (e - s);
-                            if (p < 0.5f)
-                                r = i ;
-                            else r = i + 1 ;
-                            return r;
-                        }
+                        ty = -ty;
+                        if (oy < ty)
+                            index = i - 1;
+                        if (index < 0)
+                            index = 0;
+                        break;
+                    }
+                    else 
+                    { 
+                        oy = ty;
+                        index = i;
                     }
                 }
-                return end - 1;
+                if (dir == 0)
+                    return index;
+                else if(dir<0)//向下
+                {
+                    if (lines[index].y < y)
+                        index--;
+                    if (index < 0)
+                        index = 0;
+                    return index;
+                }
+                else//向上
+                {
+                    if (lines[index].y < y)
+                        index++;
+                    if (index > end)
+                        index = end;
+                    return index;
+                }
             }
             return r;
         }
@@ -272,37 +281,42 @@ namespace huqiang.UIEvent
                 return 0;
             if (x > cha[e].cursorPos.x + cha[e].charWidth)
                 return c;
-            for (int i = 0; i < c - 1; i++)
+            float ox = 1000000;
+            int index = 0;
+            for (int i = 0; i < c ; i++)
             {
-                float r = cha[s + 1].cursorPos.x;
-                if (x < cha[s+1].cursorPos.x)
+                float tx = x - cha[s].cursorPos.x;
+                if (tx < 0)
                 {
-                   if(dir>0)//向左
-                    {
-                        float l = cha[s].cursorPos.x;
-                        float p = (x - l) / (r - l);
-                        if (p < 0.5f)
-                            c = i - 1;
-                        else c = i;
-                        if (c < 0)
-                            c = 0;
-                        return c;
-                    }
-                    else//向右
-                    {
-                        float l = cha[s].cursorPos.x;
-                        float p = (x - l) / (r - l);
-                        if (p < 0.5f)
-                            c = i ;
-                        else c = i + 1;
-                        if (c < 0)
-                            c = 0;
-                        return c;
-                    }
+                    tx = -tx;
+                    if (tx < ox)
+                        index++;
+                    if (index > c)
+                        index = c;
+                    break;
+                }
+                else
+                {
+                    ox = tx;
+                    index = i;
                 }
                 s++;
             }
-            return c;
+           if (dir < 0)//向左
+            {
+                if (cha[index].cursorPos.x < x)
+                    index ++;
+                if (index > c)
+                    index = c;
+            }
+            else if(dir > 0)//向右
+            {
+                if (cha[index].cursorPos.x < x)
+                    index++;
+                if (index > c)
+                    index = c;
+            }
+            return index;
         }
         internal override void Update()
         {

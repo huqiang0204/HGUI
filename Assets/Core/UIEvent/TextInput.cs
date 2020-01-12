@@ -446,7 +446,7 @@ namespace huqiang.UIEvent
             }
         }
         public bool ReadOnly;
-        Color textColor=Color.black;
+        Color textColor = Color.black;
         Color m_tipColor = new Color(0, 0, 0, 0.8f);
         public Color TipColor { get { return m_tipColor; } set { m_tipColor = value;} }
         public Color PointColor = Color.white;
@@ -568,7 +568,7 @@ namespace huqiang.UIEvent
         }
         internal override void Initial(FakeStruct mod)
         {
-            var txt = TextCom = Context as HText;
+            var txt = TextCom = Context as HLabel;
             textColor = txt.m_color;
             unsafe
             {
@@ -587,7 +587,7 @@ namespace huqiang.UIEvent
             }
             AutoColor = false;
         }
-        public HText TextCom { get; private set; }
+        public HLabel TextCom { get; private set; }
         public override void OnMouseDown(UserAction action)
         {
             overTime = 0;
@@ -773,8 +773,17 @@ namespace huqiang.UIEvent
             var te = TextCom;
             if (te != null)
             {
-   
-                SetPressPointer();
+                if (textControll.Style == 0)
+                {
+                    SetPressPointer();
+                }
+                else
+                {
+                    List<HVertex> hs = new List<HVertex>();
+                    List<int> tris = new List<int>();
+                    GetSelectArea(SelectionColor, tris, hs);
+                    InputCaret.ChangeCaret(hs.ToArray(),tris.ToArray());
+                }
             }
         }
         public float Percentage { get => textControll.Percentage;
@@ -975,6 +984,7 @@ namespace huqiang.UIEvent
                         float lx = rx - 2f;
                         float ty = ch.cursorPos.y;
                         float dy = ty - h;
+                        InputCaret.ChangeCaret(lx, rx, ty, dy,PointColor);
                     }
                 }
             }

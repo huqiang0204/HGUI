@@ -42,7 +42,7 @@ namespace huqiang.Core.HGUI
                 max++;
                 if (mask)
                     TxtCollector.Next();
-                var txt = script as HText;
+                var txt = script as HLabel;
                 if (txt != null)
                 {
                     TxtCollector.AddText(txt);

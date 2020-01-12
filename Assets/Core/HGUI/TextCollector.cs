@@ -9,18 +9,18 @@ namespace huqiang.Core.HGUI
     {
         struct TextInfo
         {
-            public HText[] texts;
+            public HLabel[] texts;
             public int max;
         }
         TextInfo[] buffer = new TextInfo[64];
         int point;
         int max;
-        public void AddText(HText text)
+        public void AddText(HLabel text)
         {
             var buf = buffer[point].texts;
             if (buf == null)
             {
-                buf = new HText[1024];
+                buf = new HLabel[1024];
                 buffer[point].texts = buf;
             }
             int top = buffer[point].max;

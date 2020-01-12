@@ -43,10 +43,10 @@ namespace huqiang.Core.HGUI
         float PreferredHeight;
         float HeightChange;
         Vector2 BoxSize;
-        int Style = 0;
+        public int Style = 0;
         int LineOffset;
         EmojiString Text;
-        public HText Context;
+        public HLabel Context;
         public void SetFullString(EmojiString emojiString)
         {
             Text = emojiString;
@@ -345,12 +345,12 @@ namespace huqiang.Core.HGUI
             settings.scaleFactor = 1;
             settings.textAnchor = TextAnchor.UpperLeft;
             settings.color = Color.white;
-            settings.generationExtents = new Vector2(Context.SizeDelta.x, 0);
-            settings.pivot = new Vector2(0.5f, 0.5f);
+            settings.generationExtents = new Vector2(Context.SizeDelta.x, Context.SizeDelta.y);
+            settings.pivot = new Vector2(0.5f, 0);
             settings.richText = false;
             settings.font = Context.Font;
             if (settings.font == null)
-                settings.font = HText.DefaultFont;
+                settings.font = HLabel.DefaultFont;
             settings.fontSize = Context.m_fontSize;
             settings.fontStyle = FontStyle.Normal;
             settings.alignByGeometry = false;
@@ -358,7 +358,7 @@ namespace huqiang.Core.HGUI
             settings.lineSpacing = Context.m_lineSpace;
             settings.horizontalOverflow = HorizontalWrapMode.Wrap;
             settings.verticalOverflow = VerticalWrapMode.Overflow;
-            TextGenerator generator = HText.Generator;
+            TextGenerator generator = HLabel.Generator;
             float h = generator.GetPreferredHeight(str, settings);
             HeightChange = PreferredHeight - h;
             PreferredHeight = h;

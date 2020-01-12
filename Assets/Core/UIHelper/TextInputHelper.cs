@@ -4,7 +4,7 @@ using huqiang.Data;
 using huqiang.UIEvent;
 using UnityEngine;
 
-[RequireComponent(typeof(HText))]
+[RequireComponent(typeof(HLabel))]
 public class TextInputHelper:UICompositeHelp
 {
     public Color inputColor = Color.white;
@@ -29,13 +29,13 @@ public class TextInputHelper:UICompositeHelp
     {
         if(InputString==null|InputString=="")
         {
-            var txt = GetComponent<HText>();
+            var txt = GetComponent<HLabel>();
             txt.Text = TipString;
             txt.Chromatically = tipColor;
         }
         else
         {
-            var txt = GetComponent<HText>();
+            var txt = GetComponent<HLabel>();
             txt.Text = InputString;
             txt.Chromatically = inputColor;
         }

@@ -21,7 +21,7 @@ namespace Assets.Scripts
         class ItemView
         {
             public UserEvent img;
-            public HText t1;
+            public HLabel t1;
         }
         public override void Initial(Transform parent, object dat = null)
         {

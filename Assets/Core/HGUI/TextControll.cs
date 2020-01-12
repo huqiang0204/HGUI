@@ -46,7 +46,7 @@ namespace huqiang.Core.HGUI
         public int Style = 0;
         int LineOffset;
         EmojiString Text;
-        public HLabel Context;
+        public HText Context;
         public void SetFullString(EmojiString emojiString)
         {
             Text = emojiString;
@@ -350,7 +350,7 @@ namespace huqiang.Core.HGUI
             settings.richText = false;
             settings.font = Context.Font;
             if (settings.font == null)
-                settings.font = HLabel.DefaultFont;
+                settings.font = HText.DefaultFont;
             settings.fontSize = Context.m_fontSize;
             settings.fontStyle = FontStyle.Normal;
             settings.alignByGeometry = false;
@@ -358,7 +358,7 @@ namespace huqiang.Core.HGUI
             settings.lineSpacing = Context.m_lineSpace;
             settings.horizontalOverflow = HorizontalWrapMode.Wrap;
             settings.verticalOverflow = VerticalWrapMode.Overflow;
-            TextGenerator generator = HLabel.Generator;
+            TextGenerator generator = HText.Generator;
             float h = generator.GetPreferredHeight(str, settings);
             HeightChange = PreferredHeight - h;
             PreferredHeight = h;

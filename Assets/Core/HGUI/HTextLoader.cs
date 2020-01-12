@@ -41,7 +41,7 @@ namespace huqiang.Core.HGUI
             return fonts[0];
         }
         protected string fontName;
-        protected unsafe void LoadHText(FakeStruct fake,HLabel tar)
+        protected unsafe void LoadHText(FakeStruct fake,HText tar)
         {
             HTextData* src = (HTextData*)fake.ip;
             var buffer = fake.buffer;
@@ -59,7 +59,7 @@ namespace huqiang.Core.HGUI
             tar.m_fontSize = src->m_fontSize;
             tar.m_align = src->m_align;
         }
-        protected unsafe void SaveHText(FakeStruct fake, HLabel src)
+        protected unsafe void SaveHText(FakeStruct fake, HText src)
         {
             HTextData* tar = (HTextData*)fake.ip;
             tar->text = fake.buffer.AddData(src.m_text);
@@ -76,7 +76,7 @@ namespace huqiang.Core.HGUI
         }
         public unsafe override void LoadToObject(FakeStruct fake, Component com)
         {
-            HLabel image = com.GetComponent<HLabel>();
+            HText image = com.GetComponent<HText>();
             if (image == null)
                 return;
             LoadScript(fake.ip, image);
@@ -85,7 +85,7 @@ namespace huqiang.Core.HGUI
         }
         public unsafe override FakeStruct LoadFromObject(Component com, DataBuffer buffer)
         {
-            var src = com as HLabel;
+            var src = com as HText;
             if (src == null)
                 return null;
             FakeStruct fake = new FakeStruct(buffer, HTextData.ElementSize);

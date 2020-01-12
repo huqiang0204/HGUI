@@ -11,7 +11,7 @@ namespace huqiang.UIEvent
 {
     public class TextSelect:UserEvent
     {
-        public HLabel TextCom;
+        public HText TextCom;
         EmojiString Text;
         protected float overDistance = 500;
         protected float overTime = 0;
@@ -50,7 +50,7 @@ namespace huqiang.UIEvent
         public Color32 SelectionColor = new Color(0.65882f, 0.8078f, 1, 0.2f);
         internal override void Initial(FakeStruct mod)
         {
-            TextCom = Context as HLabel;
+            TextCom = Context as HText;
             AutoColor = false;
             unsafe
             {
@@ -247,7 +247,7 @@ namespace huqiang.UIEvent
             settings.richText = false;
             settings.font = TextCom.Font;
             if (settings.font == null)
-                settings.font = HLabel.DefaultFont;
+                settings.font = HText.DefaultFont;
             settings.fontSize = TextCom.m_fontSize;
             settings.fontStyle = FontStyle.Normal;
             settings.alignByGeometry = false;
@@ -255,7 +255,7 @@ namespace huqiang.UIEvent
             settings.lineSpacing = TextCom.m_lineSpace;
             settings.horizontalOverflow = HorizontalWrapMode.Wrap;
             settings.verticalOverflow = VerticalWrapMode.Overflow;
-            TextGenerator generator = HLabel.Generator;
+            TextGenerator generator = HText.Generator;
             float h = generator.GetPreferredHeight(str, settings);
             HeightChange = PreferredHeight - h;
             PreferredHeight = h;

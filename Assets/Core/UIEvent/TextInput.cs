@@ -568,7 +568,7 @@ namespace huqiang.UIEvent
         }
         internal override void Initial(FakeStruct mod)
         {
-            var txt = TextCom = Context as HLabel;
+            var txt = TextCom = Context as HText;
             textColor = txt.m_color;
             unsafe
             {
@@ -587,7 +587,7 @@ namespace huqiang.UIEvent
             }
             AutoColor = false;
         }
-        public HLabel TextCom { get; private set; }
+        public HText TextCom { get; private set; }
         public override void OnMouseDown(UserAction action)
         {
             overTime = 0;

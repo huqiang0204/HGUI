@@ -5,7 +5,7 @@ using huqiang.Core.HGUI;
 using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(HLabel), true)]
+[CustomEditor(typeof(HText), true)]
 [CanEditMultipleObjects]
 public class HTextEditor:AsyncScriptEditor
 {
@@ -15,7 +15,7 @@ public class HTextEditor:AsyncScriptEditor
     string str;
     private void OnEnable()
     {
-        HLabel img = target as HLabel;
+        HText img = target as HText;
         if (img != null)
         {
             var can = FindHCanvas(img.transform);
@@ -26,7 +26,7 @@ public class HTextEditor:AsyncScriptEditor
     public override void OnSceneGUI()
     {
         base.OnSceneGUI();
-        HLabel txt = target as HLabel;
+        HText txt = target as HText;
         if (txt != null)
         {
             bool changed = false;
@@ -51,7 +51,7 @@ public class HTextEditor:AsyncScriptEditor
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
-        HLabel txt = target as HLabel;
+        HText txt = target as HText;
         if (txt != null)
         {
             bool changed = false;

@@ -183,10 +183,12 @@ namespace huqiang.UIEvent
             {
                 lines[i].StartIndex = tmp[i].startCharIdx;
                 lines[i].Count = tmp[i + 1].startCharIdx - tmp[i].startCharIdx;
+                lines[i].top = tmp[i].topY;
                 lines[i].y = tmp[i].topY - (tmp[i].height + tmp[i].leading) * 0.5f;
             }
             lines[len].StartIndex = tmp[len].startCharIdx;
             lines[len].Count = cha.Length - tmp[len].startCharIdx;
+            lines[len].top = tmp[len].topY;
             lines[len].y = tmp[len].topY - (tmp[len].height + tmp[len].leading) * 0.5f;
             int lc = lines.Length;
             LineChange = lc - LineCount;
@@ -212,6 +214,7 @@ namespace huqiang.UIEvent
             offset.y /= scale.y;
             float ox = -offset.x;
             float oy = -offset.y - TextCom.SizeDelta.y * 0.5f;
+            oy += lines[ShowStart].top;
             int r = GetPressLine(oy,dir.y);
             info.Row = r;
             int os = GetPressOffset(r,ox,dir.x);
@@ -230,7 +233,7 @@ namespace huqiang.UIEvent
                 if (end >= lines.Length)
                     end = lines.Length -1;
                 if (y < lines[end].y)
-                    return end - 1;
+                    return end;
                 float oy = 1000000;
                 int index = ShowStart;
                 for (int i = ShowStart; i < end ; i++)
@@ -381,66 +384,6 @@ namespace huqiang.UIEvent
                 int c = (int)(a * value);
                 //ChangeShowLine(c);
             }
-        }
-        int CommonArea(int s1, int e1, ref int s2, ref int e2)
-        {
-            if (s1 > e2)
-                return 0;
-            if (s2 > e1)
-                return 2;
-            if (s2 < s1)
-                s2 = s1;
-            if (e2 > e1)
-                e2 = e1;
-            return 1;
-        }
-        Vector2Int GetShowSelect()
-        {
-            Vector2Int vector = Vector2Int.zero;
-            vector.x = StartPress.Index;
-            vector.y = EndPress.Index;
-            if (vector.x > vector.y)
-            {
-                int t = vector.x;
-                vector.x = vector.y;
-                vector.y = t;
-            }
-            int s = lines[ShowStart].StartIndex;
-            vector.x -= s;
-            vector.y -= s;
-            return vector;
-        }
-        int GetStartLine()
-        {
-            if (StartPress.Row > EndPress.Row)
-                return EndPress.Row;
-            else return StartPress.Row;
-        }
-        int GetEndLine()
-        {
-            if (StartPress.Row > EndPress.Row)
-                return StartPress.Row;
-            else return EndPress.Row;
-        }
-        bool IsEndLine(int row)
-        {
-            if (StartPress.Index > EndPress.Index)
-            {
-                if (row < StartPress.Row)
-                    return true;
-                if (row == StartPress.Row)
-                    if (StartPress.Offset == lines[row].Count)
-                        return true;
-            }
-            else
-            {
-                if (row < EndPress.Row)
-                    return true;
-                if (row == EndPress.Row)
-                    if (EndPress.Offset == lines[row].Count)
-                        return true;
-            }
-            return false;
         }
         bool IsSelectLine(int row)
         {

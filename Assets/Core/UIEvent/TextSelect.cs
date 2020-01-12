@@ -15,14 +15,20 @@ namespace huqiang.UIEvent
         public int Offset;
         public int Index;
     }
+    struct LineInfo
+    {
+        public int StartIndex;
+        public int Count;
+        public float y;
+    }
     public class TextSelect:UserEvent
     {
         public HText TextCom;
         protected EmojiString Text = new EmojiString();
         protected float overDistance = 500;
         protected float overTime = 0;
-        UILineInfo[] lines;//所有文本行
-        UICharInfo[] uchars;
+        LineInfo[] lines;
+        UICharInfo[] cha;
         /// <summary>
         /// 总计行数
         /// </summary>
@@ -166,19 +172,27 @@ namespace huqiang.UIEvent
             float h = generator.GetPreferredHeight(str, settings);
             HeightChange = PreferredHeight - h;
             PreferredHeight = h;
-            lines = generator.lines.ToArray();
-            uchars = generator.characters.ToArray();
+      
+            cha = generator.characters.ToArray();
+            var tmp = generator.lines;
+            lines = new LineInfo[tmp.Count];
+            int len = lines.Length - 1;
+            for (int i = 0; i < len; i++)
+            {
+                lines[i].StartIndex = tmp[i].startCharIdx;
+                lines[i].Count = tmp[i + 1].startCharIdx - tmp[i].startCharIdx;
+                lines[i].y = tmp[i].topY - (tmp[i].height + tmp[i].leading) * 0.5f;
+            }
+            lines[len].StartIndex = tmp[len].startCharIdx;
+            lines[len].Count = cha.Length - tmp[len].startCharIdx;
+            lines[len].y = tmp[len].topY - (tmp[len].height + tmp[len].leading) * 0.5f;
             int lc = lines.Length;
             LineChange = lc - LineCount;
             LineCount = lc;
             float per = h / lc;
             ShowRow = (int)(Context.SizeDelta.y / per);
-            int len = lines.Length - 1;
-            for (int i = 0; i < len; i++)
-            {
-                lines[i].height = lines[i + 1].startCharIdx - lines[i].startCharIdx;
-            }
-            lines[len].height = uchars.Length - lines[len].startCharIdx;
+            for(int i=0;i<cha.Length;i++)
+                cha[i].cursorPos.x += cha[i].charWidth * 0.5f;
         }
         protected PressInfo GetPressIndex(UserAction action, Vector2 dir)
         {
@@ -200,22 +214,22 @@ namespace huqiang.UIEvent
             info.Row = r;
             int os = GetPressOffset(r,ox,dir.x);
             info.Offset = os;
-            if (os >= lines[r].height)
+            if (os >= lines[r].Count)
                 os--;
-            info.Index= lines[r].startCharIdx + os;
+            info.Index= lines[r].StartIndex+ os;
             return info;
         }
         int GetPressLine(float y,float dir)
         {
             int r = ShowStart;
-            if (y < lines[ShowStart].topY)
+            if (y < lines[ShowStart].y)
             {
                 int end = ShowStart + ShowRow;
                 if (end > lines.Length)
                     end = lines.Length;
                 for (int i = ShowStart; i < end - 1; i++)
                 {
-                    float e = lines[i + 1].topY;
+                    float e = lines[i + 1].y;
                     if (e < y)
                     {
                         if (dir==0)
@@ -224,7 +238,7 @@ namespace huqiang.UIEvent
                         }
                         else if(dir<0)//向下
                         {
-                            float s = lines[i].topY;
+                            float s = lines[i].y;
                             float p = (y - s) / (e - s);
                             if (p < 0.5f)
                                 r = i - 1;
@@ -235,7 +249,7 @@ namespace huqiang.UIEvent
                         }
                         else//向上
                         {
-                            float s = lines[i].topY;
+                            float s = lines[i].y;
                             float p = (y - s) / (e - s);
                             if (p < 0.5f)
                                 r = i ;
@@ -250,21 +264,21 @@ namespace huqiang.UIEvent
         }
         int GetPressOffset(int line,float x,float dir)
         {
-            int s = lines[line].startCharIdx;
-            int c = lines[line].height;
+            int s = lines[line].StartIndex;
+            int c = lines[line].Count;
             int e = s + c - 1;
-            if (x < uchars[s].cursorPos.x)
+            if (x < cha[s].cursorPos.x)
                 return 0;
-            if (x > uchars[e].cursorPos.x + uchars[e].charWidth)
+            if (x > cha[e].cursorPos.x + cha[e].charWidth)
                 return c;
             for (int i = 0; i < c - 1; i++)
             {
-                float r = uchars[s + 1].cursorPos.x;
-                if (x < uchars[s+1].cursorPos.x)
+                float r = cha[s + 1].cursorPos.x;
+                if (x < cha[s+1].cursorPos.x)
                 {
                    if(dir>0)//向左
                     {
-                        float l = uchars[s].cursorPos.x;
+                        float l = cha[s].cursorPos.x;
                         float p = (x - l) / (r - l);
                         if (p < 0.5f)
                             c = i - 1;
@@ -275,7 +289,7 @@ namespace huqiang.UIEvent
                     }
                     else//向右
                     {
-                        float l = uchars[s].cursorPos.x;
+                        float l = cha[s].cursorPos.x;
                         float p = (x - l) / (r - l);
                         if (p < 0.5f)
                             c = i ;
@@ -359,7 +373,7 @@ namespace huqiang.UIEvent
                 vector.x = vector.y;
                 vector.y = t;
             }
-            int s = lines[ShowStart].startCharIdx;
+            int s = lines[ShowStart].StartIndex;
             vector.x -= s;
             vector.y -= s;
             return vector;

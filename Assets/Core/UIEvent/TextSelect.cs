@@ -111,9 +111,9 @@ namespace huqiang.UIEvent
         internal override void OnMouseWheel(UserAction action)
         {
             float oy = action.MouseWheelDelta;
-            //if (oy > 0)
-            //    textControll.PointerMoveUp();
-            //else textControll.PointerMoveDown();
+            if (oy > 0)
+                MoveUp();
+            else MoveDown();
             base.OnMouseWheel(action);
         }
         internal override void OnDragEnd(UserAction action)
@@ -399,76 +399,133 @@ namespace huqiang.UIEvent
                 return EndPress.Row;
             else return StartPress.Row;
         }
-        /// <summary>
-        /// 获取当前选中的区域
-        /// </summary>
-        /// <param name="color"></param>
-        /// <param name="tri"></param>
-        /// <param name="vert"></param>
+        int GetEndLine()
+        {
+            if (StartPress.Row > EndPress.Row)
+                return StartPress.Row;
+            else return EndPress.Row;
+        }
+        bool IsEndLine(int row)
+        {
+            if (StartPress.Index > EndPress.Index)
+            {
+                if (row < StartPress.Row)
+                    return true;
+                if (row == StartPress.Row)
+                    if (StartPress.Offset == lines[row].Count)
+                        return true;
+            }
+            else
+            {
+                if (row < EndPress.Row)
+                    return true;
+                if (row == EndPress.Row)
+                    if (EndPress.Offset == lines[row].Count)
+                        return true;
+            }
+            return false;
+        }
+        bool IsSelectLine(int row)
+        {
+            int s = StartPress.Row;
+            if (row == s)
+                return true;
+            int e = EndPress.Row;
+            if (row == e)
+                return true;
+            if(s>e)
+            {
+                int t = s;
+                s = e;
+                e = t;
+            }
+            if (row > s & row < e)
+                return true;
+            return false;
+        }
+        Vector2Int GetSelectLineRange(int row)
+        {
+            Vector2Int v2 = Vector2Int.zero;
+            if (StartPress.Index > EndPress.Index)
+            {
+                if (EndPress.Row == row)
+                {
+                    v2.x = EndPress.Offset;
+                }
+                if (StartPress.Row == row)
+                {
+                    v2.y = StartPress.Offset;
+                }
+                else v2.y = lines[row].Count;
+            }
+            else
+            {
+                if(StartPress.Row==row)
+                {
+                    v2.x = StartPress.Offset;
+                }
+                if (EndPress.Row == row)
+                {
+                    v2.y = EndPress.Offset;
+                }
+                else v2.y = lines[row].Count;
+            }
+            return v2;
+        }
         public void GetSelectArea(Color32 color, List<int> tri, List<HVertex> vert)
         {
             if (TextCom == null)
                 return;
-            var ss = GetShowSelect();
-            int s = ss.x;
-            int e = ss.y;
-            int c = TextCom.uIChars.Count;
-            int state = CommonArea(0, c, ref s, ref e);
-            if (state == 1)
-                if (s != e)
+            tri.Clear();
+            vert.Clear();
+            var tl = TextCom.uILines;
+            int len = tl.Count;
+            var tc = TextCom.uIChars;
+            for (int i = 0; i < ShowRow; i++)
+            {
+                int l = i + ShowStart;
+                if(IsSelectLine(l))
                 {
-                    vert.Clear();
-                    tri.Clear();
-                    int sl = GetStartLine();
-                    if (sl < 0)
-                        sl = 0;
-                    var lines = TextCom.uILines;
-                    int len = lines.Count;
-                    var uchars = TextCom.uIChars;
-                    int clen = uchars.Count;
-                    for (int i = sl; i < len; i++)
+                    var range = GetSelectLineRange(l);
+                    bool t = false;
+                    if(range.y==lines[l].Count)
                     {
-                        int os = lines[i].startCharIdx;
-                        int oe = clen;
-                        if (i < len - 1)
-                            oe = lines[i + 1].startCharIdx - 1;
-                        state = CommonArea(s, e, ref os, ref oe);
-                        if (state == 2)//结束
-                            break;
-                        if (state == 1)//包含公共区域
-                        {
-                            float lx = uchars[os].cursorPos.x ;
-                            float rx = uchars[oe].cursorPos.x + uchars[oe].charWidth;
-                            float h = lines[i].height;
-                            float top = lines[i].topY;
-                            float down = top - h;
-                            int st = vert.Count;
-                            var v = new HVertex();
-                            v.position.x = lx;
-                            v.position.y = down;
-                            v.color = color;
-                            vert.Add(v);
-                            v.position.x = rx;
-                            v.position.y = down;
-                            v.color = color;
-                            vert.Add(v);
-                            v.position.x = lx;
-                            v.position.y = top;
-                            v.color = color;
-                            vert.Add(v);
-                            v.position.x = rx;
-                            v.position.y = top;
-                            v.color = color;
-                            vert.Add(v);
-                            tri.Add(st);
-                            tri.Add(st + 2);
-                            tri.Add(st + 3);
-                            tri.Add(st);
-                            tri.Add(st + 3);
-                            tri.Add(st + 1);
-                        }
+                        t = true;
+                        range.y--;
                     }
+                    float lx = tc[range.x].cursorPos.x;
+                    float rx = tc[range.y].cursorPos.x;
+                    if (t)
+                        rx += tc[range.y].charWidth;
+                    float h = tl[i].height;
+                    float top = tl[i].topY;
+                    float down = top - h;
+                    int st = vert.Count;
+                    var v = new HVertex();
+                    v.position.x = lx;
+                    v.position.y = down;
+                    v.color = color;
+                    vert.Add(v);
+                    v.position.x = rx;
+                    v.position.y = down;
+                    v.color = color;
+                    vert.Add(v);
+                    v.position.x = lx;
+                    v.position.y = top;
+                    v.color = color;
+                    vert.Add(v);
+                    v.position.x = rx;
+                    v.position.y = top;
+                    v.color = color;
+                    vert.Add(v);
+                    tri.Add(st);
+                    tri.Add(st + 2);
+                    tri.Add(st + 3);
+                    tri.Add(st);
+                    tri.Add(st + 3);
+                    tri.Add(st + 1);
                 }
+            }
         }
     }
 }

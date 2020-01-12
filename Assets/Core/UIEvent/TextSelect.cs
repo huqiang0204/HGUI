@@ -227,8 +227,8 @@ namespace huqiang.UIEvent
             if (y < lines[ShowStart].y)
             {
                 int end = ShowStart + ShowRow;
-                if (end > lines.Length)
-                    end = lines.Length;
+                if (end >= lines.Length)
+                    end = lines.Length -1;
                 if (y < lines[end].y)
                     return end - 1;
                 float oy = 1000000;
@@ -335,13 +335,30 @@ namespace huqiang.UIEvent
                     break;
             }
         }
+        protected string GetShowString()
+        {
+            int s = lines[ShowStart].StartIndex;
+            int end = ShowStart + ShowRow + 1;
+            int e = cha.Length;
+            if (end < LineCount)
+                e = lines[end].StartIndex - 1;
+            return Text.SubString(s, e - s);
+        }
         protected void MoveUp()
         {
-
+            if (ShowStart > 0)
+            {
+                ShowStart--;
+                TextCom.Text = GetShowString();
+            }
         }
         protected void MoveDown()
         {
-
+            if (ShowStart +ShowRow <lines.Length)
+            {
+                ShowStart++;
+                TextCom.Text = GetShowString();
+            }
         }
         public float Percentage
         {

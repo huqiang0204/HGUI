@@ -453,10 +453,11 @@ namespace huqiang.UIEvent
                         t = true;
                         range.y--;
                     }
-                    float lx = tc[range.x].cursorPos.x;
-                    float rx = tc[range.y].cursorPos.x;
+                    int s = tl[i].startCharIdx;
+                    float lx = tc[range.x + s].cursorPos.x;
+                    float rx = tc[range.y + s].cursorPos.x;
                     if (t)
-                        rx += tc[range.y].charWidth;
+                        rx += tc[range.y + s].charWidth;
                     float h = tl[i].height;
                     float top = tl[i].topY;
                     float down = top - h;

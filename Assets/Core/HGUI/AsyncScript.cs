@@ -323,13 +323,14 @@ namespace huqiang.Core.HGUI
             {
                 case CompositeType.None:
                     break;
-                case CompositeType.Slider:
-                    new UISlider().Initial(ex, script);
-                    break;
                 case CompositeType.ScrollY:
                     new ScrollY().Initial(ex,script);
                     break;
                 case CompositeType.ScrollX:
+                    new ScrollX().Initial(ex, script);
+                    break;
+                case CompositeType.Slider:
+                    new UISlider().Initial(ex, script);
                     break;
             }
         }

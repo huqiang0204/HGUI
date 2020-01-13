@@ -34,7 +34,7 @@ namespace Assets.Scripts
             scrolly.BindingData = data;
             scrolly.SetItemUpdate<ItemView, string>(ItemUpdate);
             scrolly.Refresh();
-            var scrollx = view.scrolly.composite as ScrollX;
+            var scrollx = view.scrollx.composite as ScrollX;
             scrollx.BindingData = data;
             scrollx.SetItemUpdate<ItemView, string>(ItemUpdate);
             scrollx.Refresh();

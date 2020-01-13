@@ -153,7 +153,7 @@ namespace huqiang.UIEvent
             }
             base.OnDragEnd(action);
         }
-        void OnClick(UserEvent eventCall, UserAction action)
+        internal override void OnClick(UserAction action)
         {
             Style = 0;
             InputCaret.Hide();

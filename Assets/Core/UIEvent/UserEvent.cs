@@ -465,7 +465,7 @@ namespace huqiang.UIEvent
             if (MouseWheel != null)
                 MouseWheel(this, action);
         }
-        public virtual void OnClick(UserAction action)
+        internal virtual void OnClick(UserAction action)
         {
             if (Click != null)
                 Click(this,action);

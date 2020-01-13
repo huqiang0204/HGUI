@@ -70,9 +70,9 @@ namespace huqiang.UIComposite
         public bool DynamicSize = true;
         Vector2 ctSize;
         float ctScale;
-        public override void Initial(FakeStruct mod, AsyncScript trans)
+        public override void Initial(FakeStruct mod, AsyncScript script)
         {
-            base.Initial(mod,trans);
+            base.Initial(mod,script);
             eventCall = Enity.RegEvent<UserEvent>();
             eventCall.Drag = Draging;
             eventCall.DragEnd = (o, e, s) =>

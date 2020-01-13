@@ -22,6 +22,8 @@ namespace huqiang.Core.HGUI
         Slider,
         ScrollX,
         ScrollY,
+        GridScroll,
+        Paint
     }
     public class AsyncScript:MonoBehaviour
     {
@@ -331,6 +333,12 @@ namespace huqiang.Core.HGUI
                     break;
                 case CompositeType.Slider:
                     new UISlider().Initial(ex, script);
+                    break;
+                case CompositeType.GridScroll:
+                    new GridScroll().Initial(ex,script);
+                    break;
+                case CompositeType.Paint:
+                    new Paint().Initial(ex,script);
                     break;
             }
         }

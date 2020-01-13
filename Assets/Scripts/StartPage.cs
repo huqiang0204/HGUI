@@ -16,6 +16,7 @@ namespace Assets.Scripts
             public HImage scrolly;
             public HImage scrollx;
             public HImage slider;
+            public HImage grid;
         }
         View view;
         class ItemView
@@ -38,6 +39,11 @@ namespace Assets.Scripts
             scrollx.BindingData = data;
             scrollx.SetItemUpdate<ItemView, string>(ItemUpdate);
             scrollx.Refresh();
+            var grid = view.grid.composite as GridScroll;
+            grid.Column = 10;
+            grid.BindingData = data;
+            grid.SetItemUpdate<ItemView, string>(ItemUpdate);
+            grid.Refresh();
         }
         void ItemUpdate(ItemView item,string dat,int index)
         {

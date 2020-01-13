@@ -1,4 +1,6 @@
-﻿using huqiang.UI;
+﻿using huqiang.Core.HGUI;
+using huqiang.Data;
+using huqiang.UI;
 using huqiang.UIEvent;
 using System;
 using UnityEngine;
@@ -102,50 +104,55 @@ namespace huqiang.UIComposite
         public Vector2 ContentSize;
         public FreezeDirection freeze = FreezeDirection.None;
         public ScrollType scrollType = ScrollType.BounceBack;
-        //public ModelElement view;
-        //public ModelElement Content;
+        public AsyncScript Content;
         public UserEvent eventCall;
         public Action<DragContent, Vector2> Scroll;
-        //public override void Initial(ModelElement element)
-        //{
-        //    view = element;
-        //    Size = element.data.sizeDelta;
-        //    element.RegEvent<UserEvent>();
-        //    eventCall = element.baseEvent;
-        //    eventCall.Drag = (o, e, s) => {
-        //        Scrolling(o, s);
-        //    };
-        //    eventCall.DragEnd = (o, e, s) => {
-        //        Scrolling(o, s);
-        //        o.DecayRateX = 0.998f;
-        //        o.DecayRateY = 0.998f;
-        //    };
-        //    eventCall.ScrollEndX = OnScrollEndX;
-        //    eventCall.ScrollEndY = OnScrollEndY;
-        //    eventCall.Scrolling = Scrolling;
-        //    eventCall.ForceEvent = true;
-        //    view.data.anchorMin = view.data.anchorMax = view.data.pivot = new Vector2(0.5f, 0.5f);
-        //    eventCall.CutRect = true;
-        //    Content = element.Find("Content");
-        //    if(Content!=null)
-        //        ContentSize = Content.data.sizeDelta;
-        //}
-    
+        public Action<DragContent> ScrollEnd;
+        public override void Initial(FakeStruct fake,AsyncScript script)
+        {
+            base.Initial(fake,script);
+            Size = Enity.SizeDelta;
+            eventCall = Enity.RegEvent<UserEvent>();
+            eventCall.Drag = (o, e, s) =>
+            {
+                Scrolling(o, s);
+            };
+            eventCall.DragEnd = (o, e, s) =>
+            {
+                Scrolling(o, s);
+                o.DecayRateX = 0.998f;
+                o.DecayRateY = 0.998f;
+            };
+            eventCall.ScrollEndX = OnScrollEndX;
+            eventCall.ScrollEndY = OnScrollEndY;
+            eventCall.Scrolling = Scrolling;
+            eventCall.ForceEvent = true;
+
+            eventCall.CutRect = true;
+            var chi = Enity.transform.Find("Content");
+            if(chi!=null)
+            {
+                Content = chi.GetComponent<AsyncScript>();
+                if (Content != null)
+                    ContentSize = Content.SizeDelta;
+            }
+        }
+
         void Scrolling(UserEvent back, Vector2 v)
         {
-            //v.x /= view.data.localScale.x;
-            //v.y /= view.data.localScale.y;
+            var ls = Enity.transform.localScale;
+            v.x /= ls.x;
+            v.y /= ls.y;
             Move(v);
         }
         public void Move(Vector2 v)
         {
-            //if (view == null)
-            //    return;
-            //if (Content == null)
-            //    return;
-            //ContentSize = Content.data.sizeDelta;
-            //v.x /= view.data.localScale.x;
-            //v.y /= view.data.localScale.y;
+            if (Content == null)
+                return;
+            ContentSize = Content.SizeDelta;
+            var ls = Enity.transform.localScale;
+            v.x /= ls.x;
+            v.y /= ls.y;
             switch (scrollType)
             {
                 case ScrollType.None:
@@ -166,7 +173,6 @@ namespace huqiang.UIComposite
                     p.y -= offset.y;
                     break;
                 case FreezeDirection.X:
-
                     p.y -= offset.y;
                     break;
                 case FreezeDirection.Y:
@@ -174,8 +180,7 @@ namespace huqiang.UIComposite
                     p.x += offset.x;
                     break;
             }
-            //Content.data.localPosition = p;
-            //Content.IsChanged = true;
+            Content.transform.localPosition = p;
             if (Scroll != null)
                 Scroll(this, v);
         }
@@ -202,13 +207,13 @@ namespace huqiang.UIComposite
                     }
                     else
                     {
-                        //if (ScrollEnd != null)
-                        //    ScrollEnd(this);
+                        if (ScrollEnd != null)
+                            ScrollEnd(this);
                     }
                 }
             }
-            //else if (ScrollEnd != null)
-            //    ScrollEnd(this);
+            else if (ScrollEnd != null)
+                ScrollEnd(this);
         }
         void OnScrollEndY(UserEvent back)
         {
@@ -233,40 +238,39 @@ namespace huqiang.UIComposite
                     }
                     else
                     {
-                        //if (ScrollEnd != null)
-                        //    ScrollEnd(this);
+                        if (ScrollEnd != null)
+                            ScrollEnd(this);
                     }
                 }
             }
-            //else if (ScrollEnd != null)
-            //    ScrollEnd(this);
+            else if (ScrollEnd != null)
+                ScrollEnd(this);
         }
         public float Pos
         {
             get
             {
-                //float y = Content.data.sizeDelta.y - view.data.sizeDelta.y;
-                //float p = Content.data.localPosition.y;
-                //p += 0.5f * y;
-                //p /= y;
-                //if (p < 0)
-                //    p = 0;
-                //else if (p > 1)
-                //    p = 1;
-                //return p;
-                return 0;
+                float y = Content.SizeDelta.y - Enity.SizeDelta.y;
+                float p = Content.transform.localPosition.y;
+                p += 0.5f * y;
+                p /= y;
+                if (p < 0)
+                    p = 0;
+                else if (p > 1)
+                    p = 1;
+                return p;
             }
             set
             {
-                //if (value < 0)
-                //    value = 0;
-                //else if (value > 1)
-                //    value = 1;
-                //float y = Content.data.sizeDelta.y - view.data.sizeDelta.y;
-                //if (y < 0)
-                //    y = 0;
-                //y *= (value - 0.5f);
-                //Content.data.localPosition = new Vector3(0, y, 0);
+                if (value < 0)
+                    value = 0;
+                else if (value > 1)
+                    value = 1;
+                float y = Content.SizeDelta.y - Enity.SizeDelta.y;
+                if (y < 0)
+                    y = 0;
+                y *= (value - 0.5f);
+                Content.transform.localPosition = new Vector3(0, y, 0);
             }
         }
     }

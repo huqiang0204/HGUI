@@ -146,7 +146,7 @@ namespace huqiang.UIEvent
                 {
                     if (InputEvent != null)
                     {
-                        InputEvent.MoveUp();
+                        InputEvent.PointerMoveUp();
                     }
                     KeySpeed *= 0.7f;
                     if (KeySpeed < MaxSpeed)
@@ -161,7 +161,7 @@ namespace huqiang.UIEvent
                 {
                     if (InputEvent != null)
                     {
-                        InputEvent.MoveDown();
+                        InputEvent.PointerMoveDown();
                     }
                     KeySpeed *= 0.7f;
                     if (KeySpeed < MaxSpeed)
@@ -445,6 +445,7 @@ namespace huqiang.UIEvent
         }
         public bool ReadOnly;
         bool textChanged;
+        bool textGrowth;
         Color textColor = Color.black;
         Color m_tipColor = new Color(0, 0, 0, 0.8f);
         public Color TipColor { get { return m_tipColor; } set { m_tipColor = value;} }
@@ -556,7 +557,7 @@ namespace huqiang.UIEvent
         public CharacterValidation characterValidation = CharacterValidation.None;
         public TouchScreenKeyboardType touchType = TouchScreenKeyboardType.Default;
         public int CharacterLimit = 0;
-
+        int pressOffset;
         internal override void Initial(FakeStruct mod)
         {
             var txt = TextCom = Context as HText;
@@ -586,6 +587,7 @@ namespace huqiang.UIEvent
             bool pass = InputEvent.contentType == ContentType.Password ? true : false;
             Keyboard.OnInput(m_inputString, InputEvent.touchType, InputEvent.multiLine, pass, CharacterLimit);
             InputCaret.SetParent(Context.transform);
+            pressOffset = StartPress.Offset;
             Editing = true;
         }
         internal override void OnLostFocus(UserAction action)
@@ -680,6 +682,11 @@ namespace huqiang.UIEvent
                     SetShowText();
                     TextCom.Populate();
                     textChanged = false;
+                }
+                if(textGrowth)
+                {
+                    textGrowth = false;
+                    PointerChange(StartPress.Index);
                 }
                 if (Style == 0)
                 {
@@ -777,6 +784,7 @@ namespace huqiang.UIEvent
             int c = es.Length;
             Text.Insert(StartPress.Index, es);
             StartPress.Index += c;
+            textGrowth = true;
             textChanged = true;
         }
         public void PointerMoveLeft()
@@ -815,6 +823,39 @@ namespace huqiang.UIEvent
                         textChanged = true;
                         ShowChanged = true;
                     }
+                }
+            }
+        }
+        public void PointerMoveUp()
+        {
+            if (StartPress.Row > 0)
+            {
+                StartPress.Row--;
+                var c = lines[StartPress.Row].Count;
+                if (pressOffset > c)
+                    c = pressOffset;
+                StartPress.Offset = c;
+                StartPress.Index = lines[StartPress.Row].StartIndex + c;
+                if(StartPress.Row<ShowStart)
+                {
+                    ShowStart = StartPress.Row;
+                }
+            }
+        }
+        public void PointerMoveDown()
+        {
+            int l = lines.Length - 1;
+            if (StartPress.Row < l)
+            {
+                StartPress.Row++;
+                var c = lines[StartPress.Row].Count;
+                if (pressOffset > c)
+                    c = pressOffset;
+                StartPress.Offset = c;
+                StartPress.Index = lines[StartPress.Row].StartIndex + c;
+                if(ShowStart+ShowRow<StartPress.Row)
+                {
+                    ShowStart = StartPress.Row - ShowRow;
                 }
             }
         }

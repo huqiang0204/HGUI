@@ -291,6 +291,7 @@ namespace huqiang.Core.HGUI
 
         public bool Mask;
         public UserEvent userEvent;
+        
         internal int PipelineIndex;
         public virtual Color32 Chromatically { get; set; }
         public T RegEvent<T>(FakeStruct fake = null) where T : UserEvent, new()
@@ -326,6 +327,7 @@ namespace huqiang.Core.HGUI
                     new UISlider().Initial(ex, script);
                     break;
                 case CompositeType.ScrollY:
+                    new ScrollY().Initial(ex,script);
                     break;
                 case CompositeType.ScrollX:
                     break;

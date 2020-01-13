@@ -16,7 +16,7 @@ namespace huqiang.UIComposite
         public GridScroll()
         {
         }
-        ModelElement model;
+        //ModelElement model;
 
         public int Column = 1;
         public int Row = 0;
@@ -49,22 +49,22 @@ namespace huqiang.UIComposite
                 Row++;
             ActualSize = new Vector2(Column * ItemSize.x, Row * ItemSize.y);
         }
-        public override void Initial(ModelElement model)
-        {
-            base.Initial(model);
-            //eventCall = UserEvent.RegEvent<UserEvent>(model);
-            eventCall.Drag = (o, e, s) => { Scrolling(o, s); };
-            eventCall.DragEnd = (o, e, s) => { Scrolling(o, s); };
-            eventCall.Scrolling = Scrolling;
-            eventCall.ForceEvent = true;
-            //Size = Model.data.sizeDelta;
-            eventCall.CutRect = true;
-            eventCall.ScrollEndX = OnScrollEndX;
-            eventCall.ScrollEndY = OnScrollEndY;
-            model.SizeChanged = (o) => {
-                Refresh(Position);
-            };
-        }
+        //public override void Initial(ModelElement model)
+        //{
+        //    base.Initial(model);
+        //    //eventCall = UserEvent.RegEvent<UserEvent>(model);
+        //    eventCall.Drag = (o, e, s) => { Scrolling(o, s); };
+        //    eventCall.DragEnd = (o, e, s) => { Scrolling(o, s); };
+        //    eventCall.Scrolling = Scrolling;
+        //    eventCall.ForceEvent = true;
+        //    //Size = Model.data.sizeDelta;
+        //    eventCall.CutRect = true;
+        //    eventCall.ScrollEndX = OnScrollEndX;
+        //    eventCall.ScrollEndY = OnScrollEndY;
+        //    model.SizeChanged = (o) => {
+        //        Refresh(Position);
+        //    };
+        //}
         void Scrolling(UserEvent back, Vector2 v)
         {
             if (Main == null)

@@ -21,7 +21,6 @@ public class ElementEditor : Editor
         {
             AssetBundle.UnloadAllAssetBundles(true);
             ElementAsset.bundles.Clear();
-            EditorModelManager.Clear();
         }
         if (GUILayout.Button("Create"))
         {
@@ -69,7 +68,6 @@ public class ElementEditor : Editor
         }
         dc += Assetname;
         InitialUI();
-        ModelManagerUI.SavePrefab(gameObject, dc);
         Debug.Log("create done path:"+dc);
     }
     static void Clone(string CloneName, byte[] ui, Transform root)

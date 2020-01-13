@@ -5,14 +5,14 @@ using UnityEngine;
 
 namespace huqiang.UIComposite
 {
-    public class Paint : UI.UIComposite
+    public class Paint : BaseComposite
     {
         public enum DrawModel
         {
             Brush,Scale,Rotate
         }
-        ModelElement model;
-        RawImageElement raw;
+        //ModelElement model;
+        //RawImageElement raw;
         Color[] buffer;
         public int Width;
         public int Height;
@@ -29,25 +29,25 @@ namespace huqiang.UIComposite
         Vector2 CurDirect;
         LoopBuffer<DrawArea> loopBuffer=new LoopBuffer<DrawArea>(2);
         public DrawModel drawModel;
-        public override void Initial(ModelElement mod)
-        {
-            base.Initial(mod);
-            model = mod;
-            raw = model.GetComponent<RawImageElement>();
-            var size = model.data.sizeDelta;
-            Width = (int)size.x;
-            Height = (int)size.y;
-            HalfW = Width/2;
-            HalfH = Height/2;
-            buffer = new Color[Width*Height];
-            //gesture = UserEvent.RegEvent<GestureEvent>(model);
-            gesture.PointerDown = PointDown;
-            gesture.Drag = Drag;
-            gesture.DragEnd = DragEnd;
-            gesture.AutoColor = false;
-            gesture.TowFingerMove = TowFingerMove;
-            ThreadMission.InvokeToMain(Apply, null);
-        }
+        //public override void Initial(ModelElement mod)
+        //{
+        //    base.Initial(mod);
+        //    model = mod;
+        //    raw = model.GetComponent<RawImageElement>();
+        //    var size = model.data.sizeDelta;
+        //    Width = (int)size.x;
+        //    Height = (int)size.y;
+        //    HalfW = Width/2;
+        //    HalfH = Height/2;
+        //    buffer = new Color[Width*Height];
+        //    //gesture = UserEvent.RegEvent<GestureEvent>(model);
+        //    gesture.PointerDown = PointDown;
+        //    gesture.Drag = Drag;
+        //    gesture.DragEnd = DragEnd;
+        //    gesture.AutoColor = false;
+        //    gesture.TowFingerMove = TowFingerMove;
+        //    ThreadMission.InvokeToMain(Apply, null);
+        //}
         void PointDown(UserEvent callBack, UserAction action)
         {
             Origin = callBack.ScreenToLocal(action.CanPosition);
@@ -79,15 +79,15 @@ namespace huqiang.UIComposite
             if(drawModel==DrawModel.Scale)
             {
                 float s = ges.CurScale;
-                model.data.localScale.x = s;
-                model.data.localScale.y = s;
-                model.data.localScale.y = s;
-                model.IsChanged = true;
+                //model.data.localScale.x = s;
+                //model.data.localScale.y = s;
+                //model.data.localScale.y = s;
+                //model.IsChanged = true;
             }else if(drawModel==DrawModel.Rotate)
             {
                 float a = ges.DeltaAngle;
-                model.data.localRotation*= Quaternion.Euler(0,0,a);
-                model.IsChanged = true;
+                //model.data.localRotation*= Quaternion.Euler(0,0,a);
+                //model.IsChanged = true;
             }
         }
         void DrawLine(Vector2 start, Vector2 end)
@@ -183,7 +183,7 @@ namespace huqiang.UIComposite
             }
             texture.SetPixels(buffer);
             texture.Apply();
-            raw.Context.texture = texture;
+            //raw.Context.texture = texture;
         }
         public void Resize()
         {

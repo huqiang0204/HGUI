@@ -55,7 +55,6 @@ namespace huqiang.Manager2D
                 CurrentPage.Show(dat);
                 return;
             }
-            UIAnimation.Manage.ReleaseAll();
             if (CurrentPage != null)
             {
                 CurrentPage.Dispose();

@@ -9,10 +9,10 @@ using UnityEngine;
 
 namespace huqiang.UIComposite
 {
-    public class UIRocker : UI.UIComposite
+    public class UIRocker : BaseComposite
     {
-        ModelElement model;
-        public ModelElement Nob;
+        //ModelElement model;
+        //public ModelElement Nob;
         public UserEvent callBack;
         float _r;
         public float Radius { get { return _r; }set { _r = value;_s = _r * _r; } }
@@ -35,18 +35,18 @@ namespace huqiang.UIComposite
             } }
         public Vector2 vector;
         public Action<UIRocker> Rocking;
-        public override void Initial(ModelElement mod)
-        {
-            model = mod;
-            //callBack = UserEvent.RegEvent<UserEvent>(model);
-            callBack.Drag  = Draging;
-            callBack.DragEnd = DragEnd;
-            callBack.PointerDown = PointDown;
-            callBack.IsCircular = true;
-            _r = mod.data.sizeDelta.x * 0.5f;
-            _s = _r * _r;
-            Nob = mod.Find("Nob");
-        }
+        //public override void Initial(ModelElement mod)
+        //{
+        //    model = mod;
+        //    //callBack = UserEvent.RegEvent<UserEvent>(model);
+        //    callBack.Drag  = Draging;
+        //    callBack.DragEnd = DragEnd;
+        //    callBack.PointerDown = PointDown;
+        //    callBack.IsCircular = true;
+        //    _r = mod.data.sizeDelta.x * 0.5f;
+        //    _s = _r * _r;
+        //    Nob = mod.Find("Nob");
+        //}
         void Draging(UserEvent back, UserAction action, Vector2 v)
         {
            float x = action.CanPosition.x - back.GlobalPosition.x;
@@ -71,22 +71,22 @@ namespace huqiang.UIComposite
             _dir = (Direction)index;
             vector.x = x;
             vector.y = y;
-            if (Nob != null)
-            {
-                Nob.data.localPosition.x = x;
-                Nob.data.localPosition.y = y;
-                Nob.IsChanged = true;
-            }
+            //if (Nob != null)
+            //{
+            //    Nob.data.localPosition.x = x;
+            //    Nob.data.localPosition.y = y;
+            //    Nob.IsChanged = true;
+            //}
             if (Rocking != null)
                 Rocking(this);
         }
         void DragEnd(UserEvent back, UserAction action, Vector2 v)
         {
-            if(Nob!=null)
-            {
-                Nob.data.localPosition = Vector3.zero;
-                Nob.IsChanged = true;
-            }
+            //if(Nob!=null)
+            //{
+            //    Nob.data.localPosition = Vector3.zero;
+            //    Nob.IsChanged = true;
+            //}
             _angle = 0;
             _dir = Direction.None;
             vector.x = 0;
@@ -109,12 +109,12 @@ namespace huqiang.UIComposite
             int index = (Int32)al;
             index++;
             _dir = (Direction)index;
-            if (Nob != null)
-            {
-                Nob.data.localPosition.x = x;
-                Nob.data.localPosition.y = y;
-                Nob.IsChanged = true;
-            }
+            //if (Nob != null)
+            //{
+            //    Nob.data.localPosition.x = x;
+            //    Nob.data.localPosition.y = y;
+            //    Nob.IsChanged = true;
+            //}
             vector.x = x;
             vector.y = y;
             if (Rocking != null)

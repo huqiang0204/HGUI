@@ -28,7 +28,6 @@ public class UIPage : UIBase
             CurrentPage.Show(dat);
             return;
         }
-        UIAnimation.Manage.ReleaseAll();
         if (CurrentPage != null)
         {
             CurrentPage.Save();
@@ -49,7 +48,6 @@ public class UIPage : UIBase
                     CurrentPage.Show(dat);
                     return;
                 }
-            UIAnimation.Manage.ReleaseAll();
             if (CurrentPage != null)
                 CurrentPage.Dispose();
             var t = Activator.CreateInstance(type) as UIPage;

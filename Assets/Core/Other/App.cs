@@ -28,7 +28,6 @@ namespace huqiang
             buff.transform.SetParent(UIRoot);
             buff.SetActive(false);
             buff.transform.localScale = Vector3.one;
-            ModelManagerUI.CycleBuffer = buff.transform;
         }
         public static Transform UIRoot;
         static ThreadMission mission;
@@ -47,12 +46,9 @@ namespace huqiang
         {
             Scale.MainUpdate();
             UserAction.Update();
-            RenderForm.LoadAction();
             InputCaret.UpdateCaret();
             Keyboard.DispatchEvent();
-            RenderForm.ApplyAll();
             ThreadMission.ExtcuteMain();
-            ModelManagerUI.RecycleGameObject();
             AnimationManage.Manage.Update();
             UIPage.MainRefresh(UserAction.TimeSlice);
             AllTime += Time.deltaTime;
@@ -60,12 +56,9 @@ namespace huqiang
         }
         static void SubThread(object obj)
         {
-            RenderForm.DispatchAction();
             Resize();
             UIPage.Refresh(UserAction.TimeSlice);
             UINotify.Refresh(UserAction.TimeSlice);
-            UIAnimation.Manage.Update();
-            RenderForm.VertexCalculationAll();
         }
         static void Resize()
         {

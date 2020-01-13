@@ -55,17 +55,6 @@ namespace huqiang.UIEvent
             MultiLineSubmit,
             MultiLineNewline
         }
-        public enum CharacterValidation
-        {
-            None,
-            Integer,
-            Decimal,
-            Alphanumeric,
-            Name,
-            numberAndName,
-            EmailAddress,
-            Custom
-        }
         #endregion
         #region static
         /// <summary>
@@ -282,136 +271,6 @@ namespace huqiang.UIEvent
                 InputEvent.Refresh();
             }
         }
-        static readonly char[] Separators = { ' ', '.', ',', '\t', '\r', '\n' };
-        const string EmailCharacters = "!#$%&'*+-/=?^_`{|}~";
-        static char Validate(CharacterValidation validat, string text, int pos, char ch)
-        {
-            if (validat == CharacterValidation.None)
-                return ch;
-            if (validat == CharacterValidation.Integer)
-            {
-                if (ch == '-')
-                {
-                    if (text == "")
-                        return ch;
-                    if (text.Length > 0)
-                        return (char)0;
-                }
-                if (ch < '0' | ch > '9')
-                    return (char)0;
-                return ch;
-            }
-            else if (validat == CharacterValidation.Decimal)
-            {
-                if (ch >= '0' && ch <= '9')
-                {
-                    if (ch == '.')
-                        if (text.IndexOf('.') < 0)
-                            return ch;
-                    return (char)0;
-                }
-                return ch;
-            }
-            else if (validat == CharacterValidation.Alphanumeric)
-            {
-                // All alphanumeric characters
-                if (ch >= 'A' && ch <= 'Z') return ch;
-                if (ch >= 'a' && ch <= 'z') return ch;
-                if (ch >= '0' && ch <= '9') return ch;
-            }
-            else if (validat == CharacterValidation.numberAndName)
-            {
-                if (char.IsLetter(ch))
-                {
-                    // Character following a space should be in uppercase.
-                    if (char.IsLower(ch) && ((pos == 0) || (text[pos - 1] == ' ')))
-                    {
-                        return char.ToUpper(ch);
-                    }
-
-                    // Character not following a space or an apostrophe should be in lowercase.
-                    if (char.IsUpper(ch) && (pos > 0) && (text[pos - 1] != ' ') && (text[pos - 1] != '\''))
-                    {
-                        return char.ToLower(ch);
-                    }
-
-                    return ch;
-                }
-
-                if (ch == '\'')
-                {
-                    // Don't allow more than one apostrophe
-                    if (!text.Contains("'"))
-                        // Don't allow consecutive spaces and apostrophes.
-                        if (!(((pos > 0) && ((text[pos - 1] == ' ') || (text[pos - 1] == '\''))) ||
-                              ((pos < text.Length) && ((text[pos] == ' ') || (text[pos] == '\'')))))
-                            return ch;
-                }
-
-                if (ch == ' ')
-                {
-                    // Don't allow consecutive spaces and apostrophes.
-                    if (!(((pos > 0) && ((text[pos - 1] == ' ') || (text[pos - 1] == '\''))) ||
-                          ((pos < text.Length) && ((text[pos] == ' ') || (text[pos] == '\'')))))
-                        return ch;
-                }
-                if (ch >= '0' && ch <= '9') return ch;
-            }
-            else if (validat == CharacterValidation.Name)
-            {
-                if (char.IsLetter(ch))
-                {
-                    // Character following a space should be in uppercase.
-                    if (char.IsLower(ch) && ((pos == 0) || (text[pos - 1] == ' ')))
-                    {
-                        return char.ToUpper(ch);
-                    }
-
-                    // Character not following a space or an apostrophe should be in lowercase.
-                    if (char.IsUpper(ch) && (pos > 0) && (text[pos - 1] != ' ') && (text[pos - 1] != '\''))
-                    {
-                        return char.ToLower(ch);
-                    }
-
-                    return ch;
-                }
-
-                if (ch == '\'')
-                {
-                    // Don't allow more than one apostrophe
-                    if (!text.Contains("'"))
-                        // Don't allow consecutive spaces and apostrophes.
-                        if (!(((pos > 0) && ((text[pos - 1] == ' ') || (text[pos - 1] == '\''))) ||
-                              ((pos < text.Length) && ((text[pos] == ' ') || (text[pos] == '\'')))))
-                            return ch;
-                }
-
-                if (ch == ' ')
-                {
-                    // Don't allow consecutive spaces and apostrophes.
-                    if (!(((pos > 0) && ((text[pos - 1] == ' ') || (text[pos - 1] == '\''))) ||
-                          ((pos < text.Length) && ((text[pos] == ' ') || (text[pos] == '\'')))))
-                        return ch;
-                }
-            }
-            else if (validat == CharacterValidation.EmailAddress)
-            {
-
-                if (ch >= 'A' && ch <= 'Z') return ch;
-                if (ch >= 'a' && ch <= 'z') return ch;
-                if (ch >= '0' && ch <= '9') return ch;
-                if (ch == '@' && text.IndexOf('@') == -1) return ch;
-                if (EmailCharacters.IndexOf(ch) != -1) return ch;
-                if (ch == '.')
-                {
-                    char lastChar = (text.Length > 0) ? text[Mathf.Clamp(pos, 0, text.Length - 1)] : ' ';
-                    char nextChar = (text.Length > 0) ? text[Mathf.Clamp(pos + 1, 0, text.Length - 1)] : '\n';
-                    if (lastChar != '.' && nextChar != '.')
-                        return ch;
-                }
-            }
-            return (char)0;
-        }
         #endregion
 
         string m_TipString = "";
@@ -453,7 +312,6 @@ namespace huqiang.UIEvent
         public Action<TextInput> OnValueChanged;
         public Action<TextInput> OnSubmit;
         public Action<TextInput> OnDone;
-        public Action<TextInput> LineChanged;
         public Action<TextInput, UserAction> OnSelectChanged;
         public Action<TextInput, UserAction> OnSelectEnd;
         public InputType inputType = InputType.Standard;
@@ -625,7 +483,7 @@ namespace huqiang.UIEvent
             StringBuilder sb = new StringBuilder();
             for(int i=0;i<input.Length;i++)
             {
-                if (Validate(characterValidation, sb.ToString(), i, input[i]) != 0)
+                if (CharOperation.Validate(characterValidation, sb.ToString(), i, input[i]) != 0)
                     sb.Append(input[i]);
             }
             return sb.ToString();
@@ -649,11 +507,11 @@ namespace huqiang.UIEvent
             }
             str = es.FullString;
 
-            //if (Validate(characterValidation, textInfo.text, textInfo.startSelect, str[0]) == 0)
-            //    return "";
-            //if (ValidateChar != null)
-            //    if (ValidateChar(this, textInfo.startSelect, str[0]) == 0)
-            //        return "";
+            if (CharOperation.Validate(characterValidation, Text.FullString, StartPress.Index, str[0]) == 0)
+                return "";
+            if (ValidateChar != null)
+                if (ValidateChar(this, StartPress.Index, str[0]) == 0)
+                    return "";
             InsertString(str);
             return input;
         }
@@ -661,13 +519,13 @@ namespace huqiang.UIEvent
         {
             if (input == "")
                 return "";
-            //textInfo.buffer= new EmojiString(input);
+            //textInfo.buffer = new EmojiString(input);
             //if (OnValueChanged != null)
             //    OnValueChanged(this);
             //textInfo.text = textInfo.buffer.FullString;
             //SetShowText();
             //textInfo.CaretStyle = 1;
-            //ChangePoint(textInfo,this);
+            //ChangePoint(textInfo, this);
             return input;
         }
         public bool Editing;

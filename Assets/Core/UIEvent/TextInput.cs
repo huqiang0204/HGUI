@@ -589,6 +589,7 @@ namespace huqiang.UIEvent
             InputCaret.SetParent(Context.transform);
             pressOffset = StartPress.Offset;
             Editing = true;
+            Style = 0;
         }
         internal override void OnLostFocus(UserAction action)
         {

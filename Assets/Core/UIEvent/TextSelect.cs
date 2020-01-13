@@ -130,31 +130,6 @@ namespace huqiang.UIEvent
             else MoveDown();
             base.OnMouseWheel(action);
         }
-        internal override void OnDragEnd(UserAction action)
-        {
-            if(TextCom!=null)
-            {
-                Style = 1;
-                long r = action.EventTicks - PressTime;
-                if (r <= ClickTime)
-                {
-                    float x = action.CanPosition.x;
-                    float y = action.CanPosition.y;
-                    x -= RawPosition.x;
-                    x *= x;
-                    y -= RawPosition.y;
-                    y *= y;
-                    x += y;
-                    if (x < ClickArea)
-                        return;
-                }
-                var p = GetPressIndex(action, action.CanPosition - RawPosition);
-                if (p.Index != EndPress.Index)
-                    ShowChanged = true;
-                EndPress = p;
-            }
-            base.OnDragEnd(action);
-        }
         internal override void OnClick(UserAction action)
         {
             Style = 0;
@@ -265,6 +240,7 @@ namespace huqiang.UIEvent
                         ty = -ty;
                         if (oy < ty)
                             index = i - 1;
+                        else index = i;
                         if (index < 0)
                             index = 0;
                         break;
@@ -315,9 +291,10 @@ namespace huqiang.UIEvent
                     tx = -tx;
                     if (tx < ox)
                         index++;
+                    else index = i;
                     if (index > c)
                         index = c;
-                    break;
+                    goto label;
                 }
                 else
                 {
@@ -326,6 +303,8 @@ namespace huqiang.UIEvent
                 }
                 s++;
             }
+            index = c;
+        label:;
            if (dir < 0)//向左
             {
                 if (cha[index].cursorPos.x < x)

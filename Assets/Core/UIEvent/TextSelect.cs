@@ -41,7 +41,7 @@ namespace huqiang.UIEvent
         /// 变动的行数，增加或减少
         /// </summary>
         public int LineChange = 0;
-        protected float PreferredHeight;
+        public float PreferredHeight;
         float HeightChange;
         protected int ShowStart;
         protected int ShowRow;
@@ -344,7 +344,6 @@ namespace huqiang.UIEvent
         }
         internal override void Update()
         {
-            base.Update();
             switch(Style)
             {
                 case 0:
@@ -507,7 +506,7 @@ namespace huqiang.UIEvent
                 {
                     var range = GetSelectLineRange(l);
                     bool t = false;
-                    if(range.y==lines[l].Count)
+                    if (range.y == lines[l].Count)
                     {
                         t = true;
                         range.y--;

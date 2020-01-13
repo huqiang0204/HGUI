@@ -581,6 +581,16 @@ namespace huqiang.UIEvent
             Text.FullString = m_inputString;
             GetPreferredHeight();
         }
+        public override void OnMouseDown(UserAction action)
+        {
+            base.OnMouseDown(action);
+            if(m_inputString=="")
+            {
+                StartPress.Row = 0;
+                StartPress.Index = 0;
+                StartPress.Offset = 0;
+            }
+        }
         internal override void OnClick(UserAction action)
         {
             InputEvent = this;

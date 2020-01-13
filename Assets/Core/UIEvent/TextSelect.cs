@@ -41,10 +41,10 @@ namespace huqiang.UIEvent
         /// 变动的行数，增加或减少
         /// </summary>
         public int LineChange = 0;
-        float PreferredHeight;
+        protected float PreferredHeight;
         float HeightChange;
-        int ShowStart;
-        int ShowRow;
+        protected int ShowStart;
+        protected int ShowRow;
         protected bool Focus;
         protected bool ShowChanged;
         protected PressInfo StartPress;

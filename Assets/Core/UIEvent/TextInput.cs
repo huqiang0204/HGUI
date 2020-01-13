@@ -770,38 +770,44 @@ namespace huqiang.UIEvent
         }
         public void PointerMoveLeft()
         {
-            //if (StartIndex > 0)
-            //{
-            //    StartIndex--;
-            //    if (StartIndex < lines[StartLine].startCharIdx)
-            //    {
-            //        StartLine--;
-            //    }
-            //    LineOffset = StartIndex - lines[StartLine].startCharIdx;
-            //    if (StartLine < ShowStart)
-            //    {
-            //        ChangeShowLine(StartLine);
-            //    }
-            //}
+            if (StartPress.Index > 0)
+            {
+                StartPress.Index--;
+                int c = lines[StartPress.Row].StartIndex;
+                if (StartPress.Index<c)
+                {
+                    StartPress.Row--;
+                    c = lines[StartPress.Row].StartIndex;
+                    StartPress.Offset = StartPress.Index - c;
+                   if(StartPress.Row<ShowStart)
+                    {
+                        ShowStart = StartPress.Row;
+                        TextCom.Text = GetShowString();
+                        TextCom.Populate();
+                        ShowChanged = true;
+                    }
+                }
+            }
         }
         public void PointerMoveRight()
         {
-            //if (StartIndex < uchars.Length - 1)
-            //{
-            //    StartIndex++;
-            //    if (StartLine < lines.Length - 1)
-            //    {
-            //        if (lines[StartLine + 1].startCharIdx <= StartIndex)
-            //        {
-            //            StartLine++;
-            //        }
-            //    }
-            //    LineOffset = StartIndex - lines[StartLine].startCharIdx;
-            //    if (StartLine - ShowRow > ShowStart)
-            //    {
-            //        ChangeShowLine(StartLine - ShowRow);
-            //    }
-            //}
+            if (StartPress.Index < cha.Length - 1)
+            {
+                StartPress.Index++;
+                StartPress.Offset++;
+                if (StartPress.Offset >= lines[StartPress.Row].Count)
+                {
+                    StartPress.Row++;
+                    StartPress.Offset = 0;
+                    if (ShowStart + ShowRow < lines.Length)
+                    {
+                        ShowStart++;
+                        TextCom.Text = GetShowString();
+                        TextCom.Populate();
+                        ShowChanged = true;
+                    }
+                }
+            }
         }
         public void PointerMoveStart()
         {

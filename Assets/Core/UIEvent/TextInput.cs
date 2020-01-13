@@ -839,6 +839,7 @@ namespace huqiang.UIEvent
                 if(StartPress.Row<ShowStart)
                 {
                     ShowStart = StartPress.Row;
+                    ShowChanged = true;
                 }
             }
         }
@@ -856,6 +857,7 @@ namespace huqiang.UIEvent
                 if(ShowStart+ShowRow<StartPress.Row)
                 {
                     ShowStart = StartPress.Row - ShowRow;
+                    ShowChanged = true;
                 }
             }
         }

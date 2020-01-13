@@ -796,6 +796,8 @@ namespace huqiang.UIEvent
             if (StartPress.Index > 0)
             {
                 StartPress.Index--;
+                StartPress.Offset--;
+                pressOffset = StartPress.Offset;
                 int c = lines[StartPress.Row].StartIndex;
                 if (StartPress.Index<c)
                 {
@@ -809,15 +811,17 @@ namespace huqiang.UIEvent
                         ShowChanged = true;
                     }
                 }
+                pressOffset = StartPress.Offset;
             }
         }
         public void PointerMoveRight()
         {
-            if (StartPress.Index < cha.Length - 1)
+            if (StartPress.Row < lines.Length - 1 | StartPress.Offset < lines[StartPress.Row].Count)
             {
-                StartPress.Index++;
                 StartPress.Offset++;
-                if (StartPress.Offset >= lines[StartPress.Row].Count)
+                if (StartPress.Offset != lines[StartPress.Row].Count)
+                    StartPress.Index++;
+                if (StartPress.Offset > lines[StartPress.Row].Count)
                 {
                     StartPress.Row++;
                     pressOffset = StartPress.Offset = 0;
@@ -828,6 +832,7 @@ namespace huqiang.UIEvent
                         ShowChanged = true;
                     }
                 }
+                pressOffset = StartPress.Offset;
             }
         }
         public void PointerMoveUp()
@@ -835,15 +840,16 @@ namespace huqiang.UIEvent
             if (StartPress.Row > 0)
             {
                 StartPress.Row--;
-                var c = lines[StartPress.Row].Count;
-                if (pressOffset > c)
-                    c = pressOffset;
+                var c =pressOffset;
+                if (c > lines[StartPress.Row].Count)
+                    c = lines[StartPress.Row].Count;
                 StartPress.Offset = c;
                 StartPress.Index = lines[StartPress.Row].StartIndex + c;
                 if(StartPress.Row<ShowStart)
                 {
                     ShowStart = StartPress.Row;
                     ShowChanged = true;
+                    lineChanged = true;
                 }
             }
         }
@@ -853,15 +859,16 @@ namespace huqiang.UIEvent
             if (StartPress.Row < l)
             {
                 StartPress.Row++;
-                var c = lines[StartPress.Row].Count;
-                if (pressOffset > c)
-                    c = pressOffset;
+                var c = pressOffset;
+                if (c > lines[StartPress.Row].Count)
+                    c = lines[StartPress.Row].Count;
                 StartPress.Offset = c;
                 StartPress.Index = lines[StartPress.Row].StartIndex + c;
-                if(ShowStart+ShowRow<StartPress.Row)
+                if(ShowStart+ShowRow<StartPress.Row+1)
                 {
-                    ShowStart = StartPress.Row - ShowRow;
+                    ShowStart = StartPress.Row - ShowRow+1;
                     ShowChanged = true;
+                    lineChanged = true;
                 }
             }
         }
@@ -905,8 +912,8 @@ namespace huqiang.UIEvent
                 {
                     StartPress.Index = index;
                     StartPress.Row = i;
-                    StartPress.Offset = index - lines[i].StartIndex;
-                    pressOffset = i;
+                    pressOffset = StartPress.Offset = index - lines[i].StartIndex;
+                    break;
                 }
             }
             if (StartPress.Row < ShowStart)
@@ -916,6 +923,11 @@ namespace huqiang.UIEvent
             if (ShowStart + ShowRow < StartPress.Row +1)
             {
                 ShowStart = StartPress.Row - ShowRow + 1;
+            }else if(ShowStart+ShowRow>LineCount)
+            {
+                ShowStart = LineCount - ShowRow;
+                if (ShowStart < 0)
+                    ShowStart = 0;
             }
         }
         internal override void Update()

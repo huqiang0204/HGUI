@@ -29,10 +29,10 @@ namespace huqiang.UIEvent
         protected EmojiString Text = new EmojiString();
         protected float overDistance = 500;
         protected float overTime = 0;
-        LineInfo[] lines;
-        UICharInfo[] cha;
-        UILineInfo[] showLines;
-        UICharInfo[] showChars;
+        internal LineInfo[] lines;
+        protected UICharInfo[] cha;
+        protected UILineInfo[] showLines;
+        protected UICharInfo[] showChars;
         /// <summary>
         /// 总计行数
         /// </summary>
@@ -45,6 +45,7 @@ namespace huqiang.UIEvent
         float HeightChange;
         int ShowStart;
         int ShowRow;
+        protected bool Focus;
         protected bool ShowChanged;
         protected PressInfo StartPress;
         protected PressInfo EndPress;
@@ -70,6 +71,7 @@ namespace huqiang.UIEvent
         }
         public override void OnMouseDown(UserAction action)
         {
+            Focus = true;
             if (TextCom != null)
             {
                 StartPress = GetPressIndex(action, Vector2.zero);
@@ -162,6 +164,7 @@ namespace huqiang.UIEvent
         {
             Style = 0;
             InputCaret.Hide();
+            Focus = false;
         }
         protected void SetSetting()
         {
@@ -351,6 +354,7 @@ namespace huqiang.UIEvent
                     InputCaret.CaretStyle = 2;
                     if(ShowChanged)
                     {
+                        InputCaret.Active();
                         ShowChanged = false;
                         List<HVertex> hs = new List<HVertex>();
                         List<int> tris = new List<int>();
@@ -359,9 +363,16 @@ namespace huqiang.UIEvent
                     }
                     break;
             }
-           
-            if (Keyboard.GetKeyDown(KeyCode.C) & Keyboard.GetKey(KeyCode.LeftControl))
-                GUIUtility.systemCopyBuffer = GetSelectString();
+           if(Focus)
+            {
+                if (Keyboard.GetKeyDown(KeyCode.C) & Keyboard.GetKey(KeyCode.LeftControl))
+                    GUIUtility.systemCopyBuffer = GetSelectString();
+                if (Keyboard.GetKeyDown(KeyCode.A) & Keyboard.GetKey(KeyCode.LeftControl))
+                {
+                    SelectAll();
+                    ShowChanged = true;
+                }
+            }
         }
         public string GetSelectString()
         {
@@ -533,6 +544,24 @@ namespace huqiang.UIEvent
                     tri.Add(st);
                     tri.Add(st + 3);
                     tri.Add(st + 1);
+                }
+            }
+        }
+        public void SelectAll()
+        {
+            StartPress.Row = 0;
+            StartPress.Index = 0;
+            StartPress.Offset = 0;
+            if (cha != null)
+                EndPress.Index = cha.Length - 1;
+            if (EndPress.Index < 0)
+                EndPress.Index = 0;
+            if (lines != null)
+            {
+                if (lines.Length > 0)
+                {
+                    EndPress.Row = lines.Length - 1;
+                    EndPress.Offset = lines[StartPress.Row].Count;
                 }
             }
         }

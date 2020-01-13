@@ -87,8 +87,6 @@ namespace huqiang.UIComposite
             slider.info.direction = UISlider.Direction.Vertical;
             return slider;
         }
-
-
         static public UIRocker CreateRocker(string name)
         {
             var mod = ModelElement.CreateNew(name);

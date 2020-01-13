@@ -1,5 +1,6 @@
 ﻿using huqiang;
 using huqiang.Data;
+using huqiang.UIComposite;
 using huqiang.UIEvent;
 using System;
 using System.Collections.Generic;
@@ -312,6 +313,22 @@ namespace huqiang.Core.HGUI
                 case EventType.TextSelect: RegEvent<TextSelect>(ex); break;
                 case EventType.TextInput: RegEvent<TextInput>(ex); break;
                 case EventType.GestureEvent: RegEvent<GestureEvent>(ex); break;
+            }
+            CreateUIComposite(this,ex);
+        }
+        public static void CreateUIComposite(AsyncScript script,FakeStruct ex)
+        {
+            switch(script.compositeType)
+            {
+                case CompositeType.None:
+                    break;
+                case CompositeType.Slider:
+                    new UISlider().Initial(ex, script);
+                    break;
+                case CompositeType.ScrollY:
+                    break;
+                case CompositeType.ScrollX:
+                    break;
             }
         }
     }

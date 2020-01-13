@@ -68,9 +68,10 @@ namespace huqiang.UIComposite
             info.MinScale = 1;
             info.MaxScale = 1;
         }
-        public override void Initial(FakeStruct mod, Transform trans)
+        public override void Initial(FakeStruct mod, AsyncScript script)
         {
-            Main = trans.GetComponent<AsyncScript>();
+            Main = script;
+            var trans = script.transform;
             callBack = Main.RegEvent<UserEvent>();
             callBack.Drag = callBack.DragEnd = Draging;
             callBack.PointerDown = PointDown;

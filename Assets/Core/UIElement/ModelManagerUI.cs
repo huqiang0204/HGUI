@@ -406,8 +406,8 @@ namespace huqiang.UI
     {
         public virtual void Initial(ModelElement mod) { }
         public FakeStruct BufferData;
-        public Transform Enity;
-        public virtual void Initial(FakeStruct mod,Transform trans)
+        public AsyncScript Enity;
+        public virtual void Initial(FakeStruct mod,AsyncScript trans)
         {
             BufferData = mod;
             Enity = trans;

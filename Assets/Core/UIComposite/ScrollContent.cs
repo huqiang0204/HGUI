@@ -154,10 +154,10 @@ namespace huqiang.UIComposite
         /// </summary>
         public Action<ScrollItem> ItemRecycle;
         public Transform Main;
-        public override  void Initial(FakeStruct mod, Transform trans)
+        public override  void Initial(FakeStruct mod, AsyncScript trans)
         {
-            Main = trans;
-            int c = trans.childCount;
+            Main = trans.transform;
+            int c = Main.childCount;
             if (c > 0)
             {
                 ItemMods = HGUIManager.GetAllChild(mod);

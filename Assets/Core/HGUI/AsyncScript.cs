@@ -23,7 +23,8 @@ namespace huqiang.Core.HGUI
         ScrollX,
         ScrollY,
         GridScroll,
-        Paint
+        Paint,
+        Rocker
     }
     public class AsyncScript:MonoBehaviour
     {
@@ -339,6 +340,9 @@ namespace huqiang.Core.HGUI
                     break;
                 case CompositeType.Paint:
                     new Paint().Initial(ex,script);
+                    break;
+                case CompositeType.Rocker:
+                    new UIRocker().Initial(ex,script);
                     break;
             }
         }

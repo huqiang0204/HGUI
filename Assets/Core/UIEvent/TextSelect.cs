@@ -548,6 +548,7 @@ namespace huqiang.UIEvent
         }
         public void SelectAll()
         {
+            Style = 1;
             StartPress.Row = 0;
             StartPress.Index = 0;
             StartPress.Offset = 0;

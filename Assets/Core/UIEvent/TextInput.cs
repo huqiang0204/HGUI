@@ -758,6 +758,7 @@ namespace huqiang.UIEvent
         {
             if (DeleteSelectString())
                 return true;
+            Style = 0;
             if (StartPress.Index < 1)
                 return false;
             StartPress.Index--;
@@ -773,6 +774,7 @@ namespace huqiang.UIEvent
         {
             if (DeleteSelectString())
                 return true;
+            Style = 0;
             if (Text.Remove(StartPress.Index))
             {
                 textChanged = true;
@@ -783,6 +785,7 @@ namespace huqiang.UIEvent
         }
         public void InsertString(string str)
         {
+            Style = 0;
             DeleteSelectString();
             var es = new EmojiString(str);
             int c = es.Length;
@@ -793,6 +796,7 @@ namespace huqiang.UIEvent
         }
         public void PointerMoveLeft()
         {
+            Style = 0;
             if (StartPress.Index > 0)
             {
                 StartPress.Index--;
@@ -816,6 +820,7 @@ namespace huqiang.UIEvent
         }
         public void PointerMoveRight()
         {
+            Style = 0;
             if (StartPress.Row < lines.Length - 1 | StartPress.Offset < lines[StartPress.Row].Count)
             {
                 StartPress.Offset++;
@@ -837,6 +842,7 @@ namespace huqiang.UIEvent
         }
         public void PointerMoveUp()
         {
+            Style = 0;
             if (StartPress.Row > 0)
             {
                 StartPress.Row--;
@@ -855,6 +861,7 @@ namespace huqiang.UIEvent
         }
         public void PointerMoveDown()
         {
+            Style = 0;
             int l = lines.Length - 1;
             if (StartPress.Row < l)
             {

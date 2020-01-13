@@ -116,7 +116,7 @@ namespace huqiang.UIComposite
                 ItemUpdate(t, u, index);
         }
     }
-    public class UIContainer:ModelInital
+    public class UIContainer: UI.UIComposite
     {
         class Item
         {

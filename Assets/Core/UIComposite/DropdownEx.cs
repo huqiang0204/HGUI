@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace huqiang.UIComposite
 {
-    public class DropdownEx : ModelInital
+    public class DropdownEx : UI.UIComposite
     {
         public class PopItemMod
         {

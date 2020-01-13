@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace huqiang.UIComposite
 {
-    public class UIPalette : ModelInital
+    public class UIPalette : UI.UIComposite
     {
         UserEvent callBackR;
         UserEvent callBackC;

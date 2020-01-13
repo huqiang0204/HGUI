@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace huqiang.UIComposite
 {
-    public class UIRocker : ModelInital
+    public class UIRocker : UI.UIComposite
     {
         ModelElement model;
         public ModelElement Nob;

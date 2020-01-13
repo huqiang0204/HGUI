@@ -53,7 +53,7 @@ namespace huqiang.UIComposite
             }
         }
     }
-    public class ScrollContent: ModelInital
+    public class ScrollContent: UI.UIComposite
     {
         /// <summary>
         /// 滚动公差值

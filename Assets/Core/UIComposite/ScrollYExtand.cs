@@ -10,7 +10,7 @@ namespace huqiang.UIComposite
     /// <summary>
     /// 带有标题的,可以展开收缩的
     /// </summary>
-    public class ScrollYExtand : ModelInital,AnimatInterface
+    public class ScrollYExtand : UI.UIComposite,AnimatInterface
     {
         public class DataTemplate
         {

@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace huqiang.UIComposite
 {
-    public class UIDate  : ModelInital
+    public class UIDate  : UI.UIComposite
     {
         class ItemView
         {

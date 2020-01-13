@@ -310,9 +310,9 @@ namespace huqiang.UI
                         m.Value = mod;
                     //else if (typeof(UserEvent).IsAssignableFrom(m.FieldType))
                     //    m.Value = UserEvent.RegEvent(mod.Context.GetComponent<AsyncScript>(),m.FieldType);
-                    else if (typeof(ModelInital).IsAssignableFrom(m.FieldType))
+                    else if (typeof(UIComposite).IsAssignableFrom(m.FieldType))
                     {
-                        var obj = Activator.CreateInstance(m.FieldType) as ModelInital;
+                        var obj = Activator.CreateInstance(m.FieldType) as UIComposite;
                         obj.Initial( mod);
                         m.Value = obj;
                     }
@@ -402,9 +402,8 @@ namespace huqiang.UI
         public int Top;
         public ReflectionModel[] All;
     }
-    public abstract class ModelInital
+    public abstract class UIComposite
     {
-        //public ModelElement Model;
         public virtual void Initial(ModelElement mod) { }
         public FakeStruct BufferData;
         public Transform Enity;

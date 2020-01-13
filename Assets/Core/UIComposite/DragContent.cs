@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace huqiang.UIComposite
 {
-    public class DragContent: ModelInital
+    public class DragContent: UI.UIComposite
     {
         public enum FreezeDirection
         {

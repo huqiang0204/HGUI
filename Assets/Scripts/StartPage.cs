@@ -13,9 +13,9 @@ namespace Assets.Scripts
     {
         class View
         {
-            public ScrollY scrolly;
-            public ScrollX scrollx;
-            public UISlider slider;
+            public HImage scrolly;
+            public HImage scrollx;
+            public HImage slider;
         }
         View view;
         class ItemView
@@ -30,12 +30,12 @@ namespace Assets.Scripts
             List<string> data = new List<string>();
             for (int i = 1000; i < 1200; i++)
                 data.Add(i.ToString()+"😄");
-            view.scrolly.BindingData = data;
-            view.scrolly.SetItemUpdate<ItemView, string>(ItemUpdate);
-            view.scrolly.Refresh();
-            view.scrollx.BindingData = data;
-            view.scrollx.SetItemUpdate<ItemView, string>(ItemUpdate);
-            view.scrollx.Refresh();
+            //view.scrolly.BindingData = data;
+            //view.scrolly.SetItemUpdate<ItemView, string>(ItemUpdate);
+            //view.scrolly.Refresh();
+            //view.scrollx.BindingData = data;
+            //view.scrollx.SetItemUpdate<ItemView, string>(ItemUpdate);
+            //view.scrollx.Refresh();
         }
         void ItemUpdate(ItemView item,string dat,int index)
         {

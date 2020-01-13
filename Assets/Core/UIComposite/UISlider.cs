@@ -18,7 +18,7 @@ namespace huqiang.UIComposite
         public static int Size = sizeof(SliderInfo);
         public static int ElementSize = Size / 4;
     }
-    public class UISlider : ModelInital
+    public class UISlider : UI.UIComposite
     {
         public enum Direction
         {

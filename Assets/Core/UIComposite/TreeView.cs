@@ -20,7 +20,7 @@ namespace huqiang.UIComposite
         public UserEvent callBack;
         public TreeViewNode node;
     }
-    public class TreeView : ModelInital
+    public class TreeView : UI.UIComposite
     {
         public ModelElement View;
         public Vector2 Size;//scrollView的尺寸

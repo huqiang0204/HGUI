@@ -7,14 +7,15 @@ using System.Text;
 
 namespace huqiang.UIComposite
 {
-    public abstract class BaseComposite
+    public abstract class Composite
     {
         public FakeStruct BufferData;
         public AsyncScript Enity;
-        public virtual void Initial(FakeStruct mod, AsyncScript trans)
+        public virtual void Initial(FakeStruct mod, AsyncScript script)
         {
             BufferData = mod;
-            Enity = trans;
+            Enity = script;
+            Enity.composite = this;
         }
     }
 }

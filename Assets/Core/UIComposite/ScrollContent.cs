@@ -53,7 +53,7 @@ namespace huqiang.UIComposite
             }
         }
     }
-    public class ScrollContent: BaseComposite
+    public class ScrollContent: Composite
     {
         /// <summary>
         /// 滚动公差值
@@ -65,7 +65,6 @@ namespace huqiang.UIComposite
         public Vector2 ActualSize { get; protected set; }//相当于Content的尺寸
         public Vector2 ItemSize = new Vector2(1,1);
         FakeStruct modData;
-        public AsyncScript model;
         public FakeStruct ItemMod
         {
             set
@@ -154,15 +153,16 @@ namespace huqiang.UIComposite
         /// </summary>
         public Action<ScrollItem> ItemRecycle;
         public Transform Main;
-        public override  void Initial(FakeStruct mod, AsyncScript trans)
+        public override  void Initial(FakeStruct mod, AsyncScript script)
         {
-            Main = trans.transform;
+            base.Initial(mod,script);
+            Main = script.transform;
             int c = Main.childCount;
             if (c > 0)
             {
                 ItemMods = HGUIManager.GetAllChild(mod);
                 ItemMod = ItemMods[0];
-                HGUIManager.GameBuffer.RecycleChild(trans.gameObject);
+                HGUIManager.GameBuffer.RecycleChild(script.gameObject);
                 unsafe { ItemSize = ((TransfromData*)ItemMods[0].ip)->size; }
             }
         }

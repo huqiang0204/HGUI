@@ -30,12 +30,14 @@ namespace Assets.Scripts
             List<string> data = new List<string>();
             for (int i = 1000; i < 1200; i++)
                 data.Add(i.ToString()+"😄");
-            //view.scrolly.BindingData = data;
-            //view.scrolly.SetItemUpdate<ItemView, string>(ItemUpdate);
-            //view.scrolly.Refresh();
-            //view.scrollx.BindingData = data;
-            //view.scrollx.SetItemUpdate<ItemView, string>(ItemUpdate);
-            //view.scrollx.Refresh();
+            var scrolly = view.scrolly.composite as ScrollY;
+            scrolly.BindingData = data;
+            scrolly.SetItemUpdate<ItemView, string>(ItemUpdate);
+            scrolly.Refresh();
+            var scrollx = view.scrolly.composite as ScrollX;
+            scrollx.BindingData = data;
+            scrollx.SetItemUpdate<ItemView, string>(ItemUpdate);
+            scrollx.Refresh();
         }
         void ItemUpdate(ItemView item,string dat,int index)
         {

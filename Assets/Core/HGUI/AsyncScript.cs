@@ -291,7 +291,7 @@ namespace huqiang.Core.HGUI
 
         public bool Mask;
         public UserEvent userEvent;
-        
+        public Composite composite;
         internal int PipelineIndex;
         public virtual Color32 Chromatically { get; set; }
         public T RegEvent<T>(FakeStruct fake = null) where T : UserEvent, new()

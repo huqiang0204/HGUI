@@ -73,8 +73,7 @@ namespace huqiang.UIComposite
         public override void Initial(FakeStruct mod, AsyncScript trans)
         {
             base.Initial(mod,trans);
-            model = trans;
-            eventCall = model.RegEvent<UserEvent>();
+            eventCall = Enity.RegEvent<UserEvent>();
             eventCall.Drag = Draging;
             eventCall.DragEnd = (o, e, s) =>
             {
@@ -91,10 +90,10 @@ namespace huqiang.UIComposite
             eventCall.ForceEvent = true;
             eventCall.AutoColor = false;
             eventCall.CutRect = true;
-            Size = model.SizeDelta;
+            Size = Enity.SizeDelta;
             eventCall.CutRect = true;
-            model.SizeChanged = (o) => {
-                Size = model.SizeDelta;
+            Enity.SizeChanged = (o) => {
+                Size = Enity.SizeDelta;
                 Refresh(m_point,0);
             };
         }

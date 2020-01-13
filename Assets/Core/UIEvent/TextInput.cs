@@ -431,18 +431,17 @@ namespace huqiang.UIEvent
         }
         void SetShowText()
         {
-            //m_inputString = textControll.GetFullString();
-            //string str = textControll.GetShowString();
-            //if (str== "" )
-            //{
-            //    TextCom.Chromatically = TipColor;
-            //    TextCom.Text = m_TipString;
-            //}
-            //else
-            //{
-            //    TextCom.Chromatically = textColor;
-            //    TextCom.Text = str;
-            //}
+            string str = GetShowString();
+            if (str == "")
+            {
+                TextCom.Chromatically = TipColor;
+                TextCom.Text = m_TipString;
+            }
+            else
+            {
+                TextCom.Chromatically = textColor;
+                TextCom.Text = str;
+            }
         }
         public bool ReadOnly;
         bool textChanged;
@@ -584,14 +583,10 @@ namespace huqiang.UIEvent
         internal override void OnClick(UserAction action)
         {
             InputEvent = this;
-            //textControll.Context = TextCom;
-            //textControll.SetFullString(new EmojiString(m_inputString));
-            //textControll.ReCalcul();
-            //textControll.MoveToEnd();
-            //TextCom.Text = textControll.GetShowString();
             bool pass = InputEvent.contentType == ContentType.Password ? true : false;
             Keyboard.OnInput(m_inputString, InputEvent.touchType, InputEvent.multiLine, pass, CharacterLimit);
             InputCaret.SetParent(Context.transform);
+            Editing = true;
         }
         internal override void OnLostFocus(UserAction action)
         {
@@ -627,30 +622,26 @@ namespace huqiang.UIEvent
             if (input == "")
                 return "";
             EmojiString es = new EmojiString(input);
-            //string str = textControll.GetFullString();
-            //if (CharacterLimit > 0)
-            //{
-            //    string fs = es.FilterString;
-            //    if (fs.Length + str.Length > CharacterLimit)
-            //    {
-            //        int len = CharacterLimit - str.Length;
-            //        if (len <= 0)
-            //            return "";
-            //        es.Remove(fs.Length - len, len);
-            //    }
-            //}
-            //str = es.FullString;
-            
+            string str = Text.FullString;
+            if (CharacterLimit > 0)
+            {
+                string fs = es.FilterString;
+                if (fs.Length + str.Length > CharacterLimit)
+                {
+                    int len = CharacterLimit - str.Length;
+                    if (len <= 0)
+                        return "";
+                    es.Remove(fs.Length - len, len);
+                }
+            }
+            str = es.FullString;
+
             //if (Validate(characterValidation, textInfo.text, textInfo.startSelect, str[0]) == 0)
             //    return "";
             //if (ValidateChar != null)
             //    if (ValidateChar(this, textInfo.startSelect, str[0]) == 0)
             //        return "";
-            //textControll.InsertString(str);
-            //textControll.ReCalcul();
-            //textControll.AdjustToPoint();
-            //textControll.AdjustStartLine();
-            SetShowText();
+            InsertString(str);
             return input;
         }
         string TouchInputChanged(string input)
@@ -683,6 +674,13 @@ namespace huqiang.UIEvent
             var te = TextCom;
             if (te != null)
             {
+                if(textChanged)
+                {
+                    GetPreferredHeight();
+                    SetShowText();
+                    TextCom.Populate();
+                    textChanged = false;
+                }
                 if (Style == 0)
                 {
                     SetPressPointer();
@@ -845,6 +843,22 @@ namespace huqiang.UIEvent
                         textChanged = true;
                     StartPress.Row = c ;
                     StartPress.Offset = lines[StartPress.Row].Count;
+                }
+            }
+        }
+        public void PointerChange(int index)
+        {
+            if (index < 0)
+                index = 0;
+            if (index >= cha.Length)
+                index = cha.Length - 1;
+            for (int i = 0; i < lines.Length; i++)
+            {
+                if(lines[i].StartIndex+lines[i].Count>=index)
+                {
+                    StartPress.Index = index;
+                    StartPress.Row = i;
+                    StartPress.Offset = index - lines[i].StartIndex;
                 }
             }
         }

@@ -427,7 +427,10 @@ namespace huqiang.UIEvent
                     value = 1;
                 float a = (float)LineCount - (float)ShowRow;
                 int c = (int)(a * value);
-                //ChangeShowLine(c);
+                ShowStart = c;
+                TextCom.Text = GetShowString();
+                TextCom.Populate();
+                ShowChanged = true;
             }
         }
         bool IsSelectLine(int row)
@@ -477,7 +480,7 @@ namespace huqiang.UIEvent
             }
             return v2;
         }
-        public void GetSelectArea(Color32 color, List<int> tri, List<HVertex> vert)
+        protected void GetSelectArea(Color32 color, List<int> tri, List<HVertex> vert)
         {
             if (TextCom == null)
                 return;

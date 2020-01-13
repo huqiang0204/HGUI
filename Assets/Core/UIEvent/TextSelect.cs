@@ -24,12 +24,15 @@ namespace huqiang.UIEvent
     }
     public class TextSelect:UserEvent
     {
+        protected static TextGenerationSettings settings;
         public HText TextCom;
         protected EmojiString Text = new EmojiString();
         protected float overDistance = 500;
         protected float overTime = 0;
         LineInfo[] lines;
         UICharInfo[] cha;
+        UILineInfo[] showLines;
+        UICharInfo[] showChars;
         /// <summary>
         /// 总计行数
         /// </summary>
@@ -93,7 +96,7 @@ namespace huqiang.UIEvent
                         else oy += py;
                         if (oy > overDistance)
                             oy = overDistance;
-                        float per = 50000 / oy;
+                        float per = 5000 / oy;
                         if (per < 0)
                             per = -per;
                         overTime += UserAction.TimeSlice;
@@ -103,6 +106,7 @@ namespace huqiang.UIEvent
                             if (oy > 0)
                                 MoveUp();
                             else MoveDown();
+                            EndPress = GetPressIndex(action, action.CanPosition - RawPosition);
                         }
                     }
                 }
@@ -148,10 +152,8 @@ namespace huqiang.UIEvent
             Style = 0;
             InputCaret.Hide();
         }
-        protected void GetPreferredHeight()
+        protected void SetSetting()
         {
-            string str = Text.FilterString;
-            TextGenerationSettings settings = new TextGenerationSettings();
             settings.resizeTextMinSize = 2;
             settings.resizeTextMaxSize = 40;
             settings.scaleFactor = 1;
@@ -170,6 +172,11 @@ namespace huqiang.UIEvent
             settings.lineSpacing = TextCom.m_lineSpace;
             settings.horizontalOverflow = HorizontalWrapMode.Wrap;
             settings.verticalOverflow = VerticalWrapMode.Overflow;
+        }
+        protected void GetPreferredHeight()
+        {
+            SetSetting();
+            string str = Text.FilterString;
             TextGenerator generator = HText.Generator;
             float h = generator.GetPreferredHeight(str, settings);
             HeightChange = PreferredHeight - h;
@@ -353,6 +360,7 @@ namespace huqiang.UIEvent
             {
                 ShowStart--;
                 TextCom.Text = GetShowString();
+                TextCom.Populate();
             }
         }
         protected void MoveDown()
@@ -361,6 +369,7 @@ namespace huqiang.UIEvent
             {
                 ShowStart++;
                 TextCom.Text = GetShowString();
+                TextCom.Populate();
             }
         }
         public float Percentage

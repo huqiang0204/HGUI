@@ -45,6 +45,7 @@ namespace huqiang.UIEvent
         float HeightChange;
         int ShowStart;
         int ShowRow;
+        protected bool ShowChanged;
         protected PressInfo StartPress;
         protected PressInfo EndPress;
         public int Style = 0;
@@ -74,6 +75,7 @@ namespace huqiang.UIEvent
                 StartPress = GetPressIndex(action, Vector2.zero);
                 InputCaret.SetParent(TextCom.transform);
                 InputCaret.Active();
+                ShowChanged = true;
             }
             base.OnMouseDown(action);
         }
@@ -85,7 +87,10 @@ namespace huqiang.UIEvent
                     Style = 1;
                     if (action.Motion != Vector2.zero)
                     {
-                        EndPress = GetPressIndex(action, action.CanPosition - RawPosition);
+                        var p = GetPressIndex(action, action.CanPosition - RawPosition);
+                        if (p.Index != EndPress.Index)
+                            ShowChanged = true;
+                        EndPress = p;
                     }
                     else if (!entry)
                     {
@@ -106,7 +111,10 @@ namespace huqiang.UIEvent
                             if (oy > 0)
                                 MoveUp();
                             else MoveDown();
-                            EndPress = GetPressIndex(action, action.CanPosition - RawPosition);
+                            var p = GetPressIndex(action, action.CanPosition - RawPosition);
+                            if (p.Index != EndPress.Index)
+                                ShowChanged = true;
+                            EndPress = p;
                         }
                     }
                 }
@@ -138,7 +146,10 @@ namespace huqiang.UIEvent
                     if (x < ClickArea)
                         return;
                 }
-                EndPress = GetPressIndex(action, action.CanPosition - RawPosition);
+                var p = GetPressIndex(action, action.CanPosition - RawPosition);
+                if (p.Index != EndPress.Index)
+                    ShowChanged = true;
+                EndPress = p;
             }
             base.OnDragEnd(action);
         }
@@ -147,7 +158,7 @@ namespace huqiang.UIEvent
             Style = 0;
             InputCaret.Hide();
         }
-        void OnLostFocus(UserEvent eventCall, UserAction action)
+        internal override void OnLostFocus(UserAction eventCall)
         {
             Style = 0;
             InputCaret.Hide();
@@ -338,12 +349,35 @@ namespace huqiang.UIEvent
                     break;
                 case 1:
                     InputCaret.CaretStyle = 2;
-                    List<HVertex> hs = new List<HVertex>();
-                    List<int> tris = new List<int>();
-                    GetSelectArea(SelectionColor, tris, hs);
-                    InputCaret.ChangeCaret(hs.ToArray(), tris.ToArray());
+                    if(ShowChanged)
+                    {
+                        ShowChanged = false;
+                        List<HVertex> hs = new List<HVertex>();
+                        List<int> tris = new List<int>();
+                        GetSelectArea(SelectionColor, tris, hs);
+                        InputCaret.ChangeCaret(hs.ToArray(), tris.ToArray());
+                    }
                     break;
             }
+           
+            if (Keyboard.GetKeyDown(KeyCode.C) & Keyboard.GetKey(KeyCode.LeftControl))
+                GUIUtility.systemCopyBuffer = GetSelectString();
+        }
+        public string GetSelectString()
+        {
+            if (Style == 0)
+                return "";
+            int s = StartPress.Index;
+            int e = EndPress.Index;
+            if (s == e)
+                return "";
+            if (s > e)
+            {
+                int a = e;
+                e = s;
+                s = a;
+            }
+            return Text.SubString(s, e - s);
         }
         protected string GetShowString()
         {
@@ -361,6 +395,7 @@ namespace huqiang.UIEvent
                 ShowStart--;
                 TextCom.Text = GetShowString();
                 TextCom.Populate();
+                ShowChanged = true;
             }
         }
         protected void MoveDown()
@@ -370,6 +405,7 @@ namespace huqiang.UIEvent
                 ShowStart++;
                 TextCom.Text = GetShowString();
                 TextCom.Populate();
+                ShowChanged = true;
             }
         }
         public float Percentage

@@ -444,8 +444,8 @@ namespace huqiang.UIEvent
             }
         }
         public bool ReadOnly;
+        bool lineChanged;
         bool textChanged;
-        bool textGrowth;
         Color textColor = Color.black;
         Color m_tipColor = new Color(0, 0, 0, 0.8f);
         public Color TipColor { get { return m_tipColor; } set { m_tipColor = value;} }
@@ -676,17 +676,18 @@ namespace huqiang.UIEvent
             var te = TextCom;
             if (te != null)
             {
-                if(textChanged)
+                if (textChanged)
                 {
+                    textChanged = false;
                     GetPreferredHeight();
+                    PointerChange(StartPress.Index);
+                }
+                if (lineChanged)
+                {
+                    lineChanged = false;
                     SetShowText();
                     TextCom.Populate();
-                    textChanged = false;
-                }
-                if(textGrowth)
-                {
-                    textGrowth = false;
-                    PointerChange(StartPress.Index);
+                    ShowChanged = true;
                 }
                 if (Style == 0)
                 {
@@ -747,6 +748,7 @@ namespace huqiang.UIEvent
                 Text.Remove(s, e - s);
                 if (StartPress.Index > EndPress.Index)
                     StartPress.Index = EndPress.Index;
+                lineChanged = true;
                 textChanged = true;
                 return true;
             }
@@ -762,6 +764,7 @@ namespace huqiang.UIEvent
             if (Text.Remove(StartPress.Index))
             {
                 textChanged = true;
+                lineChanged = true;
                 return true;
             }
             return false;
@@ -773,6 +776,7 @@ namespace huqiang.UIEvent
             if (Text.Remove(StartPress.Index))
             {
                 textChanged = true;
+                lineChanged = true;
                 return true;
             }
             return false;
@@ -784,8 +788,8 @@ namespace huqiang.UIEvent
             int c = es.Length;
             Text.Insert(StartPress.Index, es);
             StartPress.Index += c;
-            textGrowth = true;
             textChanged = true;
+            lineChanged = true;
         }
         public void PointerMoveLeft()
         {
@@ -797,11 +801,11 @@ namespace huqiang.UIEvent
                 {
                     StartPress.Row--;
                     c = lines[StartPress.Row].StartIndex;
-                    StartPress.Offset = StartPress.Index - c;
+                   pressOffset = StartPress.Offset = StartPress.Index - c;
                    if(StartPress.Row<ShowStart)
                     {
                         ShowStart = StartPress.Row;
-                        textChanged = true;
+                        lineChanged = true;
                         ShowChanged = true;
                     }
                 }
@@ -816,11 +820,11 @@ namespace huqiang.UIEvent
                 if (StartPress.Offset >= lines[StartPress.Row].Count)
                 {
                     StartPress.Row++;
-                    StartPress.Offset = 0;
+                    pressOffset = StartPress.Offset = 0;
                     if (ShowStart + ShowRow < lines.Length)
                     {
                         ShowStart++;
-                        textChanged = true;
+                        lineChanged = true;
                         ShowChanged = true;
                     }
                 }
@@ -865,7 +869,7 @@ namespace huqiang.UIEvent
         {
             Style = 0;
             if (StartPress.Row != 0)
-                textChanged = true;
+                lineChanged = true;
             StartPress.Row = 0;
             StartPress.Index = 0;
             StartPress.Offset = 0;
@@ -883,7 +887,7 @@ namespace huqiang.UIEvent
                 {
                     var c = lines.Length - ShowRow;
                     if (StartPress.Row != c)
-                        textChanged = true;
+                        lineChanged = true;
                     StartPress.Row = c ;
                     StartPress.Offset = lines[StartPress.Row].Count;
                 }
@@ -897,12 +901,21 @@ namespace huqiang.UIEvent
                 index = cha.Length - 1;
             for (int i = 0; i < lines.Length; i++)
             {
-                if(lines[i].StartIndex+lines[i].Count>=index)
+                if (lines[i].StartIndex + lines[i].Count >= index)
                 {
                     StartPress.Index = index;
                     StartPress.Row = i;
                     StartPress.Offset = index - lines[i].StartIndex;
+                    pressOffset = i;
                 }
+            }
+            if (StartPress.Row < ShowStart)
+            {
+                ShowStart = StartPress.Row;
+            }else
+            if (ShowStart + ShowRow < StartPress.Row +1)
+            {
+                ShowStart = StartPress.Row - ShowRow + 1;
             }
         }
         internal override void Update()

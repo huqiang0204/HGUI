@@ -49,7 +49,7 @@ namespace huqiang.UIEvent
                     }
                     break;
                 case 2:
-
+                    Caret.gameObject.SetActive(true);
                     break;
                 default:
                     Caret.gameObject.SetActive(false);

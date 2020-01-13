@@ -102,10 +102,10 @@ namespace huqiang.UIComposite
         public Action<ScrollX> ScrollEnd;
         public Action<ScrollX> ScrollToTop;
         public Action<ScrollX> ScrollToDown;
-        public float DecayRateX = 0.988f;
+        public float DecayRate = 0.998f;
         void Draging(UserEvent back, UserAction action, Vector2 v)
         {
-            back.DecayRateX = DecayRateX;
+            back.DecayRateX = DecayRate;
             Scrolling(back, v);
         }
         /// <summarx>
@@ -153,7 +153,7 @@ namespace huqiang.UIComposite
             {
                 if (m_point < -Tolerance)
                 {
-                    back.DecayRateX = DecayRateX;
+                    back.DecayRateX = DecayRate;
                     float d = -m_point;
                     back.ScrollDistanceX = -d * eventCall.Context.transform.localScale.x;
                 }
@@ -164,7 +164,7 @@ namespace huqiang.UIComposite
                         max = Size.x + Tolerance;
                     if (m_point + Size.x > max)
                     {
-                        back.DecayRateX = DecayRateX;
+                        back.DecayRateX = DecayRate;
                         float d = ActualSize.x - m_point - Size.x ;
                         back.ScrollDistanceX = -d * eventCall.Context.transform.localScale.x;
                     }

@@ -82,9 +82,10 @@ namespace huqiang.UIComposite
         public Action<ScrollY, Vector2> Scroll;
         public Action<ScrollY> ScrollStart;
         public Action<ScrollY> ScrollEnd;
+        public float DecayRate = 0.998f;
         void Draging(UserEvent back, UserAction action, Vector2 v)
         {
-            back.DecayRateY = 0.998f;
+            back.DecayRateY = DecayRate;
             Scrolling(back, v);
         }
         /// <summary>

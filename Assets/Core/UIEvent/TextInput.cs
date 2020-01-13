@@ -506,7 +506,6 @@ namespace huqiang.UIEvent
                 }
             }
             str = es.FullString;
-
             if (CharOperation.Validate(characterValidation, Text.FullString, StartPress.Index, str[0]) == 0)
                 return "";
             if (ValidateChar != null)

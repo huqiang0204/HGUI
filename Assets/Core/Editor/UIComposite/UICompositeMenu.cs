@@ -65,6 +65,7 @@ public static class UICompositeMenu
         var go = new GameObject("SliderH", typeof(HImage));
         HImage image = go.GetComponent<HImage>();
         image.SizeDelta = new Vector2(400, 20);
+        image.compositeType= CompositeType.Slider;
         var rect = image.transform;
         if (parent != null)
         {

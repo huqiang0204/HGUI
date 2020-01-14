@@ -63,7 +63,9 @@ namespace huqiang.UIComposite
                 if (LastPos.x <= hx & LastPos.x >= -hx)
                     if (LastPos.y <= hy & LastPos.y >= -hy)
                     {
-                        ThreadMission.AddMission((o)=> { DrawLine(LastPos, CurPos);},null,null,Apply);
+                        Vector3 a = LastPos;
+                        Vector3 b = CurPos;
+                        ThreadMission.AddMission((o)=> { DrawLine(a, b);},null,null,Apply);
                         LastPos = CurPos;
                     }
             }

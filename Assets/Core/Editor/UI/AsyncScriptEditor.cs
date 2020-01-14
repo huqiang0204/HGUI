@@ -3,12 +3,14 @@ using huqiang.Core.HGUI;
 using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(AsyncScriptEditor), true)]
+[CustomEditor(typeof(AsyncScript), true)]
 public class AsyncScriptEditor : Editor
 {
     public virtual void OnSceneGUI()
     {
         var txt = target as AsyncScript;
+        if (txt == null)
+            return;
         Handles.color = Color.red;
         Vector3[] verts = new Vector3[8];
         var p = txt.transform.position;

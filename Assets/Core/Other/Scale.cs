@@ -20,7 +20,7 @@ public enum AnchorType
 }
 public enum AnchorPointType
 {
-    Cneter,
+    Center,
     Left,
     Right,
     Top,

@@ -1,4 +1,5 @@
 ﻿using huqiang;
+using huqiang.Core.HGUI;
 using huqiang.Data;
 using huqiang.UIComposite;
 using System;
@@ -24,6 +25,39 @@ public static class UICompositeMenu
     private const string circlesm = "Circle-Small";
     private const string magicstick = "Magic-Stick";
 
+    [MenuItem("GameObject/HGUI/Empty", false, 0)]
+    static public void AddEmpty(MenuCommand menuCommand)
+    {
+        GameObject parent = menuCommand.context as GameObject;
+        var go = new GameObject("Empty", typeof(AsyncScript));
+        var trans = go.transform;
+        trans.SetParent(parent.transform);
+        trans.localPosition = Vector3.zero;
+        trans.localScale = Vector3.one;
+        trans.localRotation = Quaternion.identity;
+    }
+    [MenuItem("GameObject/HGUI/Image", false, 1)]
+    static public void AddImage(MenuCommand menuCommand)
+    {
+        GameObject parent = menuCommand.context as GameObject;
+        var go = new GameObject("Image", typeof(HImage));
+        var trans = go.transform;
+        trans.SetParent(parent.transform);
+        trans.localPosition = Vector3.zero;
+        trans.localScale = Vector3.one;
+        trans.localRotation = Quaternion.identity;
+    }
+    [MenuItem("GameObject/HGUI/Text", false, 2)]
+    static public void AddText(MenuCommand menuCommand)
+    {
+        GameObject parent = menuCommand.context as GameObject;
+        var go = new GameObject("Text", typeof(HText));
+        var trans = go.transform;
+        trans.SetParent(parent.transform);
+        trans.localPosition = Vector3.zero;
+        trans.localScale = Vector3.one;
+        trans.localRotation = Quaternion.identity;
+    }
     //[MenuItem("GameObject/UIComposite/UISliderH", false, 0)]
     //static public void AddSliderH(MenuCommand menuCommand)
     //{
@@ -253,7 +287,7 @@ public static class UICompositeMenu
     //    rect.localPosition = Vector3.zero;
     //    rect.localScale = Vector3.one;
     //    palette.AddComponent<RawImage>();
-      
+
 
     //    var Fill = new GameObject("HTemplate", typeof(RectTransform));
     //    var fr = Fill.transform as RectTransform;
@@ -287,7 +321,7 @@ public static class UICompositeMenu
     //    fn.localPosition = new Vector3(0, -285, 0);
     //    fn.localScale = Vector3.one;
     //    Slider.AddComponent<RawImage>();
-  
+
     //    Nob = new GameObject("Nob", typeof(RectTransform));
     //    fn = Nob.transform as RectTransform;
     //    fn.sizeDelta = new Vector2(30, 30);
@@ -677,7 +711,7 @@ public static class UICompositeMenu
     //    ss.marginType = MarginType.MarginX;
     //    Items.AddComponent<UILayout>().type = huqiang.UI.LayoutType.StackPanelH;
     //    Items.AddComponent<RectMask2D>();
-       
+
 
     //    var Item = new GameObject("Item",typeof(RectTransform));
     //    Item.transform.SetParent(Head.transform);

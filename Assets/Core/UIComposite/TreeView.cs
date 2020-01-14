@@ -1,4 +1,5 @@
-﻿using huqiang.Data;
+﻿using huqiang.Core.HGUI;
+using huqiang.Data;
 using huqiang.UI;
 using huqiang.UIEvent;
 using System.Collections.Generic;
@@ -15,22 +16,20 @@ namespace huqiang.UIComposite
     }
     public class TreeViewItem
     {
-        public ModelElement target;
-        public TextElement text;
+        public GameObject target;
+        public HText text;
         public UserEvent callBack;
         public TreeViewNode node;
     }
-    public class TreeView : ModelInital
+    public class TreeView : Composite
     {
-        public ModelElement View;
         public Vector2 Size;//scrollView的尺寸
         Vector2 aSize;
         public Vector2 ItemSize;
-        ModelElement model;
         public TreeViewNode nodes;
         public float ItemHigh = 16;
         public UserEvent eventCall;//scrollY自己的按钮
-        public ModelElement ItemMod;
+        public FakeStruct ItemMod;
         float m_point;
         public SwapBuffer<TreeViewItem, TreeViewNode> swap;
         QueueBuffer<TreeViewItem> queue;
@@ -39,25 +38,23 @@ namespace huqiang.UIComposite
             swap = new SwapBuffer<TreeViewItem, TreeViewNode>(512);
             queue = new QueueBuffer<TreeViewItem>(256);
         }
-        public override void Initial(ModelElement mod)
+        public override void Initial(FakeStruct fake,AsyncScript script)
         {
-            View = mod;
-            //eventCall = UserEvent.RegEvent<UserEvent>(mod);
+            base.Initial(fake,script);
+            eventCall = script.RegEvent<UserEvent>();
             eventCall.Drag = (o, e, s) => { Scrolling(o, s); };
             eventCall.DragEnd = (o, e, s) => { Scrolling(o, s); };
             eventCall.Scrolling = Scrolling;
             eventCall.ForceEvent = true;
             eventCall.AutoColor = false;
-            Size = View.data.sizeDelta;
+            Size = Enity.SizeDelta;
             eventCall.CutRect = true;
-            if (mod != null)
+            ItemMod = HGUIManager.FindChild(fake, "Item");
+            if (ItemMod != null)
             {
-                ItemMod = mod.Find("Item");
-                if (ItemMod != null)
-                {
-                    ItemSize = ItemMod.data.sizeDelta;
-                    ItemHigh = ItemSize.y;
-                }
+                HGUIManager.GameBuffer.RecycleChild(script.gameObject);
+                unsafe { ItemSize = ((TransfromData*)ItemMod.ip)->size; }
+                ItemHigh = ItemSize.y;
             }
         }
         void Draging(UserEvent back, UserAction action, Vector2 v)
@@ -72,7 +69,7 @@ namespace huqiang.UIComposite
         /// <param name="v">移动的实际像素位移</param>
         void Scrolling(UserEvent back, Vector2 v)
         {
-            if (View == null)
+            if (Enity == null)
                 return;
             v.y /= eventCall.Context.transform.localScale.y;
             Limit(back, v.y);
@@ -93,7 +90,7 @@ namespace huqiang.UIComposite
             for (int i = 0; i < len; i++)
             {
                 var it = swap.Pop();
-                it.target.activeSelf = false;
+                it.target.SetActive(false);
                 queue.Enqueue(it);
             }
             swap.Done();
@@ -139,19 +136,14 @@ namespace huqiang.UIComposite
             TreeViewItem it = queue.Dequeue();
             if (it != null)
             {
-                it.target.activeSelf = true;
+                it.target.SetActive(true);
                 return it;
             }
-            ModelElement mod = new ModelElement();
-            mod.Load(ItemMod.ModData);
-            mod.SetParent(View);
-            mod.data.localPosition = new Vector3(10000, 10000);
-            mod.data.localScale = Vector3.one;
-            mod.IsChanged = true;
+            var go = HGUIManager.GameBuffer.Clone(ItemMod);
             TreeViewItem a = new TreeViewItem();
-            a.target = mod;
-            a.text = mod.GetComponent<TextElement>();
-            //a.callBack = UserEvent.RegEvent<UserEvent>(mod);
+            a.target = go;
+            a.text = go.GetComponent<HText>();
+            a.callBack = go.GetComponent<AsyncScript>().RegEvent<UserEvent>();
             a.callBack.Click = (o, e) => {
                 var item = o.DataContext as TreeViewItem;
                 if (item.node != null)

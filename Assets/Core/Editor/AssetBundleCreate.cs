@@ -1,13 +1,11 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
-using UGUI;
 using System;
 using huqiang;
 using huqiang.Data;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Linq;
 using huqiang.Core.HGUI;
 
 public class AssetBundleCreate : Editor {

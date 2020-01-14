@@ -56,6 +56,7 @@ namespace huqiang.Core.HGUI
         internal Vector2 m_textureSize;
         internal Vector4 m_border;
         internal Vector2 m_pivot;
+        internal int s_id;
         public Sprite Sprite
         {
             get
@@ -69,9 +70,11 @@ namespace huqiang.Core.HGUI
                 if (value == null)
                 {
                     MainTexture = null;
+                    s_id = 0;
                 }
                 else
                 {
+                    s_id = value.GetInstanceID();
                     MainTexture = value.texture;
                 }
             }

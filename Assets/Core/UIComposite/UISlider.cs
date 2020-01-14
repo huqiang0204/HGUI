@@ -18,13 +18,12 @@ namespace huqiang.UIComposite
         public static int Size = sizeof(SliderInfo);
         public static int ElementSize = Size / 4;
     }
-    public class UISlider : ModelInital
+    public class UISlider : Composite
     {
         public enum Direction
         {
             Horizontal, Vertical
         }
-        public AsyncScript Main;
         public HImage FillImage;
         public HImage Nob;
         public SliderInfo info;
@@ -68,10 +67,11 @@ namespace huqiang.UIComposite
             info.MinScale = 1;
             info.MaxScale = 1;
         }
-        public override void Initial(FakeStruct mod, Transform trans)
+        public override void Initial(FakeStruct mod, AsyncScript script)
         {
-            Main = trans.GetComponent<AsyncScript>();
-            callBack = Main.RegEvent<UserEvent>();
+            base.Initial(mod,script);
+            var trans = script.transform;
+            callBack = Enity.RegEvent<UserEvent>();
             callBack.Drag = callBack.DragEnd = Draging;
             callBack.PointerDown = PointDown;
             callBack.AutoColor = false;
@@ -106,7 +106,7 @@ namespace huqiang.UIComposite
         }
         void RatioToPos()
         {
-            var size = Main.SizeDelta;
+            var size = Enity.SizeDelta;
             if (info.direction == Direction.Horizontal)
             {
                 float rx = size.x * 0.5f;
@@ -132,7 +132,7 @@ namespace huqiang.UIComposite
         {
             if (Nob == null)
                 return;
-            var size = Main.SizeDelta;
+            var size = Enity.SizeDelta;
             if (info.direction==Direction.Horizontal)
             {
                 float rx = size.x * 0.5f;

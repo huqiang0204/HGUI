@@ -24,7 +24,7 @@ namespace huqiang.Core.HGUI
             8, 12, 13, 8, 13, 9, 9, 13, 14, 9, 14, 10, 10, 14, 15, 10, 15, 11 };
         public static void CreateMesh(HImage image)
         {
-            if (image.texIds[0] ==0)
+            if (image.s_id ==0)
             {
                 CreateSimpleVertex(image);
                 goto label;
@@ -68,12 +68,20 @@ namespace huqiang.Core.HGUI
             float ty = 0.5f * y;
             hv[0].position.x = lx;
             hv[0].position.y = dy;
+            hv[0].uv.x = 0;
+            hv[0].uv.y = 0;
             hv[1].position.x = rx;
             hv[1].position.y = dy;
+            hv[1].uv.x = 1;
+            hv[1].uv.y = 0;
             hv[2].position.x = lx;
             hv[2].position.y = ty;
+            hv[2].uv.x = 0;
+            hv[2].uv.y =1;
             hv[3].position.x = rx;
             hv[3].position.y = ty;
+            hv[3].uv.x = 1;
+            hv[3].uv.y = 1;
             image.vertices = hv;
             image.tris = Rectangle;
         }

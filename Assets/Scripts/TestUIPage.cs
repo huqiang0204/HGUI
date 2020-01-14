@@ -1,10 +1,10 @@
-﻿using huqiang.UIComposite;
+﻿using huqiang.Core.HGUI;
+using huqiang.UIComposite;
 using huqiang.UIEvent;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Assets.Scripts
@@ -13,7 +13,7 @@ namespace Assets.Scripts
     {
         class View
         {
-            public TextInput textinput;
+            public HText  textinput;
         }
         View view;
 

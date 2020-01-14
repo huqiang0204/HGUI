@@ -53,11 +53,10 @@ namespace huqiang.UIComposite
         public bool DynamicSize = true;
         Vector2 ctSize;
         float ctScale;
-        public override void Initial(FakeStruct mod, Transform trans)
+        public override void Initial(FakeStruct mod, AsyncScript script)
         {
-            base.Initial(mod,trans);
-            model = trans.GetComponent<AsyncScript>();
-            eventCall = model.RegEvent<UserEvent>();
+            base.Initial(mod,script);
+            eventCall = Enity.RegEvent<UserEvent>();
             eventCall.Drag = Draging;
             eventCall.DragEnd = (o, e, s) =>
             {
@@ -74,18 +73,19 @@ namespace huqiang.UIComposite
             eventCall.ForceEvent = true;
             eventCall.AutoColor = false;
             eventCall.CutRect = true;
-            Size = model.SizeDelta;
-            model.SizeChanged = (o) => {
-                Size = model.SizeDelta;
+            Size = Enity.SizeDelta;
+            Enity.SizeChanged = (o) => {
+                Size = Enity.SizeDelta;
                 Refresh(0,m_point);
             };
         }
         public Action<ScrollY, Vector2> Scroll;
         public Action<ScrollY> ScrollStart;
         public Action<ScrollY> ScrollEnd;
+        public float DecayRate = 0.998f;
         void Draging(UserEvent back, UserAction action, Vector2 v)
         {
-            back.DecayRateY = 0.998f;
+            back.DecayRateY = DecayRate;
             Scrolling(back, v);
         }
         /// <summary>

@@ -1,4 +1,5 @@
 ﻿using huqiang.Data;
+using huqiang.UIEvent;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +21,8 @@ namespace huqiang.Core.HGUI
         public MarginType marginType;
         public ParentType parentType;
         public Margin margin;
+        public EventType eventType;
+        public CompositeType compositeType;
         public bool Mask;
         public static int Size = sizeof(AsyncScriptData);
         public static int ElementSize = Size / 4;
@@ -40,6 +43,8 @@ namespace huqiang.Core.HGUI
             tar.parentType = src->parentType;
             tar.margin = src->margin;
             tar.Mask = src->Mask;
+            tar.eventType = src->eventType;
+            tar.compositeType = src->compositeType;
         }
         protected unsafe void SaveScript(byte* ip, AsyncScript src)
         {
@@ -55,6 +60,8 @@ namespace huqiang.Core.HGUI
             tar->parentType = src.parentType;
             tar->margin = src.margin;
             tar->Mask = src.Mask;
+            tar->eventType = src.eventType;
+            tar->compositeType = src.compositeType;
         }
         public unsafe override void LoadToObject(FakeStruct fake, Component com)
         {

@@ -59,7 +59,6 @@ public class CreateTestHelper: UICompositeHelp
             GameObject.DestroyImmediate(caret.gameObject);
         Initital();
         CreateTestPage(UIPage.Root);
-        RenderForm.VertexCalculationAll();
     }
     public virtual void CreateTestPage(Transform parent)
     {

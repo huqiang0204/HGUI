@@ -70,11 +70,10 @@ namespace huqiang.UIComposite
         public bool DynamicSize = true;
         Vector2 ctSize;
         float ctScale;
-        public override void Initial(FakeStruct mod, Transform trans)
+        public override void Initial(FakeStruct mod, AsyncScript script)
         {
-            base.Initial(mod,trans);
-            model = trans.GetComponent<AsyncScript>();
-            eventCall = model.RegEvent<UserEvent>();
+            base.Initial(mod,script);
+            eventCall = Enity.RegEvent<UserEvent>();
             eventCall.Drag = Draging;
             eventCall.DragEnd = (o, e, s) =>
             {
@@ -91,10 +90,10 @@ namespace huqiang.UIComposite
             eventCall.ForceEvent = true;
             eventCall.AutoColor = false;
             eventCall.CutRect = true;
-            Size = model.SizeDelta;
+            Size = Enity.SizeDelta;
             eventCall.CutRect = true;
-            model.SizeChanged = (o) => {
-                Size = model.SizeDelta;
+            Enity.SizeChanged = (o) => {
+                Size = Enity.SizeDelta;
                 Refresh(m_point,0);
             };
         }
@@ -103,10 +102,10 @@ namespace huqiang.UIComposite
         public Action<ScrollX> ScrollEnd;
         public Action<ScrollX> ScrollToTop;
         public Action<ScrollX> ScrollToDown;
-        public float DecayRateX = 0.988f;
+        public float DecayRate = 0.998f;
         void Draging(UserEvent back, UserAction action, Vector2 v)
         {
-            back.DecayRateX = DecayRateX;
+            back.DecayRateX = DecayRate;
             Scrolling(back, v);
         }
         /// <summarx>
@@ -154,7 +153,7 @@ namespace huqiang.UIComposite
             {
                 if (m_point < -Tolerance)
                 {
-                    back.DecayRateX = DecayRateX;
+                    back.DecayRateX = DecayRate;
                     float d = -m_point;
                     back.ScrollDistanceX = -d * eventCall.Context.transform.localScale.x;
                 }
@@ -165,7 +164,7 @@ namespace huqiang.UIComposite
                         max = Size.x + Tolerance;
                     if (m_point + Size.x > max)
                     {
-                        back.DecayRateX = DecayRateX;
+                        back.DecayRateX = DecayRate;
                         float d = ActualSize.x - m_point - Size.x ;
                         back.ScrollDistanceX = -d * eventCall.Context.transform.localScale.x;
                     }

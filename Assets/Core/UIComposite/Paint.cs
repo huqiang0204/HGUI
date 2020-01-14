@@ -1,18 +1,18 @@
-﻿using huqiang.Data;
+﻿using huqiang.Core.HGUI;
+using huqiang.Data;
 using huqiang.UI;
 using huqiang.UIEvent;
 using UnityEngine;
 
 namespace huqiang.UIComposite
 {
-    public class Paint : ModelInital
+    public class Paint : Composite
     {
         public enum DrawModel
         {
             Brush,Scale,Rotate
         }
-        ModelElement model;
-        RawImageElement raw;
+        HImage raw;
         Color[] buffer;
         public int Width;
         public int Height;
@@ -29,24 +29,23 @@ namespace huqiang.UIComposite
         Vector2 CurDirect;
         LoopBuffer<DrawArea> loopBuffer=new LoopBuffer<DrawArea>(2);
         public DrawModel drawModel;
-        public override void Initial(ModelElement mod)
+        public override void Initial(FakeStruct fake,AsyncScript script)
         {
-            base.Initial(mod);
-            model = mod;
-            raw = model.GetComponent<RawImageElement>();
-            var size = model.data.sizeDelta;
+            base.Initial(fake,script);
+            raw = Enity as HImage;
+            var size = Enity.SizeDelta;
             Width = (int)size.x;
             Height = (int)size.y;
-            HalfW = Width/2;
-            HalfH = Height/2;
-            buffer = new Color[Width*Height];
-            //gesture = UserEvent.RegEvent<GestureEvent>(model);
+            HalfW = Width / 2;
+            HalfH = Height / 2;
+            buffer = new Color[Width * Height];
+            gesture = Enity.RegEvent<GestureEvent>();
             gesture.PointerDown = PointDown;
             gesture.Drag = Drag;
             gesture.DragEnd = DragEnd;
             gesture.AutoColor = false;
             gesture.TowFingerMove = TowFingerMove;
-            ThreadMission.InvokeToMain(Apply, null);
+            Apply(null);
         }
         void PointDown(UserEvent callBack, UserAction action)
         {
@@ -64,8 +63,9 @@ namespace huqiang.UIComposite
                 if (LastPos.x <= hx & LastPos.x >= -hx)
                     if (LastPos.y <= hy & LastPos.y >= -hy)
                     {
-                        DrawLine(LastPos, CurPos);
-                        ThreadMission.InvokeToMain(Apply, null);
+                        Vector3 a = LastPos;
+                        Vector3 b = CurPos;
+                        ThreadMission.AddMission((o)=> { DrawLine(a, b);},null,null,Apply);
                         LastPos = CurPos;
                     }
             }
@@ -79,15 +79,12 @@ namespace huqiang.UIComposite
             if(drawModel==DrawModel.Scale)
             {
                 float s = ges.CurScale;
-                model.data.localScale.x = s;
-                model.data.localScale.y = s;
-                model.data.localScale.y = s;
-                model.IsChanged = true;
-            }else if(drawModel==DrawModel.Rotate)
+                Enity.transform.localScale = new Vector3(s, s, s);
+            }
+            else if(drawModel==DrawModel.Rotate)
             {
                 float a = ges.DeltaAngle;
-                model.data.localRotation*= Quaternion.Euler(0,0,a);
-                model.IsChanged = true;
+                Enity.transform.localRotation *= Quaternion.Euler(0, 0, a);
             }
         }
         void DrawLine(Vector2 start, Vector2 end)
@@ -121,7 +118,6 @@ namespace huqiang.UIComposite
                 label:;
                 }
             }
-
         }
         void FillColor(Vector2 p)
         {
@@ -183,7 +179,7 @@ namespace huqiang.UIComposite
             }
             texture.SetPixels(buffer);
             texture.Apply();
-            raw.Context.texture = texture;
+            raw.MainTexture = texture;
         }
         public void Resize()
         {

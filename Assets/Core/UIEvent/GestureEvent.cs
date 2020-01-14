@@ -43,8 +43,7 @@ namespace huqiang.UIEvent
                 var eve = events[i];
                 if(!eve.forbid)
                 eve.Analysis();
-            }
-                
+            }      
         }
         static List<GestureEvent> events;
         List<UserAction> lastActions;

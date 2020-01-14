@@ -28,28 +28,6 @@ namespace huqiang.UIEvent
             }
         }
         static float time;
-        public static void ChangeCaret(TextControll info)
-        {
-            //if (m_Caret != null)
-            //{
-            //    int c = info.selectVertex.Count;
-            //    Color32 col;
-            //    if (info.CaretStyle == 1)
-            //        col = info.caretColor;
-            //    else col = info.areaColor;
-            //    HVertex[] hv = new HVertex[c];
-            //    for (int i = 0; i < c; i++)
-            //    {
-            //        hv[i].position = info.selectVertex[i].position;
-            //        hv[i].color = col;
-            //    }
-            //    m_Caret.vertices = hv;
-            //    m_Caret.tris = info.selectTri.ToArray();
-            //    time = 0;
-            //    m_Caret.gameObject.SetActive(true);
-            //}
-            //CaretStyle = info.CaretStyle;
-        }
         public static int CaretStyle = 1;
         public static void UpdateCaret()
         {
@@ -71,7 +49,7 @@ namespace huqiang.UIEvent
                     }
                     break;
                 case 2:
-
+                    Caret.gameObject.SetActive(true);
                     break;
                 default:
                     Caret.gameObject.SetActive(false);
@@ -100,6 +78,42 @@ namespace huqiang.UIEvent
             {
                 m_Caret.gameObject.SetActive(false);
             }
+        }
+        public static void ChangeCaret(Vector3 pos,Vector2 size)
+        {
+            var trans = Caret.transform;
+            trans.localPosition = pos;
+            Caret.SizeDelta = size;
+            Caret.m_vertexChange = true;
+            CaretStyle = 1;
+        }
+        public static void ChangeCaret(float left, float right, float top, float down, Color32 color)
+        {
+            HVertex[] hv = new HVertex[4];
+            hv[0].position.x = left;
+            hv[0].position.y = down;
+            hv[0].color = color;
+
+            hv[1].position.x = right;
+            hv[1].position.y = down;
+            hv[1].color = color;
+
+            hv[2].position.x = left;
+            hv[2].position.y = top;
+            hv[2].color = color;
+
+            hv[3].position.x = right;
+            hv[3].position.y = top;
+            hv[3].color = color;
+            Caret.vertices = hv;
+            Caret.tris = HGUIMesh.Rectangle;
+            CaretStyle = 1;
+        }
+        public static void ChangeCaret(HVertex[] vertices,int[] tris)
+        {
+            Caret.vertices = vertices;
+            Caret.tris = tris;
+            CaretStyle = 2;
         }
     }
 }

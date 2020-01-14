@@ -1,5 +1,6 @@
 ﻿using huqiang;
 using huqiang.Data;
+using huqiang.UIComposite;
 using huqiang.UIEvent;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,24 @@ using UnityEngine;
 
 namespace huqiang.Core.HGUI
 {
+    public enum EventType
+    {
+        None,
+        UserEvent,
+        TextSelect,
+        TextInput,
+        GestureEvent
+    }
+    public enum CompositeType
+    {
+        None,
+        Slider,
+        ScrollX,
+        ScrollY,
+        GridScroll,
+        Paint,
+        Rocker
+    }
     public class AsyncScript:MonoBehaviour
     {
         #region static method
@@ -258,6 +277,8 @@ namespace huqiang.Core.HGUI
         public MarginType marginType;
         public ParentType parentType;
         public Margin margin;
+        public EventType eventType;
+        public CompositeType compositeType;
         public virtual void MainUpdate()
         {
         }
@@ -273,26 +294,57 @@ namespace huqiang.Core.HGUI
 
         public bool Mask;
         public UserEvent userEvent;
+        public Composite composite;
         internal int PipelineIndex;
         public virtual Color32 Chromatically { get; set; }
-        public T RegEvent<T>() where T : UserEvent, new()
+        public T RegEvent<T>(FakeStruct fake = null) where T : UserEvent, new()
         {
             var t = new T();
             t.Context = this;
-            t.Initial(null);
+            t.Initial(fake);
             userEvent = t;
             t.g_color = Chromatically;
             return t;
         }
-        public object RegEvent(Type type, FakeStruct fake)
-        {
-            UserEvent u = Activator.CreateInstance(type) as UserEvent;
-            u.Context = this;
-            u.Initi(fake);
-            userEvent = u;
-            u.g_color = Chromatically;
-            return u;
-        }
+
         public Action<AsyncScript> SizeChanged;
+        public void Initial(FakeStruct ex)
+        {
+            switch(eventType)
+            {
+                case EventType.None: break;
+                case EventType.UserEvent:RegEvent<UserEvent>(ex); break;
+                case EventType.TextSelect: RegEvent<TextSelect>(ex); break;
+                case EventType.TextInput: RegEvent<TextInput>(ex); break;
+                case EventType.GestureEvent: RegEvent<GestureEvent>(ex); break;
+            }
+            CreateUIComposite(this,ex);
+        }
+        public static void CreateUIComposite(AsyncScript script,FakeStruct ex)
+        {
+            switch(script.compositeType)
+            {
+                case CompositeType.None:
+                    break;
+                case CompositeType.ScrollY:
+                    new ScrollY().Initial(ex,script);
+                    break;
+                case CompositeType.ScrollX:
+                    new ScrollX().Initial(ex, script);
+                    break;
+                case CompositeType.Slider:
+                    new UISlider().Initial(ex, script);
+                    break;
+                case CompositeType.GridScroll:
+                    new GridScroll().Initial(ex,script);
+                    break;
+                case CompositeType.Paint:
+                    new Paint().Initial(ex,script);
+                    break;
+                case CompositeType.Rocker:
+                    new UIRocker().Initial(ex,script);
+                    break;
+            }
+        }
     }
 }

@@ -212,7 +212,7 @@ namespace huqiang.UIEvent
         Vector2 maxVelocity;
         Vector2 sDistance;
         Vector2 mVelocity;
-        Vector3 pgs = Vector3.one;
+        protected Vector3 pgs = Vector3.one;
         public Vector3 GlobalScale = Vector3.one;
         public Vector3 GlobalPosition;
         public Quaternion GlobalRotation;
@@ -384,8 +384,7 @@ namespace huqiang.UIEvent
                     y *= y;
                     x += y;
                     if (x < ClickArea)
-                        if (Click != null)
-                            Click(this, action);
+                        OnClick(action);
                 }
             }
         }
@@ -475,6 +474,11 @@ namespace huqiang.UIEvent
         {
             if (MouseWheel != null)
                 MouseWheel(this, action);
+        }
+        internal virtual void OnClick(UserAction action)
+        {
+            if (Click != null)
+                Click(this,action);
         }
         public void Initi(FakeStruct mod)
         {

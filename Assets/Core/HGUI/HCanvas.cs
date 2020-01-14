@@ -71,6 +71,7 @@ namespace huqiang.Core.HGUI
             DispatchUserAction();
             InputCaret.UpdateCaret();
             MainMission();
+            ThreadMission.ExtcuteMain();
         }
         MeshFilter meshFilter;
         MeshRenderer renderer;
@@ -189,7 +190,7 @@ namespace huqiang.Core.HGUI
 #endif
                 }
             }
-            if (inputs.Length > 1)
+            if (inputs.Length > 0)
                 GestureEvent.Dispatch(new List<UserAction>(inputs));
         }
         /// <summary>

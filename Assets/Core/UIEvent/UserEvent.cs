@@ -30,6 +30,16 @@ namespace huqiang.UIEvent
                 }
             }
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pipeLine">所有UI</param>
+        /// <param name="index"></param>
+        /// <param name="pos">父级位置</param>
+        /// <param name="scale">父级大小</param>
+        /// <param name="quate">父级旋转</param>
+        /// <param name="action">用户操作指令</param>
+        /// <returns></returns>
         static bool DispatchEvent(HGUIElement[] pipeLine, int index,Vector3 pos,Vector3 scale,Quaternion quate, UserAction action)
         {
             Vector3 p = quate * pipeLine[index].localPosition;

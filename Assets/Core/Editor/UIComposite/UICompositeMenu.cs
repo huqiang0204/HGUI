@@ -109,7 +109,7 @@ public static class UICompositeMenu
     static public void AddSliderV(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;
-        var go = new GameObject("SliderH", typeof(HImage));
+        var go = new GameObject("SliderV", typeof(HImage));
         HImage image = go.GetComponent<HImage>();
         image.SizeDelta = new Vector2(20, 400);
         image.compositeType = CompositeType.Slider;

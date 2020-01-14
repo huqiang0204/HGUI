@@ -58,46 +58,52 @@ public static class UICompositeMenu
         trans.localScale = Vector3.one;
         trans.localRotation = Quaternion.identity;
     }
-    //[MenuItem("GameObject/UIComposite/UISliderH", false, 0)]
-    //static public void AddSliderH(MenuCommand menuCommand)
-    //{
-    //    GameObject parent = menuCommand.context as GameObject;
-    //    var ss = new GameObject("SliderH", typeof(RectTransform));
-    //    RectTransform rect = ss.transform as RectTransform;
-    //    rect.sizeDelta = new Vector2(400, 20);
-    //    if (parent != null)
-    //        rect.SetParent(parent.transform);
-    //    rect.localPosition = Vector3.zero;
-    //    rect.localScale = Vector3.one;
-    //    var help = ss.AddComponent<SliderHelper>();
-    //    help.StartOffset.x = -15;
-    //    help.EndOffset.x = -15;
-    //    var image = ss.AddComponent<Image>();
-    //    image.sprite = EditorModelManager.FindSprite(icons, background);
-    //    image.type = Image.Type.Sliced;
+    [MenuItem("GameObject/HGUI/UISliderH", false, 3)]
+    static public void AddSliderH(MenuCommand menuCommand)
+    {
+        GameObject parent = menuCommand.context as GameObject;
+        var go = new GameObject("SliderH", typeof(HImage));
+        HImage image = go.GetComponent<HImage>();
+        image.SizeDelta = new Vector2(400, 20);
+        var rect = image.transform;
+        if (parent != null)
+        {
+            rect.SetParent(parent.transform);
+            rect.localPosition = Vector3.zero;
+            rect.localScale = Vector3.one;
+            rect.localRotation = Quaternion.identity;
+        }
+         
+        var help = go.AddComponent<SliderHelper>();
+        help.StartOffset.x = -15;
+        help.EndOffset.x = -15;
+        image.Sprite = EditorModelManager.FindSprite(icons, background);
+        image.SprType = SpriteType.Sliced;
 
-    //    var Fill = new GameObject("FillImage", typeof(RectTransform));
-    //    var fr = Fill.transform as RectTransform;
-    //    fr.sizeDelta = new Vector2(400, 20);
-    //    fr.SetParent(rect);
-    //    fr.localPosition = Vector3.zero;
-    //    fr.localScale = Vector3.one;
-    //    image = Fill.AddComponent<Image>();
-    //    image.sprite = EditorModelManager.FindSprite(icons, background);
-    //    image.type = Image.Type.Sliced;
-    //    image.fillMethod = Image.FillMethod.Horizontal;
-    //    image.color = new Color32(94,137,197,255);
+        var Fill = new GameObject("FillImage", typeof(HImage));
+        image = Fill.GetComponent<HImage>();
+        image.SizeDelta = new Vector2(400, 20);
+        var son = image.transform;
+        son.SetParent(rect);
+        son.localPosition = Vector3.zero;
+        son.localScale = Vector3.one;
+        son.localRotation = Quaternion.identity;
+        image.Sprite = EditorModelManager.FindSprite(icons, background);
+        image.SprType = SpriteType.Sliced;
+        image.FillMethod = FillMethod.Horizontal;
+        image.Chromatically = new Color32(94, 137, 197, 255);
 
-    //    var Nob = new GameObject("Nob", typeof(RectTransform));
-    //    var fn = Nob.transform as RectTransform;
-    //    fn.sizeDelta = new Vector2(30, 30);
-    //    fn.SetParent(rect);
-    //    fn.localPosition = new Vector3(200, 0, 0);
-    //    fn.localScale = Vector3.one;
-    //    image = Nob.AddComponent<Image>();
-    //    image.color = Color.green;
-    //    image.sprite = EditorModelManager.FindSprite(icons,leaves);
-    //}
+        var Nob = new GameObject("Nob", typeof(HImage));
+        image = Nob.GetComponent<HImage>();
+        image.SizeDelta = new Vector2(30, 30);
+        son = image.transform;
+        son.SetParent(rect);
+        son.localPosition = new Vector3(200,0,0);
+        son.localScale = Vector3.one;
+        son.localRotation = Quaternion.identity;
+        image.Chromatically = Color.green;
+        image.Sprite = EditorModelManager.FindSprite(icons, leaves);
+    }
     //[MenuItem("GameObject/UIComposite/UISliderV", false, 1)]
     //static public void AddSliderV(MenuCommand menuCommand)
     //{

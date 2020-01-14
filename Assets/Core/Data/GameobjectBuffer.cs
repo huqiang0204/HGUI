@@ -243,6 +243,7 @@ namespace huqiang.Data
         {
             if (fake == null)
                 return null;
+            reflections = null;
             long id = fake.GetInt64(0);
             var go = CreateNew(id);
             types[0].loader.LoadToObject(fake,go.transform);
@@ -308,6 +309,16 @@ namespace huqiang.Data
             ReflectionModel[] all = reflections.All;
             for (int i = 0; i < all.Length; i++)
                 all[i].field.SetValue(o, all[i].Value);
+            return go;
+        }
+        public GameObject Clone(FakeStruct fake, TempReflection reflection)
+        {
+            if (fake == null)
+                return null;
+            reflections = reflection;
+            long id = fake.GetInt64(0);
+            var go = CreateNew(id);
+            types[0].loader.LoadToObject(fake, go.transform);
             return go;
         }
     }

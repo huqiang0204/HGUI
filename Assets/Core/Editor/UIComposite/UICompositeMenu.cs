@@ -90,7 +90,7 @@ public static class UICompositeMenu
         son.localScale = Vector3.one;
         son.localRotation = Quaternion.identity;
         image.Sprite = EditorModelManager.FindSprite(icons, background);
-        image.SprType = SpriteType.Sliced;
+        image.SprType = SpriteType.Filled;
         image.FillMethod = FillMethod.Horizontal;
         image.Chromatically = new Color32(94, 137, 197, 255);
 
@@ -105,47 +105,53 @@ public static class UICompositeMenu
         image.Chromatically = Color.green;
         image.Sprite = EditorModelManager.FindSprite(icons, leaves);
     }
-    //[MenuItem("GameObject/UIComposite/UISliderV", false, 1)]
-    //static public void AddSliderV(MenuCommand menuCommand)
-    //{
-    //    GameObject parent = menuCommand.context as GameObject;
-    //    var ss = new GameObject("SliderV", typeof(RectTransform));
-    //    RectTransform rect = ss.transform as RectTransform;
-    //    rect.sizeDelta = new Vector2(20,400);
-    //    if (parent != null)
-    //        rect.SetParent(parent.transform);
-    //    rect.localPosition = Vector3.zero;
-    //    rect.localScale = Vector3.one;
-    //    var help = ss.AddComponent<SliderHelper>();
-    //    help.direction = UISlider.Direction.Vertical;
-    //    help.StartOffset.y = -15;
-    //    help.EndOffset.y = -15;
-    //    var image = ss.AddComponent<Image>();
-    //    image.sprite = EditorModelManager.FindSprite(icons, background);
-    //    image.type = Image.Type.Sliced;
+    [MenuItem("GameObject/HGUI/UISliderV", false, 4)]
+    static public void AddSliderV(MenuCommand menuCommand)
+    {
+        GameObject parent = menuCommand.context as GameObject;
+        var go = new GameObject("SliderH", typeof(HImage));
+        HImage image = go.GetComponent<HImage>();
+        image.SizeDelta = new Vector2(20, 400);
+        image.compositeType = CompositeType.Slider;
+        var rect = image.transform;
+        if (parent != null)
+        {
+            rect.SetParent(parent.transform);
+            rect.localPosition = Vector3.zero;
+            rect.localScale = Vector3.one;
+            rect.localRotation = Quaternion.identity;
+        }
 
-    //    var Fill = new GameObject("FillImage", typeof(RectTransform));
-    //    var fr = Fill.transform as RectTransform;
-    //    fr.sizeDelta = new Vector2(20, 400);
-    //    fr.SetParent(rect);
-    //    fr.localPosition = Vector3.zero;
-    //    fr.localScale = Vector3.one;
-    //    image = Fill.AddComponent<Image>();
-    //    image.sprite = EditorModelManager.FindSprite(icons, background);
-    //    image.type = Image.Type.Sliced;
-    //    image.fillMethod = Image.FillMethod.Vertical;
-    //    image.color = new Color32(94, 137, 197, 255);
+        var help = go.AddComponent<SliderHelper>();
+        help.StartOffset.y = -15;
+        help.EndOffset.y = -15;
+        image.Sprite = EditorModelManager.FindSprite(icons, background);
+        image.SprType = SpriteType.Sliced;
 
-    //    var Nob = new GameObject("Nob", typeof(RectTransform));
-    //    var fn = Nob.transform as RectTransform;
-    //    fn.sizeDelta = new Vector2(30, 30);
-    //    fn.SetParent(rect);
-    //    fn.localPosition = new Vector3(0, 200, 0);
-    //    fn.localScale = Vector3.one;
-    //    image = Nob.AddComponent<Image>();
-    //    image.color = Color.green;
-    //    image.sprite = EditorModelManager.FindSprite(icons, ufo);
-    //}
+        var Fill = new GameObject("FillImage", typeof(HImage));
+        image = Fill.GetComponent<HImage>();
+        image.SizeDelta = new Vector2(20, 400);
+        var son = image.transform;
+        son.SetParent(rect);
+        son.localPosition = Vector3.zero;
+        son.localScale = Vector3.one;
+        son.localRotation = Quaternion.identity;
+        image.Sprite = EditorModelManager.FindSprite(icons, background);
+        image.SprType = SpriteType.Filled;
+        image.FillMethod = FillMethod.Vertical;
+        image.Chromatically = new Color32(94, 137, 197, 255);
+
+        var Nob = new GameObject("Nob", typeof(HImage));
+        image = Nob.GetComponent<HImage>();
+        image.SizeDelta = new Vector2(30, 30);
+        son = image.transform;
+        son.SetParent(rect);
+        son.localPosition = new Vector3(0, 200, 0);
+        son.localScale = Vector3.one;
+        son.localRotation = Quaternion.identity;
+        image.Chromatically = Color.green;
+        image.Sprite = EditorModelManager.FindSprite(icons, ufo);
+    }
     //[MenuItem("GameObject/UIComposite/Scroll", false, 2)]
     //static public void AddScroll(MenuCommand menuCommand)
     //{

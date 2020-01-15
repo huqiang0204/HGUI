@@ -2,20 +2,13 @@
 {
 	Properties
 	{
-		 _MainTex("Sprite Texture", 2D) = "white" {}
-		 _STex("Sprite Texture", 2D) = "white" {}
-		 _TTex("Sprite Texture", 2D) = "white" {}
-		 _FTex("Sprite Texture", 2D) = "white" {}
-		_Color("Tint", Color) = (1,1,1,1)
-		_ClipRect("_ClipRect",Vector) = (0,0,1,1)
-		_FillColor("Fill color", Vector) = (0,0,0,0)
-		_StencilComp("Stencil Comparison", Float) = 8
-		_Stencil("Stencil ID", Float) = 0
-		_StencilOp("Stencil Operation", Float) = 0
-		_StencilWriteMask("Stencil Write Mask", Float) = 255
-		_StencilReadMask("Stencil Read Mask", Float) = 255
-
-		_ColorMask("Color Mask", Float) = 15
+		 [PerRendererData]_MainTex("Sprite Texture", 2D) = "white" {}
+		 [PerRendererData]_STex("Sprite Texture", 2D) = "white" {}
+		 [PerRendererData]_TTex("Sprite Texture", 2D) = "white" {}
+		 [PerRendererData]_FTex("Sprite Texture", 2D) = "white" {}
+		 _Color("Tint", Color) = (1,1,1,1)
+		 [PerRendererData]_ClipRect("_ClipRect",Vector) = (0,0,1,1)
+		 [PerRendererData]_FillColor("Fill color", Vector) = (0,0,0,0)
 	}
 
 		SubShader
@@ -29,21 +22,12 @@
 				"CanUseSpriteAtlas" = "True"
 			}
 
-			Stencil
-			{
-				Ref[_Stencil]
-				Comp[_StencilComp]
-				Pass[_StencilOp]
-				ReadMask[_StencilReadMask]
-				WriteMask[_StencilWriteMask]
-			}
 
 			Cull Off
 			Lighting Off
 			ZWrite Off
 			ZTest[unity_GUIZTestMode]
 			Blend SrcAlpha OneMinusSrcAlpha
-			ColorMask[_ColorMask]
 
 			Pass
 			{

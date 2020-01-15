@@ -106,9 +106,7 @@ namespace huqiang.Core.HGUI
             if (renderer == null)
                 renderer = GetComponent<MeshRenderer>();
             if (renderer != null)
-            {
                 renderer.materials = MatCollector.GenerateMaterial();
-            }
         }
        
         void CheckSize()
@@ -385,21 +383,7 @@ namespace huqiang.Core.HGUI
             for (int i = 0; i < max; i++)
                 scripts[i].MainUpdate();
             TxtCollector.GenerateTexture();
-            if (scripts != null)
-            {
-                for (int i = 0; i < len; i++)
-                    scripts[i].SubUpdate();
-                for (int i = 0; i < len; i++)
-                {
-                   var grap =  scripts[i] as HGraphics;
-                    if (grap != null)
-                        grap.UpdateMesh();
-                }
-            }
-               
-            ClearMesh();
-            HBatch.Batch(this, PipeLine);
-         
+            SubMission(null);
             var mf = GetComponent<MeshFilter>();
             if (mf != null)
             {
@@ -410,21 +394,24 @@ namespace huqiang.Core.HGUI
                     mf.mesh = mesh;
                 }
                 mesh.Clear();
-                mesh.vertices = vertex.ToArray();
-                mesh.uv = uv.ToArray();
-                mesh.uv2 = uv1.ToArray();
-                mesh.uv3 = uv2.ToArray();
-                mesh.colors32 = colors.ToArray();
-                swapSubmesh = MatCollector.submesh.ToArray();
-                mesh.subMeshCount = swapSubmesh.Length;
-                for (int i = 0; i < swapSubmesh.Length; i++)
-                    mesh.SetTriangles(swapSubmesh[i], i);
+                if (swapVertex != null)
+                {
+                    mesh.vertices = swapVertex;
+                    mesh.uv = swapUV;
+                    mesh.uv2 = swapUV1;
+                    mesh.uv3 = swapUV2;
+                    mesh.colors32 = swapColors;
+                    if (swapSubmesh != null)
+                    {
+                        mesh.subMeshCount = swapSubmesh.Length;
+                        for (int i = 0; i < swapSubmesh.Length; i++)
+                            mesh.SetTriangles(swapSubmesh[i], i);
+                    }
+                }
             }
             var mr = GetComponent<MeshRenderer>();
             if (mr != null)
-            {
-                mr.materials = MatCollector.GenerateMaterial();
-            }
+                mr.sharedMaterials = MatCollector.GenerateMaterial();
         }
 #endif
         #endregion

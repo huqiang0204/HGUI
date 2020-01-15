@@ -7,6 +7,11 @@ using UnityEngine;
 [CanEditMultipleObjects]
 public class HCanvasEditor:AsyncScriptEditor
 {
+    //public override void OnSceneGUI()
+    //{
+    //    base.OnSceneGUI();
+    //    Refresh(target as HCanvas);
+    //}
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();

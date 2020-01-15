@@ -83,6 +83,9 @@ namespace huqiang.Core.HGUI
         {
             if (m_sprite != null)
             {
+#if UNITY_EDITOR
+                s_id = m_sprite.GetInstanceID();
+#endif
                 m_rect = m_sprite.rect;
                 m_textureSize.x = m_sprite.texture.width;
                 m_textureSize.y = m_sprite.texture.height;

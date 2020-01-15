@@ -199,6 +199,7 @@ namespace huqiang.Core.HGUI
                 CompeleteSub();
             }
         }
+        static string[] tc = new string[] { "_MainTex" , "_STex","_TTex" , "_FTex" };
         public Material[] GenerateMaterial()
         {
             MaterialManager.Reset();
@@ -213,27 +214,31 @@ namespace huqiang.Core.HGUI
                     mat = MaterialManager.GetNextMaterial();
                     Vector4 v = Vector4.zero;
                     int s = i * 4;
+                    for (int j = 0; j < 4; j++)
+                    {
+                        if (j < c)
+                            mat.SetTexture(tc[j], textures[s].texture);
+                        else mat.SetTexture(tc[j], null);
+                        s++;
+                    }
+                    s = i * 4;
                     if (c > 0)
                     {
-                        mat.SetTexture("_MainTex", textures[s].texture);
                         if (textures[s].fillcolor)
                             v.x = 1;
                         if (c > 1)
                         {
                             s++;
-                            mat.SetTexture("_STex", textures[s].texture);
                             if (textures[s].fillcolor)
                                 v.y = 1;
                             if (c > 2)
                             {
                                 s++;
-                                mat.SetTexture("_TTex", textures[s].texture);
                                 if (textures[s].fillcolor)
                                     v.z = 1;
                                 if (c > 3)
                                 {
                                     s++;
-                                    mat.SetTexture("_FTex", textures[s].texture);
                                     if (textures[s].fillcolor)
                                         v.w = 1;
                                 }

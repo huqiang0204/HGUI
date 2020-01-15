@@ -6,6 +6,25 @@ using UnityEngine;
 [CustomEditor(typeof(AsyncScript), true)]
 public class AsyncScriptEditor : Editor
 {
+    HCanvas FindHCanvas(Transform trans)
+    {
+        if (trans == null)
+            return null;
+        var can = trans.GetComponent<HCanvas>();
+        if (can == null)
+            return FindHCanvas(trans.parent);
+        return can;
+    }
+    public void OnEnable()
+    {
+        var scr = target as AsyncScript;
+        if(scr!=null)
+        {
+            var can = FindHCanvas(scr.transform);
+            if (can != null)
+                can.Refresh();
+        }
+    }
     public virtual void OnSceneGUI()
     {
         var txt = target as AsyncScript;

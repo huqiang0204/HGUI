@@ -113,20 +113,20 @@ public static class ExposeProperties
         return fields.ToArray();
     }
 
-    //[UnityEditor.Callbacks.DidReloadScripts]
-    //public static void ReloadScripts()
-    //{
-    //    var objs = SceneAsset.FindObjectsOfType(typeof(HCanvas));
-    //    if(objs!=null)
-    //    {
-    //        for(int i=0;i<objs.Length;i++)
-    //        {
-    //            var obj = objs[i] as HCanvas;
-    //            if (obj != null)
-    //                obj.Refresh();
-    //        }
-    //    }
-    //}
+    [UnityEditor.Callbacks.DidReloadScripts]
+    public static void ReloadScripts()
+    {
+        var objs = SceneAsset.FindObjectsOfType(typeof(HCanvas));
+        if (objs != null)
+        {
+            for (int i = 0; i < objs.Length; i++)
+            {
+                var obj = objs[i] as HCanvas;
+                if (obj != null)
+                    obj.Refresh();
+            }
+        }
+    }
 }
 public class PropertyField
 {

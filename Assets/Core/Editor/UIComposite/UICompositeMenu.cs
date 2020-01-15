@@ -24,6 +24,7 @@ public static class UICompositeMenu
     private const string circleol = "Circle-Outline";
     private const string circlesm = "Circle-Small";
     private const string magicstick = "Magic-Stick";
+    private const string box = "Border2";
 
     [MenuItem("GameObject/HGUI/Empty", false, 0)]
     static public void AddEmpty(MenuCommand menuCommand)
@@ -58,7 +59,35 @@ public static class UICompositeMenu
         trans.localScale = Vector3.one;
         trans.localRotation = Quaternion.identity;
     }
-    [MenuItem("GameObject/HGUI/UISliderH", false, 3)]
+    [MenuItem("GameObject/HGUI/InputBox", false, 3)]
+    static public void AddInputBox(MenuCommand menuCommand)
+    {
+        GameObject parent = menuCommand.context as GameObject;
+
+        var go = new GameObject("InputBox", typeof(HImage));
+        var trans = go.transform;
+        trans.SetParent(parent.transform);
+        trans.localPosition = Vector3.zero;
+        trans.localScale = Vector3.one;
+        trans.localRotation = Quaternion.identity;
+        var img = go.GetComponent<HImage>();
+        img.Sprite = EditorModelManager.FindSprite(icons, box);
+        img.SprType = SpriteType.Sliced;
+        img.SizeDelta = new Vector2(400,100);
+
+        go = new GameObject("InputText", typeof(HText));
+        var son = go.transform;
+        son.SetParent(trans);
+        son.localPosition = Vector3.zero;
+        son.localScale = Vector3.one;
+        son.localRotation = Quaternion.identity;
+        var txt = go.GetComponent<HText>();
+        txt.SizeDelta = new Vector2(380,90);
+        txt.eventType = huqiang.Core.HGUI.EventType.TextInput;
+        var help = go.AddComponent<TextInputHelper>();
+        help.Refresh();
+    }
+    [MenuItem("GameObject/HGUI/UISliderH", false, 4)]
     static public void AddSliderH(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;
@@ -105,7 +134,7 @@ public static class UICompositeMenu
         image.Chromatically = Color.green;
         image.Sprite = EditorModelManager.FindSprite(icons, leaves);
     }
-    [MenuItem("GameObject/HGUI/UISliderV", false, 4)]
+    [MenuItem("GameObject/HGUI/UISliderV", false, 5)]
     static public void AddSliderV(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;

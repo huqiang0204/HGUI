@@ -12,7 +12,7 @@ public class TextInputHelper:UICompositeHelp
     public Color pointColor=Color.white;
     public Color selectColor= new Color(0.65882f, 0.8078f, 1, 0.2f);
     public string InputString;
-    public string TipString="请输入...";
+    public string TipString = "请输入...";
     public unsafe override object ToBufferData(DataBuffer data)
     {
         FakeStruct fake = new FakeStruct(data, TextInputData.ElementSize);

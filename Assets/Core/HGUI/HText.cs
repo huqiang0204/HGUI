@@ -308,9 +308,14 @@ namespace huqiang.Core.HGUI
         }
         public void Reset()
         {
-            if (_font == null)
-                Font = DefaultFont;
             STexture = UnityEngine.Resources.Load<Texture>("Emoji");
+#if UNITY_EDITOR
+            if (_font == null)
+                if (!Application.isPlaying)
+                {
+                    _font = UnityEngine.Resources.GetBuiltinResource<Font>("Arial.ttf");
+                }
+#endif
         }
     }
 }

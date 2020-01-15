@@ -15,7 +15,7 @@ public class UITest : TestHelper
         //Scale.DpiScale = true;
 #endif
 #if UNITY_EDITOR
-        UIPage.LoadPage<TestUPage>();
+        UIPage.LoadPage<ChatPage>();
 #else
         ElementAsset.LoadAssetsAsync("base.unity3d",(o,e)=> { UIPage.LoadPage<AniTestPage>(); });
 #endif

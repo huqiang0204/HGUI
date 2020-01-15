@@ -84,6 +84,8 @@ public static class UICompositeMenu
         var txt = go.GetComponent<HText>();
         txt.SizeDelta = new Vector2(380,90);
         txt.eventType = huqiang.Core.HGUI.EventType.TextInput;
+        txt.marginType = MarginType.Margin;
+        txt.margin = new Margin(5,5,5,5);
         var help = go.AddComponent<TextInputHelper>();
         help.Refresh();
     }

@@ -183,26 +183,6 @@ public static class UICompositeMenu
         image.Chromatically = Color.green;
         image.Sprite = EditorModelManager.FindSprite(icons, ufo);
     }
-    //[MenuItem("GameObject/UIComposite/Scroll", false, 2)]
-    //static public void AddScroll(MenuCommand menuCommand)
-    //{
-    //    GameObject parent = menuCommand.context as GameObject;
-    //    var ss = new GameObject("Scroll", typeof(RectTransform));
-    //    RectTransform rect = ss.transform as RectTransform;
-    //    rect.sizeDelta = new Vector2(400, 400);
-    //    if (parent != null)
-    //        rect.SetParent(parent.transform);
-    //    rect.localPosition = Vector3.zero;
-    //    rect.localScale = Vector3.one;
-    //    ss.AddComponent<RectMask2D>();
-    //    var Item = new GameObject("Item", typeof(RectTransform));
-    //    var fr = Item.transform as RectTransform;
-    //    fr.sizeDelta = new Vector2(80, 80);
-    //    fr.SetParent(rect);
-    //    fr.localPosition = Vector3.zero;
-    //    fr.localScale = Vector3.one;
-    //}
-    //[MenuItem("GameObject/UIComposite/ScrollX", false, 3)]
     //static public void AddScrollX(MenuCommand menuCommand)
     //{
     //    GameObject parent = menuCommand.context as GameObject;

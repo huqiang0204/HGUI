@@ -216,6 +216,7 @@ public static class UICompositeMenu
         img.Mask = true;
         img.SizeDelta = new Vector2(400,400);
         img.compositeType = CompositeType.ScrollY;
+        ss.AddComponent<ScrollHelper>();
         var rect = img.transform;
         var Item = new GameObject("Item");
         var fr = Item.AddComponent<AsyncScript>();

@@ -10,12 +10,15 @@ using UnityEngine;
 
 public class ScrollHelper: UICompositeHelp
 {
-    public Vector2 minBox;
+    public ScrollType scrollType = ScrollType.Loop;
+    public Vector2 minBox=new Vector2(80,80);
+
     public unsafe override object ToBufferData(DataBuffer data)
     {
         FakeStruct fake = new FakeStruct(data, ScrollInfo.ElementSize);
         ScrollInfo* info = (ScrollInfo*)fake.ip;
         info->minBox = minBox;
+        info->scrollType = scrollType;
         return fake;
     }
 }

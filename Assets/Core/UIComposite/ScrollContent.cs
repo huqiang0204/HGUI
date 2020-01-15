@@ -17,6 +17,7 @@ namespace huqiang.UIComposite
     }
     public unsafe struct ScrollInfo
     {
+        public ScrollType scrollType;
         public Vector2 minBox;
         public static int Size = sizeof(ScrollInfo);
         public static int ElementSize = Size / 4;
@@ -144,6 +145,7 @@ namespace huqiang.UIComposite
             return null;
         }
         public Vector2 ItemOffset = Vector2.zero;
+        public Vector2 MinBox;
         protected int max_count;
         public List<ScrollItem> Items=new List<ScrollItem>();
         List<ScrollItem> Buffer=new List<ScrollItem>();
@@ -163,7 +165,17 @@ namespace huqiang.UIComposite
                 ItemMods = HGUIManager.GetAllChild(mod);
                 ItemMod = ItemMods[0];
                 HGUIManager.GameBuffer.RecycleChild(script.gameObject);
-                unsafe { ItemSize = ((TransfromData*)ItemMods[0].ip)->size; }
+                unsafe
+                {
+                    ItemSize = ((TransfromData*)ItemMods[0].ip)->size;
+                    var ex = mod.buffer.GetData(((TransfromData*)mod.ip)->ex) as FakeStruct;
+                    if (ex != null)
+                    {
+                        ScrollInfo* tp = (ScrollInfo*)ex.ip;
+                        scrollType = tp->scrollType;
+                        MinBox = tp->minBox;
+                    }
+                }
             }
         }
         public void SetMod(int index)

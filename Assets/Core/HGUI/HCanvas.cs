@@ -355,7 +355,7 @@ namespace huqiang.Core.HGUI
             uv2.Clear();
             colors.Clear();
         }
-
+        #endregion
 #if UNITY_EDITOR
         public void Refresh()
         {
@@ -379,7 +379,7 @@ namespace huqiang.Core.HGUI
                 }
             }
             for (int i = 0; i < max; i++)
-                Resize(scripts[i],false);
+                Resize(scripts[i], false);
             for (int i = 0; i < max; i++)
                 scripts[i].MainUpdate();
             TxtCollector.GenerateTexture();
@@ -413,7 +413,18 @@ namespace huqiang.Core.HGUI
             if (mr != null)
                 mr.sharedMaterials = MatCollector.GenerateMaterial();
         }
+        private void Reset()
+        {
+            UnityEditor.EditorApplication.update+= EUpdate;
+        }
+        void EUpdate()
+        {
+            Refresh();
+        }
+        private void OnDestroy()
+        {
+            UnityEditor.EditorApplication.update -= EUpdate;
+        }
 #endif
-        #endregion
     }
 }

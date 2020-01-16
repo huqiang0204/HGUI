@@ -13,6 +13,10 @@ public class UICompositeHelp : MonoBehaviour
     {
         return null;
     }
+    public virtual void Refresh()
+    {
+
+    }
     public virtual void ReSize()
     {
     }

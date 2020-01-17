@@ -329,7 +329,6 @@ namespace huqiang.UIEvent
                     InputCaret.Hide();
                     break;
                 case 2:
-                    InputCaret.CaretStyle = 2;
                     if(ShowChanged)
                     {
                         InputCaret.Active();

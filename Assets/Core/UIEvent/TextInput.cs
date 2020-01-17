@@ -63,7 +63,7 @@ namespace huqiang.UIEvent
         static float KeySpeed = 220;
         static float MaxSpeed = 30;
         static float KeyPressTime;
-        static TextInput InputEvent;
+        public static TextInput InputEvent { get; private set; }
         static EditState KeyPressed()
         {
             KeyPressTime -= UserAction.TimeSlice;
@@ -295,7 +295,7 @@ namespace huqiang.UIEvent
         void SetShowText()
         {
             string str = GetShowString();
-            if (str == "")
+            if (str == ""&! Editing)
             {
                 TextCom.Chromatically = TipColor;
                 TextCom.Text = m_TipString;
@@ -554,6 +554,7 @@ namespace huqiang.UIEvent
         }
         void Refresh()
         {
+            InputCaret.CaretStyle = Style;
             var te = TextCom;
             if (te != null)
             {
@@ -570,11 +571,7 @@ namespace huqiang.UIEvent
                     TextCom.Populate();
                     ShowChanged = true;
                 }
-                if (Style == 1)
-                {
-                    SetPressPointer();
-                }
-                else if(Style==2)
+                if(Style==2)
                 {
                     if(ShowChanged)
                     {

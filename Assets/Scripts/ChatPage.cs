@@ -61,8 +61,10 @@ namespace Assets.Scripts
             TextInput input = view.input.userEvent as TextInput;
             input.OnSubmit = OnSubmit;
             container = view.chatbox.composite as UIContainer;
-            container.RegLinker<ChatItem, ChatData>("other");
-            container.RegLinker<ChatItem, ChatData>("self");
+            other = container.RegLinker<ChatItem, ChatData>("other");
+            other.CalculItemHigh = GetContentSize;
+            self = container.RegLinker<ChatItem, ChatData>("self");
+            self.CalculItemHigh = GetContentSize;
             container.RegLinker<TipItem, TipData>("tip");
         }
         void SelectChanged(OptionGroup option,UserAction action)
@@ -90,15 +92,34 @@ namespace Assets.Scripts
                 return;
             switch (opt)
             {
-                case "Left":
-                    //other.AddData();
-                    //other.AddData();
+                case "left":
+                    ChatData chat = new ChatData();
+                    chat.name = "胡江海";
+                    chat.content = str;
+                    other.AddData(chat);
                     break;
-                case "Center":
+                case "center":
                     break;
-                case "Right":
+                case "right":
+                    chat = new ChatData();
+                    chat.name = "江海胡";
+                    chat.content = str;
+                    other.AddData(chat);
+                    container.Move(0);
                     break;
             }
+            input.InputString = "";
+        }
+        float GetContentSize(ChatItem chat, ChatData data)
+        {
+            Vector2 size = new Vector2(360, 60);
+            chat.content.GetPreferredHeight(ref size, data.content);
+            chat.content.SizeDelta = size;
+            return size.y;
+        }
+        float GetTipSize(TipItem tip,TipData data)
+        {
+            return 40;
         }
     }
 }

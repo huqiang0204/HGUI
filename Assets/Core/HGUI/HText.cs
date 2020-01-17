@@ -324,7 +324,11 @@ namespace huqiang.Core.HGUI
             var gen = Generator;
             float h = gen.GetPreferredHeight(str, settings);
             size.y = h;
-            Debug.Log(gen.rectExtents);
+            if (gen.lineCount == 1)
+            {
+                var cha = gen.characters[gen.vertexCount];
+                size.x = cha.cursorPos.x + cha.charWidth * 1.1f;
+            }
         }
     }
 }

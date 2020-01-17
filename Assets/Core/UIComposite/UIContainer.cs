@@ -18,6 +18,7 @@ namespace huqiang.UIComposite
     {
         protected List<LinkerMod> buffer = new List<LinkerMod>();
         public virtual LinkerMod CreateUI() { return null; }
+        public virtual float GetItemHigh(object t, object u) { return 40; }
         public virtual void RefreshItem(object t, object u, int index) { }
         public void RecycleItem(LinkerMod mod)
         {
@@ -50,6 +51,7 @@ namespace huqiang.UIComposite
     {
         FakeStruct model;
         public Action<T, U, int> ItemUpdate;
+        public Func<T, U, float> CalculItemHigh;
         UIContainer con;
         public UILinker(UIContainer container, FakeStruct mod)
         {
@@ -57,9 +59,9 @@ namespace huqiang.UIComposite
             model = mod;
             container.linkers.Add(this);
         }
-        public void AddData(U dat, float high)
+        public void AddData(U dat)
         {
-            con.AddData(this, dat, high);
+            con.AddData(this, dat);
         }
         public override LinkerMod CreateUI()
         {
@@ -76,6 +78,12 @@ namespace huqiang.UIComposite
             mod.UI = t;
             return mod;
         }
+        public override float GetItemHigh(object t, object u)
+        {
+            if (CalculItemHigh != null)
+                return CalculItemHigh(t as T, u as U);
+            unsafe { return ((TransfromData*)model.ip)->size.y; }
+        }
         public override void RefreshItem(object t, object u, int index)
         {
             if (ItemUpdate != null)
@@ -90,6 +98,7 @@ namespace huqiang.UIComposite
         FakeStruct model;
         public Action<object, object, int> ItemUpdate;
         public Action<ObjectLinker, LinkerMod> ItemCreate;
+        public Func<object, object, float> CalculItemHigh;
         UIContainer con;
         public ObjectLinker(UIContainer container, FakeStruct mod)
         {
@@ -97,9 +106,9 @@ namespace huqiang.UIComposite
             model = mod;
             container.linkers.Add(this);
         }
-        public void AddData(object dat, float high)
+        public void AddData(object dat)
         {
-            con.AddData(this, dat, high);
+            con.AddData(this, dat);
         }
         public override LinkerMod CreateUI()
         {
@@ -108,6 +117,12 @@ namespace huqiang.UIComposite
             if (ItemCreate != null)
                 ItemCreate(this, mod);
             return mod;
+        }
+        public override float GetItemHigh(object t, object u)
+        {
+            if (CalculItemHigh != null)
+                return CalculItemHigh(t, u);
+            unsafe { return ((TransfromData*)model.ip)->size.y; }
         }
         public override void RefreshItem(object t, object u, int index)
         {
@@ -134,7 +149,7 @@ namespace huqiang.UIComposite
         class BindingData
         {
             public float offset;
-            public float high;
+            public float high = 8;
             public object Data;
             public Linker linker;
         }
@@ -180,12 +195,12 @@ namespace huqiang.UIComposite
             return link;
         }
         public int DataCount { get { return datas.Count; } }
-        public void AddData(Linker linker, object data, float high)
+        public void AddData(Linker linker, object data)
         {
             BindingData binding = new BindingData();
             binding.linker = linker;
             binding.Data = data;
-            binding.high = high;
+            //binding.high = high;
             //binding.offset = end;
             datas.Add(binding);
         }
@@ -193,6 +208,8 @@ namespace huqiang.UIComposite
         {
             var ui = data.linker.CreateUI();
             ui.index = index;
+            if (data.high < 10)
+                data.high = data.linker.GetItemHigh(ui.UI, data.Data);
             data.linker.RefreshItem(ui.UI, data.Data, index);
             Item item = new Item();
             item.mod = ui;
@@ -369,6 +386,7 @@ namespace huqiang.UIComposite
             if(item.Index<0)
             {
                 mod.index = index;
+                data.high = data.linker.GetItemHigh(mod.UI, data.Data);
                 data.linker.RefreshItem(mod.UI, data.Data, index);
                 item.mod = mod;
                 item.linker = data.linker;
@@ -389,7 +407,7 @@ namespace huqiang.UIComposite
                 item.mod = mod;
             }
             items.Add(item);
-            float os =Enity.SizeDelta.y * 0.5f;
+            float os = Enity.SizeDelta.y * 0.5f;
             os -= start;
             os -= data.high * 0.5f;
             mod.main.transform.localPosition = new Vector3(0, os, 0);

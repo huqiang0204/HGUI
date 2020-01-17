@@ -167,6 +167,7 @@ namespace huqiang.Core.HGUI
             m_dirty = false;
             m_vertexChange = true;
             fillColors[0] = true;
+            m_colorChanged = false;
         }
         public override void UpdateMesh()
         {

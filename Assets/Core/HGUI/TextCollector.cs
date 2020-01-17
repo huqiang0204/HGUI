@@ -58,7 +58,7 @@ namespace huqiang.Core.HGUI
                 bool dirty = false;
                 for (int j = 0; j < c; j++)
                 {
-                    if (buf[j].m_dirty)
+                    if (buf[j].m_dirty|buf[j].m_colorChanged)
                     {
                         dirty = true;
                         break;

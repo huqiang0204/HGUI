@@ -163,6 +163,15 @@ namespace huqiang.Core.HGUI
             {
                 HGUIMesh.CreateMesh(this);
                 m_vertexChange = false;
+                m_colorChanged = false;
+            }else if(m_colorChanged)
+            {
+                var hv =vertices;
+                if (hv != null)
+                {
+                    for (int i = 0; i < hv.Length; i++)
+                        hv[i].color = m_color;
+                }
             }
         }
     }

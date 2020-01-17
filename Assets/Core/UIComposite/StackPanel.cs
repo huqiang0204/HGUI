@@ -92,7 +92,10 @@ namespace huqiang.UIComposite
     public class OptionGroup
     {
         public OptionsType options;
+        UserEvent m_select;
+        UserEvent m_last;
         List<UserEvent> userEvents = new List<UserEvent>();
+        public List<UserEvent> MultiSelect;
         public void AddEvent(UserEvent user)
         {
             user.Click = Click;
@@ -112,16 +115,39 @@ namespace huqiang.UIComposite
         }
         void Radio(UserEvent user,UserAction action)
         {
-
+            if (m_select == user)
+                return;
+            m_last = m_select;
+            m_select = user;
+            if (SelectChanged != null)
+                SelectChanged(this,action);
         }
         void MultiChoice(UserEvent user,UserAction action)
         {
-
+            if (MultiSelect == null)
+                MultiSelect = new List<UserEvent>();
+            if(MultiSelect.Contains(user))
+            {
+                m_last = user;
+                m_select = null;
+            }
+            else
+            {
+                m_last = null;
+                m_select = user;
+                MultiSelect.Add(user);
+            }
+            if (SelectChanged != null)
+                SelectChanged(this, action);
         }
         public Action<OptionGroup,UserAction> SelectChanged;
+        public UserEvent LastSelect { get => m_last; }
         public UserEvent Selecet
         {
-            get; set;
+            get => m_select;
+            set {
+                m_select = value;
+            }
         }
     }
 }

@@ -167,8 +167,7 @@ namespace huqiang.UIComposite
                     OnScrollEnd(o);
             };
             model = fake;
-            //for (int i = 0; i < model.child.Count; i++)
-            //    model.child[i].activeSelf = false;
+            HGUIManager.GameBuffer.RecycleChild(script.gameObject);
         }
         public UILinker<T, U> RegLinker<T,U>(string ItemName)  where T : class, new() where U : class, new()
         {

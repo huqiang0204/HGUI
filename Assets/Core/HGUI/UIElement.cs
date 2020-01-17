@@ -24,7 +24,8 @@ namespace huqiang.Core.HGUI
         ScrollY,
         GridScroll,
         Paint,
-        Rocker
+        Rocker,
+        UIContainer
     }
     public class UIElement:MonoBehaviour
     {
@@ -343,6 +344,9 @@ namespace huqiang.Core.HGUI
                     break;
                 case CompositeType.Rocker:
                     new UIRocker().Initial(ex,script);
+                    break;
+                case CompositeType.UIContainer:
+                    new UIContainer().Initial(ex,script);
                     break;
             }
         }

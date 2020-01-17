@@ -29,7 +29,7 @@ namespace huqiang.UIComposite
         Vector2 CurDirect;
         LoopBuffer<DrawArea> loopBuffer=new LoopBuffer<DrawArea>(2);
         public DrawModel drawModel;
-        public override void Initial(FakeStruct fake,AsyncScript script)
+        public override void Initial(FakeStruct fake,UIElement script)
         {
             base.Initial(fake,script);
             raw = Enity as HImage;

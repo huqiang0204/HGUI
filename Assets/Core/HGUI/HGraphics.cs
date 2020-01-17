@@ -18,7 +18,7 @@ namespace huqiang.Core.HGUI
         public Vector2 uv3;
         public int picture;
     }
-    public class HGraphics:AsyncScript
+    public class HGraphics:UIElement
     {
         internal static Shader DefShader { get {
                 if(shader==null)

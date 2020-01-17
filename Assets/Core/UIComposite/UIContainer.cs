@@ -147,7 +147,7 @@ namespace huqiang.UIComposite
         public UIContainer()
         {
         }
-        public override void Initial(FakeStruct fake, AsyncScript script)
+        public override void Initial(FakeStruct fake, UIElement script)
         {
             base.Initial(fake, script);
             items = new List<Item>();

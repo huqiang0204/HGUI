@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace huqiang.Core.HGUI
 {
-    public unsafe struct AsyncScriptData
+    public unsafe struct UIElementData
     {
         public Vector2 m_sizeDelta;
         public Vector2 Pivot;
@@ -24,14 +24,14 @@ namespace huqiang.Core.HGUI
         public EventType eventType;
         public CompositeType compositeType;
         public bool Mask;
-        public static int Size = sizeof(AsyncScriptData);
+        public static int Size = sizeof(UIElementData);
         public static int ElementSize = Size / 4;
     }
-    public class AsyncScriptLoader:DataLoader
+    public class UIElementLoader:DataLoader
     {
-        protected unsafe void LoadScript(byte* ip, AsyncScript tar)
+        protected unsafe void LoadScript(byte* ip, UIElement tar)
         {
-            var src = (AsyncScriptData*)ip;
+            var src = (UIElementData*)ip;
             tar.m_sizeDelta = src->m_sizeDelta;
             tar.Pivot = src->Pivot;
             tar.DesignSize = src->DesignSize;
@@ -46,9 +46,9 @@ namespace huqiang.Core.HGUI
             tar.eventType = src->eventType;
             tar.compositeType = src->compositeType;
         }
-        protected unsafe void SaveScript(byte* ip, AsyncScript src)
+        protected unsafe void SaveScript(byte* ip, UIElement src)
         {
-            AsyncScriptData* tar = (AsyncScriptData*)ip;
+            UIElementData* tar = (UIElementData*)ip;
             tar->m_sizeDelta = src.m_sizeDelta;
             tar->Pivot = src.Pivot;
             tar->DesignSize = src.DesignSize;
@@ -65,14 +65,14 @@ namespace huqiang.Core.HGUI
         }
         public unsafe override void LoadToObject(FakeStruct fake, Component com)
         {
-            LoadScript(fake.ip, com.GetComponent<AsyncScript>());
+            LoadScript(fake.ip, com.GetComponent<UIElement>());
         }
         public override unsafe FakeStruct LoadFromObject(Component com, DataBuffer buffer)
         {
-            var src = com as AsyncScript;
+            var src = com as UIElement;
             if (src == null)
                 return null;
-            FakeStruct fake = new FakeStruct(buffer, AsyncScriptData.ElementSize);
+            FakeStruct fake = new FakeStruct(buffer, UIElementData.ElementSize);
             SaveScript(fake.ip, src);
             return fake;
         }

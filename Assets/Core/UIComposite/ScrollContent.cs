@@ -155,7 +155,7 @@ namespace huqiang.UIComposite
         /// </summary>
         public Action<ScrollItem> ItemRecycle;
         public Transform Main;
-        public override  void Initial(FakeStruct mod, AsyncScript script)
+        public override  void Initial(FakeStruct mod, UIElement script)
         {
             base.Initial(mod,script);
             Main = script.transform;

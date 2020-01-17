@@ -67,7 +67,7 @@ namespace huqiang.UIComposite
             info.MinScale = 1;
             info.MaxScale = 1;
         }
-        public override void Initial(FakeStruct mod, AsyncScript script)
+        public override void Initial(FakeStruct mod, UIElement script)
         {
             base.Initial(mod,script);
             var trans = script.transform;

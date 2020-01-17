@@ -7,12 +7,12 @@ using UnityEngine;
 
 namespace huqiang.Core.HGUI
 {
-    public sealed class HCanvas:AsyncScript
+    public sealed class HCanvas:UIElement
     {
         public Camera camera;
         public RenderMode renderMode;
         HGUIElement[] PipeLine = new HGUIElement[4096];
-        AsyncScript[] scripts = new AsyncScript[4096];
+        UIElement[] scripts = new UIElement[4096];
         int point = 0;
         int max;
         public UserAction[] inputs;
@@ -31,7 +31,7 @@ namespace huqiang.Core.HGUI
             PipeLine[index].localScale = trans.localScale;
             PipeLine[index].trans = trans;
             PipeLine[index].active = trans.gameObject.activeSelf;
-            var script= trans.GetComponent<AsyncScript>();
+            var script= trans.GetComponent<UIElement>();
             PipeLine[index].script = script;
             bool mask = false;
             if (script != null)
@@ -301,6 +301,8 @@ namespace huqiang.Core.HGUI
                 var scr = scripts[i];
                 if (scr.userEvent != null)
                     scr.userEvent.Update();
+                //if (scr.composite != null)
+                //    scr.composite.Update();
                 scripts[i].MainUpdate();
             }
             TextInput.Dispatch();

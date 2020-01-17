@@ -109,7 +109,7 @@ namespace huqiang.Data
                     }
                     else tmp.Add(0);
                     tmp.Add((Int16)type);
-                    var scr = coms[i] as AsyncScript;
+                    var scr = coms[i] as UIElement;
                     if (scr != null)
                     {
                         td->size = scr.SizeDelta;

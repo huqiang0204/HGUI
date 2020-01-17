@@ -7,7 +7,7 @@ using UnityEngine;
 
 [CustomEditor(typeof(HImage), true)]
 [CanEditMultipleObjects]
-public class HImageEditor:AsyncScriptEditor
+public class HImageEditor:UIElementEditor
 {
     Vector3 pos;
     Vector3 scale;

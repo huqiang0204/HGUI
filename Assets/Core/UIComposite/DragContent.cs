@@ -104,11 +104,11 @@ namespace huqiang.UIComposite
         public Vector2 ContentSize;
         public FreezeDirection freeze = FreezeDirection.None;
         public ScrollType scrollType = ScrollType.BounceBack;
-        public AsyncScript Content;
+        public UIElement Content;
         public UserEvent eventCall;
         public Action<DragContent, Vector2> Scroll;
         public Action<DragContent> ScrollEnd;
-        public override void Initial(FakeStruct fake,AsyncScript script)
+        public override void Initial(FakeStruct fake,UIElement script)
         {
             base.Initial(fake,script);
             Size = Enity.SizeDelta;
@@ -132,7 +132,7 @@ namespace huqiang.UIComposite
             var chi = Enity.transform.Find("Content");
             if(chi!=null)
             {
-                Content = chi.GetComponent<AsyncScript>();
+                Content = chi.GetComponent<UIElement>();
                 if (Content != null)
                     ContentSize = Content.SizeDelta;
             }

@@ -279,7 +279,7 @@ namespace huqiang.Data
         {
             if (reflections == null)
                 return;
-            var scr = trans.GetComponent<AsyncScript>();
+            var scr = trans.GetComponent<UIElement>();
             if (scr != null)
                 scr.Initial(mod);
             for (int i = 0; i < reflections.Top; i++)

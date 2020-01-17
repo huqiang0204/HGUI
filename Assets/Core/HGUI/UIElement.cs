@@ -26,13 +26,13 @@ namespace huqiang.Core.HGUI
         Paint,
         Rocker
     }
-    public class AsyncScript:MonoBehaviour
+    public class UIElement:MonoBehaviour
     {
         #region static method
         protected static ThreadMission thread = new ThreadMission("async");
         public static Vector2[] Anchors = new[] { new Vector2(0.5f, 0.5f), new Vector2(0, 0.5f),new Vector2(1, 0.5f),
         new Vector2(0.5f, 1),new Vector2(0.5f, 0), new Vector2(0, 0), new Vector2(0, 1), new Vector2(1, 0), new Vector2(1, 1)};
-        public static void Scaling(AsyncScript script, ScaleType type, Vector2 pSize, Vector2 ds)
+        public static void Scaling(UIElement script, ScaleType type, Vector2 pSize, Vector2 ds)
         {
             var rect = script.transform;
             switch (type)
@@ -63,14 +63,14 @@ namespace huqiang.Core.HGUI
                     break;
             }
         }
-        public static void Anchor(AsyncScript script, Vector2 pivot, Vector2 offset)
+        public static void Anchor(UIElement script, Vector2 pivot, Vector2 offset)
         {
             Vector2 p;
             Vector2 pp = new Vector2(0.5f, 0.5f);
             var rect = script.transform;
             if (rect.parent != null)
             {
-                var t = rect.parent.GetComponent<AsyncScript>();
+                var t = rect.parent.GetComponent<UIElement>();
                 p = t.SizeDelta;
                 pp = t.Pivot;
             }
@@ -82,7 +82,7 @@ namespace huqiang.Core.HGUI
             float oy = sy + offset.y;
             rect.localPosition = new Vector3(ox, oy, 0);
         }
-        public static void AnchorEx(AsyncScript script, AnchorPointType type, Vector2 offset, Vector2 p, Vector2 psize)
+        public static void AnchorEx(UIElement script, AnchorPointType type, Vector2 offset, Vector2 p, Vector2 psize)
         {
             Vector2 pivot = Anchors[(int)type];
             float ox = (p.x - 1) * psize.x;//原点x
@@ -93,7 +93,7 @@ namespace huqiang.Core.HGUI
             offset.y += ty;//偏移点y
             script.transform.localPosition = new Vector3(offset.x, offset.y, 0);
         }
-        public static void AlignmentEx(AsyncScript script, AnchorPointType type, Vector2 offset, Vector2 p, Vector2 psize)
+        public static void AlignmentEx(UIElement script, AnchorPointType type, Vector2 offset, Vector2 p, Vector2 psize)
         {
             Vector2 pivot = Anchors[(int)type];
             float ox = (p.x - 1) * psize.x;//原点x
@@ -135,7 +135,7 @@ namespace huqiang.Core.HGUI
             }
             script.transform.localPosition = new Vector3(x, y, 0);
         }
-        public static void MarginEx(AsyncScript script, Margin margin, Vector2 parentPivot, Vector2 parentSize)
+        public static void MarginEx(UIElement script, Margin margin, Vector2 parentPivot, Vector2 parentSize)
         {
             var rect = script.transform;
             float w = parentSize.x - margin.left - margin.right;
@@ -148,7 +148,7 @@ namespace huqiang.Core.HGUI
             script.SizeDelta = new Vector2(w / sx, h / sy);
             rect.localPosition = new Vector3(ox, oy, 0);
         }
-        public static void MarginX(AsyncScript script, Margin margin, Vector2 parentPivot, Vector2 parentSize)
+        public static void MarginX(UIElement script, Margin margin, Vector2 parentPivot, Vector2 parentSize)
         {
             var rect = script.transform;
             float w = parentSize.x - margin.left - margin.right;
@@ -160,7 +160,7 @@ namespace huqiang.Core.HGUI
             float py = rect.localPosition.y;
             rect.localPosition = new Vector3(ox, py, 0);
         }
-        public static void MarginY(AsyncScript script, Margin margin, Vector2 parentPivot, Vector2 parentSize)
+        public static void MarginY(UIElement script, Margin margin, Vector2 parentPivot, Vector2 parentSize)
         {
             var rect = script.transform;
             float h = parentSize.y - margin.top - margin.down;
@@ -172,7 +172,7 @@ namespace huqiang.Core.HGUI
             float px = rect.localPosition.x;
             rect.localPosition = new Vector3(px, oy, 0);
         }
-        public static void Resize(AsyncScript script,bool child =true)
+        public static void Resize(UIElement script,bool child =true)
         {
             Transform rect = script.transform;
             Vector3 loclpos = rect.localPosition;
@@ -183,7 +183,7 @@ namespace huqiang.Core.HGUI
                 var p = rect.parent;
                 if(p!=null)
                 {
-                    var t = p.GetComponent<AsyncScript>();
+                    var t = p.GetComponent<UIElement>();
                     if (t != null)
                     {
                         psize = t.SizeDelta;
@@ -193,7 +193,7 @@ namespace huqiang.Core.HGUI
             }
             else
             {
-                var t = rect.root.GetComponent<AsyncScript>();
+                var t = rect.root.GetComponent<UIElement>();
                 if (t != null)
                     psize = t.SizeDelta;
             }
@@ -258,7 +258,7 @@ namespace huqiang.Core.HGUI
             if (child)
                 for (int i = 0; i < rect.childCount; i++)
                 {
-                    var ss = rect.GetChild(i).GetComponent<AsyncScript>();
+                    var ss = rect.GetChild(i).GetComponent<UIElement>();
                     if (ss != null)
                         Resize(ss,child);
                 }
@@ -307,7 +307,7 @@ namespace huqiang.Core.HGUI
             return t;
         }
 
-        public Action<AsyncScript> SizeChanged;
+        public Action<UIElement> SizeChanged;
         public void Initial(FakeStruct ex)
         {
             switch(eventType)
@@ -320,7 +320,7 @@ namespace huqiang.Core.HGUI
             }
             CreateUIComposite(this,ex);
         }
-        public static void CreateUIComposite(AsyncScript script,FakeStruct ex)
+        public static void CreateUIComposite(UIElement script,FakeStruct ex)
         {
             switch(script.compositeType)
             {

@@ -38,7 +38,7 @@ namespace huqiang.UIComposite
             swap = new SwapBuffer<TreeViewItem, TreeViewNode>(512);
             queue = new QueueBuffer<TreeViewItem>(256);
         }
-        public override void Initial(FakeStruct fake,AsyncScript script)
+        public override void Initial(FakeStruct fake,UIElement script)
         {
             base.Initial(fake,script);
             eventCall = script.RegEvent<UserEvent>();
@@ -143,7 +143,7 @@ namespace huqiang.UIComposite
             TreeViewItem a = new TreeViewItem();
             a.target = go;
             a.text = go.GetComponent<HText>();
-            a.callBack = go.GetComponent<AsyncScript>().RegEvent<UserEvent>();
+            a.callBack = go.GetComponent<UIElement>().RegEvent<UserEvent>();
             a.callBack.Click = (o, e) => {
                 var item = o.DataContext as TreeViewItem;
                 if (item.node != null)

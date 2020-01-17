@@ -45,7 +45,7 @@ namespace huqiang.UIComposite
                 Row++;
             ActualSize = new Vector2(Column * ItemSize.x, Row * ItemSize.y);
         }
-        public override void Initial(FakeStruct fake,AsyncScript script)
+        public override void Initial(FakeStruct fake,UIElement script)
         {
             base.Initial(fake,script);
             eventCall = script.RegEvent<UserEvent>();

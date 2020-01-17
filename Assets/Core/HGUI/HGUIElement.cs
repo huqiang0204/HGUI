@@ -13,7 +13,7 @@ namespace huqiang.Core.HGUI
         public Vector3 localScale;
         public bool active;
         public Transform trans;
-        public AsyncScript script;
+        public UIElement script;
     }
     public struct Batch
     {

@@ -3,8 +3,8 @@ using huqiang.Core.HGUI;
 using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(AsyncScript), true)]
-public class AsyncScriptEditor : Editor
+[CustomEditor(typeof(UIElement), true)]
+public class UIElementEditor : Editor
 {
     HCanvas FindHCanvas(Transform trans)
     {
@@ -17,7 +17,7 @@ public class AsyncScriptEditor : Editor
     }
     public void OnEnable()
     {
-        var scr = target as AsyncScript;
+        var scr = target as UIElement;
         if(scr!=null)
         {
             var can = FindHCanvas(scr.transform);
@@ -27,7 +27,7 @@ public class AsyncScriptEditor : Editor
     }
     public virtual void OnSceneGUI()
     {
-        var txt = target as AsyncScript;
+        var txt = target as UIElement;
         if (txt == null)
             return;
         Handles.color = Color.red;

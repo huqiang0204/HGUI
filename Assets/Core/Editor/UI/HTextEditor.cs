@@ -7,7 +7,7 @@ using UnityEngine;
 
 [CustomEditor(typeof(HText), true)]
 [CanEditMultipleObjects]
-public class HTextEditor:AsyncScriptEditor
+public class HTextEditor:UIElementEditor
 {
     Vector3 pos;
     Vector3 scale;

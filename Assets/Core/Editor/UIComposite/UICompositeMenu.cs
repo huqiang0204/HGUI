@@ -30,7 +30,7 @@ public static class UICompositeMenu
     static public void AddEmpty(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;
-        var go = new GameObject("Empty", typeof(AsyncScript));
+        var go = new GameObject("Empty", typeof(UIElement));
         var trans = go.transform;
         trans.SetParent(parent.transform);
         trans.localPosition = Vector3.zero;
@@ -219,7 +219,7 @@ public static class UICompositeMenu
         ss.AddComponent<ScrollHelper>();
         var rect = img.transform;
         var Item = new GameObject("Item");
-        var fr = Item.AddComponent<AsyncScript>();
+        var fr = Item.AddComponent<UIElement>();
         fr.SizeDelta = new Vector2(80, 80);
         var son = fr.transform;
         son.SetParent(rect);

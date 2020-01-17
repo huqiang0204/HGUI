@@ -5,7 +5,7 @@ using UnityEngine;
 
 [CustomEditor(typeof(HCanvas), true)]
 [CanEditMultipleObjects]
-public class HCanvasEditor:AsyncScriptEditor
+public class HCanvasEditor:UIElementEditor
 {
     //public override void OnSceneGUI()
     //{

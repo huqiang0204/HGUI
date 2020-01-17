@@ -300,7 +300,7 @@ namespace huqiang.UIEvent
         public Action<UserEvent, UserAction> LostFocus;
 
         UserAction FocusAction;
-        public AsyncScript Context;
+        public UIElement Context;
         public UserEvent()
         {
             Rectangular = new Vector3[4];

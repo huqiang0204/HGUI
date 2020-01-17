@@ -31,7 +31,7 @@ namespace huqiang.UIComposite
             } }
         public Vector2 vector;
         public Action<UIRocker> Rocking;
-        public override void Initial(FakeStruct fake,AsyncScript script)
+        public override void Initial(FakeStruct fake,UIElement script)
         {
             base.Initial(fake,script);
             callBack = script.RegEvent<UserEvent>();

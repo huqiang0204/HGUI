@@ -23,7 +23,7 @@ public class StackPanelHelper:UICompositeHelp
     }
     void OrderHorizontal()
     {
-        var scr = GetComponent<AsyncScript>();
+        var scr = GetComponent<UIElement>();
         if (scr != null)
         {
             var sx = scr.SizeDelta.x * -0.5f;
@@ -33,12 +33,11 @@ public class StackPanelHelper:UICompositeHelp
             for(int i=0;i<c;i++)
             {
                 var son = trans.GetChild(i);
-                var ss = son.GetComponent<AsyncScript>();
+                var ss = son.GetComponent<UIElement>();
                 float w = 0;
                 if(ss!=null)
                 {
                     w = ss.SizeDelta.x;
-                    ss.SizeDelta = new Vector2(w,y);
                 }
                 float os = sx + w * 0.5f;
                 son.localPosition = new Vector3(os,0,0);
@@ -49,7 +48,7 @@ public class StackPanelHelper:UICompositeHelp
     }
     void OrderVertical()
     {
-        var scr = GetComponent<AsyncScript>();
+        var scr = GetComponent<UIElement>();
         if (scr != null)
         {
             var sy = scr.SizeDelta.y * 0.5f;
@@ -59,12 +58,11 @@ public class StackPanelHelper:UICompositeHelp
             for (int i = 0; i < c; i++)
             {
                 var son = trans.GetChild(i);
-                var ss = son.GetComponent<AsyncScript>();
+                var ss = son.GetComponent<UIElement>();
                 float h = 0;
                 if (ss != null)
                 {
                     h = ss.SizeDelta.y;
-                    ss.SizeDelta = new Vector2(x, h);
                 }
                 float os = sy - h * 0.5f;
                 son.localPosition = new Vector3(0, os, 0);

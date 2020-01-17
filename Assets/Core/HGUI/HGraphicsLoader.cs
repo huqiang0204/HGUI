@@ -9,7 +9,7 @@ namespace huqiang.Core.HGUI
 {
     public unsafe struct HGraphicsData
     {
-        public AsyncScriptData scriptData;
+        public UIElementData scriptData;
         public Int32 shader;
         public Int32 asset;
         public Int32 MainTexture;
@@ -20,7 +20,7 @@ namespace huqiang.Core.HGUI
         public static int Size = sizeof(HGraphicsData);
         public static int ElementSize = Size / 4;
     }
-    public class HGraphicsLoader:AsyncScriptLoader
+    public class HGraphicsLoader:UIElementLoader
     {
         protected string shader;
         protected string asset;

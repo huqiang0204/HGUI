@@ -53,7 +53,7 @@ namespace huqiang.UIComposite
         public bool DynamicSize = true;
         Vector2 ctSize;
         float ctScale;
-        public override void Initial(FakeStruct mod, AsyncScript script)
+        public override void Initial(FakeStruct mod, UIElement script)
         {
             base.Initial(mod,script);
             eventCall = Enity.RegEvent<UserEvent>();

@@ -7,7 +7,7 @@
 		 [PerRendererData]_TTex("Sprite Texture", 2D) = "white" {}
 		 [PerRendererData]_FTex("Sprite Texture", 2D) = "white" {}
 		 _Color("Tint", Color) = (1,1,1,1)
-		 [PerRendererData]_ClipRect("_ClipRect",Vector) = (0,0,1,1)
+		 [PerRendererData]_Rect("_ClipRect",Vector) = (0,0,1,1)
 		 [PerRendererData]_FillColor("Fill color", Vector) = (0,0,0,0)
 	}
 
@@ -21,7 +21,6 @@
 				"PreviewType" = "Plane"
 				"CanUseSpriteAtlas" = "True"
 			}
-
 
 			Cull Off
 			Lighting Off
@@ -57,7 +56,7 @@
 					float4 vertex   : SV_POSITION;
 					fixed4 color : COLOR;
 					float2 uv  : TEXCOORD0;
-					float2   uv1 : TEXCOORD1;
+					float2 uv1 : TEXCOORD1;
 					float2 uv2 : TEXCOORD2;
 					UNITY_VERTEX_OUTPUT_STEREO
 				};
@@ -79,7 +78,7 @@
 				sampler2D _STex;
 				sampler2D _TTex;
 				sampler2D _FTex;
-				float4 _ClipRect;
+				float4 _Rect;
 				float4 _Color;
 				float4 _FillColor;
 				fixed4 frag(v2f IN) : SV_Target
@@ -131,7 +130,7 @@
 							}
 						}
                    }
-					if (IN.uv2.x < _ClipRect.x || IN.uv2.x > _ClipRect.z || IN.uv2.y < _ClipRect.y || IN.uv2.y > _ClipRect.w)
+					if (IN.uv2.x < _Rect.x || IN.uv2.x > _Rect.z || IN.uv2.y < _Rect.y || IN.uv2.y > _Rect.w)
 						color.a = 0;
 					return color;
 				}

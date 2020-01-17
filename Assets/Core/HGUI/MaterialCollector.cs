@@ -247,7 +247,7 @@ namespace huqiang.Core.HGUI
                     }
                     mat.SetVector("_FillColor", v);
                 }
-                mat.SetVector("_ClipRect", materials[i].clip);
+                mat.SetVector("_Rect", materials[i].clip);
                 mats[i] = mat;
             }
             return mats;

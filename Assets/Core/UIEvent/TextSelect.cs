@@ -86,7 +86,7 @@ namespace huqiang.UIEvent
             if (Pressed)
                 if (TextCom != null)
                 {
-                    Style = 1;
+                    Style = 2;
                     if (action.Motion != Vector2.zero)
                     {
                         var p = GetPressIndex(action, action.CanPosition - RawPosition);
@@ -328,7 +328,7 @@ namespace huqiang.UIEvent
                 case 0:
                     InputCaret.Hide();
                     break;
-                case 1:
+                case 2:
                     InputCaret.CaretStyle = 2;
                     if(ShowChanged)
                     {

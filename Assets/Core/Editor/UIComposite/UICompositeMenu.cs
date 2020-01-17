@@ -26,47 +26,64 @@ public static class UICompositeMenu
     private const string magicstick = "Magic-Stick";
     private const string box = "Border2";
 
-    [MenuItem("GameObject/HGUI/Empty", false, 0)]
+    [MenuItem("GameObject/HGUI/Canvas", false, 0)]
+    static public void AddCanvas(MenuCommand menuCommand)
+    {
+        GameObject parent = menuCommand.context as GameObject;
+        var go = new GameObject("Canvas", typeof(HCanvas));
+        var trans = go.transform;
+        trans.SetParent(parent.transform);
+        trans.localPosition = Vector3.zero;
+        trans.localScale = Vector3.one;
+        trans.localRotation = Quaternion.identity;
+        go.AddComponent<MeshFilter>();
+        go.AddComponent<MeshRenderer>();
+    }
+    [MenuItem("GameObject/HGUI/Empty", false, 1)]
     static public void AddEmpty(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;
         var go = new GameObject("Empty", typeof(UIElement));
         var trans = go.transform;
-        trans.SetParent(parent.transform);
+        if (parent != null)
+            trans.SetParent(parent.transform);
         trans.localPosition = Vector3.zero;
         trans.localScale = Vector3.one;
         trans.localRotation = Quaternion.identity;
     }
-    [MenuItem("GameObject/HGUI/Image", false, 1)]
+    [MenuItem("GameObject/HGUI/Image", false, 2)]
     static public void AddImage(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;
         var go = new GameObject("Image", typeof(HImage));
         var trans = go.transform;
-        trans.SetParent(parent.transform);
+        if (parent != null)
+            trans.SetParent(parent.transform);
         trans.localPosition = Vector3.zero;
         trans.localScale = Vector3.one;
         trans.localRotation = Quaternion.identity;
     }
-    [MenuItem("GameObject/HGUI/Text", false, 2)]
+    [MenuItem("GameObject/HGUI/Text", false, 3)]
     static public void AddText(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;
         var go = new GameObject("Text", typeof(HText));
         var trans = go.transform;
-        trans.SetParent(parent.transform);
+        if (parent != null)
+            trans.SetParent(parent.transform);
         trans.localPosition = Vector3.zero;
         trans.localScale = Vector3.one;
         trans.localRotation = Quaternion.identity;
     }
-    [MenuItem("GameObject/HGUI/InputBox", false, 3)]
+    [MenuItem("GameObject/HGUI/InputBox", false, 4)]
     static public void AddInputBox(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;
 
         var go = new GameObject("InputBox", typeof(HImage));
         var trans = go.transform;
-        trans.SetParent(parent.transform);
+        if (parent != null)
+            trans.SetParent(parent.transform);
         trans.localPosition = Vector3.zero;
         trans.localScale = Vector3.one;
         trans.localRotation = Quaternion.identity;

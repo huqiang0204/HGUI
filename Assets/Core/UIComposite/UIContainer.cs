@@ -200,8 +200,6 @@ namespace huqiang.UIComposite
             BindingData binding = new BindingData();
             binding.linker = linker;
             binding.Data = data;
-            //binding.high = high;
-            //binding.offset = end;
             datas.Add(binding);
         }
         Item CreateItem(BindingData data, int index)

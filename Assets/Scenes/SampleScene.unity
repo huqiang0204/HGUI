@@ -583,7 +583,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 176888502}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 10, y: -10, z: 0}
+  m_LocalPosition: {x: 10, y: -20, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1888617158}
@@ -608,7 +608,7 @@ MonoBehaviour:
   scaleType: 0
   anchorType: 2
   anchorPointType: 6
-  anchorOffset: {x: 110, y: -30}
+  anchorOffset: {x: 110, y: -40}
   marginType: 0
   parentType: 0
   margin:
@@ -703,7 +703,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  texIds: 6a490000000000000000000000000000
+  texIds: 96490000000000000000000000000000
   fillColors: 00000000
   m_sprite: {fileID: 21300052, guid: 976bc3d6b0309c34ea5ab78e8caa5a31, type: 3}
   m_spriteType: 0

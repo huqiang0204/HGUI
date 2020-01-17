@@ -36,6 +36,7 @@ namespace Assets.Scripts
             public string picName;
             public string name;
             public string content;
+            public Vector2 conSize;
         }
         class TipData
         {
@@ -63,8 +64,10 @@ namespace Assets.Scripts
             container = view.chatbox.composite as UIContainer;
             other = container.RegLinker<ChatItem, ChatData>("other");
             other.CalculItemHigh = GetContentSize;
+            other.ItemUpdate = ItemUpdate;
             self = container.RegLinker<ChatItem, ChatData>("self");
             self.CalculItemHigh = GetContentSize;
+            self.ItemUpdate = ItemUpdate;
             container.RegLinker<TipItem, TipData>("tip");
         }
         void SelectChanged(OptionGroup option,UserAction action)
@@ -104,7 +107,7 @@ namespace Assets.Scripts
                     chat = new ChatData();
                     chat.name = "江海胡";
                     chat.content = str;
-                    other.AddData(chat);
+                    self.AddData(chat);
                     container.Move(0);
                     break;
             }
@@ -112,10 +115,29 @@ namespace Assets.Scripts
         }
         float GetContentSize(ChatItem chat, ChatData data)
         {
-            Vector2 size = new Vector2(360, 60);
-            chat.content.GetPreferredHeight(ref size, data.content);
-            chat.content.SizeDelta = size;
-            return size.y;
+            if(data.conSize==Vector2.zero)
+            {
+                Vector2 size = new Vector2(360, 60);
+                chat.content.GetPreferredHeight(ref size, data.content);
+                size.y += 8;
+                data.conSize = size;
+            }
+            chat.content.SizeDelta = data.conSize;
+            var s= data.conSize;
+            s.x += 10;
+            s.y += 10;
+            chat.box.SizeDelta = s;
+            var ui = chat.box.transform.parent.GetComponent<UIElement>();
+            s.y += 40;
+            s.x = 600;
+            ui.SizeDelta = s;
+            UIElement.ResizeChild(ui);
+            return s.y;
+        }
+        void ItemUpdate(ChatItem chat,ChatData data,int index)
+        {
+            chat.content.Text = data.content;
+            chat.name.Text = data.name;
         }
         float GetTipSize(TipItem tip,TipData data)
         {

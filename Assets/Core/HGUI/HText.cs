@@ -326,8 +326,8 @@ namespace huqiang.Core.HGUI
             size.y = h;
             if (gen.lineCount == 1)
             {
-                var cha = gen.characters[gen.vertexCount];
-                size.x = cha.cursorPos.x + cha.charWidth * 1.1f;
+                var cha = gen.characters[gen.characterCountVisible];
+                size.x = cha.cursorPos.x + cha.charWidth * 1.1f + size.x * 0.5f;
             }
         }
     }

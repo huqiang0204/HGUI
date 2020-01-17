@@ -6,7 +6,7 @@
 		 [PerRendererData]_STex("Sprite Texture", 2D) = "white" {}
 		 [PerRendererData]_TTex("Sprite Texture", 2D) = "white" {}
 		 [PerRendererData]_FTex("Sprite Texture", 2D) = "white" {}
-		 _Color("Tint", Color) = (1,1,1,1)
+		 [PerRendererData]_Color("Tint", Color) = (1,1,1,1)
 		 [PerRendererData]_Rect("_ClipRect",Vector) = (0,0,1,1)
 		 [PerRendererData]_FillColor("Fill color", Vector) = (0,0,0,0)
 	}

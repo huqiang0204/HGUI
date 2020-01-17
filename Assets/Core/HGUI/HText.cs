@@ -131,7 +131,7 @@ namespace huqiang.Core.HGUI
                 m_dirty = true;
             } }
 
-        static TextGenerationSettings settings;
+        public static TextGenerationSettings settings;
         public void GetGenerationSettings(ref Vector2 size, ref TextGenerationSettings sett)
         {
             var font = Font;
@@ -317,6 +317,18 @@ namespace huqiang.Core.HGUI
                     _font = UnityEngine.Resources.GetBuiltinResource<Font>("Arial.ttf");
                 }
 #endif
+        }
+        public void GetPreferredHeight(ref Vector2 size, string str)
+        {
+            GetGenerationSettings(ref size, ref settings);
+            var gen = Generator;
+            float h = gen.GetPreferredHeight(str, settings);
+            size.y = h;
+            if (gen.lineCount == 1)
+            {
+                var cha = gen.characters[gen.characterCountVisible];
+                size.x = cha.cursorPos.x + cha.charWidth * 1.1f + size.x * 0.5f;
+            }
         }
     }
 }

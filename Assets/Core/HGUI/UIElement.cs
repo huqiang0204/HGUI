@@ -24,7 +24,8 @@ namespace huqiang.Core.HGUI
         ScrollY,
         GridScroll,
         Paint,
-        Rocker
+        Rocker,
+        UIContainer
     }
     public class UIElement:MonoBehaviour
     {
@@ -172,7 +173,7 @@ namespace huqiang.Core.HGUI
             float px = rect.localPosition.x;
             rect.localPosition = new Vector3(px, oy, 0);
         }
-        public static void Resize(UIElement script,bool child =true)
+        public static void Resize(UIElement script,bool child = true)
         {
             Transform rect = script.transform;
             Vector3 loclpos = rect.localPosition;
@@ -197,7 +198,6 @@ namespace huqiang.Core.HGUI
                 if (t != null)
                     psize = t.SizeDelta;
             }
-
             if (script.DesignSize.x == 0)
                 script.DesignSize.x = 1;
             if (script.DesignSize.y == 0)
@@ -255,14 +255,27 @@ namespace huqiang.Core.HGUI
                 case MarginType.MarginRatioY:
                     break;
             }
-            if (child)
-                for (int i = 0; i < rect.childCount; i++)
-                {
-                    var ss = rect.GetChild(i).GetComponent<UIElement>();
-                    if (ss != null)
-                        Resize(ss,child);
-                }
-            script.ReSized();
+            if (script.scaleType != ScaleType.None | script.anchorType != AnchorType.None | script.marginType != MarginType.None)
+            {
+                if (child)
+                    for (int i = 0; i < rect.childCount; i++)
+                    {
+                        var ss = rect.GetChild(i).GetComponent<UIElement>();
+                        if (ss != null)
+                            Resize(ss, child);
+                    }
+                script.ReSized();
+            }
+        }
+        public static void ResizeChild(UIElement script, bool child = true)
+        {
+            var rect = script.transform;
+            for (int i = 0; i < rect.childCount; i++)
+            {
+                var ss = rect.GetChild(i).GetComponent<UIElement>();
+                if (ss != null)
+                    Resize(ss, child);
+            }
         }
         #endregion
         [SerializeField]
@@ -343,6 +356,9 @@ namespace huqiang.Core.HGUI
                     break;
                 case CompositeType.Rocker:
                     new UIRocker().Initial(ex,script);
+                    break;
+                case CompositeType.UIContainer:
+                    new UIContainer().Initial(ex,script);
                     break;
             }
         }

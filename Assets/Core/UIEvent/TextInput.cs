@@ -275,10 +275,11 @@ namespace huqiang.UIEvent
 
         string m_TipString = "";
         string m_inputString="";
-        public string InputString { get { return m_inputString; }
+        public string InputString { get { return Text.FullString; }
             set {
-                m_inputString = value;
                 value = ValidateString(value);
+                Text.FullString = value;
+                m_inputString = value;
             } }
         public string TipString
         {

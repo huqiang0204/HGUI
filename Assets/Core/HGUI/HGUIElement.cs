@@ -15,24 +15,4 @@ namespace huqiang.Core.HGUI
         public Transform trans;
         public UIElement script;
     }
-    public struct Batch
-    {
-        public Material Fmaterial;
-        public Material Smaterial;
-        public Material Tmaterial;
-        public int MatCount;
-        public int CombineCount;
-        HGraphics current;
-        public void AddGraphics(HCanvas canvas, HGraphics graphics)
-        {
-            if (current == null)
-            {
-                current = graphics;
-            }
-            if (graphics.Mask)
-            {
-
-            }
-        }
-    }
 }

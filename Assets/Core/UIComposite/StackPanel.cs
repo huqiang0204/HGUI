@@ -98,8 +98,20 @@ namespace huqiang.UIComposite
         public List<UserEvent> MultiSelect;
         public void AddEvent(UserEvent user)
         {
+            if (user == null)
+                return;
             user.Click = Click;
+            user.AutoColor = false;
             userEvents.Add(user);
+        }
+        public void AddEvent(UIElement element)
+        {
+            if(element.userEvent==null)
+            {
+                element.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+                element.RegEvent<UserEvent>();
+            }
+            AddEvent(element.userEvent);
         }
         void Click(UserEvent user,UserAction action)
         {
@@ -130,6 +142,7 @@ namespace huqiang.UIComposite
             {
                 m_last = user;
                 m_select = null;
+                MultiSelect.Remove(user);
             }
             else
             {
@@ -146,7 +159,18 @@ namespace huqiang.UIComposite
         {
             get => m_select;
             set {
-                m_select = value;
+                if(userEvents.Contains(value))
+                {
+                    switch (options)
+                    {
+                        case OptionsType.Radio:
+                            Radio(value, null);
+                            break;
+                        case OptionsType.MultiChoice:
+                            MultiChoice(value, null);
+                            break;
+                    }
+                }
             }
         }
     }

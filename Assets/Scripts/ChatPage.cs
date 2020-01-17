@@ -31,6 +31,7 @@ namespace Assets.Scripts
             option.AddEvent(view.right.userEvent);
             option.AddEvent(view.center.userEvent);
             option.SelectChanged = SelectChanged;
+            option.Selecet = view.right.userEvent;
         }
         void SelectChanged(OptionGroup option,UserAction action)
         {

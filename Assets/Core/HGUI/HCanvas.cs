@@ -133,11 +133,11 @@ namespace huqiang.Core.HGUI
                 m_sizeDelta.y = h;
                 if(cam.orthographic)
                 {
-
+                    
                 }
                 else
                 {
-                    float near = cam.nearClipPlane + 0.1f;
+                    float near = cam.nearClipPlane + 0.01f;
                     float s = 2 / (float)h;
                     float o = MathH.Tan(cam.fieldOfView) / near;
                     s /= o;

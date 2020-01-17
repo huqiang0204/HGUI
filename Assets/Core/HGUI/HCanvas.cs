@@ -65,7 +65,7 @@ namespace huqiang.Core.HGUI
   
         private void Update()
         {
-            ApplyMesh();
+            ApplyCanvasRenderer();
             UserAction.Update();
             Keyboard.DispatchEvent();
             DispatchUserAction();
@@ -73,41 +73,13 @@ namespace huqiang.Core.HGUI
             MainMission();
             ThreadMission.ExtcuteMain();
         }
-        //MeshFilter meshFilter;
         Mesh mesh;
         CanvasRenderer render;
-        void ApplyMesh()
+        void ApplyCanvasRenderer()
         {
-            //if (meshFilter == null)
-            //    meshFilter = GetComponent<MeshFilter>();
-            //if (meshFilter != null)
-            //{
-            //    var mesh = meshFilter.mesh;
-            //    if (mesh == null)
-            //    {
-            //        mesh = new Mesh();
-            //        meshFilter.mesh = mesh;
-            //    }
-            //    mesh.Clear();
-            //    if (swapVertex != null)
-            //    {
-            //        mesh.vertices = swapVertex;
-            //        mesh.uv = swapUV;
-            //        mesh.uv2 = swapUV1;
-            //        mesh.uv3 = swapUV2;
-            //        mesh.colors32 = swapColors;
-            //        if(swapSubmesh!=null)
-            //        {
-            //            mesh.subMeshCount = swapSubmesh.Length;
-            //            for (int i = 0; i < swapSubmesh.Length; i++)
-            //                mesh.SetTriangles(swapSubmesh[i], i);
-            //        }
-            //    }
-            //}
-            //if (renderer == null)
-            //    renderer = GetComponent<MeshRenderer>();
-            //if (renderer != null)
-            //    renderer.materials = MatCollector.GenerateMaterial();
+            var rect = transform as RectTransform;
+            if (rect != null)
+                SizeDelta = rect.sizeDelta;
             render = GetComponent<CanvasRenderer>();
             if (render != null)
             {
@@ -135,20 +107,54 @@ namespace huqiang.Core.HGUI
                     render.SetMaterial(mats[i], i);
             }
         }
-       
+        MeshFilter meshFilter;
+        MeshRenderer renderer;
+        void ApplyMeshRenderer()
+        {
+            if (meshFilter == null)
+                meshFilter = GetComponent<MeshFilter>();
+            if (meshFilter != null)
+            {
+                var mesh = meshFilter.mesh;
+                if (mesh == null)
+                {
+                    mesh = new Mesh();
+                    meshFilter.mesh = mesh;
+                }
+                mesh.Clear();
+                if (swapVertex != null)
+                {
+                    mesh.vertices = swapVertex;
+                    mesh.uv = swapUV;
+                    mesh.uv2 = swapUV1;
+                    mesh.uv3 = swapUV2;
+                    mesh.colors32 = swapColors;
+                    if (swapSubmesh != null)
+                    {
+                        mesh.subMeshCount = swapSubmesh.Length;
+                        for (int i = 0; i < swapSubmesh.Length; i++)
+                            mesh.SetTriangles(swapSubmesh[i], i);
+                    }
+                }
+            }
+            if (renderer == null)
+                renderer = GetComponent<MeshRenderer>();
+            if (renderer != null)
+                renderer.materials = MatCollector.GenerateMaterial();
+        }
         void CheckSize()
         {
-            //switch(renderMode)
-            //{
-            //    case RenderMode.ScreenSpaceOverlay:
-            //        OverCamera(Camera.main);
-            //        break;
-            //    case RenderMode.ScreenSpaceCamera:
-            //        OverCamera(camera);
-            //        break;
-            //    case RenderMode.WorldSpace:
-            //        break;
-            //}
+            switch (renderMode)
+            {
+                case RenderMode.ScreenSpaceOverlay:
+                    OverCamera(Camera.main);
+                    break;
+                case RenderMode.ScreenSpaceCamera:
+                    OverCamera(camera);
+                    break;
+                case RenderMode.WorldSpace:
+                    break;
+            }
         }
         void OverCamera(Camera cam)
         {
@@ -322,7 +328,6 @@ namespace huqiang.Core.HGUI
             max = 0;
             TxtCollector.Clear();
             Collection(transform, -1, 0);
-            CheckSize();
             for (int i = 0; i < max; i++)
             {
                 var scr = scripts[i];
@@ -396,7 +401,6 @@ namespace huqiang.Core.HGUI
             max = 0;
             TxtCollector.Clear();
             Collection(transform, -1, 0);
-            CheckSize();
             int len = max;
             for (int i = 0; i < len; i++)
             {
@@ -413,40 +417,20 @@ namespace huqiang.Core.HGUI
                 scripts[i].MainUpdate();
             TxtCollector.GenerateTexture();
             SubMission(null);
-            //var mf = GetComponent<MeshFilter>();
-            //if (mf != null)
-            //{
-            //    var mesh = mf.sharedMesh;
-            //    if (mesh == null)
-            //    {
-            //        mesh = new Mesh();
-            //        mf.mesh = mesh;
-            //    }
-            //    mesh.Clear();
-            //    if (swapVertex != null)
-            //    {
-            //        mesh.vertices = swapVertex;
-            //        mesh.uv = swapUV;
-            //        mesh.uv2 = swapUV1;
-            //        mesh.uv3 = swapUV2;
-            //        mesh.colors32 = swapColors;
-            //        if (swapSubmesh != null)
-            //        {
-            //            mesh.subMeshCount = swapSubmesh.Length;
-            //            for (int i = 0; i < swapSubmesh.Length; i++)
-            //                mesh.SetTriangles(swapSubmesh[i], i);
-            //        }
-            //    }
-            //}
-            //var mr = GetComponent<MeshRenderer>();
-            //if (mr != null)
-            //    mr.sharedMaterials = MatCollector.GenerateMaterial();
-            var render = GetComponent<CanvasRenderer>();
-            if (render != null)
+            ApplyCanvasRenderer();
+        }
+        void ApplyShareMesh()
+        {
+            var mf = GetComponent<MeshFilter>();
+            if (mf != null)
             {
+                var mesh = mf.sharedMesh;
                 if (mesh == null)
+                {
                     mesh = new Mesh();
-                else mesh.Clear();
+                    mf.mesh = mesh;
+                }
+                mesh.Clear();
                 if (swapVertex != null)
                 {
                     mesh.vertices = swapVertex;
@@ -461,24 +445,10 @@ namespace huqiang.Core.HGUI
                             mesh.SetTriangles(swapSubmesh[i], i);
                     }
                 }
-                var mats = MatCollector.GenerateMaterial();
-                render.SetMesh(mesh);
-                render.materialCount = mats.Length;
-                for (int i = 0; i < mats.Length; i++)
-                    render.SetMaterial(mats[i], i);
             }
-        }
-        private void Reset()
-        {
-            UnityEditor.EditorApplication.update+= EUpdate;
-        }
-        void EUpdate()
-        {
-            Refresh();
-        }
-        private void OnDestroy()
-        {
-            UnityEditor.EditorApplication.update -= EUpdate;
+            var mr = GetComponent<MeshRenderer>();
+            if (mr != null)
+                mr.sharedMaterials = MatCollector.GenerateMaterial();
         }
 #endif
     }

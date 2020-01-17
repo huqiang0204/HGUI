@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class EditorModelManager
 {

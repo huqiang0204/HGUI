@@ -5,6 +5,7 @@ using huqiang.UIComposite;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UGUI;
 using UnityEditor;
 using UnityEngine;
@@ -39,6 +40,53 @@ public static class UICompositeMenu
         can.renderMode = RenderMode.ScreenSpaceOverlay;
         can.additionalShaderChannels = AdditionalCanvasShaderChannels.TexCoord1 | AdditionalCanvasShaderChannels.TexCoord2 | AdditionalCanvasShaderChannels.TexCoord3;
         go.AddComponent<CanvasRenderer>();
+    }
+    [MenuItem("GameObject/HGUI/Page", false, 1)]
+    static public void AddPage(MenuCommand menuCommand)
+    {
+        string path = EditorUtility.SaveFilePanel("CreatePage", Application.dataPath,"page", "cs");
+        FileStream fs1 = new FileStream(path, FileMode.Create, FileAccess.Write);//创建写入文件 
+        StreamWriter sw = new StreamWriter(fs1);
+        var paths = path.Split('/');
+        var classname = paths[paths.Length - 1];
+        classname = classname.Substring(0, classname.Length - 3);
+        sw.WriteLine(UIPageModel.GetPageModel(classname));//开始写入值
+        sw.Close();
+        fs1.Close();
+        Debug.Log(classname + ".cs Create done");
+        GameObject parent = menuCommand.context as GameObject;
+        var go = new GameObject(classname, typeof(UIElement));
+        var trans = go.transform;
+        if (parent != null)
+        {
+            HCanvas canvas = parent.GetComponent<HCanvas>();
+            if (canvas != null)
+                trans.SetParent(canvas.transform);
+            else
+            {
+                canvas = UnityEngine.Object.FindObjectOfType<HCanvas>();
+                if (canvas != null)
+                    trans.SetParent(canvas.transform);
+                else
+                {
+                    //创建Canvas并设置父级
+                }
+            }
+        }
+        else
+        {
+            var canvas = UnityEngine.Object.FindObjectOfType<HCanvas>();
+            if (canvas != null)
+                trans.SetParent(canvas.transform);
+            else
+            {
+                //创建Canvas并设置父级
+            }
+        }
+
+        trans.localPosition = Vector3.zero;
+        trans.localScale = Vector3.one;
+        trans.localRotation = Quaternion.identity;
     }
     [MenuItem("GameObject/HGUI/Empty", false, 1)]
     static public void AddEmpty(MenuCommand menuCommand)

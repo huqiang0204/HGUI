@@ -32,7 +32,6 @@ public static class UICompositeMenu
         GameObject parent = menuCommand.context as GameObject;
         var go = new GameObject("Canvas", typeof(HCanvas));
         var trans = go.transform;
-        trans.SetParent(parent.transform);
         trans.localPosition = Vector3.zero;
         trans.localScale = Vector3.one;
         trans.localRotation = Quaternion.identity;

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using huqiang.Core.HGUI;
 using huqiang.Data;
+using huqiang.UIEvent;
 using UnityEngine;
 
 namespace huqiang.UIComposite
@@ -81,6 +82,46 @@ namespace huqiang.UIComposite
                     sy -= h;
                 }
             }
+        }
+    }
+    public enum OptionsType
+    {
+        Radio,
+        MultiChoice
+    }
+    public class OptionGroup
+    {
+        public OptionsType options;
+        List<UserEvent> userEvents = new List<UserEvent>();
+        public void AddEvent(UserEvent user)
+        {
+            user.Click = Click;
+            userEvents.Add(user);
+        }
+        void Click(UserEvent user,UserAction action)
+        {
+            switch (options)
+            {
+                case OptionsType.Radio:
+                    Radio(user, action);
+                    break;
+                case OptionsType.MultiChoice:
+                    MultiChoice(user, action);
+                    break;
+            }
+        }
+        void Radio(UserEvent user,UserAction action)
+        {
+
+        }
+        void MultiChoice(UserEvent user,UserAction action)
+        {
+
+        }
+        public Action<OptionGroup,UserAction> SelectChanged;
+        public UserEvent Selecet
+        {
+            get; set;
         }
     }
 }

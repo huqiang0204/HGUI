@@ -422,8 +422,8 @@ namespace huqiang.UIEvent
                 }
             }
         }
-        public CharacterValidation characterValidation = CharacterValidation.None;
-        public TouchScreenKeyboardType touchType = TouchScreenKeyboardType.Default;
+        CharacterValidation characterValidation = CharacterValidation.None;
+        TouchScreenKeyboardType touchType = TouchScreenKeyboardType.Default;
         public int CharacterLimit = 0;
         int pressOffset;
         internal override void Initial(FakeStruct mod)

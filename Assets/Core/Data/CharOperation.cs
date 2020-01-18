@@ -148,10 +148,23 @@ namespace huqiang.Data
             }
             return (char)0;
         }
-        public static void Validate(CharacterValidation validat,string text,int count)
+        public static string Validate(CharacterValidation validat, string text, int count)
         {
-            
-
+            if (count > 0)
+                if (count > text.Length)
+                    text = text.Substring(0,count);
+            switch(validat)
+            {
+                case CharacterValidation.Integer:
+                    return ValidateInteger(text);
+                case CharacterValidation.Decimal:
+                    return ValidateDecimal(text);
+                case CharacterValidation.Alphanumeric:
+                    return ValidateAlphanumeric(text);
+                case CharacterValidation.EmailAddress:
+                    return ValidateEmailAddress(text);
+            }
+            return text;
         }
         public static string ValidateInteger(string str)
         {

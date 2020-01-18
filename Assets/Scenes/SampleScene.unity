@@ -3282,7 +3282,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2312e0734288d14b9ca518afd43ee0e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_sizeDelta: {x: 600, y: 100}
+  m_sizeDelta: {x: 600, y: 108}
   Pivot: {x: 0.5, y: 0.5}
   DesignSize: {x: 1, y: 1}
   scaleType: 0
@@ -3308,7 +3308,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  texIds: 96490000000000000000000000000000
+  texIds: c4490000000000000000000000000000
   fillColors: 00000000
   m_sprite: {fileID: 21300044, guid: 976bc3d6b0309c34ea5ab78e8caa5a31, type: 3}
   m_spriteType: 1
@@ -3762,7 +3762,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f25e2f8db5c86484ca21b4cbba5a8220, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_sizeDelta: {x: 580, y: 80}
+  m_sizeDelta: {x: 580, y: 88}
   Pivot: {x: 0.5, y: 0.5}
   DesignSize: {x: 1, y: 1}
   scaleType: 0

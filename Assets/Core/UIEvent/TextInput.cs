@@ -537,13 +537,10 @@ namespace huqiang.UIEvent
         {
             if (input == "")
                 return "";
-            //textInfo.buffer = new EmojiString(input);
-            //if (OnValueChanged != null)
-            //    OnValueChanged(this);
-            //textInfo.text = textInfo.buffer.FullString;
-            //SetShowText();
-            //textInfo.CaretStyle = 1;
-            //ChangePoint(textInfo, this);
+            Text.FullString = input;
+            if (OnValueChanged != null)
+                OnValueChanged(this);
+            SetShowText();
             return input;
         }
         public bool Editing;

@@ -152,8 +152,8 @@ namespace huqiang.Data
         {
             if (count > 0)
                 if (count > text.Length)
-                    text = text.Substring(0,count);
-            switch(validat)
+                    text = text.Substring(0, count);
+            switch (validat)
             {
                 case CharacterValidation.Integer:
                     return ValidateInteger(text);

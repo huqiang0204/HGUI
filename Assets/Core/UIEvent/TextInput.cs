@@ -307,7 +307,9 @@ namespace huqiang.UIEvent
             else
             {
                 TextCom.Chromatically = textColor;
-                TextCom.Text = str;
+                if (contentType == ContentType.Password)
+                    TextCom.Text = new string('*',str.Length);
+                else TextCom.Text = str;
             }
         }
         public bool ReadOnly;

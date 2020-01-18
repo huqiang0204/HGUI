@@ -16,7 +16,6 @@ public class TextInputHelper:UICompositeHelp
     public int CharacterLimit;
     public bool ReadyOnly;
     public ContentType contentType;
-    public InputType inputType;
     public LineType lineType;
     public unsafe override object ToBufferData(DataBuffer data)
     {
@@ -28,6 +27,10 @@ public class TextInputHelper:UICompositeHelp
         sp->selectColor = selectColor;
         sp->inputString = data.AddData(InputString);
         sp->tipString = data.AddData(TipString);
+        sp->CharacterLimit = CharacterLimit;
+        sp->ReadyOnly = ReadyOnly;
+        sp->contentType = contentType;
+        sp->lineType = lineType;
         return fake;
     }
     public override void Refresh()

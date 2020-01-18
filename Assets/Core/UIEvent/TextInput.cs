@@ -41,6 +41,10 @@ namespace huqiang.UIEvent
         public Color selectColor;
         public Int32 inputString;
         public Int32 tipString;
+        public int CharacterLimit;
+        public bool ReadyOnly;
+        public ContentType contentType;
+        public LineType lineType;
         public static int Size = sizeof(TextInputData);
         public static int ElementSize = Size / 4;
     }

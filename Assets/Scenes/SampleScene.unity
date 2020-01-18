@@ -153,7 +153,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01f5931446cde5c4aa7fe1a673961591, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_sizeDelta: {x: 1920, y: 1080}
+  m_sizeDelta: {x: 640, y: 480}
   Pivot: {x: 0.5, y: 0.5}
   DesignSize: {x: 1, y: 1}
   scaleType: 0
@@ -2073,6 +2073,11 @@ MonoBehaviour:
   selectColor: {r: 0.65882, g: 0.8078, b: 1, a: 0.2}
   InputString: 
   TipString: "\u8BF7\u8F93\u5165..."
+  CharacterLimit: 0
+  ReadyOnly: 0
+  contentType: 0
+  inputType: 0
+  lineType: 0
 --- !u!1 &1283298041
 GameObject:
   m_ObjectHideFlags: 0
@@ -3750,6 +3755,11 @@ MonoBehaviour:
   selectColor: {r: 0.65882, g: 0.8078, b: 1, a: 0.2}
   InputString: 
   TipString: "\u8BF7\u8F93\u5165..."
+  CharacterLimit: 0
+  ReadyOnly: 0
+  contentType: 0
+  inputType: 0
+  lineType: 0
 --- !u!114 &2110037610
 MonoBehaviour:
   m_ObjectHideFlags: 0

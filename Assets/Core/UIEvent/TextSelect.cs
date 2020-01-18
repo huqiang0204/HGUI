@@ -368,10 +368,10 @@ namespace huqiang.UIEvent
         protected string GetShowString()
         {
             int s = lines[ShowStart].StartIndex;
-            int end = ShowStart + ShowRow + 1;
+            int end = ShowStart + ShowRow;
             int e = cha.Length;
             if (end < LineCount)
-                e = lines[end].StartIndex - 1;
+                e = lines[end].StartIndex;
             return Text.SubString(s, e - s);
         }
         protected void MoveUp()

@@ -135,7 +135,6 @@ namespace huqiang.Core.HGUI
         public void GetGenerationSettings(ref Vector2 size, ref TextGenerationSettings sett)
         {
             var font = Font;
-            emojiString.FullString = m_text;
             sett.font = font;
             sett.pivot = TextPivot;
             sett.generationExtents = size;
@@ -158,6 +157,7 @@ namespace huqiang.Core.HGUI
         internal IList<UICharInfo> uIChars;
         public void Populate()
         {
+            emojiString.FullString = m_text;
             GetGenerationSettings(ref m_sizeDelta,ref settings);
             var g = Generator;
             g.Populate(emojiString.FilterString, settings);

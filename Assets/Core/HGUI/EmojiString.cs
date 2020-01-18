@@ -84,8 +84,11 @@ namespace huqiang.Core.HGUI
                 for (int j = 0; j < emojis.Count; j++)
                 {
                     if (emojis[j].pos == index)
+                    {
                         chr = emojis[j].chr;
-                    else if (emojis[j].pos > i)
+                        break;
+                    }
+                    else if (emojis[j].pos > index)
                         break;
                 }
                 if (chr == null)

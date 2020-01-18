@@ -7,6 +7,32 @@ using UnityEngine;
 
 namespace huqiang.UIEvent
 {
+    public enum ContentType
+    {
+        Standard,
+        Autocorrected,
+        IntegerNumber,
+        DecimalNumber,
+        Alphanumeric,
+        Name,
+        NumberAndName,
+        EmailAddress,
+        Password,
+        Pin,
+        Custom
+    }
+    public enum InputType
+    {
+        Standard,
+        AutoCorrect,
+        Password,
+    }
+    public enum LineType
+    {
+        SingleLine,
+        MultiLineSubmit,
+        MultiLineNewline
+    }
     public unsafe struct TextInputData
     {
         public Color inputColor;
@@ -27,32 +53,6 @@ namespace huqiang.UIEvent
             Continue,
             NewLine,
             Finish
-        }
-        public enum ContentType
-        {
-            Standard,
-            Autocorrected,
-            IntegerNumber,
-            DecimalNumber,
-            Alphanumeric,
-            Name,
-            NumberAndName,
-            EmailAddress,
-            Password,
-            Pin,
-            Custom
-        }
-        public enum InputType
-        {
-            Standard,
-            AutoCorrect,
-            Password,
-        }
-        public enum LineType
-        {
-            SingleLine,
-            MultiLineSubmit,
-            MultiLineNewline
         }
         #endregion
         #region static

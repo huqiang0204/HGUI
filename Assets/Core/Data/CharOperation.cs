@@ -148,6 +148,120 @@ namespace huqiang.Data
             }
             return (char)0;
         }
+        public static void Validate(CharacterValidation validat,string text,int count)
+        {
+            
 
+        }
+        public static string ValidateInteger(string str)
+        {
+            int len = str.Length;
+            for(int i=0;i<str.Length;i++)
+            {
+                if (str[i] < '0' | str[i] > '9')
+                {
+                    len = i;
+                    break;
+                }
+            }
+            if (len == str.Length)
+                return str;
+            if (len == 0)
+                return "";
+            return str.Substring(0,len);
+        }
+        public static string ValidateDecimal(string str)
+        {
+            bool point = false;
+            int len = str.Length;
+            for (int i = 0; i < str.Length; i++)
+            {
+                if (str[i] < '0' | str[i] > '9')
+                {
+                    if (!point)
+                        if (str[i] == '.')
+                        {
+                            point = true;
+                            continue;
+                        }
+                    len = i;
+                    break;
+                }
+            }
+            if (len == str.Length)
+                return str;
+            if (len == 0)
+                return "";
+            return str.Substring(0, len);
+        }
+        public static string ValidateAlphanumeric(string str)
+        {
+            int len = str.Length;
+            for (int i = 0; i < str.Length; i++)
+            {
+                if (str[i] < '0' | str[i] > '9')
+                    if (str[i] < 'a' | str[i] > 'z')
+                        if (str[i] < 'A' | str[i] > 'Z')
+                        {
+                            len = i;
+                            break;
+                        }
+            }
+            if (len == str.Length)
+                return str;
+            if (len == 0)
+                return "";
+            return str.Substring(0, len);
+        }
+        public static string ValidateEmailAddress(string str)
+        {
+            int len = str.Length;
+            bool point = false;
+            bool at = false;
+            char chr= str[0];
+            for (int i = 0; i < str.Length; i++)
+            {
+                if (str[i] < '0' | str[i] > '9')
+                    if (str[i] < 'a' | str[i] > 'z')
+                        if (str[i] < 'A' | str[i] > 'Z')
+                        {
+                            if (str[i] == '@')
+                            {
+                                if (i == 0)
+                                    break;
+                                if (!at)
+                                {
+                                   if(!point)
+                                    {
+                                        at = true;
+                                        continue;
+                                    }
+                                }
+
+                            }
+                            else if (str[i] == '.')
+                            {
+                                if (chr == '@')
+                                    break;
+                                if (!point)
+                                {
+                                    if(at)
+                                    {
+                                        point = true;
+                                        continue;
+                                    }
+                                }
+                            }
+                            len = i;
+                            break;
+                        }
+                chr = str[i];
+            }
+            if (len == str.Length)
+                return str;
+            if (len == 0)
+                return "";
+            return str.Substring(0, len);
+        }
     }
 }

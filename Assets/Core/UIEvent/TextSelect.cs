@@ -13,7 +13,6 @@ namespace huqiang.UIEvent
     {
         public int Row;
         public int Offset;
-        public int Index;
     }
     struct LineInfo
     {
@@ -74,7 +73,7 @@ namespace huqiang.UIEvent
             Focus = true;
             if (TextCom != null)
             {
-                StartPress = GetPressIndex(action, Vector2.zero);
+                EndPress = StartPress = GetPressIndex(action, Vector2.zero);
                 InputCaret.SetParent(TextCom.transform);
                 InputCaret.Active();
                 ShowChanged = true;
@@ -90,7 +89,7 @@ namespace huqiang.UIEvent
                     if (action.Motion != Vector2.zero)
                     {
                         var p = GetPressIndex(action, action.CanPosition - RawPosition);
-                        if (p.Index != EndPress.Index)
+                        if (p.Offset != EndPress.Offset | p.Row != EndPress.Row)
                             ShowChanged = true;
                         EndPress = p;
                     }
@@ -114,7 +113,7 @@ namespace huqiang.UIEvent
                                 MoveUp();
                             else MoveDown();
                             var p = GetPressIndex(action, action.CanPosition - RawPosition);
-                            if (p.Index != EndPress.Index)
+                            if (p.Offset != EndPress.Offset | p.Row != EndPress.Row)
                                 ShowChanged = true;
                             EndPress = p;
                         }
@@ -217,7 +216,6 @@ namespace huqiang.UIEvent
             info.Offset = os;
             if (os >= lines[r].Count)
                 os--;
-            info.Index= lines[r].StartIndex+ os;
             return info;
         }
         int GetPressLine(float y,float dir)
@@ -355,8 +353,8 @@ namespace huqiang.UIEvent
         {
             if (Style == 0)
                 return "";
-            int s = StartPress.Index;
-            int e = EndPress.Index;
+            int s = StartIndex;
+            int e = EndIndex;
             if (s == e)
                 return "";
             if (s > e)
@@ -442,7 +440,7 @@ namespace huqiang.UIEvent
         Vector2Int GetSelectLineRange(int row)
         {
             Vector2Int v2 = Vector2Int.zero;
-            if (StartPress.Index > EndPress.Index)
+            if (StartIndex > EndIndex)
             {
                 if (EndPress.Row == row)
                 {
@@ -528,12 +526,7 @@ namespace huqiang.UIEvent
         {
             Style = 1;
             StartPress.Row = 0;
-            StartPress.Index = 0;
             StartPress.Offset = 0;
-            if (cha != null)
-                EndPress.Index = cha.Length - 1;
-            if (EndPress.Index < 0)
-                EndPress.Index = 0;
             if (lines != null)
             {
                 if (lines.Length > 0)
@@ -541,6 +534,44 @@ namespace huqiang.UIEvent
                     EndPress.Row = lines.Length - 1;
                     EndPress.Offset = lines[StartPress.Row].Count;
                 }
+            }
+        }
+        public int StartIndex
+        {
+            get { return lines[StartPress.Row].StartIndex + StartPress.Offset; }
+            set { SetIndex(ref StartPress, value); }
+        }
+        public int EndIndex
+        {
+            get { return lines[EndPress.Row].StartIndex + EndPress.Offset; }
+            set { SetIndex(ref EndPress, value); }
+        }
+        void SetIndex(ref PressInfo press,int index)
+        {
+            if (index <= 0)
+            {
+                press.Row = 0;
+                press.Offset = 0;
+            }
+            else if (index > cha.Length)
+            {
+                press.Row = lines.Length - 1;
+                press.Offset = lines[StartPress.Row].Count;
+            }
+            else
+            {
+                int c = lines.Length - 1;
+                for (int i = c; i >= 0; i--)
+                {
+                    if (lines[i].StartIndex < index)
+                    {
+                        press.Row = i;
+                        press.Offset = index - lines[i].StartIndex;
+                        return;
+                    }
+                }
+                press.Row = 0;
+                press.Offset = index;
             }
         }
     }

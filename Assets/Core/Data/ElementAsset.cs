@@ -161,27 +161,6 @@ namespace huqiang.Data
             }
             return sprites;
         }
-        public static void FindSpriteAsync(string bundle, string tname, string name, Action<Sprite> callBack)
-        {
-            Sprite result=null;
-            ThreadMission.InvokeToMain(
-                (o)=> { result = FindSprite(bundle,tname,name); },null,
-                (e)=> {if(callBack!=null) callBack(result); });
-        }
-        public static void FindSpritesAsync(string bundle, string tname, string[] names,Action<Sprite[]> callBack)
-        {
-            Sprite[] result = null;
-            ThreadMission.InvokeToMain(
-                (o) => { result = FindSprites(bundle, tname, names); }, null,
-                (e) => { if (callBack != null) callBack(result); });
-        }
-        public static void FindSpritesAsync(string bundle, string tname, string[][] names, Action<Sprite[][]> callBack)
-        {
-            Sprite[][] result = null;
-            ThreadMission.InvokeToMain(
-                (o) => { result = FindSprites(bundle, tname, names); }, null,
-                (e) => { if (callBack != null) callBack(result); });
-        }
         class SpriteData
         {
             public string name;

@@ -1,4 +1,5 @@
 ﻿using huqiang;
+using huqiang.Core.HGUI;
 using huqiang.Data;
 using huqiang.UI;
 using System.IO;
@@ -66,7 +67,8 @@ public class TestPageHelperEditor : Editor
                 Directory.CreateDirectory(dc);
         }
         dc += Assetname;
-        InitialUI();
+        HGUIManager.Initial(gameObject.transform);
+        HGUIManager.SavePrefab(gameObject.transform, dc);
         Debug.Log("create done path:"+dc);
     }
     static void Clone(string CloneName, byte[] ui, Transform root)
@@ -77,7 +79,7 @@ public class TestPageHelperEditor : Editor
                 if (CloneName != "")
                 {
                     LoadBundle();
-                    InitialUI();
+
                     //ModelManagerUI.LoadModels(ui, "assTest");
                     //EditorModelManager.LoadToGame(CloneName, null, root, "");
                 }
@@ -94,9 +96,5 @@ public class TestPageHelperEditor : Editor
             //element.Load(all.models.ModData);
             //element.Apply();
         }
-    }
-    static void InitialUI()
-    {
-        
     }
 }

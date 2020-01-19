@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using huqiang.Data;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,8 +13,9 @@ public class ButtonTest : TestPageHelper
 #endif
 #if UNITY_EDITOR
         UIPage.LoadPage<ButtonPage>();
+
 #else
-        ElementAsset.LoadAssetsAsync("base.unity3d",(o,e)=> { UIPage.LoadPage<AniTestPage>(); });
+          ElementAsset.LoadAssetsAsync("base.unity3d", (o, e) => { UIPage.LoadPage<ButtonPage>(); });
 #endif
     }
 }

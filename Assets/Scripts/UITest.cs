@@ -17,7 +17,7 @@ public class UITest : TestPageHelper
 #if UNITY_EDITOR
         UIPage.LoadPage<ChatPage>();
 #else
-        ElementAsset.LoadAssetsAsync("base.unity3d",(o,e)=> { UIPage.LoadPage<AniTestPage>(); });
+        ElementAsset.LoadAssetsAsync("base.unity3d",(o,e)=> { UIPage.LoadPage<ChatPage>(); });
 #endif
     }
 }

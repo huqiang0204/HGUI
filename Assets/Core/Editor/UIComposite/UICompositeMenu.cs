@@ -35,10 +35,8 @@ public static class UICompositeMenu
         trans.localPosition = Vector3.zero;
         trans.localScale = Vector3.one;
         trans.localRotation = Quaternion.identity;
-        var can = go.AddComponent<Canvas>();
-        can.renderMode = RenderMode.ScreenSpaceOverlay;
-        can.additionalShaderChannels = AdditionalCanvasShaderChannels.TexCoord1 | AdditionalCanvasShaderChannels.TexCoord2 | AdditionalCanvasShaderChannels.TexCoord3;
-        go.AddComponent<CanvasRenderer>();
+        go.AddComponent<MeshRenderer>();
+        go.AddComponent<MeshFilter>();
     }
     [MenuItem("GameObject/HGUI/Page", false, 1)]
     static public void AddPage(MenuCommand menuCommand)

@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace huqiang.Core.HGUI
 {
-    public sealed class HCanvas:UIElement
+    public class HCanvas:UIElement
     {
         public Camera camera;
         public RenderMode renderMode;

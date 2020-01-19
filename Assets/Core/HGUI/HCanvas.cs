@@ -74,40 +74,6 @@ namespace huqiang.Core.HGUI
             MainMission();
             ThreadMission.ExtcuteMain();
         }
-        Mesh mesh;
-        CanvasRenderer render;
-        void ApplyCanvasRenderer()
-        {
-            var rect = transform as RectTransform;
-            if (rect != null)
-                SizeDelta = rect.sizeDelta;
-            render = GetComponent<CanvasRenderer>();
-            if (render != null)
-            {
-                if (mesh == null)
-                    mesh = new Mesh();
-                else mesh.Clear();
-                if (swapVertex != null)
-                {
-                    mesh.vertices = swapVertex;
-                    mesh.uv = swapUV;
-                    mesh.uv2 = swapUV1;
-                    mesh.uv3 = swapUV2;
-                    mesh.colors32 = swapColors;
-                    if (swapSubmesh != null)
-                    {
-                        mesh.subMeshCount = swapSubmesh.Length;
-                        for (int i = 0; i < swapSubmesh.Length; i++)
-                            mesh.SetTriangles(swapSubmesh[i], i);
-                    }
-                }
-                var mats = MatCollector.GenerateMaterial();
-                render.SetMesh(mesh);
-                render.materialCount = mats.Length;
-                for (int i = 0; i < mats.Length; i++)
-                    render.SetMaterial(mats[i], i);
-            }
-        }
         MeshFilter meshFilter;
         MeshRenderer renderer;
         void ApplyMeshRenderer()
@@ -189,7 +155,7 @@ namespace huqiang.Core.HGUI
                 }
             }
         }
-
+        #region 鼠标和触屏事件
         /// <summary>
         /// 派发用户输入指令信息
         /// </summary>
@@ -321,13 +287,13 @@ namespace huqiang.Core.HGUI
                 action.LoadMouse();
             }
         }
-       
         void ClearAllAction()
         {
             if (inputs != null)
                 for (int i = 0; i < inputs.Length; i++)
                     inputs[i].Clear();
         }
+        #endregion
         #region UI绘制与合批
         void MainMission()
         {
@@ -397,6 +363,7 @@ namespace huqiang.Core.HGUI
             colors.Clear();
         }
         #endregion
+        #region 编辑器状态刷新网格
 #if UNITY_EDITOR
         public void Refresh()
         {
@@ -459,5 +426,6 @@ namespace huqiang.Core.HGUI
                 mr.sharedMaterials = MatCollector.GenerateMaterial();
         }
 #endif
+        #endregion
     }
 }

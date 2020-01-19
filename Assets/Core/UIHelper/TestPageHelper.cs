@@ -11,7 +11,7 @@ using UnityEngine;
 /// <summary>
 /// 挂载在Canvas下
 /// </summary>
-public class TestHelper:UICompositeHelp
+public class TestPageHelper:UICompositeHelp
 {
     public virtual void LoadBundle()
     {
@@ -31,7 +31,10 @@ public class TestHelper:UICompositeHelp
         } 
 #endif
     }
+    public TextAsset bytesUI;
     public string AssetName = "baseUI";
+    public string dicpath;
+    public string CloneName;
     private void Awake()
     {
         Initital();

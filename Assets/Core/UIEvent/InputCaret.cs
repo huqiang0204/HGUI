@@ -1,5 +1,4 @@
 ﻿using huqiang.Core.HGUI;
-using UGUI;
 using UnityEngine;
 
 namespace huqiang.UIEvent

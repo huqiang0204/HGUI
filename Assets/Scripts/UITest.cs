@@ -6,7 +6,7 @@ using UnityEngine;
 using huqiang;
 using Assets.Scripts;
 
-public class UITest : TestHelper
+public class UITest : TestPageHelper
 {
     public override void LoadTestPage()
     {

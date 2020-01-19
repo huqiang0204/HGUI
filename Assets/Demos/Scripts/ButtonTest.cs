@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ButtonTest : TestHelper
+public class ButtonTest : TestPageHelper
 {
     public override void LoadTestPage()
     {

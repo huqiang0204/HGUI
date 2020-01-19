@@ -25,7 +25,7 @@
 			Cull Off
 			Lighting Off
 			ZWrite Off
-			ZTest[unity_GUIZTestMode]
+			ZTest Off //[unity_GUIZTestMode]
 			Blend SrcAlpha OneMinusSrcAlpha
 
 			Pass

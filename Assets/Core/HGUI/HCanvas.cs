@@ -65,7 +65,8 @@ namespace huqiang.Core.HGUI
   
         private void Update()
         {
-            ApplyCanvasRenderer();
+            CheckSize();
+            ApplyMeshRenderer();
             UserAction.Update();
             Keyboard.DispatchEvent();
             DispatchUserAction();
@@ -166,7 +167,13 @@ namespace huqiang.Core.HGUI
                 m_sizeDelta.y = h;
                 if(cam.orthographic)
                 {
-                    
+                    float os = cam.orthographicSize * 2;
+                    float s = os / (float)h;
+                    transform.localScale = new Vector3(s, s, s);
+                    Vector3 pos = cam.transform.position;
+                    Vector3 forward = cam.transform.forward;
+                    transform.position = pos + forward;
+                    transform.forward = forward;
                 }
                 else
                 {
@@ -417,7 +424,8 @@ namespace huqiang.Core.HGUI
                 scripts[i].MainUpdate();
             TxtCollector.GenerateTexture();
             SubMission(null);
-            ApplyCanvasRenderer();
+            CheckSize();
+            ApplyShareMesh();
         }
         void ApplyShareMesh()
         {

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using UGUI;
 using UnityEngine;
 
 namespace huqiang.Core.HGUI
@@ -135,7 +134,6 @@ namespace huqiang.Core.HGUI
         public void GetGenerationSettings(ref Vector2 size, ref TextGenerationSettings sett)
         {
             var font = Font;
-            emojiString.FullString = m_text;
             sett.font = font;
             sett.pivot = TextPivot;
             sett.generationExtents = size;
@@ -158,6 +156,7 @@ namespace huqiang.Core.HGUI
         internal IList<UICharInfo> uIChars;
         public void Populate()
         {
+            emojiString.FullString = m_text;
             GetGenerationSettings(ref m_sizeDelta,ref settings);
             var g = Generator;
             g.Populate(emojiString.FilterString, settings);
@@ -193,21 +192,31 @@ namespace huqiang.Core.HGUI
             HVertex[] hv = new HVertex[c];
            
             int e = c / 4;
-            int all = e * 6;
-            int b = emojis.Count * 6;
-            int a = all - b;
-            int[] triA = new int[a];
-            int[] triB = new int[b];
+           
             for (int i = 0; i < c; i++)
             {
                 hv[i].position = verts[i].position;
                 hv[i].color = verts[i].color;
                 hv[i].uv = verts[i].uv0;
             }
-
-            int ec = emojis.Count;
-            if (ec > 0)
+            int b = emojis.Count;
+            for (int i=0; i < emojis.Count; i++)
             {
+                if (emojis[i].pos > e)
+                {
+                    b = i;
+                    break;
+                }
+            }
+            if (b > 0)
+            {
+                int be = b;
+                b  *= 6;
+                int all = e * 6;
+                int a = all - b;
+                int[] triA = new int[a];
+                int[] triB = new int[b];
+
                 int[] offset = new int[c];
                 var info = emojis[0];
                 int si = 1;
@@ -235,7 +244,7 @@ namespace huqiang.Core.HGUI
                         hv[o].uv = info.uv[3];
                         hv[o].color = col;
                         hv[o].picture = 1;
-                        if (si < ec)
+                        if (si < be)
                             info = emojis[si];
                         si++;
                         int p = i * 4;

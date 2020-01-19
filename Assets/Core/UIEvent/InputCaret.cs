@@ -1,5 +1,4 @@
 ﻿using huqiang.Core.HGUI;
-using UGUI;
 using UnityEngine;
 
 namespace huqiang.UIEvent
@@ -28,7 +27,7 @@ namespace huqiang.UIEvent
             }
         }
         static float time;
-        public static int CaretStyle = 1;
+        public static int CaretStyle = 0;
         public static void UpdateCaret()
         {
             switch (CaretStyle)
@@ -45,6 +44,8 @@ namespace huqiang.UIEvent
                     }
                     else
                     {
+                        if (TextInput.InputEvent != null)
+                            TextInput.InputEvent.SetPressPointer();
                         Caret.gameObject.SetActive(true);
                     }
                     break;

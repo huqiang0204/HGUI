@@ -2,21 +2,18 @@
 using huqiang.Data;
 using huqiang.UI;
 using System.IO;
-using UGUI;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UI;
 
-[CustomEditor(typeof(ElementCreate), true)]
-[CanEditMultipleObjects]
-public class ElementEditor : Editor
+[CustomEditor(typeof(TestPageHelper), true)]
+public class TestPageHelperEditor : Editor
 {
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
         EditorGUILayout.Space();
         serializedObject.Update();
-        ElementCreate ele = target as ElementCreate;
+        TestPageHelper ele = target as TestPageHelper;
         if (GUILayout.Button("Clear All AssetBundle"))
         {
             AssetBundle.UnloadAllAssetBundles(true);
@@ -24,7 +21,7 @@ public class ElementEditor : Editor
         }
         if (GUILayout.Button("Create"))
         {
-            Create(ele.Assetname, ele.dicpath, ele.gameObject);
+            Create(ele.AssetName+".bytes", ele.dicpath, ele.gameObject);
         }
         if (GUILayout.Button("Clone"))
         {
@@ -65,6 +62,8 @@ public class ElementEditor : Editor
         if (dc == null | dc == "")
         {
             dc = Application.dataPath + "/AssetsBundle/";
+            if (!Directory.Exists(dc))
+                Directory.CreateDirectory(dc);
         }
         dc += Assetname;
         InitialUI();
@@ -77,8 +76,8 @@ public class ElementEditor : Editor
             if (CloneName != null)
                 if (CloneName != "")
                 {
-                    //LoadBundle();
-                    //InitialUI();
+                    LoadBundle();
+                    InitialUI();
                     //ModelManagerUI.LoadModels(ui, "assTest");
                     //EditorModelManager.LoadToGame(CloneName, null, root, "");
                 }

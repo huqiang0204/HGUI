@@ -1,7 +1,6 @@
 ﻿using huqiang.Data;
 using huqiang.UI;
 using huqiang.UIEvent;
-using UGUI;
 using UnityEngine;
 using UnityEngine.UI;
 

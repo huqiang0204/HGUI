@@ -25,6 +25,7 @@ public class ButtonPage:UIPage
     public void InitialEvent()
     {
         view.button.userEvent.Click = buttonClick;
+        view.button.userEvent.PointerDown = (o, a) => { };//其它常用事件请自行尝试，在view.button.userEvent中
     }
     public void buttonClick(UserEvent e, UserAction a)
     {

@@ -491,27 +491,29 @@ public static class UICompositeMenu
         txt.text = now.Day + " Day";
         txt.fontSize = 24;
     }
-    //[MenuItem("GameObject/UIComposite/TreeView", false, 8)]
+    [MenuItem("GameObject/HGUI/TreeView", false, 7)]
     static public void AddTreeView(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;
-        var ss = new GameObject("TreeView", typeof(RectTransform));
-        RectTransform rect = ss.transform as RectTransform;
-        rect.sizeDelta = new Vector2(400, 400);
+        var ss = new GameObject("TreeView");
+        Transform rect = ss.transform;
+        UIElement uI = ss.AddComponent<UIElement>();
+        uI.SizeDelta = new Vector2(400, 400);
+        uI.Mask = true;
+        uI.compositeType = CompositeType.TreeView;
         if (parent != null)
             rect.SetParent(parent.transform);
         rect.localPosition = Vector3.zero;
         rect.localScale = Vector3.one;
-        ss.AddComponent<RectMask2D>();
-        var Item = new GameObject("Item", typeof(RectTransform));
-        var fr = Item.transform as RectTransform;
-        fr.sizeDelta = new Vector2(200, 40);
+        var Item = new GameObject("Item");
+        var fr = Item.transform;
         fr.SetParent(rect);
         fr.localPosition = Vector3.zero;
         fr.localScale = Vector3.one;
-        var txt = Item.AddComponent<Text>();
-        txt.alignment = TextAnchor.MiddleLeft;
-        txt.fontSize = 24;
+        var txt = Item.AddComponent<HText>();
+        txt.SizeDelta = new Vector2(200,40);
+        txt.TextAnchor = TextAnchor.MiddleLeft;
+        txt.FontSize = 24;
     }
     //[MenuItem("GameObject/UIComposite/DropDown", false, 9)]
     static public void AddDropDown(MenuCommand menuCommand)

@@ -19,6 +19,7 @@ namespace Assets.Scripts
             public UIElement left;
             public UIElement center;
             public UIElement right;
+            public HImage treeView;
         }
   
         class ChatItem
@@ -54,6 +55,31 @@ namespace Assets.Scripts
         {
             base.Initial(parent, dat);
             view = LoadUI<View>("baseUI", "chat");
+            InitialChat();
+            InitialTreeView();
+        }
+        void InitialTreeView()
+        {
+            TreeViewNode node = new TreeViewNode();
+            node.content = "root";
+            for (int i = 0; i < 10; i++)
+            {
+                TreeViewNode son = new TreeViewNode();
+                son.content = i.ToString() + "tss";
+                node.child.Add(son);
+                for (int j = 0; j < 6; j++)
+                {
+                    TreeViewNode r = new TreeViewNode();
+                    r.content = j.ToString() + "sdfsdf";
+                    son.child.Add(r);
+                }
+            }
+            var tree = view.treeView.composite as TreeView;
+            tree.nodes = node;
+            tree.Refresh();
+        }
+        void InitialChat()
+        {
             option = new OptionGroup();
             option.AddEvent(view.left.userEvent);
             option.AddEvent(view.right.userEvent);

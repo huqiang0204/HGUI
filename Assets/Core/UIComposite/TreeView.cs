@@ -98,7 +98,8 @@ namespace huqiang.UIComposite
 
         float CalculHigh(TreeViewNode node, int level, float high)
         {
-            node.offset.x = level * ItemHigh;
+            float sx = level * ItemHigh + ItemSize.x * 0.5f - Enity.SizeDelta.x * 0.5f;
+            node.offset.x = sx;
             node.offset.y = high;
             UpdateItem(node);
             level++;
@@ -140,10 +141,14 @@ namespace huqiang.UIComposite
                 return it;
             }
             var go = HGUIManager.GameBuffer.Clone(ItemMod);
+            var trans = go.transform;
+            trans.SetParent(Enity.transform);
+            trans.localScale = Vector3.one;
+            trans.localRotation = Quaternion.identity;
             TreeViewItem a = new TreeViewItem();
             a.target = go;
             a.text = go.GetComponent<HText>();
-            a.callBack = go.GetComponent<UIElement>().RegEvent<UserEvent>();
+            a.callBack = a.text.RegEvent<UserEvent>();
             a.callBack.Click = (o, e) => {
                 var item = o.DataContext as TreeViewItem;
                 if (item.node != null)

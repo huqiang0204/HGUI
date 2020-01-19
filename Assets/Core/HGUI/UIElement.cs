@@ -25,7 +25,8 @@ namespace huqiang.Core.HGUI
         GridScroll,
         Paint,
         Rocker,
-        UIContainer
+        UIContainer,
+        TreeView
     }
     public class UIElement:MonoBehaviour
     {
@@ -359,6 +360,9 @@ namespace huqiang.Core.HGUI
                     break;
                 case CompositeType.UIContainer:
                     new UIContainer().Initial(ex,script);
+                    break;
+                case CompositeType.TreeView:
+                    new TreeView().Initial(ex,script);
                     break;
             }
         }

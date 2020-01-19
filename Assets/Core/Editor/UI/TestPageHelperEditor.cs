@@ -78,10 +78,14 @@ public class TestPageHelperEditor : Editor
             if (CloneName != null)
                 if (CloneName != "")
                 {
-                    LoadBundle();
-
-                    //ModelManagerUI.LoadModels(ui, "assTest");
-                    //EditorModelManager.LoadToGame(CloneName, null, root, "");
+                    HGUIManager.Initial(root);
+                    HGUIManager.LoadModels(ui, "assTest");
+                    var go = HGUIManager.GameBuffer.Clone(HGUIManager.FindModel("assTest",CloneName));
+                    if(go!=null)
+                    {
+                        var trans = go.transform;
+                        trans.SetParent(root);
+                    }
                 }
         }
     }
@@ -89,12 +93,21 @@ public class TestPageHelperEditor : Editor
     {
         if (ui != null)
         {
-            //LoadBundle();
-            //InitialUI();
-            //var all = ModelManagerUI.LoadModels(ui, "assTest");
-            //ModelElement element = new ModelElement();
-            //element.Load(all.models.ModData);
-            //element.Apply();
+            HGUIManager.Initial(root);
+            var fake = HGUIManager.LoadModels(ui, "assTest").models;
+            var child = HGUIManager.GetAllChild(fake);
+            if (child != null)
+            {
+                for (int i = 0; i < child.Length; i++)
+                {
+                    var go = HGUIManager.GameBuffer.Clone(child[i]);
+                    if (go != null)
+                    {
+                        var trans = go.transform;
+                        trans.SetParent(root);
+                    }
+                }
+            }
         }
     }
 }

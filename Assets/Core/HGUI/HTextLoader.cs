@@ -29,6 +29,12 @@ namespace huqiang.Core.HGUI
         public static List<Font> fonts = new List<Font>();
         public static Font FindFont(string str)
         {
+#if UNITY_EDITOR
+            if (!Application.isPlaying)
+            {
+                return UnityEngine.Resources.GetBuiltinResource<Font>(str + ".ttf");
+            }
+#endif
             if (fonts == null)
                 return null;
             for (int i = 0; i < fonts.Count; i++)

@@ -26,7 +26,8 @@ namespace huqiang.Core.HGUI
         Paint,
         Rocker,
         UIContainer,
-        TreeView
+        TreeView,
+        UIDate
     }
     public class UIElement:MonoBehaviour
     {
@@ -366,6 +367,9 @@ namespace huqiang.Core.HGUI
                     break;
                 case CompositeType.TreeView:
                     new TreeView().Initial(ex,script);
+                    break;
+                case CompositeType.UIDate:
+                    new UIDate().Initial(ex,script);
                     break;
             }
         }

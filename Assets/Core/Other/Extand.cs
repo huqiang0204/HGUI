@@ -4,7 +4,6 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using UnityEngine;
-using UnityEngine.UI;
 using System.Reflection;
 
 namespace huqiang
@@ -78,30 +77,6 @@ namespace huqiang
             {
                 byte* b = (byte*)&value;
                 return new Color32(*(b + 3), *(b + 2), *(b + 1), *b);
-            }
-        }
-        public static void SetSprite(this RawImage raw, Sprite sprite)
-        {
-            if (sprite == null)
-            {
-                raw.texture = null;
-                return;
-            }
-            var r = sprite.rect;
-            raw.texture = sprite.texture;
-            float w = sprite.texture.width;
-            float h = sprite.texture.height;
-            raw.uvRect = new Rect(r.x / w, r.y / h, r.width / w, r.height / h);
-            raw.SetNativeSize();
-        }
-        public static void SetRect(this RawImage raw, Rect rect)
-        {
-            if (raw.texture != null)
-            {
-                float w = raw.texture.width;
-                float h = raw.texture.height;
-                raw.uvRect = new Rect(rect.x / w, rect.y / h, rect.width / w, rect.height / h);
-                raw.SetNativeSize();
             }
         }
         public static void WriteString(this Stream stream, string str)

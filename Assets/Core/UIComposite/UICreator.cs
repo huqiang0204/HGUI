@@ -1,7 +1,6 @@
 ﻿using huqiang.UI;
 using System;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace huqiang.UIComposite
 {

@@ -1,11 +1,11 @@
-﻿using huqiang.Other;
+﻿using huqiang.Core.HGUI;
+using huqiang.Other;
 using huqiang.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using UnityEngine.UI;
 
 public class PaletteHelper:UICompositeHelp
 {
@@ -17,19 +17,19 @@ public class PaletteHelper:UICompositeHelp
         var hc = transform.Find("HTemplate");
         if (hc != null)
         {
-            var template = hc.GetComponent<RawImage>();
+            var template = hc.GetComponent<HImage>();
             if(template!=null)
-            template.texture = palette.texture;
+            template.MainTexture = palette.texture;
         }
-        var htemp = transform.GetComponent<RawImage>();
+        var htemp = transform.GetComponent<HImage>();
         if(htemp!=null)
-            htemp.texture = Palette.LoadCTemplate();
+            htemp.MainTexture = Palette.LoadCTemplate();
         var sli= transform.Find("Slider");
         if(sli!=null)
         {
-            var slider= sli.GetComponent<RawImage>();
+            var slider= sli.GetComponent<HImage>();
             if(slider!=null)
-                slider.texture = Palette.AlphaTemplate();
+                slider.MainTexture = Palette.AlphaTemplate();
         }
         
     }

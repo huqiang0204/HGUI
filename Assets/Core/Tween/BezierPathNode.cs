@@ -1,10 +1,10 @@
 ﻿using huqiang;
+using huqiang.Core.HGUI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class BezierPathNode:MonoBehaviour
 {
@@ -37,9 +37,9 @@ public class BezierPathNode:MonoBehaviour
     }
     GameObject CreateObject(string name)
     {
-        GameObject game = new GameObject(name,typeof(RectTransform));
-        var img = game.AddComponent<Image>();
-        img.color = Color.green;
+        GameObject game = new GameObject(name);
+        var img = game.AddComponent<HImage>();
+        img.Chromatically = Color.green;
         return game;
     }
     private void OnDrawGizmos()

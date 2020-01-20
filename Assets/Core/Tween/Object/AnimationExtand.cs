@@ -1,10 +1,10 @@
-﻿using huqiang.UI;
+﻿using huqiang.Core.HGUI;
+using huqiang.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace huqiang
 {
@@ -88,14 +88,14 @@ namespace huqiang
             else ani.PlayOver = over;
             ani.Play();
         }
-        public static ColorAnimat FindColorAni(this Graphic grap)
+        public static ColorAnimat FindColorAni(this HGraphics grap)
         {
             if (grap == null)
                 return null;
             grap.gameObject.SetActive(true);
             return AnimationManage.Manage.FindAni<ColorAnimat>((o) => { return o.Target == grap ? true : false; });
         }
-        public static void ColorTo(this Graphic grap, Color col, float time, float delay=0, Action<ColorAnimat> over = null, bool cover = true)
+        public static void ColorTo(this HGraphics grap, Color col, float time, float delay=0, Action<ColorAnimat> over = null, bool cover = true)
         {
             if (grap == null)
                 return;
@@ -105,7 +105,7 @@ namespace huqiang
                 ani = new ColorAnimat(grap);
             else if (!cover)
                 return;
-            ani.StartColor = grap.color;
+            ani.StartColor = grap.Chromatically;
             ani.EndColor = col;
             ani.Time = time;
             ani.Delay = delay;
@@ -114,14 +114,14 @@ namespace huqiang
             else ani.PlayOver = over;
             ani.Play();
         }
-        public static ImageAnimat FindSpritesAni(this Image img)
+        public static ImageAnimat FindSpritesAni(this HImage img)
         {
             if (img == null)
                 return null;
             img.gameObject.SetActive(true);
             return AnimationManage.Manage.FindAni<ImageAnimat>((o) => { return o.image == img ? true : false; });
         }
-        public static ImageAnimat FindOrCreateSpritesAni(this Image img)
+        public static ImageAnimat FindOrCreateSpritesAni(this HImage img)
         {
             if (img == null)
                 return null;
@@ -131,7 +131,7 @@ namespace huqiang
                 ani = new ImageAnimat(img);
             return ani;
         }
-        public static void Play(this Image img, Sprite[] sprites, float inter = 16, bool loop = false, Action<ImageAnimat> over = null, bool hide = true, bool cover = true)
+        public static void Play(this HImage img, Sprite[] sprites, float inter = 16, bool loop = false, Action<ImageAnimat> over = null, bool hide = true, bool cover = true)
         {
             if (img == null)
                 return;

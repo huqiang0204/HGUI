@@ -4,7 +4,6 @@ using huqiang.UI;
 using huqiang.UIEvent;
 using System;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace huqiang.UIComposite
 {

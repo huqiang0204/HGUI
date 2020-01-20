@@ -1,13 +1,13 @@
-﻿using System;
+﻿using huqiang.Core.HGUI;
+using System;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace huqiang
 {
     public class ImageAnimat : AnimatInterface
     {
-        public Image image { get; private set; }
-        public ImageAnimat(Image img)
+        public HImage image { get; private set; }
+        public ImageAnimat(HImage img)
         {
             image = img;
             AnimationManage.Manage.AddAnimat(this);
@@ -21,7 +21,7 @@ namespace huqiang
             if (gif != null)
             {
                 sprites = gif;
-                image.sprite = sprites[0];
+                image.Sprite = sprites[0];
                 image.SetNativeSize();
                 _playing = true;
                 curFrame = 0;
@@ -75,7 +75,7 @@ namespace huqiang
             {
                 if (sprites != null)
                 {
-                    image.sprite = sprites[0];
+                    image.Sprite = sprites[0];
                     image.SetNativeSize();
                 }
             }
@@ -106,7 +106,7 @@ namespace huqiang
                             if (Loop)
                             {
                                 PlayTime = 0;
-                                image.sprite = sprites[0];
+                                image.Sprite = sprites[0];
                                 image.SetNativeSize();
                             }
                             else
@@ -118,7 +118,7 @@ namespace huqiang
                         }
                         else
                         {
-                            image.sprite = sprites[c];
+                            image.Sprite = sprites[c];
                             image.SetNativeSize();
                         }
                         if (FrameEvent != null)

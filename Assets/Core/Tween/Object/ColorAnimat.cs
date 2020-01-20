@@ -1,16 +1,16 @@
-﻿using System;
+﻿using huqiang.Core.HGUI;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace huqiang
 {
     public class ColorAnimat : AnimatBase, AnimatInterface
     {
-        public Graphic Target { get; private set; }
-        public ColorAnimat(Graphic img)
+        public HGraphics Target { get; private set; }
+        public ColorAnimat(HGraphics img)
         {
             Target = img;
             AnimationManage.Manage.AddAnimat(this);
@@ -45,7 +45,7 @@ namespace huqiang
                     if (!Loop & c_time >= m_time)
                     {
                         playing = false;
-                        Target.color = EndColor;
+                        Target.Chromatically = EndColor;
                         if (PlayOver != null)
                             PlayOver(this);
                     }
@@ -57,7 +57,7 @@ namespace huqiang
                         if (Linear != null)
                             r = Linear(this, r);
                         Color v = EndColor - StartColor;
-                        Target.color = StartColor + v * r;
+                        Target.Chromatically = StartColor + v * r;
                     }
                 }
             }

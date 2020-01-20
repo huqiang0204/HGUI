@@ -1,9 +1,9 @@
-﻿using System;
+﻿using huqiang.Core.HGUI;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class BezierPath : MonoBehaviour
 {
@@ -105,8 +105,8 @@ public class BezierPath : MonoBehaviour
     BezierPathNode CreateNode(string name)
     {
         var game = new GameObject(name, typeof(RectTransform));
-        var img = game.AddComponent<Image>();
-        img.color = Color.blue;
+        var img = game.AddComponent<HImage>();
+        img.Chromatically = Color.blue;
         var node = game.AddComponent<BezierPathNode>();
         node.ReFresh();
         game.transform.SetParent(transform);

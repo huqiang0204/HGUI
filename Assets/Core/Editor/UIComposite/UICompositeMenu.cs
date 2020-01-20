@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UI;
 
 public static class UICompositeMenu
 {
@@ -307,7 +306,6 @@ public static class UICompositeMenu
         rect.sizeDelta = new Vector2(400, 400);
         rect.localPosition = Vector3.zero;
         rect.localScale = Vector3.one;
-        ss.AddComponent<RectMask2D>();
         var Item = new GameObject("Item", typeof(RectTransform));
         var fr = Item.transform as RectTransform;
         fr.sizeDelta = new Vector2(80, 80);
@@ -321,10 +319,10 @@ public static class UICompositeMenu
         fn.SetParent(Scroll.transform);
         fn.localPosition = new Vector3(190, 0, 0);
         fn.localScale = Vector3.one;
-        var img = ss.AddComponent<Image>();
-        img.sprite = EditorModelManager.FindSprite(icons, background);
-        img.type = Image.Type.Sliced;
-        img.color = new Color32(152, 152, 152, 255);
+        var img = ss.AddComponent<HImage>();
+        img.Sprite = EditorModelManager.FindSprite(icons, background);
+        img.SprType = SpriteType.Sliced;
+        img.Chromatically = new Color32(152, 152, 152, 255);
         var help = ss.AddComponent<SliderHelper>();
         help.direction = UISlider.Direction.Vertical;
         help.StartOffset.y = 15;
@@ -336,8 +334,8 @@ public static class UICompositeMenu
         fn.SetParent(ss.transform);
         fn.localPosition = new Vector3(0, -185, 0);
         fn.localScale = Vector3.one;
-        img = Nob.AddComponent<Image>();
-        img.sprite = EditorModelManager.FindSprite(icons, circlesm);
+        img = Nob.AddComponent<HImage>();
+        img.Sprite = EditorModelManager.FindSprite(icons, circlesm);
     }
     //[MenuItem("GameObject/UIComposite/UIRocker", false, 5)]
     static public void AddRocker(MenuCommand menuCommand)
@@ -350,76 +348,76 @@ public static class UICompositeMenu
             rect.SetParent(parent.transform);
         rect.localPosition = Vector3.zero;
         rect.localScale = Vector3.one;
-        var img = ss.AddComponent<Image>();
-        img.sprite = EditorModelManager.FindSprite(icons, circleol);
+        var img = ss.AddComponent<HImage>();
+        img.Sprite = EditorModelManager.FindSprite(icons, circleol);
         var Item = new GameObject("Nob", typeof(RectTransform));
         var fr = Item.transform as RectTransform;
         fr.sizeDelta = new Vector2(100, 100);
         fr.SetParent(rect);
         fr.localPosition = Vector3.zero;
         fr.localScale = Vector3.one;
-        img = Item.AddComponent<Image>();
-        img.sprite = EditorModelManager.FindSprite(icons, circlesm);
+        img = Item.AddComponent<HImage>();
+        img.Sprite = EditorModelManager.FindSprite(icons, circlesm);
     }
     //[MenuItem("GameObject/UIComposite/UIPalette", false, 6)]
-    static public void AddPalette(MenuCommand menuCommand)
-    {
-        GameObject parent = menuCommand.context as GameObject;
-        var palette = new GameObject("Palette", typeof(RectTransform));
-        RectTransform rect = palette.transform as RectTransform;
-        rect.sizeDelta = new Vector2(500, 500);
-        if (parent != null)
-            rect.SetParent(parent.transform);
-        rect.localPosition = Vector3.zero;
-        rect.localScale = Vector3.one;
-        palette.AddComponent<RawImage>();
+    //static public void AddPalette(MenuCommand menuCommand)
+    //{
+    //    GameObject parent = menuCommand.context as GameObject;
+    //    var palette = new GameObject("Palette", typeof(RectTransform));
+    //    RectTransform rect = palette.transform as RectTransform;
+    //    rect.sizeDelta = new Vector2(500, 500);
+    //    if (parent != null)
+    //        rect.SetParent(parent.transform);
+    //    rect.localPosition = Vector3.zero;
+    //    rect.localScale = Vector3.one;
+    //    palette.AddComponent<RawImage>();
 
 
-        var Fill = new GameObject("HTemplate", typeof(RectTransform));
-        var fr = Fill.transform as RectTransform;
-        fr.sizeDelta = new Vector2(256, 256);
-        fr.SetParent(rect);
-        fr.localPosition = Vector3.zero;
-        fr.localScale = Vector3.one;
-        Fill.AddComponent<RawImage>();
+    //    var Fill = new GameObject("HTemplate", typeof(RectTransform));
+    //    var fr = Fill.transform as RectTransform;
+    //    fr.sizeDelta = new Vector2(256, 256);
+    //    fr.SetParent(rect);
+    //    fr.localPosition = Vector3.zero;
+    //    fr.localScale = Vector3.one;
+    //    Fill.AddComponent<RawImage>();
 
-        var Nob = new GameObject("NobA", typeof(RectTransform));
-        var fn = Nob.transform as RectTransform;
-        fn.sizeDelta = new Vector2(44, 44);
-        fn.SetParent(rect);
-        fn.localPosition = new Vector3(0, -220, 0);
-        fn.localScale = Vector3.one;
-        var img = Nob.AddComponent<Image>();
-        var aim = img.sprite = EditorModelManager.FindSprite(icons, Aim);
+    //    var Nob = new GameObject("NobA", typeof(RectTransform));
+    //    var fn = Nob.transform as RectTransform;
+    //    fn.sizeDelta = new Vector2(44, 44);
+    //    fn.SetParent(rect);
+    //    fn.localPosition = new Vector3(0, -220, 0);
+    //    fn.localScale = Vector3.one;
+    //    var img = Nob.AddComponent<Image>();
+    //    var aim = img.sprite = EditorModelManager.FindSprite(icons, Aim);
 
-        Nob = new GameObject("NobB", typeof(RectTransform));
-        fn = Nob.transform as RectTransform;
-        fn.sizeDelta = new Vector2(24, 24);
-        fn.SetParent(rect);
-        fn.localPosition = new Vector3(-128, 128, 0);
-        fn.localScale = Vector3.one;
-        Nob.AddComponent<Image>().sprite = aim;
+    //    Nob = new GameObject("NobB", typeof(RectTransform));
+    //    fn = Nob.transform as RectTransform;
+    //    fn.sizeDelta = new Vector2(24, 24);
+    //    fn.SetParent(rect);
+    //    fn.localPosition = new Vector3(-128, 128, 0);
+    //    fn.localScale = Vector3.one;
+    //    Nob.AddComponent<Image>().sprite = aim;
 
-        var Slider = new GameObject("Slider", typeof(RectTransform));
-        fn = Slider.transform as RectTransform;
-        fn.sizeDelta = new Vector2(400, 20);
-        fn.SetParent(rect);
-        fn.localPosition = new Vector3(0, -285, 0);
-        fn.localScale = Vector3.one;
-        Slider.AddComponent<RawImage>();
+    //    var Slider = new GameObject("Slider", typeof(RectTransform));
+    //    fn = Slider.transform as RectTransform;
+    //    fn.sizeDelta = new Vector2(400, 20);
+    //    fn.SetParent(rect);
+    //    fn.localPosition = new Vector3(0, -285, 0);
+    //    fn.localScale = Vector3.one;
+    //    Slider.AddComponent<RawImage>();
 
-        Nob = new GameObject("Nob", typeof(RectTransform));
-        fn = Nob.transform as RectTransform;
-        fn.sizeDelta = new Vector2(30, 30);
-        fn.SetParent(Slider.transform);
-        fn.localPosition = new Vector3(200, 0, 0);
-        fn.localScale = Vector3.one;
-        img = Nob.AddComponent<Image>();
-        img.color = new Color(1, 1, 1, 1f);
-        img.sprite = aim;
+    //    Nob = new GameObject("Nob", typeof(RectTransform));
+    //    fn = Nob.transform as RectTransform;
+    //    fn.sizeDelta = new Vector2(30, 30);
+    //    fn.SetParent(Slider.transform);
+    //    fn.localPosition = new Vector3(200, 0, 0);
+    //    fn.localScale = Vector3.one;
+    //    img = Nob.AddComponent<Image>();
+    //    img.color = new Color(1, 1, 1, 1f);
+    //    img.sprite = aim;
 
-        palette.AddComponent<PaletteHelper>().Initial();
-    }
+    //    palette.AddComponent<PaletteHelper>().Initial();
+    //}
     //[MenuItem("GameObject/UIComposite/UIDate", false, 7)]
     static public void AddDate(MenuCommand menuCommand)
     {
@@ -439,8 +437,7 @@ public static class UICompositeMenu
         fr.SetParent(rect);
         fr.localPosition = new Vector3(-120, 0, 0);
         fr.localScale = Vector3.one;
-        Year.AddComponent<Image>();
-        Year.AddComponent<Mask>().showMaskGraphic = false;
+        Year.AddComponent<HImage>();
 
         var Item = new GameObject("Item", typeof(RectTransform));
         var fn = Item.transform as RectTransform;
@@ -448,10 +445,10 @@ public static class UICompositeMenu
         fn.SetParent(fr);
         fn.localPosition = Vector3.zero;
         fn.localScale = Vector3.one;
-        var txt = Item.AddComponent<Text>();
-        txt.alignment = TextAnchor.MiddleCenter;
-        txt.text = now.Year + " Year";
-        txt.fontSize = 24;
+        var txt = Item.AddComponent<HText>();
+        txt.TextAnchor = TextAnchor.MiddleCenter;
+        txt.Text = now.Year + " Year";
+        txt.FontSize = 24;
 
         var Month = new GameObject("Month", typeof(RectTransform));
         fr = Month.transform as RectTransform;
@@ -459,7 +456,6 @@ public static class UICompositeMenu
         fr.SetParent(rect);
         fr.localPosition = Vector3.zero;
         fr.localScale = Vector3.one;
-        Month.AddComponent<RectMask2D>();
 
         Item = new GameObject("Item", typeof(RectTransform));
         fn = Item.transform as RectTransform;
@@ -467,10 +463,10 @@ public static class UICompositeMenu
         fn.SetParent(fr);
         fn.localPosition = Vector3.zero;
         fn.localScale = Vector3.one;
-        txt = Item.AddComponent<Text>();
-        txt.alignment = TextAnchor.MiddleCenter;
-        txt.text = now.Month + " Month";
-        txt.fontSize = 24;
+        txt = Item.AddComponent<HText>();
+        txt.TextAnchor = TextAnchor.MiddleCenter;
+        txt.Text = now.Month + " Month";
+        txt.FontSize = 24;
 
         var Day = new GameObject("Day", typeof(RectTransform));
         fr = Day.transform as RectTransform;
@@ -478,7 +474,6 @@ public static class UICompositeMenu
         fr.SetParent(rect);
         fr.localPosition = new Vector3(120, 0, 0);
         fr.localScale = Vector3.one;
-        Day.AddComponent<RectMask2D>();
 
         Item = new GameObject("Item", typeof(RectTransform));
         fn = Item.transform as RectTransform;
@@ -486,10 +481,10 @@ public static class UICompositeMenu
         fn.SetParent(fr);
         fn.localPosition = Vector3.zero;
         fn.localScale = Vector3.one;
-        txt = Item.AddComponent<Text>();
-        txt.alignment = TextAnchor.MiddleCenter;
-        txt.text = now.Day + " Day";
-        txt.fontSize = 24;
+        txt = Item.AddComponent<HText>();
+        txt.TextAnchor = TextAnchor.MiddleCenter;
+        txt.Text = now.Day + " Day";
+        txt.FontSize = 24;
     }
     [MenuItem("GameObject/HGUI/TreeView", false, 7)]
     static public void AddTreeView(MenuCommand menuCommand)
@@ -516,40 +511,40 @@ public static class UICompositeMenu
         txt.FontSize = 24;
     }
     //[MenuItem("GameObject/UIComposite/DropDown", false, 9)]
-    static public void AddDropDown(MenuCommand menuCommand)
-    {
-        GameObject parent = menuCommand.context as GameObject;
-        var ss = new GameObject("DropDownEx", typeof(RectTransform));
-        RectTransform rect = ss.transform as RectTransform;
-        rect.sizeDelta = new Vector2(400, 40);
-        if (parent != null)
-            rect.SetParent(parent.transform);
+    //static public void AddDropDown(MenuCommand menuCommand)
+    //{
+    //    GameObject parent = menuCommand.context as GameObject;
+    //    var ss = new GameObject("DropDownEx", typeof(RectTransform));
+    //    RectTransform rect = ss.transform as RectTransform;
+    //    rect.sizeDelta = new Vector2(400, 40);
+    //    if (parent != null)
+    //        rect.SetParent(parent.transform);
 
-        var label = new GameObject("Label", typeof(RectTransform));
-        var fr = label.transform as RectTransform;
-        fr.sizeDelta = new Vector2(400, 40);
-        fr.SetParent(rect);
-        fr.localPosition = Vector3.zero;
-        fr.localScale = Vector3.one;
-        var txt = label.AddComponent<Text>();
-        txt.alignment = TextAnchor.MiddleLeft;
-        txt.fontSize = 24;
+    //    var label = new GameObject("Label", typeof(RectTransform));
+    //    var fr = label.transform as RectTransform;
+    //    fr.sizeDelta = new Vector2(400, 40);
+    //    fr.SetParent(rect);
+    //    fr.localPosition = Vector3.zero;
+    //    fr.localScale = Vector3.one;
+    //    var txt = label.AddComponent<Text>();
+    //    txt.alignment = TextAnchor.MiddleLeft;
+    //    txt.fontSize = 24;
 
-        var Scroll = new GameObject("Scroll", typeof(RectTransform));
-        RectTransform scr = Scroll.transform as RectTransform;
-        scr.sizeDelta = new Vector2(400, 400);
-        scr.SetParent(rect);
-        scr.localPosition = new Vector3(0, -220, 0);
-        scr.localScale = Vector3.one;
-        ss.AddComponent<RectMask2D>();
+    //    var Scroll = new GameObject("Scroll", typeof(RectTransform));
+    //    RectTransform scr = Scroll.transform as RectTransform;
+    //    scr.sizeDelta = new Vector2(400, 400);
+    //    scr.SetParent(rect);
+    //    scr.localPosition = new Vector3(0, -220, 0);
+    //    scr.localScale = Vector3.one;
+    //    ss.AddComponent<RectMask2D>();
 
-        var Item = new GameObject("Item", typeof(RectTransform));
-        fr = Item.transform as RectTransform;
-        fr.sizeDelta = new Vector2(400, 40);
-        fr.SetParent(scr);
-        fr.localPosition = Vector3.zero;
-        fr.localScale = Vector3.one;
-    }
+    //    var Item = new GameObject("Item", typeof(RectTransform));
+    //    fr = Item.transform as RectTransform;
+    //    fr.sizeDelta = new Vector2(400, 40);
+    //    fr.SetParent(scr);
+    //    fr.localPosition = Vector3.zero;
+    //    fr.localScale = Vector3.one;
+    //}
     //[MenuItem("GameObject/UIComposite/TabControl", false, 10)]
     //static public void AddLayout(MenuCommand menuCommand)
     //{

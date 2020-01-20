@@ -473,7 +473,7 @@ namespace huqiang.UIEvent
             tri.Clear();
             vert.Clear();
             var tl = TextCom.uILines;
-            int len = tl.Count;
+            int len = tl.Length;
             var tc = TextCom.uIChars;
             for (int i = 0; i < ShowRow; i++)
             {

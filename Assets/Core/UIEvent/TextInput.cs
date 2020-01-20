@@ -599,7 +599,7 @@ namespace huqiang.UIEvent
             if(line>=0)
             {
                 var ul = TextCom.uILines;
-                int c = ul.Count;
+                int c = ul.Length;
                 if (line < c)
                 {
                     bool right = false;

@@ -152,8 +152,8 @@ namespace huqiang.Core.HGUI
             sett.color = m_color;
             sett.alignByGeometry = m_align;
         }
-        internal IList<UILineInfo> uILines;
-        internal IList<UICharInfo> uIChars;
+        internal UILineInfo[] uILines;
+        internal UICharInfo[] uIChars;
         public void Populate()
         {
             emojiString.FullString = m_text;
@@ -161,8 +161,8 @@ namespace huqiang.Core.HGUI
             var g = Generator;
             g.Populate(emojiString.FilterString, settings);
             verts = g.verts.ToArray();
-            uILines = g.lines;
-            uIChars = g.characters;
+            uILines = g.lines.ToArray();
+            uIChars = g.characters.ToArray();
             m_dirty = false;
             m_vertexChange = true;
             fillColors[0] = true;

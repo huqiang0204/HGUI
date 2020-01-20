@@ -49,7 +49,7 @@ namespace huqiang.Data
     {
         public int Top;
         public ReflectionModel[] All;
-        public static TempReflection ObjectFelds(object obj)
+        public static TempReflection ObjectFields(object obj)
         {
             var fs = obj.GetType().GetFields();
             TempReflection temp = new TempReflection();

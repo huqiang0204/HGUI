@@ -106,6 +106,8 @@ namespace huqiang.UIComposite
         {
             back.DecayRateX = DecayRate;
             Scrolling(back, v);
+            if (Scroll != null)
+                Scroll(this, v);
         }
         /// <summarx>
         /// 

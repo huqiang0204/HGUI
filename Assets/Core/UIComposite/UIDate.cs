@@ -82,9 +82,9 @@ namespace huqiang.UIComposite
         public override void Initial(FakeStruct mod,UIElement element)
         {
             base.Initial(mod,element);
-            var mask = element.transform.Find("mask");
-            var mui = mask.GetComponent<UIElement>();
+            var mui = Enity.GetComponent<UIElement>();
             mui.userEvent.CutRect = true;
+            var mask = Enity.transform;
             Year = mask.Find("Year").GetComponent<UIElement>().composite as ScrollY;
             Year.SetItemUpdate<ItemView, int>((o, e, i) => { o.Item.Text = e.ToString(); });
             Year.Scroll = Scrolling;
@@ -156,6 +156,7 @@ namespace huqiang.UIComposite
         void UpdateItems(ScrollY scroll)
         {
             var items = scroll.Items;
+            float hy = scroll.Enity.SizeDelta.y * 0.5f;
             for (int i = 0; i < items.Count; i++)
             {
                 var mod = items[i].target;
@@ -163,16 +164,17 @@ namespace huqiang.UIComposite
                 float h = txt.SizeDelta.y;
                 float y = mod.localPosition.y;
                 float angle = y / h * 15f;
+                float r = y / hy;
+                if (r < 0)
+                    r = -r;
+                r = 1 - r;
+                if (r < 0)
+                    r = 0;
                 mod.localRotation = Quaternion.Euler(angle, 0, 0);
-
                 var v = MathH.Tan2(90 - angle);
                 mod.localPosition =new Vector3(0, v.y * 100,0);
-            
                 var col = txt.Chromatically;
-                angle /= 45;
-                if (angle < 0)
-                    angle = -angle;
-                col.a = (byte)((1 - angle)*255);
+                col.a = (byte)(r*255);
                 txt.Chromatically = col;
             }
         }

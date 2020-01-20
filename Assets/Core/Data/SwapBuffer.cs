@@ -95,7 +95,7 @@ namespace huqiang.Data
                     return null;
                 if (index >= maxA)
                     return null;
-                return A[maxA];
+                return A[index];
             }
         }
     }

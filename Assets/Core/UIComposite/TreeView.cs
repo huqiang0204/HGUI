@@ -23,13 +23,14 @@ namespace huqiang.UIComposite
     public class TreeView : Composite
     {
         public Vector2 Size;//scrollView的尺寸
-        Vector2 aSize;
+        Vector2 contentSize;
         public Vector2 ItemSize;
         public TreeViewNode nodes;
         public float ItemHigh = 16;
         public UserEvent eventCall;//scrollY自己的按钮
         public FakeStruct ItemMod;
-        float m_point;
+        float m_pointY;
+        float m_pointX;
         public SwapBuffer<TreeViewItem, TreeViewNode> swap;
         QueueBuffer<TreeViewItem> queue;
         public TreeView()
@@ -70,18 +71,34 @@ namespace huqiang.UIComposite
         {
             if (Enity == null)
                 return;
-            v.y /= eventCall.Context.transform.localScale.y;
-            Limit(back, v.y);
+            var trans = eventCall.Context.transform;
+            v.x /= trans.localScale.x;
+            v.y /= trans.localScale.y;
+            LimitX(back, -v.x);
+            LimitY(back, v.y);
             Refresh();
         }
         float hy;
+        float hx;
         public void Refresh()
         {
             if (nodes == null)
                 return;
             hy = Size.y * 0.5f;
-            aSize.y = CalculHigh(nodes, 0, 0);
+            hx = Size.x * 0.5f;
+            contentSize.x = ItemSize.x;
+            contentSize.y = CalculHigh(nodes, 0, 0);
             RecycleItem();
+            if (m_pointX + ItemSize.x > contentSize.x)
+                m_pointX = contentSize.x - ItemSize.x;
+
+            for (int i = 0; i < swap.Length; i++)
+            {
+                var trans = swap[i].target.transform;
+                var p = trans.localPosition;
+                p.x -= m_pointX;
+                trans.localPosition = p;
+            }
         }
         protected void RecycleItem()
         {
@@ -97,7 +114,7 @@ namespace huqiang.UIComposite
 
         float CalculHigh(TreeViewNode node, int level, float high)
         {
-            float sx = level * ItemHigh + ItemSize.x * 0.5f - Enity.SizeDelta.x * 0.5f;
+            float sx = level * ItemHigh + ItemSize.x * 0.5f - hx;
             node.offset.x = sx;
             node.offset.y = high;
             UpdateItem(node);
@@ -106,11 +123,14 @@ namespace huqiang.UIComposite
             if (node.extand)
                 for (int i = 0; i < node.child.Count; i++)
                     high = CalculHigh(node.child[i], level, high);
+            float x = level * ItemHigh + ItemSize.x;
+            if (x > contentSize.x)
+                contentSize.x = x;
             return high;
         }
         void UpdateItem(TreeViewNode node)
         {
-            float dy = node.offset.y - m_point;
+            float dy = node.offset.y - m_pointY;
             if (dy <= Size.y)
                 if (dy + ItemHigh > 0)
                 {
@@ -159,30 +179,96 @@ namespace huqiang.UIComposite
             a.callBack.DataContext = a;
             return a;
         }
-        protected void Limit(UserEvent callBack, float y)
+        protected void LimitX(UserEvent callBack, float x)
         {
             var size = Size;
-            if (size.y > aSize.y)
+            if (size.x > contentSize.x)
             {
-                m_point = 0;
+                m_pointX = 0;
+                return;
+            }
+            if (x == 0)
+                return;
+            float vx = m_pointX + x;
+            if (vx < 0)
+            {
+                m_pointX = 0;
+                eventCall.VelocityX = 0;
+                return;
+            }
+            else if (vx + size.x > contentSize.x)
+            {
+                m_pointX = contentSize.x - size.x;
+                eventCall.VelocityX = 0;
+                return;
+            }
+            m_pointX += x;
+        }
+        protected void LimitY(UserEvent callBack, float y)
+        {
+            var size = Size;
+            if (size.y > contentSize.y)
+            {
+                m_pointY = 0;
                 return;
             }
             if (y == 0)
                 return;
-            float vy = m_point + y;
+            float vy = m_pointY + y;
             if (vy < 0)
             {
-                m_point = 0;
+                m_pointY = 0;
                 eventCall.VelocityY = 0;
                 return;
             }
-            else if (vy + size.y > aSize.y)
+            else if (vy + size.y > contentSize.y)
             {
-                m_point = aSize.y - size.y;
+                m_pointY = contentSize.y - size.y;
                 eventCall.VelocityY = 0;
                 return;
             }
-            m_point += y;
+            m_pointY += y;
+        }
+        public float PercentageX {
+            get {
+                float o = contentSize.x - Enity.SizeDelta.x;
+                if (o < 0)
+                    return 0;
+                o = m_pointX / o;
+                if (o > 1)
+                    o = 1;
+                return o;
+            }
+            set {
+                if (value < 0)
+                    value = 0;
+                else if (value > 1)
+                    value = 1;
+                if(contentSize.x>Enity.SizeDelta.x)
+                    m_pointX = value * (contentSize.x - Enity.SizeDelta.x);
+            }
+        }
+        public float PercentageY
+        {
+            get
+            {
+                float o = contentSize.y - Enity.SizeDelta.y;
+                if (o < 0)
+                    return 0;
+                o = m_pointY / o;
+                if (o > 1)
+                    o = 1;
+                return o;
+            }
+            set
+            {
+                if (value < 0)
+                    value = 0;
+                else if (value > 1)
+                    value = 1;
+                if (contentSize.y > Enity.SizeDelta.y)
+                    m_pointY = value * (contentSize.y - Enity.SizeDelta.y);
+            }
         }
     }
 }

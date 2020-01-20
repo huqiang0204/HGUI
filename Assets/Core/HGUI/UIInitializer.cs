@@ -9,10 +9,12 @@ namespace huqiang.Core.HGUI
     {
         TempReflection reflections;
         object target;
+        int feildLenth;
         public UIInitializer(object obj)
         {
             target = obj;
-            reflections = TempReflection.ObjectFelds(obj);
+            reflections = TempReflection.ObjectFields(obj);
+            feildLenth = reflections.Top;
         }
         public UIInitializer(TempReflection temp)
         {
@@ -22,7 +24,7 @@ namespace huqiang.Core.HGUI
         public void Reset(object obj)
         {
             target = obj;
-            reflections.Top = 0;
+            reflections.Top = feildLenth;
         }
         public override void Initialiezd(FakeStruct fake, Component com)
         {

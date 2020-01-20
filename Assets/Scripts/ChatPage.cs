@@ -19,7 +19,7 @@ namespace Assets.Scripts
             public UIElement left;
             public UIElement center;
             public UIElement right;
-            public HImage treeView;
+            public UIElement treeView;
         }
   
         class ChatItem
@@ -65,13 +65,28 @@ namespace Assets.Scripts
             for (int i = 0; i < 10; i++)
             {
                 TreeViewNode son = new TreeViewNode();
-                son.content = i.ToString() + "tss";
+                son.content = i.ToString() + "第一层";
                 node.child.Add(son);
                 for (int j = 0; j < 6; j++)
                 {
                     TreeViewNode r = new TreeViewNode();
-                    r.content = j.ToString() + "sdfsdf";
+                    r.content = j.ToString() + "第二层";
                     son.child.Add(r);
+                    for (int k = 0; k < 3; k++)
+                    {
+                        TreeViewNode n = new TreeViewNode();
+                        n.content = k.ToString() + "第三层";
+                        r.child.Add(n);
+                        TreeViewNode f = new TreeViewNode();
+                        f.content = "第四层";
+                        n.child.Add(f);
+                        TreeViewNode fi = new TreeViewNode();
+                        fi.content = "第五层";
+                        f.child.Add(fi);
+                        TreeViewNode s = new TreeViewNode();
+                        s.content = "第六层";
+                        fi.child.Add(s);
+                    }
                 }
             }
             var tree = view.treeView.composite as TreeView;

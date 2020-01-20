@@ -1,11 +1,6 @@
 ﻿using huqiang.Core.HGUI;
 using huqiang.Other;
-using huqiang.UI;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 public class PaletteHelper:UICompositeHelp
 {

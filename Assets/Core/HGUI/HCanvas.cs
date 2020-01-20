@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using huqiang;
-using huqiang.UI;
 using huqiang.UIEvent;
 using UnityEngine;
 

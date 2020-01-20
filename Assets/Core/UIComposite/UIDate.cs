@@ -11,7 +11,7 @@ namespace huqiang.UIComposite
     {
         class ItemView
         {
-            public UIElement Item;
+            public HText Item;
         }
         UserEvent callBack;
         ScrollY Year;
@@ -82,50 +82,50 @@ namespace huqiang.UIComposite
         public override void Initial(FakeStruct mod,UIElement element)
         {
             base.Initial(mod,element);
-            var mask = HGUIManager.FindChild(mod, "mask");
-            var y = HGUIManager.FindChild(mask,"Year");
-            //Year = new ScrollY();
-            //Year.Initial(y);
-            //Year.SetItemUpdate<ItemView, int>((o, e, i) => { o.Item.text = e.ToString() + unitY; });
-            //Year.Scroll = Scrolling;
-            //Year.ScrollEnd = YearScrollToEnd;
-            //Year.ItemDockCenter = true;
-            //Year.scrollType = ScrollType.Loop;
-            //Year.eventCall.boxSize = new Vector2(120, 160);
-            //Year.eventCall.UseAssignSize = true;
+            var mask = element.transform.Find("mask");
+            var mui = mask.GetComponent<UIElement>();
+            mui.userEvent.CutRect = true;
+            Year = mask.Find("Year").GetComponent<UIElement>().composite as ScrollY;
+            Year.SetItemUpdate<ItemView, int>((o, e, i) => { o.Item.Text = e.ToString() + unitY; });
+            Year.Scroll = Scrolling;
+            Year.ScrollEnd = YearScrollToEnd;
+            Year.ItemDockCenter = true;
+            Year.scrollType = ScrollType.Loop;
+            Year.eventCall.boxSize = new Vector2(120, 160);
+            Year.eventCall.UseAssignSize = true;
 
-            //var m = mask.Find("Month");
-            //Month = new ScrollY();
-            //Month.Initial(m);
-            //Month.SetItemUpdate<ItemView, string>((o, e, i) => { o.Item.text = e + unitM; });
-            //Month.Scroll = Scrolling;
-            //Month.ScrollEnd = MonthScrollToEnd;
-            //Month.ItemDockCenter = true;
-            //Month.scrollType = ScrollType.Loop;
-            //Month.eventCall.boxSize = new Vector2(120, 160);
-            //Month.eventCall.UseAssignSize = true;
+            Month = mask.Find("Month").GetComponent<UIElement>().composite as ScrollY;
+            Month.SetItemUpdate<ItemView, string>((o, e, i) => { o.Item.Text = e + unitM; });
+            Month.Scroll = Scrolling;
+            Month.ScrollEnd = MonthScrollToEnd;
+            Month.ItemDockCenter = true;
+            Month.scrollType = ScrollType.Loop;
+            Month.eventCall.boxSize = new Vector2(120, 160);
+            Month.eventCall.UseAssignSize = true;
 
-            //var d = mask.Find("Day");
-            //Day = new ScrollY();
-            //Day.Initial(d);
-            //Day.SetItemUpdate<ItemView, string>((o, e, i) => { o.Item.text = e + unitD; });
-            //Day.Scroll = Scrolling;
-            //Day.ScrollEnd = DayScrollToEnd;
-            //Day.ItemDockCenter = true;
-            //Day.ScrollEnd = DayScrollToEnd;
-            //Day.scrollType = ScrollType.Loop;
-            //Day.eventCall.boxSize = new Vector2(120, 160);
-            //Day.eventCall.UseAssignSize = true;
+            Day = mask.Find("Day").GetComponent<UIElement>().composite as ScrollY;
+            Day.SetItemUpdate<ItemView, string>((o, e, i) => { o.Item.Text = e + unitD; });
+            Day.Scroll = Scrolling;
+            Day.ScrollEnd = DayScrollToEnd;
+            Day.ItemDockCenter = true;
+            Day.ScrollEnd = DayScrollToEnd;
+            Day.scrollType = ScrollType.Loop;
+            Day.eventCall.boxSize = new Vector2(120, 160);
+            Day.eventCall.UseAssignSize = true;
 
-            //var fs = mod.GetExtand() as FakeStruct;
-            //if (fs != null)
-            //{
-            //    StartYear = fs[0];
-            //    EndYear = fs[1];
-            //    if (EndYear < StartYear)
-            //        EndYear = StartYear;
-            //}
-            //year = StartYear;
+            unsafe
+            {
+                var ex = mod.buffer.GetData(((TransfromData*)mod.ip)->ex) as FakeStruct;
+                if (ex != null)
+                {
+                    StartYear = ex[0];
+                    EndYear = ex[1];
+                    if (EndYear < StartYear)
+                        EndYear = StartYear;
+                }
+            }
+        
+            year = StartYear;
             month = 1;
             day = 1;
             int len = EndYear - StartYear;
@@ -158,22 +158,22 @@ namespace huqiang.UIComposite
             var items = scroll.Items;
             for (int i = 0; i < items.Count; i++)
             {
-                //var mod = items[i].target;
-                //float h = mod.data.sizeDelta.y;
-                //float y = mod.data.localPosition.y;
-                //float angle = y / h * 15f;
-                //mod.data.localRotation = Quaternion.Euler(angle, 0, 0);
+                var mod = items[i].target;
+                var txt = (items[i].obj as ItemView).Item;
+                float h = txt.SizeDelta.y;
+                float y = mod.localPosition.y;
+                float angle = y / h * 15f;
+                mod.localRotation = Quaternion.Euler(angle, 0, 0);
 
-                //var v = MathH.Tan2(90 - angle);
-                //mod.data.localPosition.y = v.y * 100;
-                //mod.IsChanged = true;
-                //var txt = (items[i].obj as ItemView).Item;
-                //var col = txt.color;
-                //angle /= 45;
-                //if (angle < 0)
-                //    angle = -angle;
-                //col.a = 1 - angle;
-                //txt.color = col;
+                var v = MathH.Tan2(90 - angle);
+                mod.localPosition =new Vector3(0, v.y * 100,0);
+            
+                var col = txt.Chromatically;
+                angle /= 45;
+                if (angle < 0)
+                    angle = -angle;
+                col.a = (byte)((1 - angle)*255);
+                txt.Chromatically = col;
             }
         }
         void YearScrollToEnd(ScrollY scroll)

@@ -1,5 +1,4 @@
-﻿using huqiang.UI;
-using System;
+﻿using System;
 using UnityEngine;
 
 namespace huqiang.UIComposite

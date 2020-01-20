@@ -1,13 +1,9 @@
 ﻿using huqiang.Core.HGUI;
 using huqiang.Data;
-using huqiang.UI;
 using huqiang.UIEvent;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace huqiang.UIComposite

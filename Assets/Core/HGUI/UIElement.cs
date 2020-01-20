@@ -313,7 +313,10 @@ namespace huqiang.Core.HGUI
         public virtual Color32 Chromatically { get; set; }
         public T RegEvent<T>(FakeStruct fake = null) where T : UserEvent, new()
         {
-            var t = new T();
+            var t = userEvent as T;
+            if (t != null)
+                return t;
+            t = new T();
             t.Context = this;
             t.Initial(fake);
             userEvent = t;

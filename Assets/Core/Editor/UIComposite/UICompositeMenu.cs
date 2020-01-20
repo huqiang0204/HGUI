@@ -84,7 +84,7 @@ public static class UICompositeMenu
         trans.localScale = Vector3.one;
         trans.localRotation = Quaternion.identity;
     }
-    [MenuItem("GameObject/HGUI/Empty", false, 1)]
+    [MenuItem("GameObject/HGUI/Empty", false, 2)]
     static public void AddEmpty(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;
@@ -96,7 +96,7 @@ public static class UICompositeMenu
         trans.localScale = Vector3.one;
         trans.localRotation = Quaternion.identity;
     }
-    [MenuItem("GameObject/HGUI/Image", false, 2)]
+    [MenuItem("GameObject/HGUI/Image", false, 3)]
     static public void AddImage(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;
@@ -108,7 +108,7 @@ public static class UICompositeMenu
         trans.localScale = Vector3.one;
         trans.localRotation = Quaternion.identity;
     }
-    [MenuItem("GameObject/HGUI/Text", false, 3)]
+    [MenuItem("GameObject/HGUI/Text", false, 4)]
     static public void AddText(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;
@@ -120,7 +120,7 @@ public static class UICompositeMenu
         trans.localScale = Vector3.one;
         trans.localRotation = Quaternion.identity;
     }
-    [MenuItem("GameObject/HGUI/InputBox", false, 4)]
+    [MenuItem("GameObject/HGUI/InputBox", false, 5)]
     static public void AddInputBox(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;
@@ -151,7 +151,7 @@ public static class UICompositeMenu
         var help = go.AddComponent<TextInputHelper>();
         help.Refresh();
     }
-    [MenuItem("GameObject/HGUI/UISliderH", false, 4)]
+    [MenuItem("GameObject/HGUI/UISliderH", false, 6)]
     static public void AddSliderH(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;
@@ -204,7 +204,7 @@ public static class UICompositeMenu
         image.Sprite = EditorModelManager.FindSprite(icons, leaves);
         return go;
     }
-    [MenuItem("GameObject/HGUI/UISliderV", false, 5)]
+    [MenuItem("GameObject/HGUI/UISliderV", false, 7)]
     static public void AddSliderV(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;
@@ -257,7 +257,7 @@ public static class UICompositeMenu
         image.Sprite = EditorModelManager.FindSprite(icons, ufo);
         return go;
     }
-    [MenuItem("GameObject/HGUI/Scroll", false, 6)]
+    [MenuItem("GameObject/HGUI/Scroll", false, 8)]
     static public void AddScroll(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;
@@ -337,27 +337,32 @@ public static class UICompositeMenu
         img = Nob.AddComponent<HImage>();
         img.Sprite = EditorModelManager.FindSprite(icons, circlesm);
     }
-    //[MenuItem("GameObject/UIComposite/UIRocker", false, 5)]
+    [MenuItem("GameObject/HGUI/UIRocker", false, 9)]
     static public void AddRocker(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;
-        var ss = new GameObject("Rocker", typeof(RectTransform));
-        RectTransform rect = ss.transform as RectTransform;
-        rect.sizeDelta = new Vector2(300, 300);
+        var ss = new GameObject("Rocker");
+        var scr = ss.AddComponent<HImage>();
+        scr.SizeDelta = new Vector2(300, 300);
+        scr.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        scr.compositeType = CompositeType.Rocker;
+        scr.Sprite = EditorModelManager.FindSprite(icons, circleol);
+        var rect = ss.transform;
         if (parent != null)
             rect.SetParent(parent.transform);
         rect.localPosition = Vector3.zero;
         rect.localScale = Vector3.one;
-        var img = ss.AddComponent<HImage>();
-        img.Sprite = EditorModelManager.FindSprite(icons, circleol);
-        var Item = new GameObject("Nob", typeof(RectTransform));
-        var fr = Item.transform as RectTransform;
-        fr.sizeDelta = new Vector2(100, 100);
-        fr.SetParent(rect);
-        fr.localPosition = Vector3.zero;
-        fr.localScale = Vector3.one;
-        img = Item.AddComponent<HImage>();
-        img.Sprite = EditorModelManager.FindSprite(icons, circlesm);
+        rect.localRotation = Quaternion.identity;
+       
+        var Item = new GameObject("Nob");
+        var fr = Item.AddComponent<HImage>();
+        fr.SizeDelta = new Vector2(100, 100);
+        fr.Sprite = EditorModelManager.FindSprite(icons, circlesm);
+        var son = fr.transform;
+        son.SetParent(rect);
+        son.localPosition = Vector3.zero;
+        son.localScale = Vector3.one;
+       
     }
     //[MenuItem("GameObject/UIComposite/UIPalette", false, 6)]
     //static public void AddPalette(MenuCommand menuCommand)
@@ -486,7 +491,7 @@ public static class UICompositeMenu
         txt.Text = now.Day + " Day";
         txt.FontSize = 24;
     }
-    [MenuItem("GameObject/HGUI/TreeView", false, 7)]
+    [MenuItem("GameObject/HGUI/TreeView", false, 10)]
     static public void AddTreeView(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;

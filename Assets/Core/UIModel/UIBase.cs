@@ -41,11 +41,13 @@ public class UIBase
     public GameObject Main { get; protected set; }
     public FakeStruct model { get; protected set; }
     protected UIBase UIParent;
+    
     public T LoadUI<T>(string asset, string name) where T : class, new()
     {
         model = HGUIManager.FindModel(asset, name);
         T t = new T();
-        Main = HGUIManager.GameBuffer.Clone(model, t);
+        UIInitializer iInitializer = new UIInitializer(t);
+        Main = HGUIManager.GameBuffer.Clone(model, iInitializer);
         var trans = Main.transform;
         trans.SetParent(Parent);
         trans.localPosition = Vector3.zero;

@@ -38,20 +38,17 @@ namespace huqiang.Data
             return obj is T;
         }
     }
-    public class GameobjectBuffer
+    public class ReflectionModel
     {
-        public class ReflectionModel
-        {
-            public string name;
-            public FieldInfo field;
-            public Type FieldType;
-            public object Value;
-        }
-        public class TempReflection
-        {
-            public int Top;
-            public ReflectionModel[] All;
-        }
+        public string name;
+        public FieldInfo field;
+        public Type FieldType;
+        public object Value;
+    }
+    public class TempReflection
+    {
+        public int Top;
+        public ReflectionModel[] All;
         public static TempReflection ObjectFelds(object obj)
         {
             var fs = obj.GetType().GetFields();
@@ -69,6 +66,10 @@ namespace huqiang.Data
             temp.All = reflections;
             return temp;
         }
+    }
+    public class GameobjectBuffer
+    {
+       
         Transform CycleBuffer;
         public GameobjectBuffer(Transform buffer)
         {
@@ -235,26 +236,12 @@ namespace huqiang.Data
             return types[Index].loader;
         }
         /// <summary>
-        /// 克隆一个预制体对象
-        /// </summary>
-        /// <param name="fake"></param>
-        public GameObject Clone(FakeStruct fake)
-        {
-            if (fake == null)
-                return null;
-            reflections = null;
-            long id = fake.GetInt64(0);
-            var go = CreateNew(id);
-            types[0].loader.LoadToObject(fake,go.transform);
-            return go;
-        }
-        /// <summary>
         /// 查询transform的子物体
         /// </summary>
         /// <param name="fake"></param>
         /// <param name="childName"></param>
         /// <returns></returns>
-        public unsafe FakeStruct FindChild(FakeStruct fake,string childName)
+        public unsafe FakeStruct FindChild(FakeStruct fake, string childName)
         {
             var data = (TransfromData*)fake.ip;
             var buff = fake.buffer;
@@ -273,51 +260,28 @@ namespace huqiang.Data
                 }
             return null;
         }
-        TempReflection reflections;
-        public void CloneComplete(FakeStruct mod, Transform trans)
-        {
-            if (reflections == null)
-                return;
-            var scr = trans.GetComponent<UIElement>();
-            if (scr != null)
-                scr.Initial(mod);
-            for (int i = 0; i < reflections.Top; i++)
-            {
-                var m = reflections.All[i];
-                if (m.name == trans.name)
-                {
-                    if (typeof(Component).IsAssignableFrom(m.FieldType))
-                        m.Value = trans.GetComponent(m.FieldType);
-                    reflections.Top--;
-                    var j = reflections.Top;
-                    var a = reflections.All[j];
-                    reflections.All[i] = a;
-                    reflections.All[j] = m;
-                    break;
-                }
-            }
-        }
-        public GameObject Clone(FakeStruct fake, object o)
+        /// <summary>
+        /// 克隆一个预制体对象
+        /// </summary>
+        /// <param name="fake"></param>
+        public GameObject Clone(FakeStruct fake)
         {
             if (fake == null)
                 return null;
-            reflections = ObjectFelds(o);
             long id = fake.GetInt64(0);
             var go = CreateNew(id);
-            types[0].loader.LoadToObject(fake, go.transform);
-            ReflectionModel[] all = reflections.All;
-            for (int i = 0; i < all.Length; i++)
-                all[i].field.SetValue(o, all[i].Value);
+            types[0].loader.LoadToObject(fake,go.transform,null);
             return go;
         }
-        public GameObject Clone(FakeStruct fake, TempReflection reflection)
+        public GameObject Clone(FakeStruct fake, Initializer initializer)
         {
             if (fake == null)
                 return null;
-            reflections = reflection;
             long id = fake.GetInt64(0);
             var go = CreateNew(id);
-            types[0].loader.LoadToObject(fake, go.transform);
+            types[0].loader.LoadToObject(fake, go.transform,initializer);
+            if (initializer != null)
+                initializer.Done();
             return go;
         }
     }

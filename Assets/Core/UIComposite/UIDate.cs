@@ -86,7 +86,7 @@ namespace huqiang.UIComposite
             var mui = mask.GetComponent<UIElement>();
             mui.userEvent.CutRect = true;
             Year = mask.Find("Year").GetComponent<UIElement>().composite as ScrollY;
-            Year.SetItemUpdate<ItemView, int>((o, e, i) => { o.Item.Text = e.ToString() + unitY; });
+            Year.SetItemUpdate<ItemView, int>((o, e, i) => { o.Item.Text = e.ToString(); });
             Year.Scroll = Scrolling;
             Year.ScrollEnd = YearScrollToEnd;
             Year.ItemDockCenter = true;
@@ -95,7 +95,7 @@ namespace huqiang.UIComposite
             Year.eventCall.UseAssignSize = true;
 
             Month = mask.Find("Month").GetComponent<UIElement>().composite as ScrollY;
-            Month.SetItemUpdate<ItemView, string>((o, e, i) => { o.Item.Text = e + unitM; });
+            Month.SetItemUpdate<ItemView, string>((o, e, i) => { o.Item.Text = e; });
             Month.Scroll = Scrolling;
             Month.ScrollEnd = MonthScrollToEnd;
             Month.ItemDockCenter = true;
@@ -104,7 +104,7 @@ namespace huqiang.UIComposite
             Month.eventCall.UseAssignSize = true;
 
             Day = mask.Find("Day").GetComponent<UIElement>().composite as ScrollY;
-            Day.SetItemUpdate<ItemView, string>((o, e, i) => { o.Item.Text = e + unitD; });
+            Day.SetItemUpdate<ItemView, string>((o, e, i) => { o.Item.Text = e ; });
             Day.Scroll = Scrolling;
             Day.ScrollEnd = DayScrollToEnd;
             Day.ItemDockCenter = true;

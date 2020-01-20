@@ -31,7 +31,7 @@ namespace huqiang.Data
     }
     public class TransfromLoader : DataLoader
     {
-        public unsafe override void LoadToObject(FakeStruct fake, Component com)
+        public unsafe override void LoadToObject(FakeStruct fake, Component com,Initializer initializer)
         {
             var transfrom = (TransfromData*)fake.ip;
             var trans = com as Transform;
@@ -64,7 +64,7 @@ namespace huqiang.Data
                         if (go != null)
                         {
                             go.transform.SetParent(trans);
-                            this.LoadToObject(fs, go.transform);
+                            this.LoadToObject(fs, go.transform,initializer);
                         }
                     }
                 }
@@ -74,7 +74,8 @@ namespace huqiang.Data
             trans.localPosition = transfrom->localPosition;
             trans.localScale = transfrom->localScale;
             trans.gameObject.layer = transfrom->layer;
-            gameobjectBuffer.CloneComplete(fake, trans);
+            if (initializer != null)
+                initializer.Initialiezd(fake,trans);
         }
         public unsafe override FakeStruct LoadFromObject(Component com,DataBuffer buffer)
         {

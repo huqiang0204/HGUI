@@ -53,6 +53,7 @@ namespace huqiang.UIComposite
         public Action<T, U, int> ItemUpdate;
         public Func<T, U, float> CalculItemHigh;
         UIContainer con;
+        UIInitializer initializer;
         public UILinker(UIContainer container, FakeStruct mod)
         {
             con = container;
@@ -74,7 +75,10 @@ namespace huqiang.UIComposite
                 }
             LinkerMod mod = new LinkerMod();
             T t = new T();
-            mod.main = HGUIManager.GameBuffer.Clone(model,t);
+            if (initializer == null)
+                initializer = new UIInitializer(t);
+            else initializer.Reset(t);
+            mod.main = HGUIManager.GameBuffer.Clone(model,initializer);
             mod.UI = t;
             return mod;
         }

@@ -154,6 +154,7 @@ namespace huqiang.UIComposite
         /// </summary>
         public Action<ScrollItem> ItemRecycle;
         public Transform Main;
+        protected UIInitializer initializer;
         public override  void Initial(FakeStruct mod, UIElement script)
         {
             base.Initial(mod,script);
@@ -221,7 +222,10 @@ namespace huqiang.UIComposite
                 else if (creator.create)
                 {
                     a.obj = creator.Create();
-                    a.target = HGUIManager.GameBuffer.Clone(ItemMod, a.obj).transform;
+                    if (initializer == null)
+                        initializer = new UIInitializer(a.obj);
+                    else initializer.Reset(a.obj);
+                    a.target = HGUIManager.GameBuffer.Clone(ItemMod, initializer).transform;
                 }
                 else
                 {

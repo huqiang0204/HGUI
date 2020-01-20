@@ -3,8 +3,6 @@ using huqiang.Core.HGUI;
 using huqiang.Data;
 using huqiang.UIComposite;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -423,74 +421,7 @@ public static class UICompositeMenu
 
     //    palette.AddComponent<PaletteHelper>().Initial();
     //}
-    //[MenuItem("GameObject/UIComposite/UIDate", false, 7)]
-    static public void AddDate(MenuCommand menuCommand)
-    {
-        GameObject parent = menuCommand.context as GameObject;
-        var date = new GameObject("Date", typeof(RectTransform));
-        RectTransform rect = date.transform as RectTransform;
-        rect.sizeDelta = new Vector2(360, 210);
-        if (parent != null)
-            rect.SetParent(parent.transform);
-        rect.localPosition = Vector3.zero;
-        rect.localScale = Vector3.one;
 
-        var now = DateTime.Now;
-        var Year = new GameObject("Year", typeof(RectTransform));
-        var fr = Year.transform as RectTransform;
-        fr.sizeDelta = new Vector2(120, 210);
-        fr.SetParent(rect);
-        fr.localPosition = new Vector3(-120, 0, 0);
-        fr.localScale = Vector3.one;
-        Year.AddComponent<HImage>();
-
-        var Item = new GameObject("Item", typeof(RectTransform));
-        var fn = Item.transform as RectTransform;
-        fn.sizeDelta = new Vector2(120, 30);
-        fn.SetParent(fr);
-        fn.localPosition = Vector3.zero;
-        fn.localScale = Vector3.one;
-        var txt = Item.AddComponent<HText>();
-        txt.TextAnchor = TextAnchor.MiddleCenter;
-        txt.Text = now.Year + " Year";
-        txt.FontSize = 24;
-
-        var Month = new GameObject("Month", typeof(RectTransform));
-        fr = Month.transform as RectTransform;
-        fr.sizeDelta = new Vector2(120, 210);
-        fr.SetParent(rect);
-        fr.localPosition = Vector3.zero;
-        fr.localScale = Vector3.one;
-
-        Item = new GameObject("Item", typeof(RectTransform));
-        fn = Item.transform as RectTransform;
-        fn.sizeDelta = new Vector2(120, 30);
-        fn.SetParent(fr);
-        fn.localPosition = Vector3.zero;
-        fn.localScale = Vector3.one;
-        txt = Item.AddComponent<HText>();
-        txt.TextAnchor = TextAnchor.MiddleCenter;
-        txt.Text = now.Month + " Month";
-        txt.FontSize = 24;
-
-        var Day = new GameObject("Day", typeof(RectTransform));
-        fr = Day.transform as RectTransform;
-        fr.sizeDelta = new Vector2(120, 210);
-        fr.SetParent(rect);
-        fr.localPosition = new Vector3(120, 0, 0);
-        fr.localScale = Vector3.one;
-
-        Item = new GameObject("Item", typeof(RectTransform));
-        fn = Item.transform as RectTransform;
-        fn.sizeDelta = new Vector2(120, 30);
-        fn.SetParent(fr);
-        fn.localPosition = Vector3.zero;
-        fn.localScale = Vector3.one;
-        txt = Item.AddComponent<HText>();
-        txt.TextAnchor = TextAnchor.MiddleCenter;
-        txt.Text = now.Day + " Day";
-        txt.FontSize = 24;
-    }
     [MenuItem("GameObject/HGUI/TreeView", false, 10)]
     static public void AddTreeView(MenuCommand menuCommand)
     {
@@ -513,6 +444,128 @@ public static class UICompositeMenu
         var txt = Item.AddComponent<HText>();
         txt.SizeDelta = new Vector2(200,40);
         txt.TextAnchor = TextAnchor.MiddleLeft;
+        txt.FontSize = 24;
+    }
+    [MenuItem("GameObject/HGUI/UIDate", false, 11)]
+    static public void AddDate(MenuCommand menuCommand)
+    {
+        GameObject parent = menuCommand.context as GameObject;
+        var date = new GameObject("Date");
+        var main = date.AddComponent<UIElement>();
+        main.SizeDelta = new Vector2(400,200);
+        main.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        main.compositeType = CompositeType.UIDate;
+        Transform rect = date.transform;
+        if (parent != null)
+            rect.SetParent(parent.transform);
+        rect.localPosition = Vector3.zero;
+        rect.localScale = Vector3.one;
+        rect.localRotation = Quaternion.identity;
+
+        var label = new GameObject("YearLabel", typeof(HText));
+        var ht = label.GetComponent<HText>();
+        ht.SizeDelta = new Vector2(80, 40);
+        ht.FontSize = 24;
+        ht.TextAnchor = TextAnchor.MiddleCenter;
+        ht.Text = "Year";
+        var lt = label.transform;
+        lt.SetParent(rect);
+        lt.localPosition = new Vector3(-80,0,0);
+        lt.localScale = Vector3.one;
+        lt.localRotation = Quaternion.identity;
+
+        label = new GameObject("MonthLabel", typeof(HText));
+        ht = label.GetComponent<HText>();
+        ht.SizeDelta = new Vector2(80, 40);
+        ht.FontSize = 24;
+        ht.TextAnchor = TextAnchor.MiddleCenter;
+        ht.Text = "Month";
+        lt = label.transform;
+        lt.SetParent(rect);
+        lt.localPosition = new Vector3(40, 0, 0);
+        lt.localScale = Vector3.one;
+        lt.localRotation = Quaternion.identity;
+
+        label = new GameObject("DayLabel", typeof(HText));
+        ht = label.GetComponent<HText>();
+        ht.SizeDelta = new Vector2(80, 40);
+        ht.FontSize = 24;
+        ht.TextAnchor = TextAnchor.MiddleCenter;
+        ht.Text = "Year";
+        lt = label.transform;
+        lt.SetParent(rect);
+        lt.localPosition = new Vector3(160, 0, 0);
+        lt.localScale = Vector3.one;
+        lt.localRotation = Quaternion.identity;
+
+        var now = DateTime.Now;
+        var Year = new GameObject("Year", typeof(UIElement));
+        var ui = Year.GetComponent<UIElement>();
+        ui.SizeDelta = new Vector2(80,400);
+        ui.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        ui.compositeType = CompositeType.ScrollY;
+        var fr = Year.transform;
+        fr.SetParent(rect);
+        fr.localPosition = new Vector3(-147, 0, 0);
+        fr.localScale = Vector3.one;
+        fr.localRotation = Quaternion.identity;
+
+        var Item = new GameObject("Item");
+        var fn = Item.transform;
+        fn.SetParent(fr);
+        fn.localPosition = Vector3.zero;
+        fn.localScale = Vector3.one;
+        fn.localRotation = Quaternion.identity;
+        var txt = Item.AddComponent<HText>();
+        txt.SizeDelta = new Vector2(60, 40);
+        txt.TextAnchor = TextAnchor.MiddleCenter;
+        txt.Text = now.Year.ToString();
+        txt.FontSize = 24;
+
+        var Month = new GameObject("Month",typeof(UIElement));
+        ui = Month.GetComponent<UIElement>();
+        ui.SizeDelta = new Vector2(80, 400);
+        ui.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        ui.compositeType = CompositeType.ScrollY;
+        fr = Month.transform;
+        fr.SetParent(rect);
+        fr.localPosition = new Vector3(-22,0,0);
+        fr.localScale = Vector3.one;
+        fr.localRotation = Quaternion.identity;
+
+        Item = new GameObject("Item");
+        fn = Item.transform;
+        fn.SetParent(fr);
+        fn.localPosition = Vector3.zero;
+        fn.localScale = Vector3.one;
+        fn.localRotation = Quaternion.identity;
+        txt = Item.AddComponent<HText>();
+        txt.SizeDelta = new Vector2(60,40);
+        txt.TextAnchor = TextAnchor.MiddleCenter;
+        txt.Text = now.Month.ToString();
+        txt.FontSize = 24;
+
+        var Day = new GameObject("Day", typeof(UIElement));
+        ui = Day.GetComponent<UIElement>();
+        ui.SizeDelta = new Vector2(80, 400);
+        ui.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        ui.compositeType = CompositeType.ScrollY;
+        fr = Day.transform;
+        fr.SetParent(rect);
+        fr.localPosition = new Vector3(107, 0, 0);
+        fr.localScale = Vector3.one;
+        fr.localRotation = Quaternion.identity;
+
+        Item = new GameObject("Item");
+        fn = Item.transform;
+        fn.SetParent(fr);
+        fn.localPosition = Vector3.zero;
+        fn.localScale = Vector3.one;
+        fn.localRotation = Quaternion.identity;
+        txt = Item.AddComponent<HText>();
+        txt.SizeDelta = new Vector2(60,40);
+        txt.TextAnchor = TextAnchor.MiddleCenter;
+        txt.Text = now.Day.ToString();
         txt.FontSize = 24;
     }
     //[MenuItem("GameObject/UIComposite/DropDown", false, 9)]

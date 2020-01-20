@@ -109,11 +109,28 @@ namespace huqiang.Other
         /// <returns></returns>
         public void LoadHSVT(float h)
         {
-            HSVTemplate(h, buffer);
             if (t2d == null)
                 t2d = new Texture2D(256, 256, TextureFormat.ARGB32, false);
+            HSVTemplate(h, buffer);
             t2d.SetPixels(buffer);
             t2d.Apply();
+        }
+        /// <summary>
+        /// 主线程访问此函数
+        /// </summary>
+        /// <returns></returns>
+        public void AwaitLoadHSVT(float h)
+        {
+            if (t2d == null)
+                t2d = new Texture2D(256, 256, TextureFormat.ARGB32, false);
+            ThreadMission.AddMission(
+                (o)=> {
+                HSVTemplate(h, buffer);
+            },null, null, 
+                (o)=> {
+                t2d.SetPixels(buffer);
+                t2d.Apply();
+            });
         }
         /// <summary>
         /// 多线程使用此函数

@@ -362,65 +362,6 @@ public static class UICompositeMenu
         son.localScale = Vector3.one;
        
     }
-    //[MenuItem("GameObject/UIComposite/UIPalette", false, 6)]
-    //static public void AddPalette(MenuCommand menuCommand)
-    //{
-    //    GameObject parent = menuCommand.context as GameObject;
-    //    var palette = new GameObject("Palette", typeof(RectTransform));
-    //    RectTransform rect = palette.transform as RectTransform;
-    //    rect.sizeDelta = new Vector2(500, 500);
-    //    if (parent != null)
-    //        rect.SetParent(parent.transform);
-    //    rect.localPosition = Vector3.zero;
-    //    rect.localScale = Vector3.one;
-    //    palette.AddComponent<RawImage>();
-
-
-    //    var Fill = new GameObject("HTemplate", typeof(RectTransform));
-    //    var fr = Fill.transform as RectTransform;
-    //    fr.sizeDelta = new Vector2(256, 256);
-    //    fr.SetParent(rect);
-    //    fr.localPosition = Vector3.zero;
-    //    fr.localScale = Vector3.one;
-    //    Fill.AddComponent<RawImage>();
-
-    //    var Nob = new GameObject("NobA", typeof(RectTransform));
-    //    var fn = Nob.transform as RectTransform;
-    //    fn.sizeDelta = new Vector2(44, 44);
-    //    fn.SetParent(rect);
-    //    fn.localPosition = new Vector3(0, -220, 0);
-    //    fn.localScale = Vector3.one;
-    //    var img = Nob.AddComponent<Image>();
-    //    var aim = img.sprite = EditorModelManager.FindSprite(icons, Aim);
-
-    //    Nob = new GameObject("NobB", typeof(RectTransform));
-    //    fn = Nob.transform as RectTransform;
-    //    fn.sizeDelta = new Vector2(24, 24);
-    //    fn.SetParent(rect);
-    //    fn.localPosition = new Vector3(-128, 128, 0);
-    //    fn.localScale = Vector3.one;
-    //    Nob.AddComponent<Image>().sprite = aim;
-
-    //    var Slider = new GameObject("Slider", typeof(RectTransform));
-    //    fn = Slider.transform as RectTransform;
-    //    fn.sizeDelta = new Vector2(400, 20);
-    //    fn.SetParent(rect);
-    //    fn.localPosition = new Vector3(0, -285, 0);
-    //    fn.localScale = Vector3.one;
-    //    Slider.AddComponent<RawImage>();
-
-    //    Nob = new GameObject("Nob", typeof(RectTransform));
-    //    fn = Nob.transform as RectTransform;
-    //    fn.sizeDelta = new Vector2(30, 30);
-    //    fn.SetParent(Slider.transform);
-    //    fn.localPosition = new Vector3(200, 0, 0);
-    //    fn.localScale = Vector3.one;
-    //    img = Nob.AddComponent<Image>();
-    //    img.color = new Color(1, 1, 1, 1f);
-    //    img.sprite = aim;
-
-    //    palette.AddComponent<PaletteHelper>().Initial();
-    //}
 
     [MenuItem("GameObject/HGUI/TreeView", false, 10)]
     static public void AddTreeView(MenuCommand menuCommand)
@@ -567,6 +508,75 @@ public static class UICompositeMenu
         txt.TextAnchor = TextAnchor.MiddleCenter;
         txt.Text = now.Day.ToString();
         txt.FontSize = 24;
+    }
+    [MenuItem("GameObject/HGUI/UIPalette", false, 12)]
+    static public void AddPalette(MenuCommand menuCommand)
+    {
+        GameObject parent = menuCommand.context as GameObject;
+        var palette = new GameObject("Palette");
+        var main = palette.AddComponent<HImage>();
+        main.SizeDelta = new Vector2(500,500);
+        main.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        main.compositeType = CompositeType.UIPalette;
+        Transform rect = palette.transform;
+        if (parent != null)
+            rect.SetParent(parent.transform);
+        rect.localPosition = Vector3.zero;
+        rect.localScale = Vector3.one;
+        rect.localRotation = Quaternion.identity;
+
+        var Fill = new GameObject("HTemplate");
+        var fr = Fill.transform;
+        var ht = Fill.AddComponent<HImage>();
+        ht.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        ht.SizeDelta = new Vector2(256, 256);
+        fr.SetParent(rect);
+        fr.localPosition = Vector3.zero;
+        fr.localScale = Vector3.one;
+        fr.localRotation = Quaternion.identity;
+
+        var Nob = new GameObject("NobA");
+        var fn = Nob.transform;
+        fn.SetParent(rect);
+        fn.localPosition = new Vector3(0, -220, 0);
+        fn.localScale = Vector3.one;
+        fn.localRotation = Quaternion.identity;
+        var img = Nob.AddComponent<HImage>();
+        img.SizeDelta = new Vector2(44,44);
+        var aim = img.Sprite = EditorModelManager.FindSprite(icons, Aim);
+
+        Nob = new GameObject("NobB");
+        fn = Nob.transform ;
+        fn.SetParent(rect);
+        fn.localPosition = new Vector3(-128, 128, 0);
+        fn.localScale = Vector3.one;
+        fn.localRotation = Quaternion.identity;
+        img = Nob.AddComponent<HImage>();
+        img.SizeDelta= new Vector2(24, 24);
+        img.Sprite = aim;
+
+        var Slider = new GameObject("Slider");
+        fn = Slider.transform;
+        fn.SetParent(rect);
+        fn.localPosition = new Vector3(0, -285, 0);
+        fn.localScale = Vector3.one;
+        fn.localRotation = Quaternion.identity;
+        img= Slider.AddComponent<HImage>();
+        img.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        img.compositeType = CompositeType.Slider;
+        img.SizeDelta = new Vector2(400, 20);
+
+        Nob = new GameObject("Nob");
+        fn = Nob.transform;
+        fn.SetParent(Slider.transform);
+        fn.localPosition = new Vector3(200, 0, 0);
+        fn.localScale = Vector3.one;
+        img = Nob.AddComponent<HImage>();
+        img.SizeDelta= new Vector2(30, 30);
+        img.Chromatically = new Color(1, 1, 1, 1f);
+        img.Sprite = aim;
+
+        palette.AddComponent<PaletteHelper>().Initial();
     }
     //[MenuItem("GameObject/UIComposite/DropDown", false, 9)]
     //static public void AddDropDown(MenuCommand menuCommand)

@@ -43,14 +43,15 @@ namespace huqiang.Core.HGUI
                 {
                     if (typeof(Component).IsAssignableFrom(m.FieldType))
                         m.Value = com.GetComponent(m.FieldType);
-                    else if (typeof(UserEvent).IsAssignableFrom(m.FieldType))
-                    {
-                        if (scr != null)
-                            m.Value = scr.userEvent;
-                    }else if(typeof(Composite).IsAssignableFrom(m.FieldType))
+                    else if(typeof(Composite).IsAssignableFrom(m.FieldType))
                     {
                         if (scr != null)
                             m.Value = scr.composite;
+                    }
+                    else
+                    {
+                        if (scr != null)
+                            m.Value = scr.userEvent;
                     }
                     reflections.Top--;
                     var j = reflections.Top;

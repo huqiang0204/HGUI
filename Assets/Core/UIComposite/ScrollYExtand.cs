@@ -43,6 +43,7 @@ namespace huqiang.UIComposite
             eventCall.ForceEvent = true;
             Size = Enity.SizeDelta;
             eventCall.CutRect = true;
+            HGUIManager.GameBuffer.RecycleChild(Enity.gameObject);
             ItemParent = HGUIManager.GameBuffer.CreateNew(1).transform;
             ItemParent.SetParent(Enity.transform);
             ItemParent.name = "Items";
@@ -53,6 +54,13 @@ namespace huqiang.UIComposite
             ItemMod = HGUIManager.FindChild(fake, "Item");
             TailMod = HGUIManager.FindChild(fake, "Tail");
             Body = HGUIManager.FindChild(fake, "Body");
+            unsafe
+            {
+                ItemSize = ((TransfromData*)ItemMod.ip)->size;
+                TitleSize= ((TransfromData*)TitleMod.ip)->size;
+                if(TailMod!=null)
+                    TailSize= ((TransfromData*)TailMod.ip)->size;
+            }
         }
         void Scrolling(UserEvent back, Vector2 v)
         {
@@ -132,7 +140,6 @@ namespace huqiang.UIComposite
             Size = Enity.SizeDelta;
             CalculSize();
             Order(true);
-
         }
         public void CalculSize()
         {
@@ -176,6 +183,8 @@ namespace huqiang.UIComposite
             PushItems();
             float y = Point;
             float oy = 0;
+            if (BindingData == null)
+                return;
             for (int i = 0; i < BindingData.Count; i++)
             {
                 var dat = BindingData[i];
@@ -378,6 +387,7 @@ namespace huqiang.UIComposite
                     a.target = HGUIManager.GameBuffer.Clone(ItemMod, con.initializer).transform;
                 }
             }
+            a.target.SetParent(parent);
             return a;
         }
         ScrollItem CreateTitle()

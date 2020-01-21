@@ -45,6 +45,8 @@ namespace huqiang.Core.HGUI
             tar.Mask = src->Mask;
             tar.eventType = src->eventType;
             tar.compositeType = src->compositeType;
+            tar.userEvent = null;
+            tar.composite = null;
         }
         protected unsafe void SaveScript(byte* ip, UIElement src)
         {

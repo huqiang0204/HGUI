@@ -16,7 +16,7 @@ public class Scrollex:UIPage
     }
     class TitleItem
     {
-        public UserEvent bk;
+        public UserEvent Image;
         public HText Text;
     }
     class SubItem
@@ -28,7 +28,7 @@ public class Scrollex:UIPage
     {
         base.Initial(parent, dat);
         view = LoadUI<View>("baseUI", "scrollex");//"baseUI"创建的bytes文件名,"page"为创建的页面名
-
+        InitialScrollEx();
     }
     void InitialScrollEx()
     {
@@ -70,8 +70,8 @@ public class Scrollex:UIPage
     void TitleUpdate(TitleItem title, ScrollYExtand.DataTemplate data, int index)
     {
         title.Text.Text = data.Title as string;
-        title.bk.DataContext = data;
-        title.bk.Click = (o, e) => {
+        title.Image.DataContext = data;
+        title.Image.Click = (o, e) => {
             var dt = o.DataContext as ScrollYExtand.DataTemplate;
             if (dt.Hide)
             {

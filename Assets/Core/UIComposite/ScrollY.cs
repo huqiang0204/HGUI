@@ -86,8 +86,6 @@ namespace huqiang.UIComposite
         {
             back.DecayRateY = DecayRate;
             Scrolling(back, v);
-            if (Scroll != null)
-                Scroll(this, v);
         }
         /// <summary>
         /// 
@@ -99,7 +97,7 @@ namespace huqiang.UIComposite
             if (Main == null)
                 return;
             Vector2 u = v;
-            v.y /= eventCall.Context.transform.localScale.y;
+            v.y /= Enity.transform.localScale.y;
             back.VelocityX = 0;
             v.x = 0;
             float x = 0;

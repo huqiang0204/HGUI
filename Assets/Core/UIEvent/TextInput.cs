@@ -247,19 +247,24 @@ namespace huqiang.UIEvent
                         var state = KeyPressed();
                         if (state == EditState.Continue)
                         {
+
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN
                             if (Keyboard.InputChanged)
                             {
                                 if (Keyboard.InputString == "")
                                     return;
-#if UNITY_EDITOR || UNITY_STANDALONE_WIN
                                 if (Keyboard.Nokey())
                                     InputEvent.OnInputChanged(IME.CurrentCompStr());
                                 else
                                     InputEvent.OnInputChanged(Keyboard.InputString);
-#else
-                                   InputEvent.TouchInputChanged(Keyboard.InputString);
-#endif
                             }
+#else
+                                InputEvent.TouchInputChanged(Keyboard.TouchString);
+                                if (Keyboard.status == TouchScreenKeyboard.Status.Done)
+                                    if (InputEvent.OnSubmit != null)
+                                        InputEvent.OnSubmit(InputEvent);
+#endif
+                            
                         }
                         else if (state == EditState.Finish)
                         {
@@ -277,12 +282,10 @@ namespace huqiang.UIEvent
         #endregion
 
         string m_TipString = "";
-        string m_inputString="";
         public string InputString { get { return Text.FullString; }
             set {
                 value = ValidateString(value);
                 Text.FullString = value;
-                m_inputString = value;
                 GetPreferredHeight();
                 PointerMoveEnd();
                 SetShowText();
@@ -444,17 +447,14 @@ namespace huqiang.UIEvent
                     var str = mod.buffer.GetData(tp->inputString) as string;
                     str = ValidateString(str);
                     Text.FullString = str;
-                    m_inputString = str;
                 }
                 else {
                     string str = txt.Text;
                     str = ValidateString(str);
                     Text.FullString = str;
-                    m_inputString = str;
                 }
             }
             AutoColor = false;
-            Text.FullString = m_inputString;
             GetPreferredHeight();
         }
         public override void OnMouseDown(UserAction action)
@@ -472,10 +472,14 @@ namespace huqiang.UIEvent
             {
                 InputEvent = this;
                 bool pass = InputEvent.contentType == ContentType.Password ? true : false;
-                Keyboard.OnInput(m_inputString, InputEvent.touchType, InputEvent.multiLine, pass, CharacterLimit);
+                Keyboard.OnInput(Text.FullString, InputEvent.touchType, InputEvent.multiLine, pass, CharacterLimit);
                 InputCaret.SetParent(Context.transform);
                 pressOffset = StartPress.Offset;
                 Editing = true;
+            }else if(!Keyboard.active)
+            {
+                bool pass = InputEvent.contentType == ContentType.Password ? true : false;
+                Keyboard.OnInput(Text.FullString, InputEvent.touchType, InputEvent.multiLine, pass, CharacterLimit);
             }
             Style = 1;
         }
@@ -537,9 +541,24 @@ namespace huqiang.UIEvent
         }
         string TouchInputChanged(string input)
         {
-            if (input == "")
-                return "";
-            Text.FullString = input;
+            if(Keyboard.InputChanged)
+            {
+                Text.FullString = input;
+                GetPreferredHeight();
+            }
+            if (Keyboard.selection.length > 0)
+            {
+                StartIndex = Keyboard.selection.start;
+                EndIndex = Keyboard.selection.end;
+                Style = 2;
+                ShowChanged = true;
+            }
+            else
+            {
+                StartIndex = Keyboard.selection.start;
+                SetShowStart();
+                Style = 1;
+            }
             if (OnValueChanged != null)
                 OnValueChanged(this);
             SetShowText();
@@ -575,7 +594,7 @@ namespace huqiang.UIEvent
                     TextCom.Populate();
                     ShowChanged = true;
                 }
-                if(Style==2)
+                if(Style == 2)
                 {
                     if(ShowChanged)
                     {

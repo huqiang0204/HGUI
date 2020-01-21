@@ -65,13 +65,20 @@ namespace huqiang.Core.HGUI
         private void Update()
         {
             CheckSize();
-            ApplyMeshRenderer();
             UserAction.Update();
-            Keyboard.DispatchEvent();
+            Keyboard.InfoCollection();
             DispatchUserAction();
             InputCaret.UpdateCaret();
+            if (UIPage.CurrentPage != null)
+                UIPage.CurrentPage.Update(UserAction.TimeSlice);
             MainMission();
             ThreadMission.ExtcuteMain();
+        }
+        private void LateUpdate()
+        {
+            TxtCollector.GenerateTexture();
+            SubMission(null);
+            ApplyMeshRenderer();
         }
         MeshFilter meshFilter;
         MeshRenderer renderer;
@@ -88,18 +95,19 @@ namespace huqiang.Core.HGUI
                     meshFilter.mesh = mesh;
                 }
                 mesh.Clear();
-                if (swapVertex != null)
+                if (vertex != null)
                 {
-                    mesh.vertices = swapVertex;
-                    mesh.uv = swapUV;
-                    mesh.uv2 = swapUV1;
-                    mesh.uv3 = swapUV2;
-                    mesh.colors32 = swapColors;
-                    if (swapSubmesh != null)
+                    mesh.vertices = vertex.ToArray();
+                    mesh.uv = uv.ToArray();
+                    mesh.uv2 = uv1.ToArray();
+                    mesh.uv3 = uv2.ToArray();
+                    mesh.colors32 = colors.ToArray();
+                    var submesh= MatCollector.submesh;
+                    if (submesh != null)
                     {
-                        mesh.subMeshCount = swapSubmesh.Length;
-                        for (int i = 0; i < swapSubmesh.Length; i++)
-                            mesh.SetTriangles(swapSubmesh[i], i);
+                        mesh.subMeshCount = submesh.Count;
+                        for (int i = 0; i < submesh.Count; i++)
+                            mesh.SetTriangles(submesh[i], i);
                     }
                 }
             }
@@ -305,14 +313,10 @@ namespace huqiang.Core.HGUI
                 var scr = scripts[i];
                 if (scr.userEvent != null)
                     scr.userEvent.Update();
-                //if (scr.composite != null)
-                //    scr.composite.Update();
                 scripts[i].MainUpdate();
             }
             TextInput.Dispatch();
             InputCaret.UpdateCaret();
-            TxtCollector.GenerateTexture();
-            thread.AddSubMission(SubMission, null);
         }
         void SubMission(object obj)
         {
@@ -331,12 +335,6 @@ namespace huqiang.Core.HGUI
               
             ClearMesh();
             HBatch.Batch(this, PipeLine);
-            swapVertex = vertex.ToArray();
-            swapUV = uv.ToArray();
-            swapUV1 = uv1.ToArray();
-            swapUV2 = uv2.ToArray();
-            swapColors = colors.ToArray();
-            swapSubmesh = MatCollector.submesh.ToArray();
         }
         internal TextCollector TxtCollector = new TextCollector();
         internal List<Vector3> vertex = new List<Vector3>();
@@ -345,14 +343,7 @@ namespace huqiang.Core.HGUI
         internal List<Vector2> uv2 = new List<Vector2>();
         internal List<Color32> colors = new List<Color32>();
         
-        Vector3[] swapVertex;
-        Vector2[] swapUV;
-        Vector2[] swapUV1;
-        Vector2[] swapUV2;
-        Color32[] swapColors;
-        Material[] swapMaterials;
         internal MaterialCollector MatCollector = new MaterialCollector();
-        int[][] swapSubmesh;
         void ClearMesh()
         {
             vertex.Clear();
@@ -405,18 +396,19 @@ namespace huqiang.Core.HGUI
                     mf.mesh = mesh;
                 }
                 mesh.Clear();
-                if (swapVertex != null)
+                if (vertex != null)
                 {
-                    mesh.vertices = swapVertex;
-                    mesh.uv = swapUV;
-                    mesh.uv2 = swapUV1;
-                    mesh.uv3 = swapUV2;
-                    mesh.colors32 = swapColors;
-                    if (swapSubmesh != null)
+                    mesh.vertices = vertex.ToArray();
+                    mesh.uv = uv.ToArray();
+                    mesh.uv2 = uv1.ToArray();
+                    mesh.uv3 = uv2.ToArray();
+                    mesh.colors32 = colors.ToArray();
+                    var submesh = MatCollector.submesh;
+                    if (submesh != null)
                     {
-                        mesh.subMeshCount = swapSubmesh.Length;
-                        for (int i = 0; i < swapSubmesh.Length; i++)
-                            mesh.SetTriangles(swapSubmesh[i], i);
+                        mesh.subMeshCount = submesh.Count;
+                        for (int i = 0; i < submesh.Count; i++)
+                            mesh.SetTriangles(submesh[i], i);
                     }
                 }
             }

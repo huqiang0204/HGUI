@@ -9,20 +9,26 @@ namespace huqiang.UIEvent
 {
     public class Keyboard
     {
+        public enum TouchOpertaion
+        {
+            None,
+            Insert,
+            Delete
+        }
         static KeyCode[] keys;
         public static List<KeyCode> KeyPress;
         public static List<KeyCode> KeyDowns;
         public static List<KeyCode> KeyUps;
         public static string InputString;
         public static string CorrectionInput;
-        public static string TouchString;
+        public static string TouchString="";
         public static string CorrectionTouch;
         public static bool InputChanged;
         static TouchScreenKeyboard m_touch;
         static bool _touch = false;
         public static IMECompositionMode iME;
         public static string systemCopyBuffer;
-        public static void DispatchEvent()
+        public static void InfoCollection()
         {
             systemCopyBuffer = GUIUtility.systemCopyBuffer;
             if (keys == null)
@@ -52,10 +58,6 @@ namespace huqiang.UIEvent
                 if (Input.GetKeyUp(key))
                     KeyUps.Add(key);
             }
-            if (InputString != Input.inputString)
-                InputChanged = true;
-            else InputChanged = false;
-            InputString = Input.inputString;
             if(_touch)
             {
                 if(m_touch!=null)
@@ -67,12 +69,21 @@ namespace huqiang.UIEvent
                         type = m_touch.type;
 #endif
                         selection = m_touch.selection;
-                        TouchString = m_touch.text;
+                        string str = m_touch.text;
+                        InputChanged = true;
+                        TouchString = str;
                         canGetSelection = m_touch.canGetSelection;
                         status = m_touch.status;
                     }
                     active = m_touch.active;
                 }
+            }
+            else
+            {
+                if (InputString != Input.inputString)
+                    InputChanged = true;
+                else InputChanged = false;
+                InputString = Input.inputString;
             }
             iME = Input.imeCompositionMode;
         }
@@ -80,7 +91,7 @@ namespace huqiang.UIEvent
         {
             if(_touch)
             {
-                m_touch = TouchScreenKeyboard.Open("", type, true, multiLine, passward);
+                m_touch = TouchScreenKeyboard.Open(str, type, true, multiLine, passward);
                 m_touch.characterLimit = limit;
             }
         }
@@ -127,44 +138,6 @@ namespace huqiang.UIEvent
             if (KeyUps.Contains(key))
                 return true;
             return false;
-        }
-        static string GetDifferentString(string a,string b,ref int index)
-        {
-            if (b.Length < a.Length)
-            {
-                var tmp = a;
-                a = b;
-                b = tmp;
-            }
-            int min = a.Length;
-            int max = b.Length;
-            index = max - 1;
-            for(int i=0;i<min;i++)
-            {
-                if(a[i]!=b[i])
-                {
-                    index = i;
-                    break;
-                }
-            }
-            int k = max - 1;
-            if (k == index)
-                return "";
-            int e = index;
-            int j=min-1;
-            for(int i=0;i<max;i++)
-            {
-                if(a[j]!=b[k])
-                {
-                    e = k;
-                    break;
-                }
-                j--;
-                if (j < 0)
-                    break;
-                k--;
-            }
-            return b.Substring(index,e-index);
         }
     }
 }

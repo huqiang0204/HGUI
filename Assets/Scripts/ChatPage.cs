@@ -185,5 +185,9 @@ namespace Assets.Scripts
         {
             return 40;
         }
+        public override void Update(float time)
+        {
+            
+        }
     }
 }

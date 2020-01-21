@@ -250,10 +250,6 @@ public class UIPage : UIBase
         page.DataContext = DataContext;
         pages.Push(page);
     }
-    /// <summary>
-    /// 分线程更新
-    /// </summary>
-    /// <param name="time"></param>
     public override void Update(float time)
     {
         if (currentPop != null)

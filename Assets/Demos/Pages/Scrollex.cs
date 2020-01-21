@@ -12,7 +12,7 @@ public class Scrollex:UIPage
     //反射UI界面上的物体
     class View
     {
-        public UIElement scrollY;
+        public ScrollYExtand scrollY;
     }
     class TitleItem
     {
@@ -60,7 +60,7 @@ public class Scrollex:UIPage
         tmp.Data = list;
         datas.Add(tmp);
 
-        ScrollYExtand scrollY = view.scrollY.composite as ScrollYExtand;
+        ScrollYExtand scrollY = view.scrollY;
         scrollY.BindingData = datas;
         scrollY.SetTitleUpdate<TitleItem, ScrollYExtand.DataTemplate>(TitleUpdate);
         scrollY.SetItemUpdate<SubItem, string>(ItemUpdate);
@@ -73,21 +73,21 @@ public class Scrollex:UIPage
         title.bk.DataContext = data;
         title.bk.Click = (o, e) => {
             var dt = o.DataContext as ScrollYExtand.DataTemplate;
-            //if (dt.Hide)
-            //{
-            //    view.scroll.OpenSection(dt);
-            //    if (current != dt)
-            //    {
-            //        view.scroll.HideSection(current);
-            //    }
-            //    current = dt;
-            //}
-            //else
-            //{
-            //    view.scroll.HideSection(dt);
-            //    if (dt == current)
-            //        current = null;
-            //}
+            if (dt.Hide)
+            {
+                view.scrollY.OpenSection(dt);
+                if (current != dt)
+                {
+                    view.scrollY.HideSection(current);
+                }
+                current = dt;
+            }
+            else
+            {
+                view.scrollY.HideSection(dt);
+                if (dt == current)
+                    current = null;
+            }
         };
     }
     void ItemUpdate(SubItem item, string data, int index)

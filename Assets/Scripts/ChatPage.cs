@@ -20,6 +20,7 @@ namespace Assets.Scripts
             public UIElement center;
             public UIElement right;
             public UIElement treeView;
+            public HImage send;
         }
   
         class ChatItem
@@ -51,6 +52,7 @@ namespace Assets.Scripts
         UILinker<ChatItem, ChatData> other;
         UILinker<ChatItem, ChatData> self;
         UILinker<TipItem, TipData> tip;
+        TextInput input;
         public override void Initial(Transform parent, object dat = null)
         {
             base.Initial(parent, dat);
@@ -101,7 +103,7 @@ namespace Assets.Scripts
             option.AddEvent(view.center.userEvent);
             option.SelectChanged = SelectChanged;
             option.Selecet = view.right.userEvent;
-            TextInput input = view.input.userEvent as TextInput;
+            input = view.input.userEvent as TextInput;
             input.OnSubmit = OnSubmit;
             container = view.chatbox.composite as UIContainer;
             other = container.RegLinker<ChatItem, ChatData>("other");
@@ -111,6 +113,7 @@ namespace Assets.Scripts
             self.CalculItemHigh = GetContentSize;
             self.ItemUpdate = ItemUpdate;
             container.RegLinker<TipItem, TipData>("tip");
+            view.send.userEvent.Click = (o, e) => {OnSubmit(input); };
         }
         void SelectChanged(OptionGroup option,UserAction action)
         {

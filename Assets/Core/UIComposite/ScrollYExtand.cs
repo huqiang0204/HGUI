@@ -30,6 +30,7 @@ namespace huqiang.UIComposite
         public float Point;
         public Vector2 ActualSize;
         public Action<ScrollYExtand, Vector2> Scroll;
+        Transform BodyParent;
         Transform TitleParent;
         Transform ItemParent;
         public override void Initial(FakeStruct fake,UIElement element)
@@ -44,11 +45,23 @@ namespace huqiang.UIComposite
             Size = Enity.SizeDelta;
             eventCall.CutRect = true;
             HGUIManager.GameBuffer.RecycleChild(Enity.gameObject);
+            BodyParent = HGUIManager.GameBuffer.CreateNew(1).transform;
+            BodyParent.SetParent(Enity.transform);
+            BodyParent.localPosition = Vector3.zero;
+            BodyParent.localScale = Vector3.one;
+            BodyParent.localRotation = Quaternion.identity;
+            BodyParent.name = "Bodys";
             ItemParent = HGUIManager.GameBuffer.CreateNew(1).transform;
             ItemParent.SetParent(Enity.transform);
+            ItemParent.localPosition = Vector3.zero;
+            ItemParent.localScale = Vector3.one;
+            ItemParent.localRotation = Quaternion.identity;
             ItemParent.name = "Items";
             TitleParent = HGUIManager.GameBuffer.CreateNew(1).transform;
             TitleParent.SetParent(Enity.transform);
+            TitleParent.localPosition = Vector3.zero;
+            TitleParent.localScale = Vector3.one;
+            TitleParent.localRotation = Quaternion.identity;
             TitleParent.name = "Titles";
             TitleMod =  HGUIManager.FindChild(fake,"Title");
             ItemMod = HGUIManager.FindChild(fake, "Item");
@@ -370,13 +383,13 @@ namespace huqiang.UIComposite
             ScrollItem a = new ScrollItem();
             if (con == null)
             {
-                a.obj = HGUIManager.GameBuffer.Clone(mod).transform;
+                a.obj = a.target = HGUIManager.GameBuffer.Clone(mod).transform;
             }
             else
             {
                 if (con.hotfix)
                 {
-                    var trans = HGUIManager.GameBuffer.Clone(mod).transform;
+                    var trans = a.target = HGUIManager.GameBuffer.Clone(mod).transform;
                     if (con.reflect != null)
                         a.obj = con.reflect(trans);
                     else a.obj = trans;
@@ -384,10 +397,12 @@ namespace huqiang.UIComposite
                 else
                 {
                     a.obj = con.Create();
-                    a.target = HGUIManager.GameBuffer.Clone(ItemMod, con.initializer).transform;
+                    a.target = HGUIManager.GameBuffer.Clone(mod, con.initializer).transform;
                 }
             }
             a.target.SetParent(parent);
+            a.target.localScale = Vector3.one;
+            a.target.localRotation = Quaternion.identity;
             return a;
         }
         ScrollItem CreateTitle()
@@ -404,7 +419,7 @@ namespace huqiang.UIComposite
         }
         ScrollItem CreateBody()
         {
-            return CreateItem(BodyRecycler, null, Body, Enity.transform);
+            return CreateItem(BodyRecycler, null, Body, BodyParent);
         }
         protected void PushItems(List<ScrollItem> tar, List<ScrollItem> src)
         {

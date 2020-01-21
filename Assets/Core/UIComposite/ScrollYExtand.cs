@@ -235,7 +235,10 @@ namespace huqiang.UIComposite
             }
             Bodys.Add(t);
             t.target.localPosition = new Vector3(0, Size.y * 0.5f - os - h * 0.5f, 0);
-            //t.target.GetComponent<UIElement>().SizeDelta.y = h;
+            var ui = t.target.GetComponent<UIElement>();
+            var size = ui.SizeDelta;
+            size.y = h;
+            ui.SizeDelta = size;
             t.target.gameObject.SetActive(true);
             if (dat.Data != null)
                 for (int i = 0; i < dat.Data.Count; i++)
@@ -257,9 +260,9 @@ namespace huqiang.UIComposite
                 t.index = index;
             }
             Items.Add(t);
-            //float h = parent.data.sizeDelta.y*0.5f;
-            //t.target.data.localPosition = new Vector3(ItemOffset.x,  h - oy + ItemOffset.y - ItemSize.y * 0.5f, 0);
-            //t.target.activeSelf = true;
+            float h = parent.GetComponent<UIElement>().SizeDelta.y * 0.5f;
+            t.target.localPosition = new Vector3(ItemOffset.x, h - oy + ItemOffset.y - ItemSize.y * 0.5f, 0);
+            t.target.gameObject.SetActive(true);
             t.target.SetParent(parent);
             ItemUpdate(t.obj, dat, index, ItemCreator);
         }

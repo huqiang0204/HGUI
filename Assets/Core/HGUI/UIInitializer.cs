@@ -1,4 +1,6 @@
 ﻿using huqiang.Data;
+using huqiang.UIComposite;
+using huqiang.UIEvent;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -41,6 +43,15 @@ namespace huqiang.Core.HGUI
                 {
                     if (typeof(Component).IsAssignableFrom(m.FieldType))
                         m.Value = com.GetComponent(m.FieldType);
+                    else if (typeof(UserEvent).IsAssignableFrom(m.FieldType))
+                    {
+                        if (scr != null)
+                            m.Value = scr.userEvent;
+                    }else if(typeof(Composite).IsAssignableFrom(m.FieldType))
+                    {
+                        if (scr != null)
+                            m.Value = scr.composite;
+                    }
                     reflections.Top--;
                     var j = reflections.Top;
                     var a = reflections.All[j];

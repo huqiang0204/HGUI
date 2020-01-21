@@ -28,7 +28,8 @@ namespace huqiang.Core.HGUI
         UIContainer,
         TreeView,
         UIDate,
-        UIPalette
+        UIPalette,
+        ScrollYExtand
     }
     public class UIElement:MonoBehaviour
     {
@@ -374,6 +375,9 @@ namespace huqiang.Core.HGUI
                     break;
                 case CompositeType.UIPalette:
                     new UIPalette().Initial(ex,script);
+                    break;
+                case CompositeType.ScrollYExtand:
+                    new ScrollYExtand().Initial(ex,script);
                     break;
             }
         }

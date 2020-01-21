@@ -29,12 +29,19 @@ namespace huqiang.UIComposite
         public bool create;
         public Action<object, object, int> Update;
         public Func<Transform, object> reflect;
+        public Initializer initializer;
     }
     public class Middleware<T, U> : Constructor where T : class, new()
     {
+        public Middleware()
+        {
+            initializer = new UIInitializer(TempReflection.ObjectFields(typeof(T)));
+        }
         public override object Create()
         {
-            return new T();
+            var t = new T();
+            initializer.Reset(t);
+            return t;
         }
         public Action<T, U, int> Invoke;
         U u;
@@ -154,7 +161,6 @@ namespace huqiang.UIComposite
         /// </summary>
         public Action<ScrollItem> ItemRecycle;
         public Transform Main;
-        protected UIInitializer initializer;
         public override  void Initial(FakeStruct mod, UIElement script)
         {
             base.Initial(mod,script);
@@ -222,10 +228,7 @@ namespace huqiang.UIComposite
                 else if (creator.create)
                 {
                     a.obj = creator.Create();
-                    if (initializer == null)
-                        initializer = new UIInitializer(a.obj);
-                    else initializer.Reset(a.obj);
-                    a.target = HGUIManager.GameBuffer.Clone(ItemMod, initializer).transform;
+                    a.target = HGUIManager.GameBuffer.Clone(ItemMod, creator.initializer).transform;
                 }
                 else
                 {

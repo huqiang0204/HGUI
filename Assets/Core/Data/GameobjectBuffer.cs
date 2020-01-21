@@ -49,9 +49,9 @@ namespace huqiang.Data
     {
         public int Top;
         public ReflectionModel[] All;
-        public static TempReflection ObjectFields(object obj)
+        public static TempReflection ObjectFields(Type type)
         {
-            var fs = obj.GetType().GetFields();
+            var fs = type.GetFields();
             TempReflection temp = new TempReflection();
             temp.Top = fs.Length;
             ReflectionModel[] reflections = new ReflectionModel[temp.Top];
@@ -65,6 +65,10 @@ namespace huqiang.Data
             }
             temp.All = reflections;
             return temp;
+        }
+        public static TempReflection ObjectFields(object obj)
+        {
+            return ObjectFields(obj.GetType());
         }
     }
     public class GameobjectBuffer

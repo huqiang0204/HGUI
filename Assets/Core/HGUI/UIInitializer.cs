@@ -19,9 +19,10 @@ namespace huqiang.Core.HGUI
         public UIInitializer(TempReflection temp)
         {
             reflections = temp;
+            feildLenth = temp.Top;
             target = null;
         }
-        public void Reset(object obj)
+        public override void Reset(object obj)
         {
             target = obj;
             reflections.Top = feildLenth;

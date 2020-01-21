@@ -76,8 +76,8 @@ namespace huqiang.UIComposite
             LinkerMod mod = new LinkerMod();
             T t = new T();
             if (initializer == null)
-                initializer = new UIInitializer(t);
-            else initializer.Reset(t);
+                initializer = new UIInitializer(TempReflection.ObjectFields(typeof(T)));
+            initializer.Reset(t);
             mod.main = HGUIManager.GameBuffer.Clone(model,initializer);
             mod.UI = t;
             return mod;

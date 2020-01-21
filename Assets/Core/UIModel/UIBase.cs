@@ -46,7 +46,8 @@ public class UIBase
     {
         model = HGUIManager.FindModel(asset, name);
         T t = new T();
-        UIInitializer iInitializer = new UIInitializer(t);
+        UIInitializer iInitializer = new UIInitializer(TempReflection.ObjectFields(typeof(T)));
+        iInitializer.Reset(t);
         Main = HGUIManager.GameBuffer.Clone(model, iInitializer);
         var trans = Main.transform;
         trans.SetParent(Parent);

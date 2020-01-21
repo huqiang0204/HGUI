@@ -14,8 +14,5 @@ namespace huqiang.UIComposite
             Enity = element;
             Enity.composite = this;
         }
-        //public virtual void Update()
-        //{
-        //}
     }
 }

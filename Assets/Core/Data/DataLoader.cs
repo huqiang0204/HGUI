@@ -9,6 +9,7 @@ namespace huqiang.Data
         public virtual void Initialiezd(FakeStruct fake, Component com)
         {
         }
+        public virtual void Reset(object obj) { }
         public virtual void Done() { }
     }
     public abstract class DataLoader

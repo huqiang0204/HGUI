@@ -26,14 +26,14 @@ public class DrawingPage:UIPage
     void InitialUI()
     {
         view.paint.BrushColor = Color.black;
-        view.paint.BrushSize = 72;
+        view.paint.BrushSize = 36;
         view.palette.TemplateChanged=
         view.palette.ColorChanged = (o) => {
             view.color.Chromatically = o.SelectColor;
             view.paint.BrushColor = o.SelectColor;
         };
         view.paintSize.OnValueChanged = (o) => {
-            var v = o.Percentage * 72;
+            var v = o.Percentage * 36;
             if (v < 1)
                 v = 1;
             view.size.Text = v.ToString();

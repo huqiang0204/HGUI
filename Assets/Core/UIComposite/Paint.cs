@@ -32,6 +32,7 @@ namespace huqiang.UIComposite
         {
             base.Initial(fake,script);
             raw = Enity as HImage;
+            raw.Chromatically = Color.white;
             var size = Enity.SizeDelta;
             Width = (int)size.x;
             Height = (int)size.y;

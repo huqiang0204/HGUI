@@ -220,7 +220,7 @@ namespace huqiang.UIComposite
             item.binding = data;
             item.Data = data.Data;
             item.UI = ui.UI;
-            //item.offset = data.offset;
+            item.offset = data.offset;
             item.high = data.high;
             item.main = ui.main;
             var son = ui.main.transform;
@@ -396,7 +396,7 @@ namespace huqiang.UIComposite
                 item.binding = data;
                 item.Data = data.Data;
                 item.UI = mod.UI;
-                //item.offset = data.offset;
+                item.offset = data.offset;
                 item.high = data.high;
                 item.main = mod.main;
                 var son = mod.main.transform;
@@ -428,8 +428,8 @@ namespace huqiang.UIComposite
             {
                 var item = datas[maxIndex];
                 float y = Enity.SizeDelta.y;
-                float top = item.offset - item.high;
-                if (top > y * -0.5f)
+                float top = item.offset + item.high;
+                if (top < y)
                     return true;
             }
             return false;

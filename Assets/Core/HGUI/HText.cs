@@ -198,6 +198,8 @@ namespace huqiang.Core.HGUI
                 hv[i].position = verts[i].position;
                 hv[i].color = verts[i].color;
                 hv[i].uv = verts[i].uv0;
+                hv[i].uv4.x = 1;
+                hv[i].uv4.y = 1;
             }
             int b = emojis.Count;
             for (int i=0; i < emojis.Count; i++)

@@ -48,6 +48,8 @@
 					float2 uv : TEXCOORD0;
 					float2 uv1 : TEXCOORD1;
 					float2 uv2 : TEXCOORD2;
+					float2 uv3 : TEXCOORD3;
+					float2 uv4 : TEXCOORD4;
 					UNITY_VERTEX_INPUT_INSTANCE_ID
 				};
 
@@ -58,6 +60,8 @@
 					float2 uv  : TEXCOORD0;
 					float2 uv1 : TEXCOORD1;
 					float2 uv2 : TEXCOORD2;
+					float2 uv3 : TEXCOORD3;
+					float2 uv4 : TEXCOORD4;
 					UNITY_VERTEX_OUTPUT_STEREO
 				};
 
@@ -70,6 +74,8 @@
 					OUT.uv = IN.uv;
 					OUT.uv1 = IN.uv1;
 					OUT.uv2 = IN.uv2;
+					OUT.uv3 = IN.uv3;
+					OUT.uv4 = IN.uv4;
 					OUT.color = IN.color;
 					return OUT;
 				}
@@ -84,11 +90,16 @@
 				fixed4 frag(v2f IN) : SV_Target
 				{
 					half4 color;
+			     	float2 uv = IN.uv;
+					uv.x *= IN.uv4.x;
+					uv.y *= IN.uv4.y;
+					uv.x += IN.uv3.x;
+					uv.y += IN.uv3.y;
 					if (IN.uv1.x == 0)
 					{
 						if (IN.uv1.y == 0)
 						{
-							color = tex2D(_MainTex, IN.uv);
+							color = tex2D(_MainTex, uv);
 							if(_FillColor.x==0)
 								color *= IN.color;
 							else { 
@@ -98,7 +109,7 @@
 						}
 						else
 						{ 
-							color = tex2D(_STex, IN.uv); 
+							color = tex2D(_STex, uv); 
 							if (_FillColor.y == 0)
 								color *= IN.color;
 							else {
@@ -111,7 +122,7 @@
                    {
 						if (IN.uv1.y == 0)
 						{
-							color = tex2D(_TTex, IN.uv);
+							color = tex2D(_TTex, uv);
 							if (_FillColor.z == 0)
 								color *= IN.color;
 							else {
@@ -121,7 +132,7 @@
 						}
 						else
 						{ 
-							color = tex2D(_FTex, IN.uv); 
+							color = tex2D(_FTex, uv); 
 							if (_FillColor.w == 0)
 								color *= IN.color;
 							else {

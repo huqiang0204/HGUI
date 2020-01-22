@@ -47,10 +47,17 @@ namespace huqiang.Core.HGUI
         label:;
             var hv = image.vertices;
             var col = image.m_color;
+            Vector4 tang = image.uvrect;
             if(hv!=null)
             {
                 for (int i = 0; i < hv.Length; i++)
+                {
                     hv[i].color = col;
+                    hv[i].uv3.x = tang.x;
+                    hv[i].uv3.y = tang.y;
+                    hv[i].uv4.x = tang.z;
+                    hv[i].uv4.y = tang.w;
+                }
             }
         }
         static void CreateSimpleVertex(HImage image)

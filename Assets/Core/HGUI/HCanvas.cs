@@ -101,7 +101,10 @@ namespace huqiang.Core.HGUI
                     mesh.uv = uv.ToArray();
                     mesh.uv2 = uv1.ToArray();
                     mesh.uv3 = uv2.ToArray();
+                    mesh.uv4 = uv3.ToArray();
+                    mesh.uv5 = uv4.ToArray();
                     mesh.colors32 = colors.ToArray();
+                   
                     var submesh= MatCollector.submesh;
                     if (submesh != null)
                     {
@@ -343,8 +346,10 @@ namespace huqiang.Core.HGUI
         internal List<Vector2> uv = new List<Vector2>();
         internal List<Vector2> uv1 = new List<Vector2>();
         internal List<Vector2> uv2 = new List<Vector2>();
+        internal List<Vector2> uv3 = new List<Vector2>();
+        internal List<Vector2> uv4 = new List<Vector2>();
         internal List<Color32> colors = new List<Color32>();
-        
+
         internal MaterialCollector MatCollector = new MaterialCollector();
         void ClearMesh()
         {
@@ -352,6 +357,8 @@ namespace huqiang.Core.HGUI
             uv.Clear();
             uv1.Clear();
             uv2.Clear();
+            uv3.Clear();
+            uv4.Clear();
             colors.Clear();
         }
         #endregion
@@ -404,6 +411,8 @@ namespace huqiang.Core.HGUI
                     mesh.uv = uv.ToArray();
                     mesh.uv2 = uv1.ToArray();
                     mesh.uv3 = uv2.ToArray();
+                    mesh.uv4 = uv3.ToArray();
+                    mesh.uv5 = uv4.ToArray();
                     mesh.colors32 = colors.ToArray();
                     var submesh = MatCollector.submesh;
                     if (submesh != null)

@@ -94,6 +94,8 @@ namespace huqiang.Core.HGUI
                             canvas.colors.Add(vert[j].color);
                             canvas.uv.Add(vert[j].uv);
                             canvas.uv2.Add(uv2);
+                            canvas.uv3.Add(vert[j].uv3);
+                            canvas.uv4.Add(vert[j].uv4);
                         }
                         if (graphics.tris != null)
                         {

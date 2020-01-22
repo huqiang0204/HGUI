@@ -38,18 +38,25 @@ namespace huqiang.Core.HGUI
             Quaternion q = quate * pipeLine[index].localRotation;
 
             bool mask = false;
-            if (root.script != null)
+            var script = root.script;
+            if (script != null)
             {
-                mask = root.script.Mask;
+                mask = script.Mask;
                 if (mask)//计算遮挡区域
                 {
-                    float x = root.script.SizeDelta.x;
-                    float y = root.script.SizeDelta.y;
-                    float hx = x * 0.5f;
-                    hx *= s.x;
-                    float hy = y * 0.5f;
-                    hy *= s.y;
-                    Vector4 v = new Vector4(o.x - hx, o.y - hy, o.x + hx, o.y + hy);
+                    float x = script.SizeDelta.x;
+                    float y = script.SizeDelta.y;
+                    float px = script.Pivot.x;
+                    float py = script.Pivot.y;
+                    float lx = x * -px;
+                    float rx = x + lx;
+                    float dy = y * -py;
+                    float ty = y + dy;
+                    lx *= s.x;
+                    rx *= s.x;
+                    dy *= s.y;
+                    ty *= s.y;
+                    Vector4 v = new Vector4(o.x + lx, o.y + dy, o.x + rx, o.y + ty);
                     v.x += 10000;
                     v.x /= 20000;
                     v.y += 10000;
@@ -60,7 +67,7 @@ namespace huqiang.Core.HGUI
                     v.w /= 20000;
                     clip = CutRect(clip, v);
                 }
-                var graphics = root.script as HGraphics;
+                var graphics = script as HGraphics;
                 if (graphics != null)//计算图形
                 {
                     var vs = canvas.vertex;
@@ -68,10 +75,15 @@ namespace huqiang.Core.HGUI
                     var vert = graphics.vertices;
                     if (vert != null)
                     {
+                        float px = (0.5f - script.Pivot.x) * script.SizeDelta.x;
+                        float py = (0.5f - script.Pivot.y) * script.SizeDelta.y;
                         Vector2 uv2 = Vector2.zero;
                         for (int j = 0; j < vert.Length; j++)
                         {
-                            var t = q * vert[j].position;
+                            var tp= vert[j].position;
+                            tp.x += px;
+                            tp.y += py;
+                            var t = q * tp;
                             t.x *= s.x;
                             t.y *= s.y;
                             t += o;

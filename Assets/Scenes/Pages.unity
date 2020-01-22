@@ -171,7 +171,7 @@ MonoBehaviour:
   anchorType: 0
   anchorPointType: 0
   anchorOffset: {x: 0, y: 0}
-  marginType: 1
+  marginType: 0
   parentType: 0
   margin:
     left: 0
@@ -227,7 +227,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01f5931446cde5c4aa7fe1a673961591, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_sizeDelta: {x: 640, y: 480}
+  m_sizeDelta: {x: 1920, y: 1080}
   Pivot: {x: 0.5, y: 0.5}
   DesignSize: {x: 1, y: 1}
   scaleType: 0
@@ -274,7 +274,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2040585606}
+  - {fileID: 1145303334}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -304,7 +304,7 @@ RectTransform:
   m_GameObject: {fileID: 24788666}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0.31}
-  m_LocalScale: {x: 0.0007456378, y: 0.0007456378, z: 0.0007456378}
+  m_LocalScale: {x: 0.00033139455, y: 0.00033139455, z: 0.00033139455}
   m_Children:
   - {fileID: 61434008}
   - {fileID: 489363690}
@@ -3486,6 +3486,46 @@ MonoBehaviour:
   m_richText: 0
   m_lineSpace: 1
   m_fontSize: 24
+--- !u!21 &1145303334
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Custom/UIDef
+  m_Shader: {fileID: 4800000, guid: cabe688b41bac2649be3055d8299759d, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _FTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _STex:
+        m_Texture: {fileID: 10103, guid: 0000000000000000e000000000000000, type: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats: []
+    m_Colors:
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _FillColor: {r: 0, g: 1, b: 0, a: 0}
+    - _Rect: {r: 0.49, g: 0.48, b: 0.51, a: 0.52}
 --- !u!1 &1173019196
 GameObject:
   m_ObjectHideFlags: 0
@@ -6314,46 +6354,6 @@ MonoBehaviour:
   m_sprite: {fileID: 0}
   m_spriteType: 0
   m_fillClockwise: 0
---- !u!21 &2040585606
-Material:
-  serializedVersion: 6
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Custom/UIDef
-  m_Shader: {fileID: 4800000, guid: cabe688b41bac2649be3055d8299759d, type: 3}
-  m_ShaderKeywords: 
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _FTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _STex:
-        m_Texture: {fileID: 10103, guid: 0000000000000000e000000000000000, type: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _TTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Floats: []
-    m_Colors:
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _FillColor: {r: 0, g: 1, b: 0, a: 0}
-    - _Rect: {r: 0.49, g: 0.48, b: 0.51, a: 0.52}
 --- !u!1 &2089183052
 GameObject:
   m_ObjectHideFlags: 0

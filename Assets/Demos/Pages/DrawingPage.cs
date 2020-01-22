@@ -17,19 +17,4 @@ public class DrawingPage:UIPage
         base.Initial(parent, dat);
         view = LoadUI<View>("baseUI", "drawing");//"baseUI"创建的bytes文件名,"page"为创建的页面名
     }
-    //语言切换功能用
-    public override void ChangeLanguage()
-    {
-        base.ChangeLanguage();
-    }
-    //接收消息
-    public override void Cmd(DataBuffer dat)
-    {
-        base.Cmd(dat);
-    }
-    //页面弹窗
-    public override T PopUpWindow<T>(object obj = null)
-    {
-        return base.PopUpWindow<T>(obj);
-    }
 }

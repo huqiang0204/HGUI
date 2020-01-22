@@ -17,6 +17,7 @@ namespace huqiang.Core.HGUI
         public Int32 TTexture;
         public Int32 FTexture;
         public Color color;
+        public Vector4 uvRect;
         public static int Size = sizeof(HGraphicsData);
         public static int ElementSize = Size / 4;
     }
@@ -54,6 +55,7 @@ namespace huqiang.Core.HGUI
                 tar.Material = new Material(Shader.Find(shader));
             else tar.Material = null;
             tar.m_color = src->color;
+            tar.uvrect = src->uvRect;
         }
         protected unsafe void SaveHGraphics(FakeStruct fake, HGraphics src)
         {
@@ -94,6 +96,7 @@ namespace huqiang.Core.HGUI
             if (src.m_material != null)
                 tar->shader = buffer.AddData(src.m_material.shader.name);
             tar->color = src.m_color;
+            tar->uvRect = src.uvrect;
         }
         public unsafe override void LoadToObject(FakeStruct fake, Component com)
         {

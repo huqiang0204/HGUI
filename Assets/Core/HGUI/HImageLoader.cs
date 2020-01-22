@@ -27,7 +27,11 @@ namespace huqiang.Core.HGUI
             Sprite = fake.buffer.GetData(src->Sprite)as string;
             if (Sprite != null)
                 tar.Sprite = ElementAsset.FindSprite(asset, MainTexture, Sprite);
-            else tar.Sprite = null;
+            else {
+                tar.Sprite = null;
+                if (MainTexture != null)
+                    tar.MainTexture = ElementAsset.FindTexture(asset,MainTexture);
+            }
             tar.m_spriteType = src->spriteType;
             tar.m_fillAmount = src->fillAmount;
             tar.m_fillCenter = src->fillCenter;

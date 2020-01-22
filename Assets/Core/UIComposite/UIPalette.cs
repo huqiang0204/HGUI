@@ -25,6 +25,7 @@ namespace huqiang.UIComposite
         UISlider uISlider;
         public override void Initial(FakeStruct fake,UIElement element)
         {
+            base.Initial(fake,element);
             palette = new Palette();
             callBackR = element.RegEvent<UserEvent>();
             callBackR.IsCircular = true;

@@ -32,7 +32,6 @@ namespace huqiang.UIComposite
         public Action<ScrollYExtand, Vector2> Scroll;
         Transform BodyParent;
         Transform TitleParent;
-        Transform ItemParent;
         public override void Initial(FakeStruct fake,UIElement element)
         {
             base.Initial(fake,element);
@@ -51,12 +50,6 @@ namespace huqiang.UIComposite
             BodyParent.localScale = Vector3.one;
             BodyParent.localRotation = Quaternion.identity;
             BodyParent.name = "Bodys";
-            ItemParent = HGUIManager.GameBuffer.CreateNew(1).transform;
-            ItemParent.SetParent(Enity.transform);
-            ItemParent.localPosition = Vector3.zero;
-            ItemParent.localScale = Vector3.one;
-            ItemParent.localRotation = Quaternion.identity;
-            ItemParent.name = "Items";
             TitleParent = HGUIManager.GameBuffer.CreateNew(1).transform;
             TitleParent.SetParent(Enity.transform);
             TitleParent.localPosition = Vector3.zero;
@@ -243,11 +236,10 @@ namespace huqiang.UIComposite
         {
             if (os > Size.y)
                 return;
-            float h = dat.Height - dat.ShowHeight;
+            float h =dat.ShowHeight;
             float oe = os + h;
             if (oe < 0)
                 return;
-            float oy = os + 0.5f * h;
             var t = PopItem(BodyBuffer, index);
             if (t == null)
             {
@@ -408,7 +400,7 @@ namespace huqiang.UIComposite
         }
         ScrollItem CreateItem()
         {
-            return CreateItem(ItemRecycler,ItemCreator,ItemMod,ItemParent);
+            return CreateItem(ItemRecycler,ItemCreator,ItemMod,BodyParent);
         }
         ScrollItem CreateTail()
         {
@@ -564,8 +556,7 @@ namespace huqiang.UIComposite
             {
                 if (!BindingData[i].Hide)
                 {
-                    height += BindingData[i].Height;
-                    height -= BindingData[i].ShowHeight;
+                    height += BindingData[i].ShowHeight;
                 }
             }
             if (height < Size.y)

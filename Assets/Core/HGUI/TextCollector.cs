@@ -43,7 +43,8 @@ namespace huqiang.Core.HGUI
         public void Next()
         {
             point++;
-            max = point+1;
+            if (max <= point)
+                max = point + 1;
         }
         public void Back()
         {

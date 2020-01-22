@@ -587,18 +587,68 @@ public static class UICompositeMenu
         main.SizeDelta = new Vector2(400,800);
         main.Pivot = new Vector2(0.5f,1);
         main.Mask = true;
+        main.Chromatically = new Color32(54,54,54,255);
         main.eventType = huqiang.Core.HGUI.EventType.UserEvent;
         main.compositeType = CompositeType.ScrollYExtand;
         var trans = scroll.transform;
         if (parent != null)
             trans.SetParent(parent.transform);
-        trans.localPosition = Vector3.zero;
+        trans.localPosition = new Vector3(0,400,0);
         trans.localScale = Vector3.one;
         trans.localRotation = Quaternion.identity;
 
-        var title = new GameObject("Title");
-        var ui = title.AddComponent<UIElement>();
+        CreateItem(trans,"Title");
+        var item= CreateItem(trans, "Item");
+        item.localPosition = new Vector3(0,-100, 0);
+        var tail = CreateItem(trans,"Tail");
+        tail.localPosition = new Vector3(0,-200,0);
+
+        var body = new GameObject("Body");
+        var son = body.transform;
+        son.SetParent(trans);
+        son.localPosition = new Vector3(0, -300, 0);
+        son.localScale = Vector3.one;
+        son.localRotation = Quaternion.identity;
+        var ui = body.AddComponent<UIElement>();
         ui.SizeDelta = new Vector2(400,100);
+        ui.Pivot = new Vector2(0.5f,1);
+        ui.Mask = true;
+    }
+    static Transform CreateItem(Transform parent,string name)
+    {
+        var mod = new GameObject(name);
+        var trans = mod.transform;
+        trans.SetParent(parent);
+        trans.localPosition = Vector3.zero;
+        trans.localScale = Vector3.one;
+        trans.localRotation = Quaternion.identity;
+        var ui = mod.AddComponent<UIElement>();
+        ui.SizeDelta = new Vector2(400,100);
+        ui.Pivot = new Vector2(0.5f, 1);
+
+        var img = new GameObject("Image");
+        var son = img.transform;
+        son.SetParent(trans);
+        son.localPosition = new Vector3(0,-50, 0);
+        son.localScale = Vector3.one;
+        son.localRotation = Quaternion.identity;
+        ui = img.AddComponent<HImage>();
+        ui.SizeDelta = new Vector2(400,90);
+        ui.Chromatically = new Color32(4,30,65,255);
+        ui.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+
+        var txt = new GameObject("Text");
+        son = txt.transform;
+        son.SetParent(trans);
+        son.localPosition = new Vector3(0, -50, 0);
+        son.localScale = Vector3.one;
+        son.localRotation = Quaternion.identity;
+        var ht = txt.AddComponent<HText>();
+        ht.SizeDelta = new Vector2(400, 80);
+        ht.Text = name;
+        ht.FontSize = 30;
+
+        return trans;
     }
     //[MenuItem("GameObject/UIComposite/DropDown", false, 9)]
     //static public void AddDropDown(MenuCommand menuCommand)

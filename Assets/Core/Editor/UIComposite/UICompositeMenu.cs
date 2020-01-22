@@ -578,6 +578,28 @@ public static class UICompositeMenu
 
         palette.AddComponent<PaletteHelper>().Initial();
     }
+    [MenuItem("GameObject/HGUI/ScrollYExtand", false, 13)]
+    static public void AddScrollYExtand(MenuCommand menuCommand)
+    {
+        GameObject parent = menuCommand.context as GameObject;
+        var scroll = new GameObject("scrollEx");
+        var main = scroll.AddComponent<HImage>();
+        main.SizeDelta = new Vector2(400,800);
+        main.Pivot = new Vector2(0.5f,1);
+        main.Mask = true;
+        main.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        main.compositeType = CompositeType.ScrollYExtand;
+        var trans = scroll.transform;
+        if (parent != null)
+            trans.SetParent(parent.transform);
+        trans.localPosition = Vector3.zero;
+        trans.localScale = Vector3.one;
+        trans.localRotation = Quaternion.identity;
+
+        var title = new GameObject("Title");
+        var ui = title.AddComponent<UIElement>();
+        ui.SizeDelta = new Vector2(400,100);
+    }
     //[MenuItem("GameObject/UIComposite/DropDown", false, 9)]
     //static public void AddDropDown(MenuCommand menuCommand)
     //{

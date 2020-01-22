@@ -21,7 +21,7 @@ namespace huqiang.UIComposite
             public bool Hide;
             public bool HideTail;
             public float Height { internal set; get; }
-            public float ShowOffset = 0;
+            public float ShowHeight = 0;
             public float aniTime;
         }
         UserEvent eventCall;
@@ -175,11 +175,11 @@ namespace huqiang.UIComposite
                     int a = n / wm;
                     if (n % wm > 0)
                         a++;
-                    var h = BindingData[i].Height = a * ItemSize.y;
+                    BindingData[i].Height = a * ItemSize.y;
                     if (!BindingData[i].Hide)
                     {
-                        height += h;
-                        height -= BindingData[i].ShowOffset;
+                        //height += h;
+                        height += BindingData[i].ShowHeight;
                     }
                 }
                 else
@@ -205,10 +205,9 @@ namespace huqiang.UIComposite
                 oy += TitleSize.y;
                 if (!dat.Hide)
                 {
-                    float so = dat.ShowOffset;
-                    OrderBody(oy-y,dat,i,force);
-                    oy += dat.Height;
-                    oy -= so;
+                    float so = dat.ShowHeight;
+                    OrderBody(oy - y, dat, i, force);
+                    oy += dat.ShowHeight;
                 }
                 if (oy - y > Size.y)
                     break;
@@ -244,7 +243,7 @@ namespace huqiang.UIComposite
         {
             if (os > Size.y)
                 return;
-            float h = dat.Height - dat.ShowOffset;
+            float h = dat.Height - dat.ShowHeight;
             float oe = os + h;
             if (oe < 0)
                 return;
@@ -259,7 +258,7 @@ namespace huqiang.UIComposite
             t.target.localPosition = new Vector3(0, -os, 0);
             var ui = t.target.GetComponent<UIElement>();
             var size = ui.SizeDelta;
-            size.y = h;
+            size.y = dat.ShowHeight;
             ui.SizeDelta = size;
             t.target.gameObject.SetActive(true);
             if (dat.Data != null)
@@ -533,7 +532,7 @@ namespace huqiang.UIComposite
         {
             if (template == null)
                 return;
-            template.ShowOffset = template.Height;
+            template.ShowHeight = template.Height;
             template.aniTime = 0;
             hideSect = template;
         }
@@ -541,7 +540,7 @@ namespace huqiang.UIComposite
         {
             if (template == null)
                 return;
-            template.ShowOffset = 0;
+            template.ShowHeight = 0;
             template.aniTime = 0;
             showSect = template;
             template.Hide = false;
@@ -566,7 +565,7 @@ namespace huqiang.UIComposite
                 if (!BindingData[i].Hide)
                 {
                     height += BindingData[i].Height;
-                    height -= BindingData[i].ShowOffset;
+                    height -= BindingData[i].ShowHeight;
                 }
             }
             if (height < Size.y)
@@ -576,7 +575,6 @@ namespace huqiang.UIComposite
         public override void Update(float time)
         {
             bool up = false;
-            float os = 0;
             if (hideSect != null)
             {
                 up = true;
@@ -585,8 +583,7 @@ namespace huqiang.UIComposite
                 if (hideSect.aniTime > 400)
                     hideSect.aniTime = 400;
                 float r = hideSect.aniTime / 400;
-                hideSect.ShowOffset = hideSect.Height * r;
-                os -= (hideSect.aniTime - a)/400 * hideSect.Height;
+                hideSect.ShowHeight = hideSect.Height * (1 - r);
                 if (r == 1)
                 {
                     hideSect.Hide = true;
@@ -601,9 +598,8 @@ namespace huqiang.UIComposite
                 if (showSect.aniTime > 400)
                     showSect.aniTime = 400;
                 float r = showSect.aniTime / 400;
-                r = 1 - r;
-                showSect.ShowOffset = showSect.Height * r;
-                if (r == 0)
+                showSect.ShowHeight = showSect.Height * r;
+                if (r == 1)
                     showSect = null;
             }
             if(up)

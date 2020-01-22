@@ -11,7 +11,7 @@ namespace huqiang.UIComposite
     /// <summary>
     /// 带有标题的,可以展开收缩的
     /// </summary>
-    public class ScrollYExtand : Composite,AnimatInterface
+    public class ScrollYExtand : Composite
     {
         public class DataTemplate
         {
@@ -323,7 +323,6 @@ namespace huqiang.UIComposite
             Titles.Clear();
             Items.Clear();
             Tails.Clear();
-            //UIAnimation.Manage.ReleaseAnimat(this);
         }
         Constructor ItemCreator;
         Constructor TitleCreator;
@@ -575,7 +574,7 @@ namespace huqiang.UIComposite
                 height = Size.y;
             ActualSize.y = height;
         }
-        public void Update(float time)
+        public override void Update(float time)
         {
             bool up = false;
             float os = 0;

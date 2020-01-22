@@ -313,6 +313,8 @@ namespace huqiang.Core.HGUI
                 var scr = scripts[i];
                 if (scr.userEvent != null)
                     scr.userEvent.Update();
+                if (scr.composite != null)
+                    scr.composite.Update(UserAction.TimeSlice);
                 scripts[i].MainUpdate();
             }
             TextInput.Dispatch();

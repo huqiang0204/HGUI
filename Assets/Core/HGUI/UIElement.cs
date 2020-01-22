@@ -68,32 +68,19 @@ namespace huqiang.Core.HGUI
                     break;
             }
         }
-        public static void Anchor(UIElement script, Vector2 pivot, Vector2 offset)
-        {
-            Vector2 p;
-            Vector2 pp = new Vector2(0.5f, 0.5f);
-            var rect = script.transform;
-            if (rect.parent != null)
-            {
-                var t = rect.parent.GetComponent<UIElement>();
-                p = t.SizeDelta;
-                pp = t.Pivot;
-            }
-            else { p = new Vector2(Screen.width, Screen.height); }
-            rect.localScale = Vector3.one;
-            float sx = p.x * (pivot.x - 0.5f);
-            float sy = p.y * (pivot.y - 0.5f);
-            float ox = sx + offset.x;
-            float oy = sy + offset.y;
-            rect.localPosition = new Vector3(ox, oy, 0);
-        }
         public static void AnchorEx(UIElement script, AnchorPointType type, Vector2 offset, Vector2 p, Vector2 psize)
         {
             Vector2 pivot = Anchors[(int)type];
-            float ox = (p.x - 1) * psize.x;//原点x
-            float oy = (p.y - 1) * psize.y;//原点y
-            float tx = ox + pivot.x * psize.x;//锚点x
-            float ty = oy + pivot.y * psize.y;//锚点y
+            float x = psize.x;
+            float y = psize.y;
+            float px = p.x;
+            float py = p.y;
+
+            float lx = x * -px;
+            float dy = y * -py;
+
+            float tx = lx + pivot.x * psize.x;//锚点x
+            float ty = dy + pivot.y * psize.y;//锚点y
             offset.x += tx;//偏移点x
             offset.y += ty;//偏移点y
             script.transform.localPosition = new Vector3(offset.x, offset.y, 0);
@@ -101,43 +88,66 @@ namespace huqiang.Core.HGUI
         public static void AlignmentEx(UIElement script, AnchorPointType type, Vector2 offset, Vector2 p, Vector2 psize)
         {
             Vector2 pivot = Anchors[(int)type];
-            float ox = (p.x - 1) * psize.x;//原点x
-            float oy = (p.y - 1) * psize.y;//原点y
-            float tx = ox + pivot.x * psize.x;//锚点x
-            float ty = oy + pivot.y * psize.y;//锚点y
-            float x = offset.x + tx;
-            float y = offset.y + ty;
+            float ax = psize.x;
+            float ay = psize.y;
+            float apx = p.x;
+            float apy = p.y;
+            float alx = ax * -apx;
+            float ady = ay * -apy;
+            float aox = ax * apx;//原点x
+            float aoy = ay * apy;//原点y
+
+            float x = script.SizeDelta.x;
+            float y = script.SizeDelta.y;
+            float px = script.Pivot.x;
+            float py = script.Pivot.y;
+            float lx = x * -px;
+            float dy = y * -py;
+
+            float ox = x * px;//原点x
+            float oy = y * py;//原点y
+
             switch (type)
             {
                 case AnchorPointType.Left:
-                    x += script.SizeDelta.x * 0.5f;
+                    x = alx - lx;
+                    y = (ady + ay * 0.5f) - (dy + y * 0.5f);
                     break;
                 case AnchorPointType.Right:
-                    x -= script.SizeDelta.x * 0.5f;
+                    x = (ax + alx) - (x + lx);
+                    y = (ady + ay * 0.5f) - (dy + y * 0.5f);
                     break;
                 case AnchorPointType.Top:
-                    y -= script.SizeDelta.y * 0.5f;
+                    x = (alx + ax * 0.5f) - (lx + x * 0.5f);
+                    y = (ay + ady) - (y + dy);
                     break;
                 case AnchorPointType.Down:
-                    y += script.SizeDelta.y * 0.5f;
+                    x = (alx + ax * 0.5f) - (lx + x * 0.5f);
+                    y = ady - dy;
                     break;
                 case AnchorPointType.LeftDown:
-                    x += script.SizeDelta.x * 0.5f;
-                    y += script.SizeDelta.y * 0.5f;
+                    x = alx - lx;
+                    y = ady - dy;
                     break;
                 case AnchorPointType.LeftTop:
-                    x += script.SizeDelta.x * 0.5f;
-                    y -= script.SizeDelta.y * 0.5f;
+                    x = alx - lx;
+                    y = (ay + ady) - (y + dy);
                     break;
                 case AnchorPointType.RightDown:
-                    x -= script.SizeDelta.x * 0.5f;
-                    y += script.SizeDelta.y * 0.5f;
+                    x = (ax + alx) - (x + lx);
+                    y = ady - dy;
                     break;
                 case AnchorPointType.RightTop:
-                    x -= script.SizeDelta.x * 0.5f;
-                    y -= script.SizeDelta.y * 0.5f;
+                    x = (ax + alx) - (x + lx);
+                    y = (ay + ady) - (y + dy);
+                    break;
+                default:
+                    x = (alx + ax * 0.5f) - (lx + x * 0.5f);
+                    y = (ady + ay * 0.5f) - (dy + y * 0.5f);
                     break;
             }
+            x += offset.x;
+            y += offset.y;
             script.transform.localPosition = new Vector3(x, y, 0);
         }
         public static void MarginEx(UIElement script, Margin margin, Vector2 parentPivot, Vector2 parentSize)

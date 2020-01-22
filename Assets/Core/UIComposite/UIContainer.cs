@@ -409,11 +409,8 @@ namespace huqiang.UIComposite
                 item.mod = mod;
             }
             items.Add(item);
-            float os = Enity.SizeDelta.y * 0.5f;
-            os -= start;
-            os -= data.high * 0.5f;
-            mod.main.transform.localPosition = new Vector3(0, os, 0);
-            data.offset = os;
+            mod.main.transform.localPosition = new Vector3(0, -start, 0);
+            data.offset = start;
         }
         bool OutDown()
         {

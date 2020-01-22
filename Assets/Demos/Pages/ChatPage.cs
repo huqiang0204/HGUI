@@ -145,6 +145,7 @@ namespace Assets.Scripts
                     chat.name = "胡江海";
                     chat.content = str;
                     other.AddData(chat);
+                    container.Move(0);
                     break;
                 case "center":
                     break;

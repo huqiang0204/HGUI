@@ -171,7 +171,7 @@ MonoBehaviour:
   anchorType: 0
   anchorPointType: 0
   anchorOffset: {x: 0, y: 0}
-  marginType: 0
+  marginType: 1
   parentType: 0
   margin:
     left: 0
@@ -193,7 +193,7 @@ MonoBehaviour:
   texIds: 00000000000000000000000000000000
   fillColors: 00000000
   m_sprite: {fileID: 0}
-  m_spriteType: 0
+  m_spriteType: 1
   m_fillClockwise: 0
 --- !u!1 &24788666
 GameObject:

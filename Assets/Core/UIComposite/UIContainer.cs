@@ -238,8 +238,8 @@ namespace huqiang.UIComposite
         }
         float GetDownLenth(float max)
         {
-            int i = pointIndex;
-            float d = datas[i].high*pointOffsetRatio;
+            int i = index;
+            float d = datas[i].high*offsetRatio;
             i--;
             for (; i >= 0; i--)
             {
@@ -256,7 +256,7 @@ namespace huqiang.UIComposite
             if (OutDown())
             {
                 back.DecayRateY = 0.988f;
-                float d = -datas[pointIndex].high*pointOffsetRatio;
+                float d = -datas[index].high*offsetRatio;
                 back.ScrollDistanceY = d * eventCall.Context.transform.localScale.y;
             }
             else
@@ -274,9 +274,9 @@ namespace huqiang.UIComposite
                 }
             }
         }
-        int pointIndex=0;//指向第一个显示的ui
+        //int pointIndex=0;//指向第一个显示的ui
         int maxIndex = 0;
-        float pointOffsetRatio=0;//指向第一个显示ui的偏移百分比
+        //float pointOffsetRatio=0;//指向第一个显示ui的偏移百分比
         public void Move(float y)
         {
             if(datas.Count==1)
@@ -301,52 +301,52 @@ namespace huqiang.UIComposite
         }
         void Calcul(float y)
         {
-            var item = datas[pointIndex];//当前指向的数据
-            float os = item.high * pointOffsetRatio;
+            var item = datas[index];//当前指向的数据
+            float os = item.high * offsetRatio;
             os += y;
             if (os > item.high)
             {
-                if (pointIndex < datas.Count - 1)
+                if (index < datas.Count - 1)
                 {
                     os -= item.high;
-                    pointIndex++;
-                    float h = datas[pointIndex].high;
-                    pointOffsetRatio = os / h;
+                    index++;
+                    float h = datas[index].high;
+                    offsetRatio = os / h;
                 }
-                else pointOffsetRatio = os / item.high;
+                else offsetRatio = os / item.high;
             }
             else if (os < 0)
             {
-                if (pointIndex > 0)
+                if (index > 0)
                 {
-                    pointIndex--;
-                    float h = datas[pointIndex].high;
+                    index--;
+                    float h = datas[index].high;
                     os += h;
-                    pointOffsetRatio = os / h;
+                    offsetRatio = os / h;
                 }
-                else pointOffsetRatio = os / item.high;
+                else offsetRatio = os / item.high;
             }
-            else pointOffsetRatio = os / item.high;
+            else offsetRatio = os / item.high;
             Order();
         }
         List<Item> buffer = new List<Item>();
         void Order()
         {
-            for(int i=0;i<items.Count;i++)
+            for (int i = 0; i < items.Count; i++)
             {
                 var item = items[i];
                 item.linker.RecycleItem(item.mod);
             }
             buffer.AddRange(items);
             items.Clear();
-            float start = - datas[pointIndex].high * pointOffsetRatio;
-            maxIndex = datas.Count - 1;
-            for(int i=pointIndex;i<datas.Count;i++)
+            float offset = datas[index].offset;
+            float start = Point;
+            for (int i = index; i < datas.Count; i++)
             {
                 var item = datas[i];
-                UpdateItem(item,i,start);
-                start += item.high;
-                if (start > Enity.SizeDelta.y)
+                UpdateItem(item, i, offset, start);
+                offset += item.high;
+                if (offset - start > Enity.SizeDelta.y)
                 {
                     maxIndex = i;
                     break;
@@ -375,7 +375,7 @@ namespace huqiang.UIComposite
                 }
             return new Item();
         }
-        void UpdateItem(BindingData data, int index,float start)
+        void UpdateItem(BindingData data, int index,float offset, float start)
         {
             var mod = data.linker.PopItem(index);
             if (mod == null)
@@ -396,7 +396,7 @@ namespace huqiang.UIComposite
                 item.binding = data;
                 item.Data = data.Data;
                 item.UI = mod.UI;
-                item.offset = data.offset;
+                item.offset = offset;
                 item.high = data.high;
                 item.main = mod.main;
                 var son = mod.main.transform;
@@ -409,20 +409,19 @@ namespace huqiang.UIComposite
                 item.mod = mod;
             }
             items.Add(item);
-            mod.main.transform.localPosition = new Vector3(0, -start, 0);
-            data.offset = start;
+            mod.main.transform.localPosition = new Vector3(0, start-offset, 0);
         }
         bool OutDown()
         {
-            if (pointIndex == 0)
-                if (pointOffsetRatio < 0)
+            if (index== 0)
+                if (offsetRatio < 0)
                     return true;
             return false;
         }
         bool OutTop()
         {
-            if (pointIndex == 0)
-                if (pointOffsetRatio <= 0)
+            if (index == 0)
+                if (offsetRatio <= 0)
                     return false;
             if (maxIndex == datas.Count - 1)
             {
@@ -443,7 +442,7 @@ namespace huqiang.UIComposite
                 {
                     if (OutDown())
                     {
-                        float d = -datas[pointIndex].high * pointOffsetRatio;
+                        float d = -datas[index].high * offsetRatio;
                         float hf = Enity.SizeDelta.y * 0.5f;
                         float r = d / hf;
                         if (r > 1)
@@ -457,7 +456,7 @@ namespace huqiang.UIComposite
                 {
                     if (OutTop())
                     {
-                        var item = datas[pointIndex];
+                        var item = datas[index];
                         float f = Enity.SizeDelta.y;
                         f = GetDownLenth(f);
                         float d = f - item.offset + item.high * 0.5f;
@@ -504,6 +503,94 @@ namespace huqiang.UIComposite
                         }
                     }
                 }
+            }
+        }
+        void ReSized()
+        {
+            for(int i=0;i<items.Count;i++)//重新计算内容的高度
+            {
+                var it = items[i];
+                it.binding.high = it.high = it.binding.linker.GetItemHigh(it.UI,it.Data);
+            }
+        }
+        int index;
+        float offsetRatio;
+        float Point {
+            get
+            {
+                if (datas == null)
+                    return 0;
+                if (datas.Count > 1)
+                    return 0;
+               return datas[index].offset + datas[index].high * offsetRatio;
+            }
+            set
+            {
+                if (datas == null)
+                    return;
+                if (datas.Count < 1)
+                    return;
+                if(value<=datas[0].offset)
+                {
+                    index = 0;
+                    offsetRatio = (value - datas[0].offset) / datas[0].high;
+                    return;
+                }else
+                {
+                    var c = datas.Count;
+                    if(value>=datas[c].offset+datas[c].high)
+                    {
+                        index = c;
+                        offsetRatio = (value - datas[c].offset) / datas[c].high;
+                        return;
+                    }
+                }
+                for (int i = 0; i < datas.Count; i++)
+                {
+                    var dt = datas[i];
+                    if (value >= dt.offset & value <= dt.offset + dt.high)
+                    {
+                        index = i;
+                        offsetRatio = (value - dt.offset) / dt.high;
+                        break;
+                    }
+                }
+            }
+        }
+        float Start { get
+            {
+                if (datas == null)
+                    return 0;
+                if (datas.Count < 1)
+                    return 0;
+                return datas[0].offset;
+            } }
+        float End { get {
+                if (datas == null)
+                    return 0;
+                if (datas.Count < 1)
+                    return 0;
+                var c = datas.Count - 1;
+                return datas[c].offset+datas[c].high;
+            } }
+        void MoveUp(float y)
+        {
+        
+        }
+        void MoveDown(float y)
+        {
+            float p = Point + y;
+            for (int i = index; i >= 0; i--)
+            {
+                var dat = datas[i];
+                if (p > dat.offset)
+                {
+                    index = i;
+                    offsetRatio = (p - datas[i].offset) / datas[i].high;
+                    break;
+                }
+                //if (dat.high < 10)
+                //    dat.high = dat.linker.GetItemHigh(dat);
             }
         }
     }

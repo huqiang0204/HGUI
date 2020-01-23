@@ -18,7 +18,7 @@ namespace huqiang.UIComposite
     {
         protected List<LinkerMod> buffer = new List<LinkerMod>();
         public virtual LinkerMod CreateUI() { return null; }
-        public virtual float GetItemHigh(object t, object u) { return 40; }
+        public virtual float GetItemSize(object t, object u) { return 40; }
         public virtual void RefreshItem(object t, object u, int index) { }
         public void RecycleItem(LinkerMod mod)
         {
@@ -82,7 +82,7 @@ namespace huqiang.UIComposite
             mod.UI = t;
             return mod;
         }
-        public override float GetItemHigh(object t, object u)
+        public override float GetItemSize(object t, object u)
         {
             if (CalculItemHigh != null)
                 return CalculItemHigh(t as T, u as U);
@@ -122,7 +122,7 @@ namespace huqiang.UIComposite
                 ItemCreate(this, mod);
             return mod;
         }
-        public override float GetItemHigh(object t, object u)
+        public override float GetItemSize(object t, object u)
         {
             if (CalculItemHigh != null)
                 return CalculItemHigh(t, u);
@@ -136,6 +136,12 @@ namespace huqiang.UIComposite
     }
     public class UIContainer:Composite
     {
+        struct Layout
+        {
+            public Vector3 position;
+            public Vector2 sizeDelta;
+            public Quaternion rotate;
+        }
         class Item
         {
             public Linker linker;
@@ -156,6 +162,7 @@ namespace huqiang.UIComposite
             public float high = 8;
             public object Data;
             public Linker linker;
+            public Layout[] layouts;
         }
         public UserEvent eventCall;
         public Action<UIContainer, Vector2> Scroll;
@@ -187,6 +194,9 @@ namespace huqiang.UIComposite
             };
             model = fake;
             HGUIManager.GameBuffer.RecycleChild(script.gameObject);
+            //var trans = Enity.transform;
+            //for (int i = 0; i < trans.childCount; i++)
+            //    trans.GetChild(i).gameObject.SetActive(false);
         }
         public UILinker<T, U> RegLinker<T,U>(string ItemName)  where T : class, new() where U : class, new()
         {
@@ -195,6 +205,7 @@ namespace huqiang.UIComposite
             var mod = HGUIManager.FindChild(model, ItemName);
             if (mod == null)
                 return null;
+            var trans = Enity.transform.Find(ItemName);
             UILinker<T, U> link = new UILinker<T, U>(this,mod);
             return link;
         }
@@ -211,7 +222,7 @@ namespace huqiang.UIComposite
             var ui = data.linker.CreateUI();
             ui.index = index;
             if (data.high < 10)
-                data.high = data.linker.GetItemHigh(ui.UI, data.Data);
+                data.high = data.linker.GetItemSize(ui.UI, data.Data);
             data.linker.RefreshItem(ui.UI, data.Data, index);
             Item item = new Item();
             item.mod = ui;
@@ -388,7 +399,7 @@ namespace huqiang.UIComposite
             if(item.Index<0)
             {
                 mod.index = index;
-                data.high = data.linker.GetItemHigh(mod.UI, data.Data);
+                data.high = data.linker.GetItemSize(mod.UI, data.Data);
                 data.linker.RefreshItem(mod.UI, data.Data, index);
                 item.mod = mod;
                 item.linker = data.linker;
@@ -510,7 +521,7 @@ namespace huqiang.UIComposite
             for(int i=0;i<items.Count;i++)//重新计算内容的高度
             {
                 var it = items[i];
-                it.binding.high = it.high = it.binding.linker.GetItemHigh(it.UI,it.Data);
+                it.binding.high = it.high = it.binding.linker.GetItemSize(it.UI,it.Data);
             }
         }
         int index;
@@ -591,6 +602,37 @@ namespace huqiang.UIComposite
                 }
                 //if (dat.high < 10)
                 //    dat.high = dat.linker.GetItemHigh(dat);
+            }
+        }
+        int id = 0;
+        void ApplayLayout(Transform trans,Layout[] layouts)
+        {
+            if (id >= layouts.Length)
+                return;
+            trans.localPosition = layouts[id].position;
+            var ui = trans.GetComponent<UIElement>();
+            if (ui != null)
+                ui.SizeDelta = layouts[id].sizeDelta;
+            var c = trans.childCount;
+            id++;
+            for (int i = 0; i < c; i++)
+            {
+                ApplayLayout(trans.GetChild(i), layouts);
+            }
+        }
+        void LoadLayout(Transform trans,Layout[] layouts)
+        {
+            if (id >= layouts.Length)
+                return;
+            layouts[id].position = trans.localPosition;
+            var ui = trans.GetComponent<UIElement>();
+            if (ui != null)
+                layouts[id].sizeDelta = ui.SizeDelta;
+            var c = trans.childCount;
+            id++;
+            for (int i = 0; i < c; i++)
+            {
+                LoadLayout(trans.GetChild(i), layouts);
             }
         }
     }

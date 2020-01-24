@@ -70,5 +70,47 @@ namespace huqiang.Core.HGUI
             for (int i = 0; i < all.Length; i++)
                 all[i].field.SetValue(target, all[i].Value);
         }
+        public void ReflectionEnity(object obj, Transform com)
+        {
+            target = obj;
+            reflections.Top = feildLenth;
+            ReflectionEnity(com);
+            ReflectionModel[] all = reflections.All;
+            for (int i = 0; i < all.Length; i++)
+                all[i].field.SetValue(target, all[i].Value);
+        }
+        void ReflectionEnity(Transform com)
+        {
+            for (int i = 0; i < reflections.Top; i++)
+            {
+                var m = reflections.All[i];
+                if (m.name == com.name)
+                {
+                    if (typeof(Component).IsAssignableFrom(m.FieldType))
+                        m.Value = com.GetComponent(m.FieldType);
+                    else if (typeof(Composite).IsAssignableFrom(m.FieldType))
+                    {
+                        var scr = com.GetComponent<UIElement>();
+                        if (scr != null)
+                            m.Value = scr.composite;
+                    }
+                    else
+                    {
+                        var scr = com.GetComponent<UIElement>();
+                        if (scr != null)
+                            m.Value = scr.userEvent;
+                    }
+                    reflections.Top--;
+                    var j = reflections.Top;
+                    var a = reflections.All[j];
+                    reflections.All[i] = a;
+                    reflections.All[j] = m;
+                    break;
+                }
+            }
+            int c = com.childCount;
+            for (int i = 0; i < c; i++)
+                ReflectionEnity(com.GetChild(i));
+        }
     }
 }

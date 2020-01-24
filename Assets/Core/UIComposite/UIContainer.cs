@@ -16,10 +16,23 @@ namespace huqiang.UIComposite
     }
     public class Linker
     {
+        /// <summary>
+        /// 实体模型,用于计算实体尺寸
+        /// </summary>
+        public Transform enityModel;
+        protected int ElementCount;
         protected List<LinkerMod> buffer = new List<LinkerMod>();
         public virtual LinkerMod CreateUI() { return null; }
+        public virtual float GetItemSize(object u) { return 40; }
         public virtual float GetItemSize(object t, object u) { return 40; }
         public virtual void RefreshItem(object t, object u, int index) { }
+        public virtual void SetEnityModel(Transform transform) 
+        {
+            enityModel = transform;
+            ElementCount = 0;
+            if (enityModel != null)
+                GetElementCount(transform);
+        }
         public void RecycleItem(LinkerMod mod)
         {
             buffer.Add(mod);
@@ -41,6 +54,14 @@ namespace huqiang.UIComposite
             for (int i = 0; i < buffer.Count; i++)
                 buffer[i].index = -1;
         }
+        protected void GetElementCount(Transform trans)
+        {
+            ElementCount++;
+            for(int i=0;i<trans.childCount;i++)
+            {
+                GetElementCount(trans.GetChild(i));
+            }
+        }
     }
     /// <summary>
     /// 泛型连接器
@@ -54,11 +75,16 @@ namespace huqiang.UIComposite
         public Func<T, U, float> CalculItemHigh;
         UIContainer con;
         UIInitializer initializer;
+        T uiModel;
+        private UILinker()
+        {
+        }
         public UILinker(UIContainer container, FakeStruct mod)
         {
             con = container;
             model = mod;
             container.linkers.Add(this);
+            initializer = new UIInitializer(TempReflection.ObjectFields(typeof(T)));
         }
         public void AddData(U dat)
         {
@@ -82,6 +108,12 @@ namespace huqiang.UIComposite
             mod.UI = t;
             return mod;
         }
+        public override float GetItemSize(object u)
+        {
+            if (CalculItemHigh != null)
+                return CalculItemHigh(uiModel, u as U);
+            unsafe { return ((TransfromData*)model.ip)->size.y; }
+        }
         public override float GetItemSize(object t, object u)
         {
             if (CalculItemHigh != null)
@@ -92,6 +124,16 @@ namespace huqiang.UIComposite
         {
             if (ItemUpdate != null)
                 ItemUpdate(t as T, u as U, index);
+        }
+        public override void SetEnityModel(Transform transform)
+        {
+            enityModel = transform;
+            if (enityModel != null)
+            {
+                uiModel = new T();
+                initializer.ReflectionEnity(uiModel, transform);
+                GetElementCount(transform);
+            }
         }
     }
     /// <summary>
@@ -193,10 +235,10 @@ namespace huqiang.UIComposite
                     OnScrollEnd(o);
             };
             model = fake;
-            HGUIManager.GameBuffer.RecycleChild(script.gameObject);
-            //var trans = Enity.transform;
-            //for (int i = 0; i < trans.childCount; i++)
-            //    trans.GetChild(i).gameObject.SetActive(false);
+            //HGUIManager.GameBuffer.RecycleChild(script.gameObject);
+            var trans = Enity.transform;
+            for (int i = 0; i < trans.childCount; i++)
+                trans.GetChild(i).gameObject.SetActive(false);
         }
         public UILinker<T, U> RegLinker<T,U>(string ItemName)  where T : class, new() where U : class, new()
         {
@@ -206,7 +248,8 @@ namespace huqiang.UIComposite
             if (mod == null)
                 return null;
             var trans = Enity.transform.Find(ItemName);
-            UILinker<T, U> link = new UILinker<T, U>(this,mod);
+            UILinker<T, U> link = new UILinker<T, U>(this, mod);
+            link.SetEnityModel(trans);
             return link;
         }
         public int DataCount { get { return datas.Count; } }
@@ -600,8 +643,8 @@ namespace huqiang.UIComposite
                     offsetRatio = (p - datas[i].offset) / datas[i].high;
                     break;
                 }
-                //if (dat.high < 10)
-                //    dat.high = dat.linker.GetItemHigh(dat);
+                if (dat.high < 10)
+                    dat.high = dat.linker.GetItemSize(dat);
             }
         }
         int id = 0;
@@ -616,9 +659,7 @@ namespace huqiang.UIComposite
             var c = trans.childCount;
             id++;
             for (int i = 0; i < c; i++)
-            {
                 ApplayLayout(trans.GetChild(i), layouts);
-            }
         }
         void LoadLayout(Transform trans,Layout[] layouts)
         {
@@ -631,9 +672,7 @@ namespace huqiang.UIComposite
             var c = trans.childCount;
             id++;
             for (int i = 0; i < c; i++)
-            {
                 LoadLayout(trans.GetChild(i), layouts);
-            }
         }
     }
 }

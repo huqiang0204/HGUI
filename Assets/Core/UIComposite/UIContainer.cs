@@ -20,11 +20,10 @@ namespace huqiang.UIComposite
         /// 实体模型,用于计算实体尺寸
         /// </summary>
         public Transform enityModel;
-        protected int ElementCount;
+        public int ElementCount { get; private set; }
         protected List<LinkerMod> buffer = new List<LinkerMod>();
         public virtual LinkerMod CreateUI() { return null; }
         public virtual float GetItemSize(object u) { return 40; }
-        public virtual float GetItemSize(object t, object u) { return 40; }
         public virtual void RefreshItem(object t, object u, int index) { }
         public virtual void SetEnityModel(Transform transform) 
         {
@@ -114,12 +113,6 @@ namespace huqiang.UIComposite
                 return CalculItemHigh(uiModel, u as U);
             unsafe { return ((TransfromData*)model.ip)->size.y; }
         }
-        public override float GetItemSize(object t, object u)
-        {
-            if (CalculItemHigh != null)
-                return CalculItemHigh(t as T, u as U);
-            unsafe { return ((TransfromData*)model.ip)->size.y; }
-        }
         public override void RefreshItem(object t, object u, int index)
         {
             if (ItemUpdate != null)
@@ -163,12 +156,6 @@ namespace huqiang.UIComposite
             if (ItemCreate != null)
                 ItemCreate(this, mod);
             return mod;
-        }
-        public override float GetItemSize(object t, object u)
-        {
-            if (CalculItemHigh != null)
-                return CalculItemHigh(t, u);
-            unsafe { return ((TransfromData*)model.ip)->size.y; }
         }
         public override void RefreshItem(object t, object u, int index)
         {
@@ -258,29 +245,8 @@ namespace huqiang.UIComposite
             BindingData binding = new BindingData();
             binding.linker = linker;
             binding.Data = data;
+            binding.layouts = new Layout[linker.ElementCount];
             datas.Add(binding);
-        }
-        Item CreateItem(BindingData data, int index)
-        {
-            var ui = data.linker.CreateUI();
-            ui.index = index;
-            if (data.high < 10)
-                data.high = data.linker.GetItemSize(ui.UI, data.Data);
-            data.linker.RefreshItem(ui.UI, data.Data, index);
-            Item item = new Item();
-            item.mod = ui;
-            item.linker = data.linker;
-            item.Index = index;
-            item.binding = data;
-            item.Data = data.Data;
-            item.UI = ui.UI;
-            item.offset = data.offset;
-            item.high = data.high;
-            item.main = ui.main;
-            var son = ui.main.transform;
-            son.SetParent(Enity.transform);
-            son.localScale = Vector3.one;
-            return item;
         }
         void Scrolling(UserEvent scroll, Vector2 offset)
         {
@@ -328,9 +294,7 @@ namespace huqiang.UIComposite
                 }
             }
         }
-        //int pointIndex=0;//指向第一个显示的ui
         int maxIndex = 0;
-        //float pointOffsetRatio=0;//指向第一个显示ui的偏移百分比
         public void Move(float y)
         {
             if(datas.Count==1)
@@ -435,14 +399,18 @@ namespace huqiang.UIComposite
             if (mod == null)
             {
                 mod = data.linker.CreateUI();
+                LoadLayout(data.linker.enityModel, data.layouts);
                 mod.main.transform.SetParent(Enity.transform);
             }
             mod.main.SetActive(true);
+            var son = mod.main.transform;
+            ApplayLayout(son, data.layouts);
             var item = FindOrCreateItem(index);
             if(item.Index<0)
             {
                 mod.index = index;
-                data.high = data.linker.GetItemSize(mod.UI, data.Data);
+                data.high = data.linker.GetItemSize(data.Data);
+                LoadLayout(data.linker.enityModel,data.layouts);
                 data.linker.RefreshItem(mod.UI, data.Data, index);
                 item.mod = mod;
                 item.linker = data.linker;
@@ -453,7 +421,6 @@ namespace huqiang.UIComposite
                 item.offset = offset;
                 item.high = data.high;
                 item.main = mod.main;
-                var son = mod.main.transform;
                 son.SetParent(Enity.transform);
                 son.localScale = Vector3.one;
             }
@@ -463,7 +430,7 @@ namespace huqiang.UIComposite
                 item.mod = mod;
             }
             items.Add(item);
-            mod.main.transform.localPosition = new Vector3(0, start-offset, 0);
+            son.localPosition = new Vector3(0, start-offset, 0);
         }
         bool OutDown()
         {
@@ -564,7 +531,7 @@ namespace huqiang.UIComposite
             for(int i=0;i<items.Count;i++)//重新计算内容的高度
             {
                 var it = items[i];
-                it.binding.high = it.high = it.binding.linker.GetItemSize(it.UI,it.Data);
+                it.binding.high = it.high = it.binding.linker.GetItemSize(it.Data);
             }
         }
         int index;
@@ -644,7 +611,10 @@ namespace huqiang.UIComposite
                     break;
                 }
                 if (dat.high < 10)
+                {
                     dat.high = dat.linker.GetItemSize(dat);
+                    LoadLayout(dat.linker.enityModel,dat.layouts);
+                }
             }
         }
         int id = 0;

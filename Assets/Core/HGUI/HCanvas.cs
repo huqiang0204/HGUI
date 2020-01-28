@@ -17,7 +17,13 @@ namespace huqiang.Core.HGUI
         public UserAction[] inputs;
         public bool PauseEvent;
         public UserAction.InputType inputType = UserAction.InputType.OnlyMouse;
-
+        bool textRebuilt;
+        private void Start()
+        {
+            Font.textureRebuilt += (o) => { 
+                textRebuilt = true;
+            };
+        }
         /// <summary>
         /// 信息采集
         /// </summary>
@@ -76,7 +82,8 @@ namespace huqiang.Core.HGUI
         }
         private void LateUpdate()
         {
-            TxtCollector.GenerateTexture();
+            TxtCollector.GenerateTexture(textRebuilt);
+            textRebuilt = false;
             SubMission(null);
             ApplyMeshRenderer();
         }

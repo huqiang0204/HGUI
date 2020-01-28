@@ -50,20 +50,27 @@ namespace huqiang.Core.HGUI
         {
             point--;
         }
-        public void GenerateTexture()
+        public void GenerateTexture(bool force = false)
         {
             for (int i = 0; i < max; i++)
             {
                 int c = buffer[i].max;
                 var buf = buffer[i].texts;
-                bool dirty = false;
-                for (int j = 0; j < c; j++)
+                bool dirty = force;
+                if (!force)
                 {
-                    if (buf[j].m_dirty|buf[j].m_colorChanged)
+                    for (int j = 0; j < c; j++)
                     {
-                        dirty = true;
-                        break;
+                        if (buf[j].m_dirty | buf[j].m_colorChanged)
+                        {
+                            dirty = true;
+                            break;
+                        }
                     }
+                }
+                else
+                {
+                   Debug.Log("dddd");
                 }
                 if (dirty)
                 {

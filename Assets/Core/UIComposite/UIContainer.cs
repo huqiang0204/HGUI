@@ -199,9 +199,20 @@ namespace huqiang.UIComposite
             public Layout[] layouts;
         }
         public UserEvent eventCall;
-        public Action<UIContainer, Vector2> Scroll;
+        /// <summary>
+        /// 最大值滚动框的0.5倍
+        /// </summary>
+        public float OutRatio { get; private set; }
+        /// <summary>
+        /// 用于上拉刷新
+        /// </summary>
+        public Action<UIContainer> ScrollOutDown;
+        /// <summary>
+        /// 用于下拉刷新
+        /// </summary>
+        public Action<UIContainer> ScrollOutTop;
         List<Item> items;
-        List<BindingData> datas=new List<BindingData>();
+        List<BindingData> datas = new List<BindingData>();
         public FakeStruct model;
         public List<Linker> linkers = new List<Linker>();
         public UIContainer()
@@ -222,10 +233,6 @@ namespace huqiang.UIComposite
             };
             eventCall.Scrolling = Scrolling;
             eventCall.ScrollEndY = OnScrollEnd;
-            eventCall.PointerUp = (o, e) => {
-                if (o.VelocityY == 0)
-                    OnScrollEnd(o);
-            };
             model = fake;
             var trans = Enity.transform;
             for (int i = 0; i < trans.childCount; i++)
@@ -267,6 +274,15 @@ namespace huqiang.UIComposite
             {
                 BounceBack(scroll, ref offset);
                 Calcul(offset.y);
+                if(outState<0)
+                {
+                    if (ScrollOutTop != null)
+                        ScrollOutTop(this);
+                }else if(outState>0)
+                {
+                    if (ScrollOutDown != null)
+                        ScrollOutDown(this);
+                }
             }
         }
         void OnScrollEnd(UserEvent back)
@@ -473,6 +489,7 @@ namespace huqiang.UIComposite
         }
         int index;
         float offsetRatio;
+        int outState;
         float Point {
             get
             {
@@ -515,22 +532,22 @@ namespace huqiang.UIComposite
                 }
             }
         }
-        float Start { get
-            {
-                if (datas == null)
-                    return 0;
-                if (datas.Count < 1)
-                    return 0;
-                return datas[0].offset;
-            } }
-        float End { get {
-                if (datas == null)
-                    return 0;
-                if (datas.Count < 1)
-                    return 0;
-                var c = datas.Count - 1;
-                return datas[c].offset+datas[c].high;
-            } }
+        //float Start { get
+        //    {
+        //        if (datas == null)
+        //            return 0;
+        //        if (datas.Count < 1)
+        //            return 0;
+        //        return datas[0].offset;
+        //    } }
+        //float End { get {
+        //        if (datas == null)
+        //            return 0;
+        //        if (datas.Count < 1)
+        //            return 0;
+        //        var c = datas.Count - 1;
+        //        return datas[c].offset+datas[c].high;
+        //    } }
         /// <summary>
         /// 向终点滚动
         /// </summary>
@@ -603,6 +620,8 @@ namespace huqiang.UIComposite
         }
         protected void BounceBack(UserEvent eventCall, ref Vector2 v)
         {
+            OutRatio = 0;
+            outState = 0;
             float y = Enity.SizeDelta.y;
             if (eventCall.Pressed)
             {
@@ -617,8 +636,10 @@ namespace huqiang.UIComposite
                             d = 1;
                         else if (d < 0)
                             d = 0;
+                        OutRatio = d;
                         v.y *= d;
                         eventCall.VelocityY = 0;
+                        outState = -1;
                     }
                 }
                 else if (v.y > 0)//往终点移动
@@ -632,8 +653,10 @@ namespace huqiang.UIComposite
                         if (os < 0)
                             os = 0;
                         float r = os / l;
+                        OutRatio = r;
                         v.y *= r;
                         eventCall.VelocityY = 0;
+                        outState = 1;
                     }
                 }
             }

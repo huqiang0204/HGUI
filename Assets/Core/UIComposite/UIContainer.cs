@@ -85,6 +85,10 @@ namespace huqiang.UIComposite
             container.linkers.Add(this);
             initializer = new UIInitializer(TempReflection.ObjectFields(typeof(T)));
         }
+        public void InsertData(U dat)
+        {
+            con.InsertData(this,dat);
+        }
         public void AddData(U dat)
         {
             con.AddData(this, dat);
@@ -240,6 +244,15 @@ namespace huqiang.UIComposite
             return link;
         }
         public int DataCount { get { return datas.Count; } }
+        public void InsertData(Linker linker,object data)
+        {
+            BindingData binding = new BindingData();
+            binding.linker = linker;
+            binding.Data = data;
+            binding.layouts = new Layout[linker.ElementCount];
+            datas.Insert(0,binding);
+            index++;
+        }
         public void AddData(Linker linker, object data)
         {
             BindingData binding = new BindingData();
@@ -590,14 +603,14 @@ namespace huqiang.UIComposite
         }
         protected void BounceBack(UserEvent eventCall, ref Vector2 v)
         {
-            var Size = Enity.SizeDelta;
+            float y = Enity.SizeDelta.y;
             if (eventCall.Pressed)
             {
                 if (v.y < 0)//往起点移动
                 {
                     if (OutDown())
                     {
-                        float l = Enity.SizeDelta.y*0.5f;
+                        float l = y*0.5f;
                         float f = datas[0].high * -offsetRatio;
                         float d = 1 - f / l;
                         if (d > 1)
@@ -612,7 +625,7 @@ namespace huqiang.UIComposite
                 {
                     if (OutTop())
                     {
-                        float l = Enity.SizeDelta.y * 0.5f;
+                        float l = y * 0.5f;
                         int c = datas.Count - 1;
                         float e = datas[c].offset + datas[c].high;
                         float os = e - Point - l;
@@ -643,7 +656,7 @@ namespace huqiang.UIComposite
                     {
                         if (OutTop())
                         {
-                            float l = Enity.SizeDelta.y;
+                            float l = y;
                             int c = datas.Count - 1;
                             float e = datas[c].offset + datas[c].high;
                             float d = l - e + Point;

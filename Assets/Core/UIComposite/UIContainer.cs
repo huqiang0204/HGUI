@@ -188,7 +188,8 @@ namespace huqiang.UIComposite
         class BindingData
         {
             public float offset;
-            public float high = 8;
+            public float width;
+            public float high;
             public object Data;
             public Linker linker;
             public Layout[] layouts;
@@ -222,7 +223,6 @@ namespace huqiang.UIComposite
                     OnScrollEnd(o);
             };
             model = fake;
-            //HGUIManager.GameBuffer.RecycleChild(script.gameObject);
             var trans = Enity.transform;
             for (int i = 0; i < trans.childCount; i++)
                 trans.GetChild(i).gameObject.SetActive(false);
@@ -256,19 +256,6 @@ namespace huqiang.UIComposite
                 Calcul(offset.y);
             }
         }
-        float GetDownLenth(float max)
-        {
-            int i = index;
-            float d = datas[i].high*offsetRatio;
-            i--;
-            for (; i >= 0; i--)
-            {
-                d += datas[i].high;
-                if (d > max)
-                    return max;
-            }
-            return d;
-        }
         void OnScrollEnd(UserEvent back)
         {
             if (datas.Count == 0)
@@ -276,75 +263,30 @@ namespace huqiang.UIComposite
             if (OutDown())
             {
                 back.DecayRateY = 0.988f;
-                float d = -datas[index].high*offsetRatio;
+                float d = -datas[index].high * offsetRatio;
                 back.ScrollDistanceY = d * eventCall.Context.transform.localScale.y;
             }
-            else
+            else if (OutTop())
             {
-                if(OutTop())
-                {
-                    back.DecayRateY = 0.988f;
-                    var item = datas[maxIndex];
-                    float f = Enity.SizeDelta.y*0.5f;
-                    float d = f + item.offset - item.high ;
-                    d = GetDownLenth(d);
-                    if (d > 0.01f)
-                        back.ScrollDistanceY = -d * eventCall.Context.transform.localScale.y;
-                    else back.VelocityY = 0;
-                }
+                back.DecayRateY = 0.988f;
+                float l = Enity.SizeDelta.y;
+                int c = datas.Count - 1;
+                float e = datas[c].offset + datas[c].high;
+                float d = l - e + Point;
+                if (d > 0.01f)
+                    back.ScrollDistanceY = -d * eventCall.Context.transform.localScale.y;
+                else back.VelocityY = 0;
             }
         }
-        int maxIndex = 0;
         public void Move(float y)
         {
-            if(datas.Count==1)
-            {
-                Calcul(0);
-                return;
-            }
-            var item = datas[maxIndex];
-            float h = Enity.SizeDelta.y;
-            float top =0.5f* h - item.offset;
-            top += 0.5f * item.high;
-            float tar = top + y;
-            if (tar < h)
-                Calcul(0);
-            else
-            {
-                float os = tar - h;
-                if (y > os)
-                    y = os;
-                Calcul(y);
-            }
+            Calcul(y);
         }
         void Calcul(float y)
         {
-            var item = datas[index];//当前指向的数据
-            float os = item.high * offsetRatio;
-            os += y;
-            if (os > item.high)
-            {
-                if (index < datas.Count - 1)
-                {
-                    os -= item.high;
-                    index++;
-                    float h = datas[index].high;
-                    offsetRatio = os / h;
-                }
-                else offsetRatio = os / item.high;
-            }
-            else if (os < 0)
-            {
-                if (index > 0)
-                {
-                    index--;
-                    float h = datas[index].high;
-                    os += h;
-                    offsetRatio = os / h;
-                }
-                else offsetRatio = os / item.high;
-            }
-            else offsetRatio = os / item.high;
+            if (y < 0)
+                MoveDown(y); 
+            else MoveUp(y);
             Order();
         }
         List<Item> buffer = new List<Item>();
@@ -357,16 +299,24 @@ namespace huqiang.UIComposite
             }
             buffer.AddRange(items);
             items.Clear();
-            float offset = datas[index].offset;
-            float start = Point;
+            float w = Enity.SizeDelta.x;
+            float os = datas[index].offset;
+            float start = -datas[index].high * offsetRatio;
             for (int i = index; i < datas.Count; i++)
             {
-                var item = datas[i];
-                UpdateItem(item, i, offset, start);
-                offset += item.high;
-                if (offset - start > Enity.SizeDelta.y)
+                var data = datas[i];
+                if(data.width!=w)
                 {
-                    maxIndex = i;
+                    data.high = data.linker.GetItemSize(data.Data);
+                    LoadLayout(data.linker.enityModel, data);
+                    data.offset = os;
+                    data.width = w;
+                }
+                UpdateItem(data, i, start);
+                start += data.high;
+                os += data.high;
+                if (start > Enity.SizeDelta.y)
+                {
                     break;
                 }
             }
@@ -393,24 +343,57 @@ namespace huqiang.UIComposite
                 }
             return new Item();
         }
-        void UpdateItem(BindingData data, int index,float offset, float start)
+        int id = 0;
+        void ApplayLayout(Transform trans, BindingData data)
+        {
+            id = 0;
+            ApplayLayout(trans, data.layouts);
+        }
+        void ApplayLayout(Transform trans, Layout[] layouts)
+        {
+            if (id >= layouts.Length)
+                return;
+            trans.localPosition = layouts[id].position;
+            var ui = trans.GetComponent<UIElement>();
+            if (ui != null)
+                ui.SizeDelta = layouts[id].sizeDelta;
+            var c = trans.childCount;
+            id++;
+            for (int i = 0; i < c; i++)
+                ApplayLayout(trans.GetChild(i), layouts);
+        }
+        void LoadLayout(Transform trans, BindingData data)
+        {
+            id = 0;
+            LoadLayout(trans, data.layouts);
+        }
+        void LoadLayout(Transform trans, Layout[] layouts)
+        {
+            if (id >= layouts.Length)
+                return;
+            layouts[id].position = trans.localPosition;
+            var ui = trans.GetComponent<UIElement>();
+            if (ui != null)
+                layouts[id].sizeDelta = ui.SizeDelta;
+            var c = trans.childCount;
+            id++;
+            for (int i = 0; i < c; i++)
+                LoadLayout(trans.GetChild(i), layouts);
+        }
+        void UpdateItem(BindingData data, int index, float offset)
         {
             var mod = data.linker.PopItem(index);
             if (mod == null)
             {
                 mod = data.linker.CreateUI();
-                LoadLayout(data.linker.enityModel, data.layouts);
                 mod.main.transform.SetParent(Enity.transform);
             }
             mod.main.SetActive(true);
             var son = mod.main.transform;
-            ApplayLayout(son, data.layouts);
             var item = FindOrCreateItem(index);
             if(item.Index<0)
             {
                 mod.index = index;
-                data.high = data.linker.GetItemSize(data.Data);
-                LoadLayout(data.linker.enityModel,data.layouts);
                 data.linker.RefreshItem(mod.UI, data.Data, index);
                 item.mod = mod;
                 item.linker = data.linker;
@@ -418,7 +401,7 @@ namespace huqiang.UIComposite
                 item.binding = data;
                 item.Data = data.Data;
                 item.UI = mod.UI;
-                item.offset = offset;
+                item.offset = data.offset;
                 item.high = data.high;
                 item.main = mod.main;
                 son.SetParent(Enity.transform);
@@ -429,8 +412,9 @@ namespace huqiang.UIComposite
                 mod.index = index;
                 item.mod = mod;
             }
+            ApplayLayout(son, data);
             items.Add(item);
-            son.localPosition = new Vector3(0, start-offset, 0);
+            son.localPosition = new Vector3(0, -offset, 0);
         }
         bool OutDown()
         {
@@ -441,90 +425,30 @@ namespace huqiang.UIComposite
         }
         bool OutTop()
         {
-            if (index == 0)
-                if (offsetRatio <= 0)
+            if (offsetRatio > 1)
+                return true;
+            float w = Enity.SizeDelta.x;
+            float l = Enity.SizeDelta.y;
+            int end = datas.Count;
+
+            var os = datas[index].offset + datas[index].high;
+            float start = -datas[index].high * (offsetRatio - 1);
+            for (int i = index + 1; i < end; i++)
+            {
+                var dat = datas[i];
+                if (dat.width != w)//如果当前数据未计算实际高度
+                {
+                    dat.high = dat.linker.GetItemSize(dat.Data);
+                    LoadLayout(dat.linker.enityModel, dat);
+                    dat.offset = os;
+                    dat.width = w;
+                }
+                os += dat.high;
+                start += dat.high;
+                if (start > l)
                     return false;
-            if (maxIndex == datas.Count - 1)
-            {
-                var item = datas[maxIndex];
-                float y = Enity.SizeDelta.y;
-                float top = item.offset + item.high;
-                if (top < y)
-                    return true;
             }
-            return false;
-        }
-        protected void BounceBack(UserEvent eventCall, ref Vector2 v)
-        {
-            var Size = Enity.SizeDelta;
-            if (eventCall.Pressed)
-            {
-                if (v.y < 0)
-                {
-                    if (OutDown())
-                    {
-                        float d = -datas[index].high * offsetRatio;
-                        float hf = Enity.SizeDelta.y * 0.5f;
-                        float r = d / hf;
-                        if (r > 1)
-                            r = 1;
-                        r = 1 - r;
-                        v.y *=  r;
-                        eventCall.VelocityY = 0;
-                    }
-                }
-                else if (v.y > 0)
-                {
-                    if (OutTop())
-                    {
-                        var item = datas[index];
-                        float f = Enity.SizeDelta.y;
-                        f = GetDownLenth(f);
-                        float d = f - item.offset + item.high * 0.5f;
-                        float hf = f * 0.5f;
-                        d /= hf;
-                        if (d > 1)
-                            d = 1;
-                        else if (d < 0)
-                            d = 0;
-                        v.y *= d;
-                        eventCall.VelocityY = 0;
-                    }
-                }
-            }
-            else
-            {
-                if (v.y < 0)
-                {
-                    if (eventCall.DecayRateY >= 0.95f)
-                    {
-                            if (OutDown())
-                            {
-                                eventCall.DecayRateY = 0.9f;
-                                eventCall.VelocityY = eventCall.VelocityY;
-                            }
-                    }
-                }
-                else if (v.y > 0)
-                {
-                    if (eventCall.DecayRateY >= 0.95f)
-                    {
-                        if (OutTop())
-                        {
-                            var f = GetDownLenth(eventCall.ScrollDistanceY);
-                            if(f<0.01f)
-                            {
-                                eventCall.VelocityY = 0;
-                            }
-                            else
-                            {
-                                eventCall.DecayRateY = 0.9f;
-                                eventCall.VelocityY = eventCall.VelocityY;
-                            }
-                        }
-                    }
-                }
-            }
+            return true;
         }
         void ReSized()
         {
@@ -541,7 +465,7 @@ namespace huqiang.UIComposite
             {
                 if (datas == null)
                     return 0;
-                if (datas.Count > 1)
+                if (datas.Count < 1)
                     return 0;
                return datas[index].offset + datas[index].high * offsetRatio;
             }
@@ -594,55 +518,148 @@ namespace huqiang.UIComposite
                 var c = datas.Count - 1;
                 return datas[c].offset+datas[c].high;
             } }
+        /// <summary>
+        /// 向终点滚动
+        /// </summary>
+        /// <param name="y"></param>
         void MoveUp(float y)
         {
-        
-        }
-        void MoveDown(float y)
-        {
-            float p = Point + y;
-            for (int i = index; i >= 0; i--)
+            float w = Enity.SizeDelta.x;
+            float op = Point;
+            float p = op + y;
+            float os = datas[index].offset;
+            int end = datas.Count;
+            for (int i = index; i <end; i++)
             {
                 var dat = datas[i];
-                if (p > dat.offset)
+                if (dat.width!= w)//如果当前数据未计算实际高度
+                {
+                    dat.high = dat.linker.GetItemSize(dat.Data);
+                    LoadLayout(dat.linker.enityModel, dat);
+                    dat.offset = os;
+                    dat.width = w;
+                }
+                if (p < dat.offset+dat.high)//如果当前指针小于数据的结束位置
                 {
                     index = i;
                     offsetRatio = (p - datas[i].offset) / datas[i].high;
-                    break;
+                    return;
                 }
-                if (dat.high < 10)
+                os += dat.high;
+            }
+            end--;
+            if (end >= 0)
+                if (p > datas[end].offset + datas[end].high)//偏移百分比为大于1
                 {
-                    dat.high = dat.linker.GetItemSize(dat);
-                    LoadLayout(dat.linker.enityModel,dat.layouts);
+                    index = end;
+                    offsetRatio = (p - datas[end].offset) / datas[end].high;
                 }
+        }
+        /// <summary>
+        /// 向起点滚动
+        /// </summary>
+        /// <param name="y"></param>
+        void MoveDown(float y)
+        {
+            float w = Enity.SizeDelta.x;
+            float p = Point +y;
+            float os = datas[index].offset;
+            for (int i = index; i >= 0; i--)
+            {
+                var dat = datas[i];
+                if (dat.width != w)//如果当前数据未计算实际高度
+                {
+                    dat.high = dat.linker.GetItemSize(dat.Data);
+                    LoadLayout(dat.linker.enityModel, dat);
+                    dat.offset = os - dat.high;
+                    dat.width = w;
+                }
+                if (p > dat.offset)//如果当前指针大于数据的起始位置
+                {
+                    index = i;
+                    offsetRatio = (p - datas[i].offset) / datas[i].high;
+                    return;
+                }
+                os = dat.offset;
+            }
+            if(p<datas[0].offset)//偏移百分比为负数
+            {
+                index = 0;
+                offsetRatio = (p - datas[0].offset) / datas[0].high;
             }
         }
-        int id = 0;
-        void ApplayLayout(Transform trans,Layout[] layouts)
+        protected void BounceBack(UserEvent eventCall, ref Vector2 v)
         {
-            if (id >= layouts.Length)
-                return;
-            trans.localPosition = layouts[id].position;
-            var ui = trans.GetComponent<UIElement>();
-            if (ui != null)
-                ui.SizeDelta = layouts[id].sizeDelta;
-            var c = trans.childCount;
-            id++;
-            for (int i = 0; i < c; i++)
-                ApplayLayout(trans.GetChild(i), layouts);
-        }
-        void LoadLayout(Transform trans,Layout[] layouts)
-        {
-            if (id >= layouts.Length)
-                return;
-            layouts[id].position = trans.localPosition;
-            var ui = trans.GetComponent<UIElement>();
-            if (ui != null)
-                layouts[id].sizeDelta = ui.SizeDelta;
-            var c = trans.childCount;
-            id++;
-            for (int i = 0; i < c; i++)
-                LoadLayout(trans.GetChild(i), layouts);
+            var Size = Enity.SizeDelta;
+            if (eventCall.Pressed)
+            {
+                if (v.y < 0)//往起点移动
+                {
+                    if (OutDown())
+                    {
+                        float l = Enity.SizeDelta.y*0.5f;
+                        float f = datas[0].high * -offsetRatio;
+                        float d = 1 - f / l;
+                        if (d > 1)
+                            d = 1;
+                        else if (d < 0)
+                            d = 0;
+                        v.y *= d;
+                        eventCall.VelocityY = 0;
+                    }
+                }
+                else if (v.y > 0)//往终点移动
+                {
+                    if (OutTop())
+                    {
+                        float l = Enity.SizeDelta.y * 0.5f;
+                        int c = datas.Count - 1;
+                        float e = datas[c].offset + datas[c].high;
+                        float os = e - Point - l;
+                        if (os < 0)
+                            os = 0;
+                        float r = os / l;
+                        v.y *= r;
+                        eventCall.VelocityY = 0;
+                    }
+                }
+            }
+            else
+            {
+                if (v.y < 0)
+                {
+                    if (eventCall.DecayRateY >= 0.95f)
+                    {
+                        if (OutDown())
+                        {
+                            eventCall.DecayRateY = 0.9f;
+                            eventCall.VelocityY = eventCall.VelocityY;
+                        }
+                    }
+                }
+                else if (v.y > 0)
+                {
+                    if (eventCall.DecayRateY >= 0.95f)
+                    {
+                        if (OutTop())
+                        {
+                            float l = Enity.SizeDelta.y;
+                            int c = datas.Count - 1;
+                            float e = datas[c].offset + datas[c].high;
+                            float d = l - e + Point;
+                            if (d < 0.01f)
+                            {
+                                eventCall.VelocityY = 0;
+                            }
+                            else
+                            {
+                                eventCall.DecayRateY = 0.9f;
+                                eventCall.VelocityY = eventCall.VelocityY;
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

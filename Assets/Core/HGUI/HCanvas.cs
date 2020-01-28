@@ -328,8 +328,8 @@ namespace huqiang.Core.HGUI
             int len = max;
             if (scripts != null)
             {
-                for (int i = 0; i < len; i++)
-                    scripts[i].SubUpdate();
+                //for (int i = 0; i < len; i++)
+                //    scripts[i].SubUpdate();
                 for (int i = 0; i < len; i++)
                 {
                     var grap = scripts[i] as HGraphics;

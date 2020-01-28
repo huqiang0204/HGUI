@@ -59,6 +59,36 @@ namespace Assets.Scripts
             view = LoadUI<View>("baseUI", "chat");
             InitialChat();
             InitialTreeView();
+            var chat = new ChatData();
+            chat.name = "江海胡";
+            chat.content = "是地方还是快点结婚说的话付款时间和十大科技回复空间说的话精神科大夫收到回复收到回复时代发收到回复";
+            self.AddData(chat);
+            container.Move(0);
+            chat = new ChatData();
+            chat.name = "江海胡";
+            chat.content = "是地方还是快点结婚说的话付款时间和十大科技回复空间说的话精神科大夫收到回复收到回复时代发收到回复";
+            self.AddData(chat);
+            container.Move(0);
+            chat = new ChatData();
+            chat.name = "江海胡";
+            chat.content = "是地方还是快点结婚说的话付款时间和十大科技回复空间说的话精神科大夫收到回复收到回复时代发收到回复";
+            self.AddData(chat);
+            container.Move(0);
+            chat = new ChatData();
+            chat.name = "江海胡";
+            chat.content = "是地方还是快点结婚说的话付款时间和十大科技回复空间说的话精神科大夫收到回复收到回复时代发收到回复";
+            self.AddData(chat);
+            container.Move(0);
+            chat = new ChatData();
+            chat.name = "江海胡";
+            chat.content = "是地方还是快点结婚说的话付款时间和十大科技回复空间说的话精神科大夫收到回复收到回复时代发收到回复";
+            self.AddData(chat);
+            container.Move(0);
+            chat = new ChatData();
+            chat.name = "江海胡";
+            chat.content = "是地方还是快点结婚说的话付款时间和十大科技回复空间说的话精神科大夫收到回复收到回复时代发收到回复";
+            self.AddData(chat);
+            container.Move(0);
         }
         void InitialTreeView()
         {
@@ -161,7 +191,7 @@ namespace Assets.Scripts
         }
         float GetContentSize(ChatItem chat, ChatData data)
         {
-            if(data.conSize==Vector2.zero)
+            if (data.conSize == Vector2.zero)
             {
                 Vector2 size = new Vector2(360, 60);
                 chat.content.GetPreferredHeight(ref size, data.content);
@@ -169,7 +199,7 @@ namespace Assets.Scripts
                 data.conSize = size;
             }
             chat.content.SizeDelta = data.conSize;
-            var s= data.conSize;
+            var s = data.conSize;
             s.x += 10;
             s.y += 10;
             chat.box.SizeDelta = s;

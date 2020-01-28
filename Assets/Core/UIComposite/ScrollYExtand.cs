@@ -171,7 +171,6 @@ namespace huqiang.UIComposite
                     BindingData[i].Height = a * ItemSize.y;
                     if (!BindingData[i].Hide)
                     {
-                        //height += h;
                         height += BindingData[i].ShowHeight;
                     }
                 }

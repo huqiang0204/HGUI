@@ -17,11 +17,10 @@ namespace huqiang.Core.HGUI
         public UserAction[] inputs;
         public bool PauseEvent;
         public UserAction.InputType inputType = UserAction.InputType.OnlyMouse;
-        bool textRebuilt;
         private void Start()
         {
-            Font.textureRebuilt += (o) => { 
-                textRebuilt = true;
+            Font.textureRebuilt += (o) => {
+                TxtCollector.GenerateTexture(true);
             };
         }
         /// <summary>
@@ -49,9 +48,7 @@ namespace huqiang.Core.HGUI
                     TxtCollector.Next();
                 var txt = script as HText;
                 if (txt != null)
-                {
                     TxtCollector.AddText(txt);
-                }
             }
             PipeLine[index].script = script;
             int c = trans.childCount;
@@ -79,11 +76,11 @@ namespace huqiang.Core.HGUI
                 UIPage.CurrentPage.Update(UserAction.TimeSlice);
             MainMission();
             ThreadMission.ExtcuteMain();
+      
         }
         private void LateUpdate()
         {
-            TxtCollector.GenerateTexture(textRebuilt);
-            textRebuilt = false;
+           TxtCollector.GenerateTexture(false);
             SubMission(null);
             ApplyMeshRenderer();
         }

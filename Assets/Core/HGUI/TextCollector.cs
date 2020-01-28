@@ -11,10 +11,13 @@ namespace huqiang.Core.HGUI
         {
             public HText[] texts;
             public int max;
+            public bool end;
         }
         TextInfo[] buffer = new TextInfo[64];
+        int[] indexs = new int[64];
         int point;
         int max;
+        int top = 0;
         public void AddText(HText text)
         {
             var buf = buffer[point].texts;
@@ -36,19 +39,34 @@ namespace huqiang.Core.HGUI
                 for (int j = 0; j < c; j++)
                     buf.texts[j] = null;
                 buffer[i].max = 0;
+                buffer[i].end = false;
             }
             max = 1;
             point = 0;
+            top = 0;
         }
-        public void Next()
+        public int Next()
         {
             point++;
+            top++;
+            for (int i=point;i<64;i++)
+            {
+                if(!buffer[i].end)
+                {
+                    point = i;
+                    indexs[top] = point;
+                    break;
+                }
+            }
             if (max <= point)
                 max = point + 1;
+            return point;
         }
         public void Back()
         {
-            point--;
+            top--;
+            buffer[point].end = true;
+            point = indexs[top];
         }
         public void GenerateTexture(bool force = false)
         {
@@ -67,10 +85,6 @@ namespace huqiang.Core.HGUI
                             break;
                         }
                     }
-                }
-                else
-                {
-                   Debug.Log("dddd");
                 }
                 if (dirty)
                 {

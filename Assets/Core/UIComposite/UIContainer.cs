@@ -93,6 +93,15 @@ namespace huqiang.UIComposite
         {
             con.AddData(this, dat);
         }
+        public void AddAndMove(U dat)
+        {
+            var t = con.AddData(this, dat);
+            if (CalculItemHigh != null)
+                t.high = CalculItemHigh(uiModel, dat);
+            unsafe { t.high = ((TransfromData*)model.ip)->size.y; }
+            t.LoadLayout(enityModel);
+            con.Move(t.high);
+        }
         public override LinkerMod CreateUI()
         {
             for(int i=0;i<buffer.Count;i++)
@@ -167,14 +176,63 @@ namespace huqiang.UIComposite
                 ItemUpdate(t, u, index);
         }
     }
+    public struct BaseLayout
+    {
+        public Vector3 position;
+        public Vector2 sizeDelta;
+        public Quaternion rotate;
+    }
+    public class BindingData
+    {
+        public float offset;
+        public float width;
+        public float high;
+        public object Data;
+        public Linker linker;
+        public BaseLayout[] layouts;
+        static int id = 0;
+        public void ApplayLayout(Transform trans)
+        {
+            id = 0;
+            if (layouts != null)
+                ApplayLayout(trans, layouts);
+        }
+        static void ApplayLayout(Transform trans, BaseLayout[] layouts)
+        {
+            if (id >= layouts.Length)
+                return;
+            trans.localPosition = layouts[id].position;
+            var ui = trans.GetComponent<UIElement>();
+            if (ui != null)
+                ui.SizeDelta = layouts[id].sizeDelta;
+            var c = trans.childCount;
+            id++;
+            for (int i = 0; i < c; i++)
+                ApplayLayout(trans.GetChild(i), layouts);
+        }
+        public void LoadLayout(Transform trans)
+        {
+            id = 0;
+            if (layouts != null)
+                LoadLayout(trans, layouts);
+        }
+        static void LoadLayout(Transform trans, BaseLayout[] layouts)
+        {
+            if (id >= layouts.Length)
+                return;
+            layouts[id].position = trans.localPosition;
+            var ui = trans.GetComponent<UIElement>();
+            if (ui != null)
+                layouts[id].sizeDelta = ui.SizeDelta;
+            var c = trans.childCount;
+            id++;
+            for (int i = 0; i < c; i++)
+                LoadLayout(trans.GetChild(i), layouts);
+        }
+     
+    }
     public class UIContainer:Composite
     {
-        struct Layout
-        {
-            public Vector3 position;
-            public Vector2 sizeDelta;
-            public Quaternion rotate;
-        }
         class Item
         {
             public Linker linker;
@@ -188,15 +246,6 @@ namespace huqiang.UIComposite
             public GameObject main;
             public float offset;
             public float high;
-        }
-        class BindingData
-        {
-            public float offset;
-            public float width;
-            public float high;
-            public object Data;
-            public Linker linker;
-            public Layout[] layouts;
         }
         public UserEvent eventCall;
         /// <summary>
@@ -251,22 +300,24 @@ namespace huqiang.UIComposite
             return link;
         }
         public int DataCount { get { return datas.Count; } }
-        public void InsertData(Linker linker,object data)
+        public BindingData InsertData(Linker linker,object data)
         {
             BindingData binding = new BindingData();
             binding.linker = linker;
             binding.Data = data;
-            binding.layouts = new Layout[linker.ElementCount];
+            binding.layouts = new BaseLayout[linker.ElementCount];
             datas.Insert(0,binding);
             index++;
+            return binding;
         }
-        public void AddData(Linker linker, object data)
+        public BindingData AddData(Linker linker, object data)
         {
             BindingData binding = new BindingData();
             binding.linker = linker;
             binding.Data = data;
-            binding.layouts = new Layout[linker.ElementCount];
+            binding.layouts = new BaseLayout[linker.ElementCount];
             datas.Add(binding);
+            return binding;
         }
         void Scrolling(UserEvent scroll, Vector2 offset)
         {
@@ -309,13 +360,24 @@ namespace huqiang.UIComposite
         }
         public void Move(float y)
         {
-            Calcul(y);
+            if(y<0)
+            {
+                MoveStart(y);
+                if (index == 0)
+                    if (offsetRatio < 0)
+                        offsetRatio = 0;
+            }
+            else
+            {
+
+            }
+            Order();
         }
         void Calcul(float y)
         {
             if (y < 0)
-                MoveDown(y); 
-            else MoveUp(y);
+                MoveStart(y); 
+            else MoveEnd(y);
             Order();
         }
         List<Item> buffer = new List<Item>();
@@ -337,7 +399,7 @@ namespace huqiang.UIComposite
                 if(data.width!=w)
                 {
                     data.high = data.linker.GetItemSize(data.Data);
-                    LoadLayout(data.linker.enityModel, data);
+                    data.LoadLayout(data.linker.enityModel);
                     data.offset = os;
                     data.width = w;
                 }
@@ -372,43 +434,6 @@ namespace huqiang.UIComposite
                 }
             return new Item();
         }
-        int id = 0;
-        void ApplayLayout(Transform trans, BindingData data)
-        {
-            id = 0;
-            ApplayLayout(trans, data.layouts);
-        }
-        void ApplayLayout(Transform trans, Layout[] layouts)
-        {
-            if (id >= layouts.Length)
-                return;
-            trans.localPosition = layouts[id].position;
-            var ui = trans.GetComponent<UIElement>();
-            if (ui != null)
-                ui.SizeDelta = layouts[id].sizeDelta;
-            var c = trans.childCount;
-            id++;
-            for (int i = 0; i < c; i++)
-                ApplayLayout(trans.GetChild(i), layouts);
-        }
-        void LoadLayout(Transform trans, BindingData data)
-        {
-            id = 0;
-            LoadLayout(trans, data.layouts);
-        }
-        void LoadLayout(Transform trans, Layout[] layouts)
-        {
-            if (id >= layouts.Length)
-                return;
-            layouts[id].position = trans.localPosition;
-            var ui = trans.GetComponent<UIElement>();
-            if (ui != null)
-                layouts[id].sizeDelta = ui.SizeDelta;
-            var c = trans.childCount;
-            id++;
-            for (int i = 0; i < c; i++)
-                LoadLayout(trans.GetChild(i), layouts);
-        }
         void UpdateItem(BindingData data, int index, float offset)
         {
             var mod = data.linker.PopItem(index);
@@ -420,7 +445,7 @@ namespace huqiang.UIComposite
             mod.main.SetActive(true);
             var son = mod.main.transform;
             var item = FindOrCreateItem(index);
-            if(item.Index<0)
+            if (item.Index < 0)
             {
                 mod.index = index;
                 data.linker.RefreshItem(mod.UI, data.Data, index);
@@ -441,7 +466,7 @@ namespace huqiang.UIComposite
                 mod.index = index;
                 item.mod = mod;
             }
-            ApplayLayout(son, data);
+            data.ApplayLayout(son);
             items.Add(item);
             son.localPosition = new Vector3(0, -offset, 0);
         }
@@ -468,7 +493,7 @@ namespace huqiang.UIComposite
                 if (dat.width != w)//如果当前数据未计算实际高度
                 {
                     dat.high = dat.linker.GetItemSize(dat.Data);
-                    LoadLayout(dat.linker.enityModel, dat);
+                    dat.LoadLayout(dat.linker.enityModel);
                     dat.offset = os;
                     dat.width = w;
                 }
@@ -479,14 +504,7 @@ namespace huqiang.UIComposite
             }
             return true;
         }
-        void ReSized()
-        {
-            for(int i=0;i<items.Count;i++)//重新计算内容的高度
-            {
-                var it = items[i];
-                it.binding.high = it.high = it.binding.linker.GetItemSize(it.Data);
-            }
-        }
+
         int index;
         float offsetRatio;
         int outState;
@@ -549,10 +567,43 @@ namespace huqiang.UIComposite
         //        return datas[c].offset+datas[c].high;
         //    } }
         /// <summary>
+        /// 向起点滚动
+        /// </summary>
+        /// <param name="y"></param>
+        void MoveStart(float y)
+        {
+            float w = Enity.SizeDelta.x;
+            float p = Point + y;
+            float os = datas[index].offset;
+            for (int i = index; i >= 0; i--)
+            {
+                var dat = datas[i];
+                if (dat.width != w)//如果当前数据未计算实际高度
+                {
+                    dat.high = dat.linker.GetItemSize(dat.Data);
+                    dat.LoadLayout(dat.linker.enityModel);
+                    dat.offset = os - dat.high;
+                    dat.width = w;
+                }
+                if (p > dat.offset)//如果当前指针大于数据的起始位置
+                {
+                    index = i;
+                    offsetRatio = (p - datas[i].offset) / datas[i].high;
+                    return;
+                }
+                os = dat.offset;
+            }
+            if (p < datas[0].offset)//偏移百分比为负数
+            {
+                index = 0;
+                offsetRatio = (p - datas[0].offset) / datas[0].high;
+            }
+        }
+        /// <summary>
         /// 向终点滚动
         /// </summary>
         /// <param name="y"></param>
-        void MoveUp(float y)
+        void MoveEnd(float y)
         {
             float w = Enity.SizeDelta.x;
             float op = Point;
@@ -565,7 +616,7 @@ namespace huqiang.UIComposite
                 if (dat.width!= w)//如果当前数据未计算实际高度
                 {
                     dat.high = dat.linker.GetItemSize(dat.Data);
-                    LoadLayout(dat.linker.enityModel, dat);
+                    dat.LoadLayout(dat.linker.enityModel);
                     dat.offset = os;
                     dat.width = w;
                 }
@@ -584,39 +635,6 @@ namespace huqiang.UIComposite
                     index = end;
                     offsetRatio = (p - datas[end].offset) / datas[end].high;
                 }
-        }
-        /// <summary>
-        /// 向起点滚动
-        /// </summary>
-        /// <param name="y"></param>
-        void MoveDown(float y)
-        {
-            float w = Enity.SizeDelta.x;
-            float p = Point +y;
-            float os = datas[index].offset;
-            for (int i = index; i >= 0; i--)
-            {
-                var dat = datas[i];
-                if (dat.width != w)//如果当前数据未计算实际高度
-                {
-                    dat.high = dat.linker.GetItemSize(dat.Data);
-                    LoadLayout(dat.linker.enityModel, dat);
-                    dat.offset = os - dat.high;
-                    dat.width = w;
-                }
-                if (p > dat.offset)//如果当前指针大于数据的起始位置
-                {
-                    index = i;
-                    offsetRatio = (p - datas[i].offset) / datas[i].high;
-                    return;
-                }
-                os = dat.offset;
-            }
-            if(p<datas[0].offset)//偏移百分比为负数
-            {
-                index = 0;
-                offsetRatio = (p - datas[0].offset) / datas[0].high;
-            }
         }
         protected void BounceBack(UserEvent eventCall, ref Vector2 v)
         {
@@ -697,5 +715,13 @@ namespace huqiang.UIComposite
                 }
             }
         }
+        //void ReSized()
+        //{
+        //    for(int i=0;i<items.Count;i++)//重新计算内容的高度
+        //    {
+        //        var it = items[i];
+        //        it.binding.high = it.high = it.binding.linker.GetItemSize(it.Data);
+        //    }
+        //}
     }
 }

@@ -162,15 +162,23 @@ namespace huqiang.UIComposite
         public Transform Main;
         protected UISlider m_slider;
         public virtual UISlider Slider { get; set; }
-        public override  void Initial(FakeStruct mod, UIElement script)
+        public override void Initial(FakeStruct mod, UIElement script)
         {
             base.Initial(mod,script);
             Main = script.transform;
             int c = Main.childCount;
             if (c > 0)
             {
+                
+                var it = Main.Find("Item").gameObject;
+                HGUIManager.GameBuffer.RecycleGameObject(it);
+                var sli = Main.Find("Slider");
+                if (sli != null)
+                {
+                    var ui = sli.GetComponent<UIElement>();
+                    Slider = ui.composite as UISlider;
+                }
                 ItemMod = HGUIManager.FindChild(mod, "Item");
-                HGUIManager.GameBuffer.RecycleGameObject(script.transform.Find("Item").gameObject);
                 unsafe
                 {
                     ItemSize = ((TransfromData*)ItemMod.ip)->size;
@@ -182,12 +190,7 @@ namespace huqiang.UIComposite
                         MinBox = tp->minBox;
                     }
                 }
-                var sli = Main.Find("Slider");
-                if (sli != null)
-                {
-                    var ui = sli.GetComponent<UIElement>();
-                    Slider = ui.composite as UISlider;
-                }
+             
             }
         }
         public virtual void Refresh(float x = 0, float y = 0)
@@ -239,6 +242,7 @@ namespace huqiang.UIComposite
                 a.target = go.transform;
             }
             a.target.SetParent(Main);
+            a.target.SetAsFirstSibling();
             a.target.localRotation = Quaternion.identity;
             return a;
         }
@@ -270,7 +274,10 @@ namespace huqiang.UIComposite
         }
         public void Clear()
         {
-            HGUIManager.GameBuffer.RecycleChild(Main.gameObject);
+            for (int i = 0; i < Items.Count; i++)
+                HGUIManager.GameBuffer.RecycleGameObject(Items[i].target.gameObject);
+            for (int i = 0; i < Recycler.Count; i++)
+                HGUIManager.GameBuffer.RecycleGameObject(Recycler[i].target.gameObject);
             Items.Clear();
             Recycler.Clear();
         }

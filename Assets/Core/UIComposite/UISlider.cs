@@ -152,9 +152,9 @@ namespace huqiang.UIComposite
                 if(Nob!=null)
                 {
                     var trans = Nob.transform;
-                    trans.localPosition = pos;
+                    //trans.localPosition = pos;
                     float s = (info.MaxScale - info.MinScale) * ratio + info.MinScale;
-                    trans.localScale = new Vector3(s, s, s);
+                    //trans.localScale = new Vector3(s, s, s);
                 }
             }
             else

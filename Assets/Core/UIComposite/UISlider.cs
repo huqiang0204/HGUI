@@ -77,7 +77,7 @@ namespace huqiang.UIComposite
             callBack.Drag = callBack.DragEnd = Draging;
             callBack.PointerDown = PointDown;
             callBack.AutoColor = false;
-            var tmp = trans.Find("Fill");
+            var tmp = trans.Find("FillImage");
             if (tmp != null)
                 FillImage = tmp.GetComponent<HImage>();
             tmp = trans.Find("Nob");

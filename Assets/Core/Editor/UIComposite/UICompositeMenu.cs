@@ -216,7 +216,7 @@ public static class UICompositeMenu
             rect.localRotation = Quaternion.identity;
         }
     }
-    static GameObject CreateSliderV()
+    static GameObject CreateSliderV(float startOffset=-15,float endOffset=-15)
     {
         var go = new GameObject("SliderV", typeof(HImage));
         HImage image = go.GetComponent<HImage>();
@@ -225,8 +225,8 @@ public static class UICompositeMenu
         var rect = image.transform;
 
         var help = go.AddComponent<SliderHelper>();
-        help.StartOffset.y = -15;
-        help.EndOffset.y = -15;
+        help.StartOffset.y = startOffset;
+        help.EndOffset.y = endOffset;
         image.Sprite = EditorModelManager.FindSprite(icons, background);
         image.SprType = SpriteType.Sliced;
 
@@ -248,7 +248,7 @@ public static class UICompositeMenu
         image.SizeDelta = new Vector2(30, 30);
         son = image.transform;
         son.SetParent(rect);
-        son.localPosition = new Vector3(0, 200, 0);
+        son.localPosition = new Vector3(0, 200+startOffset, 0);
         son.localScale = Vector3.one;
         son.localRotation = Quaternion.identity;
         image.Chromatically = Color.green;
@@ -288,53 +288,7 @@ public static class UICompositeMenu
         son.localRotation = Quaternion.identity;
         return ss;
     }
-    //[MenuItem("GameObject/UIComposite/ScrollY", false, 4)]
-    static public void AddScrollY(MenuCommand menuCommand)
-    {
-        GameObject parent = menuCommand.context as GameObject;
-        var Scroll = new GameObject("ScrollY", typeof(RectTransform));
-        if (parent != null)
-            Scroll.transform.SetParent(parent.transform);
-        Scroll.transform.localPosition = Vector3.zero;
-        Scroll.transform.localScale = Vector3.one;
-
-        var ss = new GameObject("Scroll", typeof(RectTransform));
-        RectTransform rect = ss.transform as RectTransform;
-        rect.SetParent(Scroll.transform);
-        rect.sizeDelta = new Vector2(400, 400);
-        rect.localPosition = Vector3.zero;
-        rect.localScale = Vector3.one;
-        var Item = new GameObject("Item", typeof(RectTransform));
-        var fr = Item.transform as RectTransform;
-        fr.sizeDelta = new Vector2(80, 80);
-        fr.SetParent(rect);
-        fr.localPosition = Vector3.zero;
-        fr.localScale = Vector3.one;
-
-        ss = new GameObject("Slider", typeof(RectTransform));
-        var fn = ss.transform as RectTransform;
-        fn.sizeDelta = new Vector2(20, 400);
-        fn.SetParent(Scroll.transform);
-        fn.localPosition = new Vector3(190, 0, 0);
-        fn.localScale = Vector3.one;
-        var img = ss.AddComponent<HImage>();
-        img.Sprite = EditorModelManager.FindSprite(icons, background);
-        img.SprType = SpriteType.Sliced;
-        img.Chromatically = new Color32(152, 152, 152, 255);
-        var help = ss.AddComponent<SliderHelper>();
-        help.direction = UISlider.Direction.Vertical;
-        help.StartOffset.y = 15;
-        help.EndOffset.y = 15;
-
-        var Nob = new GameObject("Nob", typeof(RectTransform));
-        fn = Nob.transform as RectTransform;
-        fn.sizeDelta = new Vector2(30, 30);
-        fn.SetParent(ss.transform);
-        fn.localPosition = new Vector3(0, -185, 0);
-        fn.localScale = Vector3.one;
-        img = Nob.AddComponent<HImage>();
-        img.Sprite = EditorModelManager.FindSprite(icons, circlesm);
-    }
+   
     [MenuItem("GameObject/HGUI/UIRocker", false, 9)]
     static public void AddRocker(MenuCommand menuCommand)
     {
@@ -578,7 +532,35 @@ public static class UICompositeMenu
 
         palette.AddComponent<PaletteHelper>().Initial();
     }
-    [MenuItem("GameObject/HGUI/ScrollYExtand", false, 13)]
+    [MenuItem("GameObject/HGUI/ScrollY", false, 13)]
+    static public void AddScrollY(MenuCommand menuCommand)
+    {
+        GameObject parent = menuCommand.context as GameObject;
+        var scroll = new GameObject("ScrollY");
+        var main = scroll.AddComponent<HImage>();
+        main.SizeDelta = new Vector2(400, 400);
+        main.Pivot = new Vector2(0.5f, 1);
+        main.Mask = true;
+        main.Chromatically = new Color32(54, 54, 54, 255);
+        main.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        main.compositeType = CompositeType.ScrollY;
+        var trans = scroll.transform;
+        if (parent != null)
+            trans.SetParent(parent.transform);
+        trans.localPosition = Vector3.zero;
+        trans.localScale = Vector3.one;
+        trans.localRotation = Quaternion.identity;
+
+        CreateItem(trans, "Item");
+        var slider = CreateSliderV();
+        slider.name = "Slider";
+        var ss = slider.transform;
+        ss.SetParent(trans);
+        ss.localPosition = new Vector3(190, -200, 0);
+        ss.localScale = Vector3.one;
+        ss.localRotation = Quaternion.identity;
+    }
+    [MenuItem("GameObject/HGUI/ScrollYExtand", false, 14)]
     static public void AddScrollYExtand(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;

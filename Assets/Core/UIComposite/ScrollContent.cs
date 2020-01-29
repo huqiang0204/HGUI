@@ -82,7 +82,6 @@ namespace huqiang.UIComposite
             }
             get { return modData; }
         }
-        public FakeStruct[] ItemMods;
         IList dataList;
         Array array;
         FakeArray fakeStruct;
@@ -161,6 +160,8 @@ namespace huqiang.UIComposite
         /// </summary>
         public Action<ScrollItem> ItemRecycle;
         public Transform Main;
+        protected UISlider m_slider;
+        public virtual UISlider Slider { get; set; }
         public override  void Initial(FakeStruct mod, UIElement script)
         {
             base.Initial(mod,script);
@@ -168,12 +169,11 @@ namespace huqiang.UIComposite
             int c = Main.childCount;
             if (c > 0)
             {
-                ItemMods = HGUIManager.GetAllChild(mod);
-                ItemMod = ItemMods[0];
-                HGUIManager.GameBuffer.RecycleChild(script.gameObject);
+                ItemMod = HGUIManager.FindChild(mod, "Item");
+                HGUIManager.GameBuffer.RecycleGameObject(script.transform.Find("Item").gameObject);
                 unsafe
                 {
-                    ItemSize = ((TransfromData*)ItemMods[0].ip)->size;
+                    ItemSize = ((TransfromData*)ItemMod.ip)->size;
                     var ex = mod.buffer.GetData(((TransfromData*)mod.ip)->ex) as FakeStruct;
                     if (ex != null)
                     {
@@ -182,18 +182,13 @@ namespace huqiang.UIComposite
                         MinBox = tp->minBox;
                     }
                 }
+                var sli = Main.Find("Slider");
+                if (sli != null)
+                {
+                    var ui = sli.GetComponent<UIElement>();
+                    Slider = ui.composite as UISlider;
+                }
             }
-        }
-        public void SetMod(int index)
-        {
-            if (ItemMods == null)
-                return;
-            if (index < 0)
-                index = 0;
-            if (index >= ItemMods.Length)
-                index = ItemMods.Length - 1;
-            ItemMod = ItemMods[index];
-            unsafe { ItemSize = ((TransfromData*)ItemMods[index].ip)->size; }
         }
         public virtual void Refresh(float x = 0, float y = 0)
         {

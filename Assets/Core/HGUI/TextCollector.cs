@@ -68,10 +68,6 @@ namespace huqiang.Core.HGUI
                         }
                     }
                 }
-                else
-                {
-                   Debug.Log("dddd");
-                }
                 if (dirty)
                 {
                     for (int j = 0; j < c; j++)

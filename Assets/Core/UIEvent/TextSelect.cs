@@ -170,9 +170,9 @@ namespace huqiang.UIEvent
             HeightChange = PreferredHeight - h;
             PreferredHeight = h;
       
-            cha = generator.characters.ToArray();
-            var tmp = generator.lines;
-            lines = new LineInfo[tmp.Count];
+            cha = generator.GetCharactersArray();
+            var tmp = generator.GetLinesArray();
+            lines = new LineInfo[tmp.Length];
             int len = lines.Length - 1;
             for (int i = 0; i < len; i++)
             {
@@ -538,7 +538,10 @@ namespace huqiang.UIEvent
         }
         public int StartIndex
         {
-            get { return lines[StartPress.Row].StartIndex + StartPress.Offset; }
+            get 
+            {
+                return lines[StartPress.Row].StartIndex + StartPress.Offset; 
+            }
             set { SetIndex(ref StartPress, value); }
         }
         public int EndIndex

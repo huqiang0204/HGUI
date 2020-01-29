@@ -183,8 +183,8 @@ namespace Assets.Scripts
                     chat = new ChatData();
                     chat.name = "江海胡";
                     chat.content = str;
-                    self.AddData(chat);
-                    container.Move(0);
+                    self.AddAndMove(chat);
+                    //container.Move(0);
                     break;
             }
             input.InputString = "";

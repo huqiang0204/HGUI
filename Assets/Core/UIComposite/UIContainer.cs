@@ -95,12 +95,21 @@ namespace huqiang.UIComposite
         }
         public void AddAndMove(U dat)
         {
-            var t = con.AddData(this, dat);
+            float h;
             if (CalculItemHigh != null)
-                t.high = CalculItemHigh(uiModel, dat);
-            unsafe { t.high = ((TransfromData*)model.ip)->size.y; }
-            t.LoadLayout(enityModel);
-            con.Move(t.high);
+                h = CalculItemHigh(uiModel, dat);
+            else
+                unsafe { h = ((TransfromData*)model.ip)->size.y; }
+            con.AddAndMove(this, dat, h);
+        }
+        public void AddAndMoveEnd(U dat)
+        {
+            float h;
+            if (CalculItemHigh != null)
+                h = CalculItemHigh(uiModel, dat);
+            else
+                unsafe { h = ((TransfromData*)model.ip)->size.y; }
+            con.AddAndMoveEnd(this, dat, h);
         }
         public override LinkerMod CreateUI()
         {
@@ -282,6 +291,7 @@ namespace huqiang.UIComposite
             };
             eventCall.Scrolling = Scrolling;
             eventCall.ScrollEndY = OnScrollEnd;
+            eventCall.MouseWheel= (o,e) => { Move(e.MouseWheelDelta*100); };
             model = fake;
             var trans = Enity.transform;
             for (int i = 0; i < trans.childCount; i++)
@@ -319,65 +329,101 @@ namespace huqiang.UIComposite
             datas.Add(binding);
             return binding;
         }
+        public void AddAndMove(Linker linker, object data, float h)
+        {
+            float end = End;
+            BindingData binding = AddData(linker, data);
+            binding.LoadLayout(linker.enityModel);
+            binding.width = Enity.SizeDelta.x;
+            binding.offset = end;
+            binding.high = h;
+            float y = end + h - Point - Enity.SizeDelta.y;
+            if (y < 0)
+                y = 0;
+            else if (y > h)
+                y = h;
+            Move(y);
+        }
+        public void AddAndMoveEnd(Linker linker, object data,float h)
+        {
+            float end = End;
+            BindingData binding = AddData(linker, data);
+            binding.LoadLayout(linker.enityModel);
+            binding.width = Enity.SizeDelta.x;
+            binding.offset = end;
+            binding.high = h;
+            float y = end + h - Point - Enity.SizeDelta.y;
+            if (y < 0)
+                y = 0;
+            Move(y);
+        }
         void Scrolling(UserEvent scroll, Vector2 offset)
         {
-            if (datas.Count > 0)
-            {
-                BounceBack(scroll, ref offset);
-                Calcul(offset.y);
-                if(outState<0)
+            if (offset != Vector2.zero)
+                if (datas.Count > 0)
                 {
-                    if (ScrollOutTop != null)
-                        ScrollOutTop(this);
-                }else if(outState>0)
-                {
-                    if (ScrollOutDown != null)
-                        ScrollOutDown(this);
+                    BounceBack(scroll, ref offset);
+                    if (offset.y < 0)
+                        MoveBack(offset.y);
+                    else MoveForward(offset.y);
+                    Order();
+                    if (outState < 0)
+                    {
+                        if (ScrollOutTop != null)
+                            ScrollOutTop(this);
+                    }
+                    else if (outState > 0)
+                    {
+                        if (ScrollOutDown != null)
+                            ScrollOutDown(this);
+                    }
                 }
-            }
         }
         void OnScrollEnd(UserEvent back)
         {
             if (datas.Count == 0)
                 return;
-            if (OutDown())
+            if (OutBack())
             {
                 back.DecayRateY = 0.988f;
                 float d = -datas[index].high * offsetRatio;
-                back.ScrollDistanceY = d * eventCall.Context.transform.localScale.y;
+                if (d > 0.01f)
+                    back.ScrollDistanceY = d * Enity.transform.localScale.y;
+                else back.VelocityY = 0;
             }
-            else if (OutTop())
+            else if (OutForward())
             {
                 back.DecayRateY = 0.988f;
+                float cl = End - Start;
                 float l = Enity.SizeDelta.y;
+                if (l > cl)
+                    l = cl;
                 int c = datas.Count - 1;
                 float e = datas[c].offset + datas[c].high;
                 float d = l - e + Point;
                 if (d > 0.01f)
-                    back.ScrollDistanceY = -d * eventCall.Context.transform.localScale.y;
+                    back.ScrollDistanceY = -d * Enity.transform.localScale.y;
                 else back.VelocityY = 0;
             }
         }
         public void Move(float y)
         {
-            if(y<0)
+            if (y < 0)
             {
-                MoveStart(y);
+                MoveBack(y);
                 if (index == 0)
                     if (offsetRatio < 0)
                         offsetRatio = 0;
             }
-            else
+            else if (y > 0)
             {
-
+                float a = End - Point - Enity.SizeDelta.y;
+                if (a < 0)
+                    a = 0;
+                else if (a > y)
+                    a = y;
+                MoveForward(a);
             }
-            Order();
-        }
-        void Calcul(float y)
-        {
-            if (y < 0)
-                MoveStart(y); 
-            else MoveEnd(y);
             Order();
         }
         List<Item> buffer = new List<Item>();
@@ -470,14 +516,14 @@ namespace huqiang.UIComposite
             items.Add(item);
             son.localPosition = new Vector3(0, -offset, 0);
         }
-        bool OutDown()
+        bool OutBack()
         {
             if (index== 0)
                 if (offsetRatio < 0)
                     return true;
             return false;
         }
-        bool OutTop()
+        bool OutForward()
         {
             if (offsetRatio > 1)
                 return true;
@@ -550,27 +596,34 @@ namespace huqiang.UIComposite
                 }
             }
         }
-        //float Start { get
-        //    {
-        //        if (datas == null)
-        //            return 0;
-        //        if (datas.Count < 1)
-        //            return 0;
-        //        return datas[0].offset;
-        //    } }
-        //float End { get {
-        //        if (datas == null)
-        //            return 0;
-        //        if (datas.Count < 1)
-        //            return 0;
-        //        var c = datas.Count - 1;
-        //        return datas[c].offset+datas[c].high;
-        //    } }
+        float Start
+        {
+            get
+            {
+                if (datas == null)
+                    return 0;
+                if (datas.Count < 1)
+                    return 0;
+                return datas[0].offset;
+            }
+        }
+        float End
+        {
+            get
+            {
+                if (datas == null)
+                    return 0;
+                if (datas.Count < 1)
+                    return 0;
+                var c = datas.Count - 1;
+                return datas[c].offset + datas[c].high;
+            }
+        }
         /// <summary>
         /// 向起点滚动
         /// </summary>
         /// <param name="y"></param>
-        void MoveStart(float y)
+        void MoveBack(float y)
         {
             float w = Enity.SizeDelta.x;
             float p = Point + y;
@@ -603,7 +656,7 @@ namespace huqiang.UIComposite
         /// 向终点滚动
         /// </summary>
         /// <param name="y"></param>
-        void MoveEnd(float y)
+        void MoveForward(float y)
         {
             float w = Enity.SizeDelta.x;
             float op = Point;
@@ -645,7 +698,7 @@ namespace huqiang.UIComposite
             {
                 if (v.y < 0)//往起点移动
                 {
-                    if (OutDown())
+                    if (OutBack())
                     {
                         float l = y*0.5f;
                         float f = datas[0].high * -offsetRatio;
@@ -662,12 +715,14 @@ namespace huqiang.UIComposite
                 }
                 else if (v.y > 0)//往终点移动
                 {
-                    if (OutTop())
+                    if (OutForward())
                     {
+                        float end = End;
+                        float cl = end - Start;
+                        if (cl < y)
+                            end += y - cl;
                         float l = y * 0.5f;
-                        int c = datas.Count - 1;
-                        float e = datas[c].offset + datas[c].high;
-                        float os = e - Point - l;
+                        float os = end - Point - l;
                         if (os < 0)
                             os = 0;
                         float r = os / l;
@@ -684,7 +739,7 @@ namespace huqiang.UIComposite
                 {
                     if (eventCall.DecayRateY >= 0.95f)
                     {
-                        if (OutDown())
+                        if (OutBack())
                         {
                             eventCall.DecayRateY = 0.9f;
                             eventCall.VelocityY = eventCall.VelocityY;
@@ -695,7 +750,7 @@ namespace huqiang.UIComposite
                 {
                     if (eventCall.DecayRateY >= 0.95f)
                     {
-                        if (OutTop())
+                        if (OutForward())
                         {
                             float l = y;
                             int c = datas.Count - 1;

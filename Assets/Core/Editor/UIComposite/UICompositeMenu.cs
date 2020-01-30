@@ -729,58 +729,51 @@ public static class UICompositeMenu
         Nob.Sprite = EditorModelManager.FindSprite(icons, background);
         Nob.SprType = SpriteType.Sliced;
     }
-    //[MenuItem("GameObject/UIComposite/TabControl", false, 10)]
-    //static public void AddLayout(MenuCommand menuCommand)
-    //{
-    //    var parent = menuCommand.context as GameObject;
-    //    if (parent == null)
-    //        return;
-    //    var tab = new GameObject("TabControl", typeof(RectTransform));
-    //    tab.transform.SetParent(parent.transform);
-    //    var ss = tab.AddComponent<SizeScaleEx>();
-    //    ss.marginType = MarginType.Margin;
+    [MenuItem("GameObject/HGUI/TabControl", false, 17)]
+    static public void AddLayout(MenuCommand menuCommand)
+    {
+        GameObject parent = menuCommand.context as GameObject;
+        Transform pt = null;
+        if (parent != null)
+            pt = parent.transform;
+        var tab = UICreator.CreateHImage(Vector3.zero, new Vector2(800, 800), "table", pt);
+        tab.Mask = true;
+        tab.MainColor = new Color32(204, 204, 204, 255);
+        tab.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        tab.compositeType = CompositeType.TabControl;
+        tab.Sprite = EditorModelManager.FindSprite(icons, background);
+        tab.SprType = SpriteType.Sliced;
 
-    //    var Head = new GameObject("Head", typeof(RectTransform));
-    //    Head.transform.SetParent(tab.transform);
-    //    (Head.transform as RectTransform).sizeDelta = new Vector2(100, 60);
+        var head = UICreator.CreateElement(Vector3.zero, new Vector2(100, 44), "Head", tab.transform);
+        head.marginType = MarginType.MarginX;
+        head.anchorType = AnchorType.Alignment;
+        head.anchorPointType = AnchorPointType.Top;
 
-    //    var Items = new GameObject("Items");
-    //    Items.transform.SetParent(Head.transform);
-    //    Items.transform.localPosition = Vector3.zero;
-    //    ss = Items.AddComponent<SizeScaleEx>();
-    //    ss.marginType = MarginType.MarginX;
+        var items= UICreator.CreateElement(Vector3.zero, new Vector2(800, 42), "Items", head.transform);
+        items.marginType = MarginType.Margin;
+        items.margin.down = 2;
+        items.compositeType = CompositeType.StackPanel;
 
-    //    var Item = new GameObject("Item", typeof(RectTransform));
-    //    Item.transform.SetParent(Head.transform);
-    //    Item.transform.localPosition = Vector3.zero;
-    //    (Item.transform as RectTransform).sizeDelta = new Vector2(100, 50);
+        var line = UICreator.CreateHImage(Vector3.zero, new Vector2(100, 2), "Line", head.transform);
+        line.anchorType = AnchorType.Alignment;
+        line.anchorPointType = AnchorPointType.Down;
+        line.marginType = MarginType.MarginX;
 
-    //    var back = new GameObject("Back", typeof(RectTransform));
-    //    back.transform.SetParent(Item.transform);
-    //    var img = back.AddComponent<Image>();
-    //    img.color = 0x2555FFff.ToColor();
-    //    ss = back.AddComponent<SizeScaleEx>();
-    //    ss.marginType = MarginType.Margin;
+        var item = UICreator.CreateElement(new Vector3(-350,380), new Vector2(100, 40), "Item", tab.transform);
 
-    //    var label = new GameObject("Label", typeof(RectTransform));
-    //    label.transform.SetParent(Item.transform);
-    //    (label.transform as RectTransform).sizeDelta = new Vector2(100, 50);
-    //    label.transform.localPosition = new Vector3(-20, 0, 0);
-    //    var txt = label.AddComponent<Text>();
-    //    txt.alignment = TextAnchor.MiddleLeft;
-    //    txt.fontSize = 30;
+        var img= UICreator.CreateHImage(Vector3.zero, new Vector2(100, 40), "Image", item.transform);
+        img.MainColor = new Color32(168,168,168,255);
 
-    //    var line = new GameObject("Line", typeof(RectTransform));
-    //    line.transform.SetParent(Head.transform);
-    //    (line.transform as RectTransform).sizeDelta = new Vector2(100, 4);
-    //    line.transform.localPosition = new Vector3(0, -24, 0);
-    //    ss = line.AddComponent<SizeScaleEx>();
-    //    ss.marginType = MarginType.MarginX;
+        var txt = UICreator.CreateHText(Vector3.zero, new Vector2(80, 40), "Text", item.transform);
+        txt.MainColor = Color.black;
+        txt.Text = "Label";
+        txt.FontSize = 24;
+        txt.TextAnchor = TextAnchor.MiddleLeft;
 
-    //    var content = new GameObject("Content", typeof(RectTransform));
-    //    content.transform.SetParent(tab.transform);
-    //    content.transform.localPosition = Vector3.zero;
-    //}
+        var content= UICreator.CreateElement(Vector3.zero, new Vector2(800, 756), "Content", tab.transform);
+        content.marginType = MarginType.Margin;
+        content.margin.top = 44;
+    }
 
     //[MenuItem("GameObject/UIComposite/DockPanel", false, 13)]
     //static public void AddDockPanel(MenuCommand menuCommand)

@@ -22,6 +22,8 @@ public static class UICompositeMenu
     private const string circlesm = "Circle-Small";
     private const string magicstick = "Magic-Stick";
     private const string box = "Border2";
+    private const string diamond = "Diamond-Outline5";
+    private const string star = "Star";
 
     [MenuItem("GameObject/HGUI/Canvas", false, 0)]
     static public void AddCanvas(MenuCommand menuCommand)
@@ -316,7 +318,6 @@ public static class UICompositeMenu
         son.localScale = Vector3.one;
        
     }
-
     [MenuItem("GameObject/HGUI/TreeView", false, 10)]
     static public void AddTreeView(MenuCommand menuCommand)
     {
@@ -552,13 +553,33 @@ public static class UICompositeMenu
         trans.localRotation = Quaternion.identity;
 
         CreateItem(trans, "Item");
-        var slider = CreateSliderV();
-        slider.name = "Slider";
-        var ss = slider.transform;
-        ss.SetParent(trans);
-        ss.localPosition = new Vector3(190, -200, 0);
-        ss.localScale = Vector3.one;
-        ss.localRotation = Quaternion.identity;
+
+        var go = new GameObject("Slider", typeof(HImage));
+        HImage image = go.GetComponent<HImage>();
+        image.SizeDelta = new Vector2(20, 400);
+        image.compositeType = CompositeType.Slider;
+        var rect = image.transform;
+        rect.SetParent(trans);
+        rect.localPosition = new Vector3(190,-200,0);
+        rect.localScale = Vector3.one;
+        rect.localRotation = Quaternion.identity;
+
+        var help = go.AddComponent<SliderHelper>();
+        help.direction = UISlider.Direction.Vertical;
+        image.Sprite = EditorModelManager.FindSprite(icons, background);
+        image.SprType = SpriteType.Sliced;
+
+        var Nob = new GameObject("Nob", typeof(HImage));
+        image = Nob.GetComponent<HImage>();
+        image.SizeDelta = new Vector2(20, 30);
+        var son = image.transform;
+        son.SetParent(rect);
+        son.localPosition = new Vector3(0, 185, 0);
+        son.localScale = Vector3.one;
+        son.localRotation = Quaternion.identity;
+        image.Chromatically = Color.green;
+        image.Sprite = EditorModelManager.FindSprite(icons, background);
+        image.SprType = SpriteType.Sliced;
     }
     [MenuItem("GameObject/HGUI/ScrollYExtand", false, 14)]
     static public void AddScrollYExtand(MenuCommand menuCommand)
@@ -632,41 +653,82 @@ public static class UICompositeMenu
 
         return trans;
     }
-    //[MenuItem("GameObject/UIComposite/DropDown", false, 9)]
-    //static public void AddDropDown(MenuCommand menuCommand)
-    //{
-    //    GameObject parent = menuCommand.context as GameObject;
-    //    var ss = new GameObject("DropDownEx", typeof(RectTransform));
-    //    RectTransform rect = ss.transform as RectTransform;
-    //    rect.sizeDelta = new Vector2(400, 40);
-    //    if (parent != null)
-    //        rect.SetParent(parent.transform);
+    [MenuItem("GameObject/HGUI/DropDown", false, 15)]
+    static public void AddDropDown(MenuCommand menuCommand)
+    {
+        GameObject parent = menuCommand.context as GameObject;
 
-    //    var label = new GameObject("Label", typeof(RectTransform));
-    //    var fr = label.transform as RectTransform;
-    //    fr.sizeDelta = new Vector2(400, 40);
-    //    fr.SetParent(rect);
-    //    fr.localPosition = Vector3.zero;
-    //    fr.localScale = Vector3.one;
-    //    var txt = label.AddComponent<Text>();
-    //    txt.alignment = TextAnchor.MiddleLeft;
-    //    txt.fontSize = 24;
+        var ss = new GameObject("DropDown");
+        Transform rect = ss.transform;
+        var drop = ss.AddComponent<HImage>();
+        drop.SizeDelta=new Vector2(300,60);
+        drop.Sprite = EditorModelManager.FindSprite(icons, background);
+        drop.SprType = SpriteType.Sliced;
+        drop.Chromatically = new Color32(224,224,224,255);
+        if (parent != null)
+            rect.SetParent(parent.transform);
+        rect.localPosition = Vector3.zero;
+        rect.localScale = Vector3.one;
+        rect.localRotation = Quaternion.identity;
 
-    //    var Scroll = new GameObject("Scroll", typeof(RectTransform));
-    //    RectTransform scr = Scroll.transform as RectTransform;
-    //    scr.sizeDelta = new Vector2(400, 400);
-    //    scr.SetParent(rect);
-    //    scr.localPosition = new Vector3(0, -220, 0);
-    //    scr.localScale = Vector3.one;
-    //    ss.AddComponent<RectMask2D>();
+        var txt = UICreator.CreateHText(Vector3.zero, Vector2.zero, "Label", rect);
+        txt.TextAnchor = TextAnchor.MiddleLeft;
+        txt.FontSize = 36;
+        txt.marginType = MarginType.Margin;
+        txt.margin = new Margin(20, 100, 5, 5);
+        txt.Text = "Label";
+        txt.Chromatically = Color.black;
 
-    //    var Item = new GameObject("Item", typeof(RectTransform));
-    //    fr = Item.transform as RectTransform;
-    //    fr.sizeDelta = new Vector2(400, 40);
-    //    fr.SetParent(scr);
-    //    fr.localPosition = Vector3.zero;
-    //    fr.localScale = Vector3.one;
-    //}
+        var img = UICreator.CreateHImage(Vector3.zero, new Vector2(50, 50), "Arrow", rect);
+        img.SizeDelta = new Vector2(50,50);
+        img.Sprite = EditorModelManager.FindSprite(icons, diamond);
+        img.anchorPointType = AnchorPointType.Right;
+        img.anchorType = AnchorType.Alignment;
+        img.Chromatically = Color.black;
+
+        var main = UICreator.CreateHImage(new Vector3(0,-34,0), new Vector2(300, 300), "Scroll", rect);
+        main.Pivot = new Vector2(0.5f, 1);
+        main.Mask = true;
+        main.Chromatically = new Color32(224, 224, 224, 255);
+        main.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        main.compositeType = CompositeType.ScrollY;
+        main.Sprite = EditorModelManager.FindSprite(icons, background);
+        main.SprType = SpriteType.Sliced;
+
+        var item = UICreator.CreateElement(new Vector3(0, -150, 0), new Vector2(300, 60), "Item", main.transform);
+        img = UICreator.CreateHImage(Vector3.zero,new Vector2(290,50),"Image",item.transform);
+        img.Sprite = EditorModelManager.FindSprite(icons, background);
+        img.SprType = SpriteType.Sliced;
+        txt = UICreator.CreateHText(Vector3.zero, Vector2.zero, "Text", item.transform);
+        txt.marginType = MarginType.Margin;
+        txt.margin = new Margin(60,60,5,5);
+        txt.Chromatically = Color.black;
+        txt.Text = "Option";
+        txt.FontSize = 32;
+        txt.TextAnchor = TextAnchor.MiddleLeft;
+        img= UICreator.CreateHImage(Vector3.zero, new Vector2(30, 30), "Check", item.transform);
+        img.Sprite = EditorModelManager.FindSprite(icons, star);
+        img.anchorType = AnchorType.Alignment;
+        img.anchorOffset.x = 20;
+        img.anchorPointType = AnchorPointType.Left;
+        img.Chromatically = Color.black;
+
+        var image = UICreator.CreateHImage(new Vector3(140,-150,0), new Vector2(20, 300), "Slider", main.transform);
+        image.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        image.compositeType = CompositeType.Slider;
+        image.Sprite = EditorModelManager.FindSprite(icons, background);
+        image.SprType = SpriteType.Sliced;
+        image.Chromatically = 0x295B7680.ToColor();
+
+        var help = image.gameObject.AddComponent<SliderHelper>();
+        help.direction = UISlider.Direction.Vertical;
+    
+
+        var Nob = UICreator.CreateHImage(new Vector3(0, 135, 0), new Vector2(20, 30), "Nob", image.transform);
+        Nob.Chromatically = 0x5F5263ff.ToColor();
+        Nob.Sprite = EditorModelManager.FindSprite(icons, background);
+        Nob.SprType = SpriteType.Sliced;
+    }
     //[MenuItem("GameObject/UIComposite/TabControl", false, 10)]
     //static public void AddLayout(MenuCommand menuCommand)
     //{

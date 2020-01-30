@@ -85,7 +85,7 @@ namespace huqiang.UIComposite
                     m_slider.OnValueChanged = null;
                 m_slider = value;
                 if (m_slider != null)
-                    m_slider.OnValueChanged = (o) => { Pos = 1 - o.Percentage; };
+                    m_slider.OnValueChanged = (o) => { Pos = o.Percentage; };
             }
         }
         public override void Initial(FakeStruct mod, UIElement script)
@@ -166,7 +166,7 @@ namespace huqiang.UIComposite
             }
             if (m_slider != null)
             {
-                m_slider.Percentage = 1 - Pos;
+                m_slider.Percentage = Pos;
             }
         }
         void OnScrollEnd(UserEvent back)
@@ -200,7 +200,7 @@ namespace huqiang.UIComposite
             else if (ScrollEnd != null)
                 ScrollEnd(this);
             if (m_slider != null)
-                m_slider.Percentage = 1 - Pos;
+                m_slider.Percentage =  Pos;
         }
         public void Calcul()
         {
@@ -252,8 +252,8 @@ namespace huqiang.UIComposite
             Order(true);
             if (m_slider != null)
             {
-                m_slider.Percentage = 1 - Pos;
-                if (ActualSize.y <= Enity.SizeDelta.y)
+                m_slider.Percentage = Pos;
+                if (ActualSize.x <= Enity.SizeDelta.x)
                     m_slider.Enity.gameObject.SetActive(false);
                 else m_slider.Enity.gameObject.SetActive(true);
             }

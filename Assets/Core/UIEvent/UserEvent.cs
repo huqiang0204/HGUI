@@ -42,6 +42,8 @@ namespace huqiang.UIEvent
         /// <returns></returns>
         static bool DispatchEvent(HGUIElement[] pipeLine, int index,Vector3 pos,Vector3 scale,Quaternion quate, UserAction action)
         {
+            if (!pipeLine[index].active)
+                return false;
             Vector3 p = quate * pipeLine[index].localPosition;
             Vector3 o = Vector3.zero;
             o.x = p.x * scale.x;

@@ -190,7 +190,6 @@ namespace huqiang.UIComposite
                         MinBox = tp->minBox;
                     }
                 }
-             
             }
         }
         public virtual void Refresh(float x = 0, float y = 0)

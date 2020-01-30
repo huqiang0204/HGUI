@@ -261,15 +261,18 @@ public static class UICompositeMenu
     static public void AddScroll(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;
-        var Scroll = CreateScroll();
+        Transform pt = null;
         if (parent != null)
-        {
-            var rect = Scroll.transform;
-            rect.SetParent(parent.transform);
-            rect.localPosition = Vector3.zero;
-            rect.localScale = Vector3.one;
-            rect.localRotation = Quaternion.identity;
-        }
+            pt = parent.transform;
+        var scroll = UICreator.CreateHImage(Vector3.zero, new Vector2(400, 400), "gridScroll", pt);
+        scroll.Mask = true;
+        scroll.Chromatically = new Color32(224, 224, 224, 255);
+        scroll.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        scroll.compositeType = CompositeType.GridScroll;
+        scroll.Sprite = EditorModelManager.FindSprite(icons, background);
+        scroll.SprType = SpriteType.Sliced;
+
+        CreateItem(scroll.transform, "Item");
     }
     static GameObject CreateScroll()
     {
@@ -277,7 +280,7 @@ public static class UICompositeMenu
         var img = ss.AddComponent<HImage>();
         img.Mask = true;
         img.SizeDelta = new Vector2(400,400);
-        img.compositeType = CompositeType.ScrollY;
+        img.compositeType = CompositeType.GridScroll;
         ss.AddComponent<ScrollHelper>();
         var rect = img.transform;
         var Item = new GameObject("Item");

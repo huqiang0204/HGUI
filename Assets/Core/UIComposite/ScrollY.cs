@@ -309,7 +309,7 @@ namespace huqiang.UIComposite
             int row = index / Column;
             float dy = ly * row + oy;
             dy -= m_point;
-            float ss = 0.5f * Size.y - 0.5f * ly;
+            float ss = (1 - Enity.Pivot.y) * Size.y - 0.5f * ly;//0.5f * Size.y 
             dy = ss - dy;
             float ox = (index%Column) * ctSize.x + ctSize.x * 0.5f + ItemOffset.x - Size.x * 0.5f;
             var a = PopItem(index);

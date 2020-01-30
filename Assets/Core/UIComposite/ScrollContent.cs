@@ -53,7 +53,7 @@ namespace huqiang.UIComposite
                 {
                     u = (U)dat;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                 }
                 Invoke(obj as T, u, index);

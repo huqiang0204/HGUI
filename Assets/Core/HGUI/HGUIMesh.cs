@@ -1208,7 +1208,7 @@ namespace huqiang.Core.HGUI
             float a = image.m_fillAmount;
             float x = image.SizeDelta.x;
             float y = image.SizeDelta.y;
-            if (image.PreserveAspect & a > 0)
+            if (image.m_preserveAspect & a > 0)
             {
                 float ocx = x * 0.5f;
                 float ocy = y * 0.5f;
@@ -1540,7 +1540,7 @@ namespace huqiang.Core.HGUI
             float a = image.m_fillAmount;
             float x = image.SizeDelta.x;
             float y = image.SizeDelta.y;
-            if (image.PreserveAspect & a > 0)
+            if (image.m_preserveAspect & a > 0)
             {
                 float ocx = x * 0.5f;
                 float ocy = y * 0.5f;
@@ -1871,7 +1871,7 @@ namespace huqiang.Core.HGUI
             float a = image.m_fillAmount;
             float x = image.SizeDelta.x;
             float y = image.SizeDelta.y;
-            if(image.PreserveAspect & a>0)
+            if(image.m_preserveAspect & a>0)
             {
                 float ocx = x * 0.5f;
                 float ocy = y * 0.5f;
@@ -2200,7 +2200,7 @@ namespace huqiang.Core.HGUI
             float a = image.m_fillAmount;
             float x = image.SizeDelta.x;
             float y = image.SizeDelta.y;
-            if (image.PreserveAspect & a > 0)
+            if (image.m_preserveAspect & a > 0)
             {
                 float ocx = x * 0.5f;
                 float ocy = y * 0.5f;

@@ -38,7 +38,14 @@ namespace huqiang.UIComposite
         /// </summary>
         public float Pos
         {
-            get { var p = m_point/(ActualSize.y - Size.y);if (p < 0) p = 0; else if (p > 1) p = 1; return p; }
+            get {
+                var p = m_point / (ActualSize.y - Size.y);
+                if (p < 0)
+                    p = 0;
+                else if (p > 1)
+                    p = 1;
+                return p; 
+            }
             set
             {
                 if (value < 0 | value > 1)
@@ -59,7 +66,7 @@ namespace huqiang.UIComposite
                     m_slider.OnValueChanged = null;
                 m_slider = value;
                 if (m_slider != null)
-                    m_slider.OnValueChanged = (o) => { Pos = o.Percentage; };
+                    m_slider.OnValueChanged = (o) => { Pos = 1 - o.Percentage; };
             } }
         public override void Initial(FakeStruct mod, UIElement script)
         {
@@ -135,7 +142,9 @@ namespace huqiang.UIComposite
                     ScrollEnd(this);
             }
             if (m_slider != null)
-                m_slider.Percentage = Pos;
+            {
+                m_slider.Percentage = 1 - Pos;
+            }
         }
         void OnScrollEnd(UserEvent back)
         {
@@ -168,7 +177,7 @@ namespace huqiang.UIComposite
             else if (ScrollEnd != null)
                 ScrollEnd(this);
             if (m_slider != null)
-                m_slider.Percentage = Pos;
+                m_slider.Percentage = 1- Pos;
         }
         public void Calcul()
         {
@@ -218,7 +227,12 @@ namespace huqiang.UIComposite
             Calcul();
             Order(true);
             if (m_slider != null)
-                m_slider.Percentage = Pos;
+            {
+                m_slider.Percentage = 1 - Pos;
+                if (ActualSize.y <= Enity.SizeDelta.y)
+                    m_slider.Enity.gameObject.SetActive(false);
+                else m_slider.Enity.gameObject.SetActive(true);
+            }
         }
         /// <summary>
         /// 指定下标处的位置重排

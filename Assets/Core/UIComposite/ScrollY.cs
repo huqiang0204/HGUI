@@ -39,6 +39,8 @@ namespace huqiang.UIComposite
         public float Pos
         {
             get {
+                if (ActualSize.y <= Size.y)
+                    return 0;
                 var p = m_point / (ActualSize.y - Size.y);
                 if (p < 0)
                     p = 0;

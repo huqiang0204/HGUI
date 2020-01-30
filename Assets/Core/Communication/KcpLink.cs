@@ -81,7 +81,7 @@ namespace huqiang
                 var ss = envelope.Pack(data, type);
                 for (int i = 0; i < ss.Length; i++)
                     kcp.soc.SendTo(ss[i], endpPoint);
-            }catch(Exception ex)
+            }catch(Exception )
             {
             }
         }

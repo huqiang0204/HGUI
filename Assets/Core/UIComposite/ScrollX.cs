@@ -51,7 +51,14 @@ namespace huqiang.UIComposite
         /// </summarx>
         public float Pos
         {
-            get { var p = m_point / (ActualSize.x - Size.x); if (p < 0) p = 0; else if (p > 1) p = 1; return p; }
+            get {
+                if (ActualSize.x <= Size.x)
+                    return 0;
+                var p = m_point / (ActualSize.x - Size.x);
+                if (p < 0) p = 0; 
+                else if (p > 1) 
+                    p = 1; 
+                return p; }
             set
             {
                 if (value < 0 | value > 1)

@@ -665,6 +665,8 @@ public static class UICompositeMenu
         drop.Sprite = EditorModelManager.FindSprite(icons, background);
         drop.SprType = SpriteType.Sliced;
         drop.Chromatically = new Color32(224,224,224,255);
+        drop.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        drop.compositeType = CompositeType.DropDown;
         if (parent != null)
             rect.SetParent(parent.transform);
         rect.localPosition = Vector3.zero;
@@ -696,6 +698,7 @@ public static class UICompositeMenu
         main.SprType = SpriteType.Sliced;
 
         var item = UICreator.CreateElement(new Vector3(0, -150, 0), new Vector2(300, 60), "Item", main.transform);
+        item.eventType = huqiang.Core.HGUI.EventType.UserEvent;
         img = UICreator.CreateHImage(Vector3.zero,new Vector2(290,50),"Image",item.transform);
         img.Sprite = EditorModelManager.FindSprite(icons, background);
         img.SprType = SpriteType.Sliced;

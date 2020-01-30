@@ -14,11 +14,13 @@ public class Scrollex:UIPage
     {
         public ScrollYExtand scrollY;
         public ScrollY scroll;
+        public DropdownEx dropDown;
     }
     class TitleItem
     {
         public UserEvent Image;
         public HText Text;
+        
     }
     class SubItem
     {
@@ -31,6 +33,7 @@ public class Scrollex:UIPage
         view = LoadUI<View>("baseUI", "scrollex");//"baseUI"创建的bytes文件名,"page"为创建的页面名
         InitialScrollEx();
         InitialScrollY();
+        InitialDropDown();
     }
     void InitialScrollEx()
     {
@@ -104,5 +107,13 @@ public class Scrollex:UIPage
         view.scroll.BindingData = data;
         view.scroll.SetItemUpdate<SubItem, string>(ItemUpdate);
         view.scroll.Refresh();
+    }
+    void InitialDropDown()
+    {
+        List<string> data = new List<string>();
+        for (int i = 1000; i < 1400; i++)
+            data.Add("Num:" + i.ToString());
+        view.dropDown.scrollY.BindingData = data;
+        view.dropDown.scrollY.Refresh();
     }
 }

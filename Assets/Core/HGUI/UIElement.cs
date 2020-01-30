@@ -29,7 +29,8 @@ namespace huqiang.Core.HGUI
         TreeView,
         UIDate,
         UIPalette,
-        ScrollYExtand
+        ScrollYExtand,
+        DropDown
     }
     public class UIElement:MonoBehaviour
     {
@@ -389,7 +390,17 @@ namespace huqiang.Core.HGUI
                 case CompositeType.ScrollYExtand:
                     new ScrollYExtand().Initial(ex,script);
                     break;
+                case CompositeType.DropDown:
+                    new DropdownEx().Initial(ex,script);
+                    break;
             }
+        }
+        protected virtual void Update()
+        {
+            if (userEvent != null)
+                userEvent.Update();
+            if (composite != null)
+                composite.Update(UserAction.TimeSlice);
         }
     }
 }

@@ -17,12 +17,9 @@ namespace huqiang
         }
         public override void Play()
         {
-            lifetime = 0;
             playing = true;
         }
         public Action<ColorAnimat> PlayOver;
-        float lifetime = 0;
-        int index = 0;
         public float Interval = 100;
         public bool autoHide;
         public Color StartColor;

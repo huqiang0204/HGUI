@@ -12,8 +12,8 @@ namespace huqiang.UIComposite
         public class PopItemMod
         {
             public UserEvent Item;
-            public HText Label;
-            public Transform check;
+            public HText Text;
+            public Transform Check;
             [NonSerialized]
             public object data;
             [NonSerialized]
@@ -34,22 +34,20 @@ namespace huqiang.UIComposite
                 m_scroll.Enity.gameObject.SetActive(false);
             }
         }
-        public FakeStruct ItemMod;
-        IList DataList;
-        public object BindingData { get { return DataList; } set { DataList = value as IList; } }
         public bool down = true;
         public float MaxHeight = 300;
         public float PopOffset = 0;
         public Vector2 ItemSize;
-        int s_index;
+        int s_index = -1;
         public UserEvent callBack;
         public int SelectIndex
         {
             get { return s_index; }
             set
             {
-                if (BindingData == null)
+                if (m_scroll == null)
                     return;
+                int len = m_scroll.DataLength;
                 if (value < 0)
                 {
                     s_index = -1;
@@ -57,12 +55,12 @@ namespace huqiang.UIComposite
                         Label.Text = "";
                     return;
                 }
-                if (value >= DataList.Count)
-                    value = DataList.Count - 1;
+                if (value >= len)
+                    value = len - 1;
                 s_index = value;
                 if (Label != null)
                 {
-                    var dat = DataList[s_index];
+                    var dat = m_scroll.GetData(s_index);
                     if (dat is string)
                         Label.Text = dat as string;
                     else Label.Text = dat.ToString();
@@ -82,21 +80,33 @@ namespace huqiang.UIComposite
                 scroll.gameObject.SetActive(false);
                 var ui = scroll.GetComponent<UIElement>();
                 if (ui != null)
+                {
                     m_scroll = ui.composite as ScrollY;
+                    if (m_scroll != null)
+                    {
+                        m_scroll.SetItemUpdate<PopItemMod, object>(ItemUpdate);
+                        m_scroll.eventCall.LostFocus = LostFocus;
+                        m_scroll.eventCall.DataContext = this;
+                    }
+                }  
             }
         }
+        int showAni;
+        float showTime;
+        Vector2 size;
         void Show(UserEvent back, UserAction action)
         {
             if (m_scroll != null)
             {
-                if (ItemMod != null)
-                    m_scroll.ItemMod = ItemMod;
-                m_scroll.BindingData = BindingData;
-                m_scroll.SetItemUpdate<PopItemMod,object>(ItemUpdate);
-                m_scroll.eventCall.LostFocus = LostFocus;
-                m_scroll.eventCall.DataContext = this;
-
-                action.AddFocus(m_scroll.eventCall);
+                if(!m_scroll.Enity.gameObject.activeSelf)
+                {
+                    m_scroll.Enity.gameObject.SetActive(true);
+                    action.AddFocus(m_scroll.eventCall);
+                    showAni = 1;
+                    showTime = 0;
+                    size = m_scroll.Enity.SizeDelta;
+                    m_scroll.Enity.SizeDelta = new Vector2(size.x,0);
+                }
             }
         }
 
@@ -104,7 +114,13 @@ namespace huqiang.UIComposite
 
         void LostFocus(UserEvent eve, UserAction action)
         {
-            m_scroll.Enity.gameObject.SetActive(false);
+            if (action.ExistFocus(callBack))
+                action.AddFocus(eve);
+            else {
+                //m_scroll.Enity.gameObject.SetActive(false); 
+                showAni = -1;
+                showTime = 0;
+            }
         }
         GameObject Checked;
         void ItemUpdate(PopItemMod g,object o, int index)
@@ -120,20 +136,20 @@ namespace huqiang.UIComposite
                 item.Item.DataContext = item;
                 item.Item.Click = ItemClick;
             }
-            if (item.Label != null)
+            if (item.Text != null)
             {
                 if (o is string)
-                    item.Label.Text = o as string;
-                else item.Label.Text = o.ToString();
+                    item.Text.Text = o as string;
+                else item.Text.Text = o.ToString();
             }
-            if (item.check != null)
+            if (item.Check != null)
             {
                 if (index == SelectIndex)
                 {
-                    item.check.gameObject.SetActive(true);
-                    Checked = item.check.gameObject;
+                    item.Check.gameObject.SetActive(true);
+                    Checked = item.Check.gameObject;
                 }
-                else item.check.gameObject.SetActive(false);
+                else item.Check.gameObject.SetActive(false);
             }
         }
         void ItemClick(UserEvent eventCall, UserAction action)
@@ -143,8 +159,11 @@ namespace huqiang.UIComposite
             PopItemMod mod = eventCall.DataContext as PopItemMod;
             if (mod == null)
                 return;
-            if (mod.check != null)
-                mod.check.gameObject.SetActive(true);
+            if (mod.Check != null)
+            { 
+                mod.Check.gameObject.SetActive(true);
+                Checked = mod.Check.gameObject;
+            }
             SelectIndex = mod.Index;
             if (Label != null)
             {
@@ -154,7 +173,39 @@ namespace huqiang.UIComposite
             }
             if (OnSelectChanged != null)
                 OnSelectChanged(this, mod.data);
-            scrollY.Enity.gameObject.SetActive(false);
+            //scrollY.Enity.gameObject.SetActive(false);
+            showAni = -1;
+            showTime = 0;
+        }
+        public override void Update(float time)
+        {
+            if(showAni>0)
+            {
+                showTime += time;
+                if (showTime > 300)
+                {
+                    showTime = 300;
+                    showAni = 0;
+                }
+                float y = showTime / 300;
+                y *= size.y;
+                m_scroll.Enity.SizeDelta = new Vector2(size.x, y);
+            }else if(showAni<0)
+            {
+                showTime += time;
+                if (showTime >= 300)
+                {
+                    showAni = 0;
+                    m_scroll.Enity.gameObject.SetActive(false);
+                    m_scroll.Enity.SizeDelta = size;
+                }
+                else
+                {
+                    float y = 1 - showTime / 300;
+                    y *= size.y;
+                    m_scroll.Enity.SizeDelta = new Vector2(size.x, y);
+                }
+            }
         }
     }
 }

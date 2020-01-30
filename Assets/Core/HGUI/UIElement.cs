@@ -30,7 +30,8 @@ namespace huqiang.Core.HGUI
         UIDate,
         UIPalette,
         ScrollYExtand,
-        DropDown
+        DropDown,
+        TabControl
     }
     public class UIElement:MonoBehaviour
     {
@@ -392,6 +393,9 @@ namespace huqiang.Core.HGUI
                     break;
                 case CompositeType.DropDown:
                     new DropdownEx().Initial(ex,script);
+                    break;
+                case CompositeType.TabControl:
+                    new TabControl().Initial(ex,script);
                     break;
             }
         }

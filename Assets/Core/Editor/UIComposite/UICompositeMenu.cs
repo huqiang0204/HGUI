@@ -40,49 +40,50 @@ public static class UICompositeMenu
     [MenuItem("GameObject/HGUI/Page", false, 1)]
     static public void AddPage(MenuCommand menuCommand)
     {
-        string path = EditorUtility.SaveFilePanel("CreatePage", Application.dataPath,"page", "cs");
+        GameObject parent = menuCommand.context as GameObject;
+        string pagename = "page";
+        bool root = false;
+        if(parent!=null)
+        {
+            if (parent.GetComponent<HCanvas>() == null)
+            {
+                pagename = parent.name;
+            }
+            else root = true;
+        }
+        string path = EditorUtility.SaveFilePanel("CreatePage", Application.dataPath,pagename, "cs");
         FileStream fs1 = new FileStream(path, FileMode.Create, FileAccess.Write);//创建写入文件 
         StreamWriter sw = new StreamWriter(fs1);
         var paths = path.Split('/');
         var classname = paths[paths.Length - 1];
         classname = classname.Substring(0, classname.Length - 3);
-        sw.WriteLine(UIPageModel.GetPageModel(classname));//开始写入值
+        if(root)
+            sw.WriteLine(UIPageModel.GetPageModel(classname, classname));//开始写入值
+        else sw.WriteLine(UIPageModel.GetPageModel(classname,pagename));//开始写入值
         sw.Close();
         fs1.Close();
         Debug.Log(classname + ".cs Create done");
-        GameObject parent = menuCommand.context as GameObject;
-        var go = new GameObject(classname, typeof(UIElement));
-        var trans = go.transform;
-        if (parent != null)
-        {
-            HCanvas canvas = parent.GetComponent<HCanvas>();
-            if (canvas != null)
-                trans.SetParent(canvas.transform);
-            else
-            {
-                canvas = UnityEngine.Object.FindObjectOfType<HCanvas>();
-                if (canvas != null)
-                    trans.SetParent(canvas.transform);
-                else
-                {
-                    //创建Canvas并设置父级
-                }
-            }
-        }
-        else
+     
+        if(parent==null)
         {
             var canvas = UnityEngine.Object.FindObjectOfType<HCanvas>();
+            var go = new GameObject(classname, typeof(UIElement));
+            var trans = go.transform;
             if (canvas != null)
                 trans.SetParent(canvas.transform);
-            else
-            {
-                //创建Canvas并设置父级
-            }
+            trans.localPosition = Vector3.zero;
+            trans.localScale = Vector3.one;
+            trans.localRotation = Quaternion.identity;
         }
-
-        trans.localPosition = Vector3.zero;
-        trans.localScale = Vector3.one;
-        trans.localRotation = Quaternion.identity;
+        else if(root)
+        {
+            var go = new GameObject(classname, typeof(UIElement));
+            var trans = go.transform;
+            trans.SetParent(parent.transform);
+            trans.localPosition = Vector3.zero;
+            trans.localScale = Vector3.one;
+            trans.localRotation = Quaternion.identity;
+        }
     }
     [MenuItem("GameObject/HGUI/Empty", false, 2)]
     static public void AddEmpty(MenuCommand menuCommand)
@@ -274,26 +275,6 @@ public static class UICompositeMenu
 
         CreateItem(scroll.transform, "Item");
     }
-    static GameObject CreateScroll()
-    {
-        var ss = new GameObject("Scroll");
-        var img = ss.AddComponent<HImage>();
-        img.Mask = true;
-        img.SizeDelta = new Vector2(400,400);
-        img.compositeType = CompositeType.GridScroll;
-        ss.AddComponent<ScrollHelper>();
-        var rect = img.transform;
-        var Item = new GameObject("Item");
-        var fr = Item.AddComponent<UIElement>();
-        fr.SizeDelta = new Vector2(80, 80);
-        var son = fr.transform;
-        son.SetParent(rect);
-        son.localPosition = Vector3.zero;
-        son.localScale = Vector3.one;
-        son.localRotation = Quaternion.identity;
-        return ss;
-    }
-   
     [MenuItem("GameObject/HGUI/UIRocker", false, 9)]
     static public void AddRocker(MenuCommand menuCommand)
     {

@@ -121,16 +121,16 @@ namespace Assets.Scripts
             if(ue!=null)
             {
                 var trans = ue.Context.transform;
-                trans.GetComponentInChildren<HImage>().Chromatically = 0x5E5E5EFF.ToColor();
-                trans.GetComponentInChildren<HText>().Chromatically = Color.white;
+                trans.GetComponentInChildren<HImage>().MainColor = 0x5E5E5EFF.ToColor();
+                trans.GetComponentInChildren<HText>().MainColor = Color.white;
             }
             ue = option.Selecet;
             if(ue!=null)
             {
                 opt = ue.Context.name;
                 var trans = ue.Context.transform;
-                trans.GetComponentInChildren<HImage>().Chromatically = Color.blue;
-                trans.GetComponentInChildren<HText>().Chromatically = Color.red;
+                trans.GetComponentInChildren<HImage>().MainColor = Color.blue;
+                trans.GetComponentInChildren<HText>().MainColor = Color.red;
             }
         }
         void OnSubmit(TextInput input)

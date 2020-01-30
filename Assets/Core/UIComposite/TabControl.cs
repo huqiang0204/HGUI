@@ -68,31 +68,25 @@ namespace huqiang.UIComposite
             var mod = HGUIManager.GameBuffer.Clone(Item).transform;
 
             content.Item = mod.GetComponent<UIElement>();
-            content.Label = mod.Find("Label").GetComponent<HText>();
-            content.Back = mod.Find("Back").GetComponent<HImage>();
+            content.Label = mod.Find("Text").GetComponent<HText>();
+            content.Back = mod.Find("Image").GetComponent<HImage>();
             content.Content = model;
 
-            var txt = mod.Find("Label").GetComponent<HText>();
-            //if (txt != null)
-            //{
-            //    txt.text = label;
-            //    txt.AsyncApplyTextSizeY((o)=> {
-            //        panel.IsChanged = true;
-            //    });
-            //}
             var eve = content.Item.RegEvent<UserEvent>();
             eve.Click = ItemClick;
             eve.PointerEntry = ItemPointEntry;
             eve.PointerLeave = ItemPointLeave;
             content.eventCall = eve;
             content.eventCall.DataContext = content;
-            //if (curContent != null)
-            //{
-            //    curContent.Content.activeSelf = false;
-            //    if (curContent.Back != null)
-            //        curContent.Back.activeSelf = false;
-            //}
-            //model.SetParent(Content);
+            if (curContent != null)
+            {
+                curContent.Content.gameObject.SetActive(false);
+                if (curContent.Back != null)
+                    curContent.Back.gameObject.SetActive(false);
+            }
+            model.transform.SetParent(Content);
+            model.transform.localScale = Vector3.one;
+            UIElement.Resize(model);
             curContent = content;
             contents.Add(curContent);
         }
@@ -184,7 +178,7 @@ namespace huqiang.UIComposite
             curContent.Content.gameObject.SetActive(true);
             if (curContent.Back != null)
             {
-                curContent.Back.GetComponent<UIElement>().Chromatically = SelectColor;
+                curContent.Back.GetComponent<UIElement>().MainColor = SelectColor;
                 curContent.Back.gameObject.SetActive(true);
             }
         }
@@ -205,7 +199,7 @@ namespace huqiang.UIComposite
             {
                 if (c.Back != null)
                 {
-                    c.Back.GetComponent<UIElement>().Chromatically = HoverColor;
+                    c.Back.GetComponent<UIElement>().MainColor = HoverColor;
                     c.Back.gameObject.SetActive(false);
                 }
             }

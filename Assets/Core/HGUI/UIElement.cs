@@ -31,6 +31,7 @@ namespace huqiang.Core.HGUI
         UIPalette,
         ScrollYExtand,
         DropDown,
+        StackPanel,
         TabControl
     }
     public class UIElement:MonoBehaviour
@@ -325,7 +326,7 @@ namespace huqiang.Core.HGUI
         public UserEvent userEvent;
         public Composite composite;
         internal int PipelineIndex;
-        public virtual Color32 Chromatically { get; set; }
+        public virtual Color32 MainColor { get; set; }
         public T RegEvent<T>(FakeStruct fake = null) where T : UserEvent, new()
         {
             var t = userEvent as T;
@@ -335,7 +336,7 @@ namespace huqiang.Core.HGUI
             t.Context = this;
             t.Initial(fake);
             userEvent = t;
-            t.g_color = Chromatically;
+            t.g_color = MainColor;
             return t;
         }
 
@@ -393,6 +394,9 @@ namespace huqiang.Core.HGUI
                     break;
                 case CompositeType.DropDown:
                     new DropdownEx().Initial(ex,script);
+                    break;
+                case CompositeType.StackPanel:
+                    new StackPanel().Initial(ex,script);
                     break;
                 case CompositeType.TabControl:
                     new TabControl().Initial(ex,script);

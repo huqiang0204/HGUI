@@ -29,7 +29,7 @@ public class DrawingPage:UIPage
         view.paint.BrushSize = 36;
         view.palette.TemplateChanged=
         view.palette.ColorChanged = (o) => {
-            view.color.Chromatically = o.SelectColor;
+            view.color.MainColor = o.SelectColor;
             view.paint.BrushColor = o.SelectColor;
         };
         view.paintSize.OnValueChanged = (o) => {

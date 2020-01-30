@@ -355,7 +355,7 @@ namespace huqiang.UIEvent
                 a.g = g_color.g * 0.8f;
                 a.b = g_color.b * 0.8f;
                 a.a = g_color.a;
-                Context.Chromatically = a;
+                Context.MainColor = a;
             }
             if (PointerDown != null)
                 PointerDown(this, action);
@@ -369,7 +369,7 @@ namespace huqiang.UIEvent
             if (AutoColor)
             {
                 if (!forbid)
-                    Context.Chromatically = g_color;
+                    Context.MainColor = g_color;
             }
             bool press = Pressed;
             Pressed = false;
@@ -426,7 +426,7 @@ namespace huqiang.UIEvent
             if (AutoColor)
             {
                 if (!forbid)
-                    Context.Chromatically = g_color;
+                    Context.MainColor = g_color;
             }
             if (PointerLeave != null)
                 PointerLeave(this, action);

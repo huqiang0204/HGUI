@@ -173,9 +173,9 @@ namespace huqiang.UIComposite
                 mod.localRotation = Quaternion.Euler(angle, 0, 0);
                 var v = MathH.Tan2(90 - angle);
                 mod.localPosition =new Vector3(0, v.y * 100,0);
-                var col = txt.Chromatically;
+                var col = txt.MainColor;
                 col.a = (byte)(r*255);
-                txt.Chromatically = col;
+                txt.MainColor = col;
             }
         }
         void YearScrollToEnd(ScrollY scroll)

@@ -42,7 +42,7 @@ namespace huqiang
                     if (!Loop & c_time >= m_time)
                     {
                         playing = false;
-                        Target.Chromatically = EndColor;
+                        Target.MainColor = EndColor;
                         if (PlayOver != null)
                             PlayOver(this);
                     }
@@ -54,7 +54,7 @@ namespace huqiang
                         if (Linear != null)
                             r = Linear(this, r);
                         Color v = EndColor - StartColor;
-                        Target.Chromatically = StartColor + v * r;
+                        Target.MainColor = StartColor + v * r;
                     }
                 }
             }

@@ -39,13 +39,13 @@ public class TextInputHelper:UICompositeHelp
         {
             var txt = GetComponent<HText>();
             txt.Text = TipString;
-            txt.Chromatically = tipColor;
+            txt.MainColor = tipColor;
         }
         else
         {
             var txt = GetComponent<HText>();
             txt.Text = InputString;
-            txt.Chromatically = inputColor;
+            txt.MainColor = inputColor;
         }
     }
 }

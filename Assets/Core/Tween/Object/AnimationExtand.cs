@@ -104,7 +104,7 @@ namespace huqiang
                 ani = new ColorAnimat(grap);
             else if (!cover)
                 return;
-            ani.StartColor = grap.Chromatically;
+            ani.StartColor = grap.MainColor;
             ani.EndColor = col;
             ani.Time = time;
             ani.Delay = delay;

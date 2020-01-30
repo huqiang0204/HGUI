@@ -25,17 +25,38 @@ namespace huqiang.UIComposite
         {
             Top, Down
         }
-        public Transform Head;
+        public UIElement Head;
         public Transform Items;
-        public Transform Content;
+        public UIElement Content;
         public FakeStruct Item;
         public TableContent curContent;
         StackPanel stackPanel;
+        HeadDock dock;
         /// <summary>
         /// 头部停靠位置
         /// </summary>
-        public HeadDock headDock = HeadDock.Top;
-        float headHigh = 0;
+        public HeadDock headDock { 
+            get=>dock; 
+            set {
+                if (value == dock)
+                    return;
+                dock = value;
+                switch(dock)
+                {
+                    case HeadDock.Top:
+                        Head.anchorPointType = AnchorPointType.Top;
+                        Content.margin.top = Head.SizeDelta.y;
+                        Content.margin.down = 0;
+                        break;
+                    case HeadDock.Down:
+                        Head.anchorPointType = AnchorPointType.Down;
+                        Content.margin.down = Head.SizeDelta.y;
+                        Content.margin.top = 0;
+                        break;
+                }
+                UIElement.ResizeChild(Enity);
+            } }
+        public float headHigh = 0;
         public List<TableContent> contents;
         /// <summary>
         /// 当前被选中项的背景色
@@ -50,11 +71,11 @@ namespace huqiang.UIComposite
             base.Initial(mod,element);
             contents = new List<TableContent>();
             var trans = Enity.transform;
-            Head = trans.Find("Head");
-            Items = Head.Find("Items");
+            Head = trans.Find("Head").GetComponent<UIElement>();
+            Items = Head.transform.Find("Items");
             stackPanel = Items.GetComponent<UIElement>().composite as StackPanel;
             Item= HGUIManager.FindChild(mod, "Item");
-            Content = trans.Find("Content");
+            Content = trans.Find("Content").GetComponent<UIElement>();
             HGUIManager.GameBuffer.RecycleGameObject(trans.Find("Item").gameObject);
         }
         /// <summary>
@@ -88,7 +109,7 @@ namespace huqiang.UIComposite
                 if (curContent.Back != null)
                     curContent.Back.gameObject.SetActive(false);
             }
-            model.transform.SetParent(Content);
+            model.transform.SetParent(Content.transform);
             model.transform.localScale = Vector3.one;
             UIElement.Resize(model);
             curContent = content;
@@ -115,7 +136,7 @@ namespace huqiang.UIComposite
             table.Item.userEvent.Click = ItemClick;
             table.Item.userEvent.PointerEntry = ItemPointEntry;
             table.Item.userEvent.PointerLeave = ItemPointLeave;
-            table.Content.transform.SetParent(Content);
+            table.Content.transform.SetParent(Content.transform);
             curContent = table;
             curContent.Content.gameObject.SetActive(true);
             if (curContent.Back != null)
@@ -133,7 +154,7 @@ namespace huqiang.UIComposite
         {
             if (Head == null)
                 return;
-            mod.SetParent(Head);
+            mod.SetParent(Head.transform);
             //panel.IsChanged = true;
         }
         /// <summary>
@@ -170,8 +191,8 @@ namespace huqiang.UIComposite
             table.eventCall.Click = ItemClick;
             table.eventCall.PointerEntry = ItemPointEntry;
             table.eventCall.PointerLeave = ItemPointLeave;
-            table.Label.transform.SetParent(Head);
-            table.Content.transform.SetParent(Content);
+            table.Label.transform.SetParent(Head.transform);
+            table.Content.transform.SetParent(Content.transform);
         }
         public void ShowContent(TableContent content)
         {

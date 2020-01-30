@@ -26,11 +26,11 @@ public class TabPage:UIPage
         img.marginType = MarginType.Margin;
         img.MainColor = Color.red;
         tab.AddContent(img,"标签1");
-        img = UICreator.CreateHImage(Vector3.zero, Vector2.zero, "con1", null);
+        img = UICreator.CreateHImage(Vector3.zero, Vector2.zero, "con2", null);
         img.marginType = MarginType.Margin;
         img.MainColor = Color.green;
         tab.AddContent(img,"标签2");
-        img = UICreator.CreateHImage(Vector3.zero, Vector2.zero, "con1", null);
+        img = UICreator.CreateHImage(Vector3.zero, Vector2.zero, "con3", null);
         img.marginType = MarginType.Margin;
         img.MainColor = Color.blue;
         tab.AddContent(img,"标签3");

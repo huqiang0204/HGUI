@@ -30,6 +30,7 @@ namespace huqiang.UIComposite
         public Transform Content;
         public FakeStruct Item;
         public TableContent curContent;
+        StackPanel stackPanel;
         /// <summary>
         /// 头部停靠位置
         /// </summary>
@@ -50,9 +51,11 @@ namespace huqiang.UIComposite
             contents = new List<TableContent>();
             var trans = Enity.transform;
             Head = trans.Find("Head");
-            Items = trans.Find("Items");
+            Items = Head.Find("Items");
+            stackPanel = Items.GetComponent<UIElement>().composite as StackPanel;
             Item= HGUIManager.FindChild(mod, "Item");
             Content = trans.Find("Content");
+            HGUIManager.GameBuffer.RecycleGameObject(trans.Find("Item").gameObject);
         }
         /// <summary>
         /// 使用默认标签页
@@ -69,6 +72,7 @@ namespace huqiang.UIComposite
 
             content.Item = mod.GetComponent<UIElement>();
             content.Label = mod.Find("Text").GetComponent<HText>();
+            content.Label.Text = label;
             content.Back = mod.Find("Image").GetComponent<HImage>();
             content.Content = model;
 
@@ -88,7 +92,9 @@ namespace huqiang.UIComposite
             model.transform.localScale = Vector3.one;
             UIElement.Resize(model);
             curContent = content;
+            curContent.Back.MainColor = SelectColor;
             contents.Add(curContent);
+            mod.SetParent(Items);
         }
         /// <summary>
         /// 使用自定义标签页,标签模型自行管理
@@ -178,7 +184,7 @@ namespace huqiang.UIComposite
             curContent.Content.gameObject.SetActive(true);
             if (curContent.Back != null)
             {
-                curContent.Back.GetComponent<UIElement>().MainColor = SelectColor;
+                curContent.Back.MainColor = SelectColor;
                 curContent.Back.gameObject.SetActive(true);
             }
         }
@@ -199,8 +205,8 @@ namespace huqiang.UIComposite
             {
                 if (c.Back != null)
                 {
-                    c.Back.GetComponent<UIElement>().MainColor = HoverColor;
-                    c.Back.gameObject.SetActive(false);
+                    c.Back.MainColor = HoverColor;
+                    c.Back.gameObject.SetActive(true);
                 }
             }
         }

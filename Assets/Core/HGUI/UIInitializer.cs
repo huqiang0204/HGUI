@@ -46,12 +46,25 @@ namespace huqiang.Core.HGUI
                     else if(typeof(Composite).IsAssignableFrom(m.FieldType))
                     {
                         if (scr != null)
+                        {
+                            if(scr.composite==null)
+                            {
+                                var obj = Activator.CreateInstance(m.FieldType) as Composite;
+                                obj.Initial(fake,scr);
+                                m.Value = obj;
+                            }
+                            else
                             m.Value = scr.composite;
+                        }
                     }
                     else
                     {
                         if (scr != null)
+                        {
+                            if(scr.userEvent==null)
+                                scr.userEvent= Activator.CreateInstance(m.FieldType) as UserEvent;
                             m.Value = scr.userEvent;
+                        }
                     }
                     reflections.Top--;
                     var j = reflections.Top;

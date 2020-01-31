@@ -731,13 +731,13 @@ public static class UICompositeMenu
         Nob.SprType = SpriteType.Sliced;
     }
     [MenuItem("GameObject/HGUI/TabControl", false, 17)]
-    static public void AddLayout(MenuCommand menuCommand)
+    static public void AddTabControl(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;
         Transform pt = null;
         if (parent != null)
             pt = parent.transform;
-        var tab = UICreator.CreateHImage(Vector3.zero, new Vector2(800, 800), "table", pt);
+        var tab = UICreator.CreateHImage(Vector3.zero, new Vector2(800, 800), "TabControl", pt);
         tab.Mask = true;
         tab.MainColor = new Color32(204, 204, 204, 255);
         tab.eventType = huqiang.Core.HGUI.EventType.UserEvent;

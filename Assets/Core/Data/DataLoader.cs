@@ -16,7 +16,7 @@ namespace huqiang.Data
     {
         public GameobjectBuffer gameobjectBuffer;
         public virtual void LoadToObject(FakeStruct fake, Component com) { }
-        public virtual void LoadToObject(FakeStruct fake,Component com,Initializer initializer) { }
-        public virtual FakeStruct LoadFromObject(Component com,DataBuffer buffer) { return null; }
+        public virtual void LoadToObject(FakeStruct fake, Component com, Initializer initializer) { }
+        public virtual FakeStruct LoadFromObject(Component com, DataBuffer buffer) { return null; }
     }
 }

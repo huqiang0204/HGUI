@@ -34,8 +34,31 @@ namespace huqiang.Data
         public unsafe override void LoadToObject(FakeStruct fake, Component com,Initializer initializer)
         {
             var transfrom = (TransfromData*)fake.ip;
-            var trans = com as Transform;
             var buff = fake.buffer;
+            var trans = com as Transform;
+            com.name = buff.GetData(transfrom->name) as string;
+            com.tag = buff.GetData(transfrom->tag) as string;
+            trans.localEulerAngles = transfrom->localEulerAngles;
+            trans.localPosition = transfrom->localPosition;
+            trans.localScale = transfrom->localScale;
+            trans.gameObject.layer = transfrom->layer;
+
+            Int16[] chi = fake.buffer.GetData(transfrom->child) as Int16[];
+            if (chi != null)
+                for (int i = 0; i < chi.Length; i++)
+                {
+                    var fs = buff.GetData(chi[i]) as FakeStruct;
+                    if (fs != null)
+                    {
+                        var go = gameobjectBuffer.CreateNew(fs.GetInt64(0));
+                        if (go != null)
+                        {
+                            go.transform.SetParent(trans);
+                            this.LoadToObject(fs, go.transform, initializer);
+                        }
+                    }
+                }
+
             Int16[] coms = buff.GetData(transfrom->coms) as Int16[];
             if (coms != null)
             {
@@ -53,27 +76,7 @@ namespace huqiang.Data
                     }
                 }
             }
-            Int16[] chi = fake.buffer.GetData(transfrom->child) as Int16[];
-            if (chi != null)
-                for (int i = 0; i < chi.Length; i++)
-                {
-                    var fs = buff.GetData(chi[i]) as FakeStruct;
-                    if (fs != null)
-                    {
-                        var go = gameobjectBuffer.CreateNew(fs.GetInt64(0));
-                        if (go != null)
-                        {
-                            go.transform.SetParent(trans);
-                            this.LoadToObject(fs, go.transform,initializer);
-                        }
-                    }
-                }
-            com.name = buff.GetData(transfrom->name) as string;
-            com.tag = buff.GetData(transfrom->tag) as string;
-            trans.localEulerAngles = transfrom->localEulerAngles;
-            trans.localPosition = transfrom->localPosition;
-            trans.localScale = transfrom->localScale;
-            trans.gameObject.layer = transfrom->layer;
+    
             if (initializer != null)
                 initializer.Initialiezd(fake,trans);
         }

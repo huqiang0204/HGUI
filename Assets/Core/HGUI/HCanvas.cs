@@ -19,9 +19,19 @@ namespace huqiang.Core.HGUI
         public UserAction.InputType inputType = UserAction.InputType.OnlyMouse;
         private void Start()
         {
-            Font.textureRebuilt += (o) => {
-                TxtCollector.GenerateTexture(true);
-            };
+            Font.textureRebuilt += FontTextureRebuilt;
+        }
+        void FontTextureRebuilt(Font font)
+        {
+            point = 1;
+            max = 0;
+            TxtCollector.Clear();
+            Collection(transform, -1, 0);
+            TxtCollector.GenerateTexture(true);
+        }
+        private void OnDestroy()
+        {
+            Font.textureRebuilt -= FontTextureRebuilt;
         }
         /// <summary>
         /// 信息采集
@@ -35,7 +45,7 @@ namespace huqiang.Core.HGUI
             PipeLine[index].localScale = trans.localScale;
             PipeLine[index].trans = trans;
             PipeLine[index].active = trans.gameObject.activeSelf;
-            var script= trans.GetComponent<UIElement>();
+            var script = trans.GetComponent<UIElement>();
             PipeLine[index].script = script;
             bool mask = false;
             if (script != null)
@@ -65,22 +75,28 @@ namespace huqiang.Core.HGUI
                 TxtCollector.Back();
         }
   
-        private void Update()
+        protected override void Update()
         {
             CheckSize();
             UserAction.Update();
             Keyboard.InfoCollection();
             DispatchUserAction();
-            InputCaret.UpdateCaret();
             if (UIPage.CurrentPage != null)
                 UIPage.CurrentPage.Update(UserAction.TimeSlice);
-            MainMission();
+            TextInput.Dispatch();
+            InputCaret.UpdateCaret();
             ThreadMission.ExtcuteMain();
       
         }
         private void LateUpdate()
         {
-           TxtCollector.GenerateTexture(false);
+            point = 1;
+            max = 0;
+            TxtCollector.Clear();
+            Collection(transform, -1, 0);
+            for (int i = 0; i < max; i++)
+                scripts[i].MainUpdate();
+            TxtCollector.GenerateTexture();
             SubMission(null);
             ApplyMeshRenderer();
         }
@@ -309,31 +325,11 @@ namespace huqiang.Core.HGUI
         }
         #endregion
         #region UI绘制与合批
-        void MainMission()
-        {
-            point = 1;
-            max = 0;
-            TxtCollector.Clear();
-            Collection(transform, -1, 0);
-            for (int i = 0; i < max; i++)
-            {
-                var scr = scripts[i];
-                if (scr.userEvent != null)
-                    scr.userEvent.Update();
-                if (scr.composite != null)
-                    scr.composite.Update(UserAction.TimeSlice);
-                scripts[i].MainUpdate();
-            }
-            TextInput.Dispatch();
-            InputCaret.UpdateCaret();
-        }
         void SubMission(object obj)
         {
             int len = max;
             if (scripts != null)
             {
-                //for (int i = 0; i < len; i++)
-                //    scripts[i].SubUpdate();
                 for (int i = 0; i < len; i++)
                 {
                     var grap = scripts[i] as HGraphics;
@@ -341,7 +337,6 @@ namespace huqiang.Core.HGUI
                         grap.UpdateMesh();
                 }
             }
-              
             ClearMesh();
             HBatch.Batch(this, PipeLine);
         }

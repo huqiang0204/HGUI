@@ -19,7 +19,7 @@ namespace huqiang.Data2D
     }
     public class RelativeJointLoader:DataLoader
     {
-        public unsafe override void LoadToObject(FakeStruct fake, Component game)
+        public unsafe override void LoadToComponent(FakeStruct fake, Component game,FakeStruct main)
         {
             var data = (RelativeJointData*)fake.ip;
             var obj = game.GetComponent<RelativeJoint2D>();

@@ -27,7 +27,7 @@ namespace huqiang.Data2D
     public class BoxColliderLoader:DataLoader
     {
       
-        public unsafe override void LoadToObject(FakeStruct fake,Component game)
+        public unsafe override void LoadToComponent(FakeStruct fake,Component game, FakeStruct main)
         {
             BoxColliderData* data = (BoxColliderData*)fake.ip;
             var obj = game.GetComponent<BoxCollider2D>();

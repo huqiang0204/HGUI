@@ -23,7 +23,7 @@ namespace huqiang.Data2D
     }
     public class PlatformEffectorLoader:DataLoader
     {
-        public unsafe override void LoadToObject(FakeStruct fake, Component game)
+        public unsafe override void LoadToComponent(FakeStruct fake, Component game, FakeStruct main)
         {
             PlatformEffectorData* data = (PlatformEffectorData*)fake.ip;
             var obj = game.GetComponent<PlatformEffector2D>();

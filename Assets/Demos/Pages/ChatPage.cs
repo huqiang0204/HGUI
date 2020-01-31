@@ -59,36 +59,6 @@ namespace Assets.Scripts
             view = LoadUI<View>("baseUI", "chat");
             InitialChat();
             InitialTreeView();
-            //var chat = new ChatData();
-            //chat.name = "江海胡";
-            //chat.content = "是地方还是快点结婚说的话付款时间和十大科技回复空间说的话精神科大夫收到回复收到回复时代发收到回复";
-            //self.AddData(chat);
-            //container.Move(0);
-            //chat = new ChatData();
-            //chat.name = "江海胡";
-            //chat.content = "是地方还是快点结婚说的话付款时间和十大科技回复空间说的话精神科大夫收到回复收到回复时代发收到回复";
-            //self.AddData(chat);
-            //container.Move(0);
-            //chat = new ChatData();
-            //chat.name = "江海胡";
-            //chat.content = "是地方还是快点结婚说的话付款时间和十大科技回复空间说的话精神科大夫收到回复收到回复时代发收到回复";
-            //self.AddData(chat);
-            //container.Move(0);
-            //chat = new ChatData();
-            //chat.name = "江海胡";
-            //chat.content = "是地方还是快点结婚说的话付款时间和十大科技回复空间说的话精神科大夫收到回复收到回复时代发收到回复";
-            //self.AddData(chat);
-            //container.Move(0);
-            //chat = new ChatData();
-            //chat.name = "江海胡";
-            //chat.content = "是地方还是快点结婚说的话付款时间和十大科技回复空间说的话精神科大夫收到回复收到回复时代发收到回复";
-            //self.AddData(chat);
-            //container.Move(0);
-            //chat = new ChatData();
-            //chat.name = "江海胡";
-            //chat.content = "是地方还是快点结婚说的话付款时间和十大科技回复空间说的话精神科大夫收到回复收到回复时代发收到回复";
-            //self.AddData(chat);
-            //container.Move(0);
         }
         void InitialTreeView()
         {
@@ -151,16 +121,16 @@ namespace Assets.Scripts
             if(ue!=null)
             {
                 var trans = ue.Context.transform;
-                trans.GetComponentInChildren<HImage>().Chromatically = 0x5E5E5EFF.ToColor();
-                trans.GetComponentInChildren<HText>().Chromatically = Color.white;
+                trans.GetComponentInChildren<HImage>().MainColor = 0x5E5E5EFF.ToColor();
+                trans.GetComponentInChildren<HText>().MainColor = Color.white;
             }
             ue = option.Selecet;
             if(ue!=null)
             {
                 opt = ue.Context.name;
                 var trans = ue.Context.transform;
-                trans.GetComponentInChildren<HImage>().Chromatically = Color.blue;
-                trans.GetComponentInChildren<HText>().Chromatically = Color.red;
+                trans.GetComponentInChildren<HImage>().MainColor = Color.blue;
+                trans.GetComponentInChildren<HText>().MainColor = Color.red;
             }
         }
         void OnSubmit(TextInput input)
@@ -175,7 +145,7 @@ namespace Assets.Scripts
                     chat.name = "胡江海";
                     chat.content = str;
                     other.AddData(chat);
-                    container.Move(0);
+                    other.AddAndMove(chat);
                     break;
                 case "center":
                     break;
@@ -183,8 +153,8 @@ namespace Assets.Scripts
                     chat = new ChatData();
                     chat.name = "江海胡";
                     chat.content = str;
-                    self.AddData(chat);
-                    container.Move(0);
+                    self.AddAndMove(chat);
+                    //container.Move(0);
                     break;
             }
             input.InputString = "";

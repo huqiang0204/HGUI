@@ -21,7 +21,7 @@ namespace huqiang.Data2D
     }
     public class SpriteMaskLoader:DataLoader
     {
-        public unsafe override void LoadToObject(FakeStruct fake, Component game)
+        public unsafe override void LoadToComponent(FakeStruct fake, Component game, FakeStruct main)
         {
             var data = (SpriteMaskData*)fake.ip;
             var obj = game.GetComponent<SpriteMask>();

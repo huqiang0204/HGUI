@@ -90,15 +90,18 @@ namespace huqiang.Core.HGUI
                 {
                     for (int j = 0; j < c; j++)
                         buf[j].Populate();
-                    var font = buf[0].Font;
-                    if (font != null)
+                    if (buf.Length>0)
                     {
-                        var tex = font.material.mainTexture;
-                        var id = tex.GetInstanceID();
-                        for (int j = 0; j < c; j++)
+                        var font = buf[0].Font;
+                        if (font != null)
                         {
-                            buf[j].texIds[0] = id;
-                            buf[j].textures[0] = tex;
+                            var tex = font.material.mainTexture;
+                            var id = tex.GetInstanceID();
+                            for (int j = 0; j < c; j++)
+                            {
+                                buf[j].texIds[0] = id;
+                                buf[j].textures[0] = tex;
+                            }
                         }
                     }
                 }

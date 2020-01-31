@@ -106,7 +106,7 @@ public class BezierPath : MonoBehaviour
     {
         var game = new GameObject(name, typeof(RectTransform));
         var img = game.AddComponent<HImage>();
-        img.Chromatically = Color.blue;
+        img.MainColor = Color.blue;
         var node = game.AddComponent<BezierPathNode>();
         node.ReFresh();
         game.transform.SetParent(transform);

@@ -39,7 +39,7 @@ public class BezierPathNode:MonoBehaviour
     {
         GameObject game = new GameObject(name);
         var img = game.AddComponent<HImage>();
-        img.Chromatically = Color.green;
+        img.MainColor = Color.green;
         return game;
     }
     private void OnDrawGizmos()

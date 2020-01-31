@@ -23,7 +23,7 @@ namespace huqiang.Data2D
     }
     public class CompositeColliderLoader:DataLoader
     {
-        public unsafe override void LoadToObject(FakeStruct fake, Component game)
+        public unsafe override void LoadToComponent(FakeStruct fake, Component game, FakeStruct main)
         {
             CompositeColliderData* data = (CompositeColliderData*)fake.ip;
             var obj = game as CompositeCollider2D;

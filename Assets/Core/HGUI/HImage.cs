@@ -102,6 +102,8 @@ namespace huqiang.Core.HGUI
                 m_spriteType = value;
                 m_vertexChange = true;
             } }
+        [SerializeField]
+        [HideInInspector]
         internal FillMethod m_fillMethod;
         public FillMethod FillMethod { get => m_fillMethod;
             set {
@@ -111,11 +113,15 @@ namespace huqiang.Core.HGUI
         [SerializeField]
         internal bool m_fillClockwise;
         public bool FillClockwise { get; set; }
+        [SerializeField]
+        [HideInInspector]
         internal int m_fillOrigin;
         public int FillOrigin { get => m_fillOrigin; set {
                 m_fillOrigin = value;
                 m_vertexChange = true;
             } }
+        [SerializeField]
+        [HideInInspector]
         internal float m_fillAmount = 1;
         public float FillAmount {
             get => m_fillAmount;
@@ -123,10 +129,13 @@ namespace huqiang.Core.HGUI
                 m_fillAmount = value;
                 m_vertexChange = true;
             } }
+        [SerializeField]
+        [HideInInspector]
+        internal bool m_preserveAspect;
         /// <summary>
         /// 开启此项,按弧度填充,否则按矩形四个角填充
         /// </summary>
-        public bool PreserveAspect { get; set; }
+        public bool PreserveAspect { get => m_preserveAspect; set => m_preserveAspect = value; }
         internal float m_pixelsPerUnit = 1;
         internal bool m_fillCenter = true;
         public bool FillCenter {

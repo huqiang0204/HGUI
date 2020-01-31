@@ -65,9 +65,11 @@ namespace huqiang.Core.HGUI
             tar->eventType = src.eventType;
             tar->compositeType = src.compositeType;
         }
-        public unsafe override void LoadToObject(FakeStruct fake, Component com)
+        public unsafe override void LoadToComponent(FakeStruct fake, Component com, FakeStruct main)
         {
-            LoadScript(fake.ip, com.GetComponent<UIElement>());
+            var ui = com.GetComponent<UIElement>();
+            LoadScript(fake.ip, ui);
+            ui.Initial(main);
         }
         public override unsafe FakeStruct LoadFromObject(Component com, DataBuffer buffer)
         {

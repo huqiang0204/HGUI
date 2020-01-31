@@ -33,9 +33,6 @@ namespace huqiang.Core.HGUI
         {
             if (reflections == null)
                 return;
-            var scr = com.GetComponent<UIElement>();
-            if (scr != null)
-                scr.Initial(fake);
             for (int i = 0; i < reflections.Top; i++)
             {
                 var m = reflections.All[i];
@@ -45,13 +42,28 @@ namespace huqiang.Core.HGUI
                         m.Value = com.GetComponent(m.FieldType);
                     else if(typeof(Composite).IsAssignableFrom(m.FieldType))
                     {
+                        var scr = com.GetComponent<UIElement>();
                         if (scr != null)
+                        {
+                            if(scr.composite==null)
+                            {
+                                var obj = Activator.CreateInstance(m.FieldType) as Composite;
+                                obj.Initial(fake,scr);
+                                m.Value = obj;
+                            }
+                            else
                             m.Value = scr.composite;
+                        }
                     }
                     else
                     {
+                        var scr = com.GetComponent<UIElement>();
                         if (scr != null)
+                        {
+                            if(scr.userEvent==null)
+                                scr.userEvent= Activator.CreateInstance(m.FieldType) as UserEvent;
                             m.Value = scr.userEvent;
+                        }
                     }
                     reflections.Top--;
                     var j = reflections.Top;

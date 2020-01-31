@@ -1,4 +1,5 @@
-﻿using System;
+﻿using huqiang.Core.HGUI;
+using System;
 using UnityEngine;
 
 namespace huqiang.UIComposite
@@ -17,5 +18,41 @@ namespace huqiang.UIComposite
         private const string circleol = "Circle-Outline";
         private const string circlesm = "Circle-Small";
         private const string magicstick = "Magic-Stick";
+        public static UIElement CreateElement(Vector3 pos, Vector2 size, string name, Transform parent)
+        {
+            var go = new GameObject(name);
+            var img = go.AddComponent<UIElement>();
+            img.SizeDelta = size;
+            var trans = go.transform;
+            trans.SetParent(parent);
+            trans.localPosition = pos;
+            trans.localScale = Vector3.one;
+            trans.localRotation = Quaternion.identity;
+            return img;
+        }
+        public static HImage CreateHImage(Vector3 pos,Vector2 size, string name,Transform parent)
+        {
+            var go = new GameObject(name);
+            var img = go.AddComponent<HImage>();
+            img.SizeDelta = size;
+            var trans = go.transform;
+            trans.SetParent(parent);
+            trans.localPosition = pos;
+            trans.localScale = Vector3.one;
+            trans.localRotation = Quaternion.identity;
+            return img;
+        }
+        public static HText CreateHText(Vector3 pos, Vector2 size, string name, Transform parent)
+        {
+            var go = new GameObject(name);
+            var img = go.AddComponent<HText>();
+            img.SizeDelta = size;
+            var trans = go.transform;
+            trans.SetParent(parent);
+            trans.localPosition = pos;
+            trans.localScale = Vector3.one;
+            trans.localRotation = Quaternion.identity;
+            return img;
+        }
     }
 }

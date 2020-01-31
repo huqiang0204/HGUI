@@ -4,9 +4,9 @@ using UnityEngine;
 
 public static class UIPageModel
 {
-    public static string GetPageModel(string pageName)
+    public static string GetPageModel(string pageName,string uiName)
     {
-        return PageModelFront + pageName + PageModelRear;
+        return PageModelFront + pageName + PageModelRear+uiName+PageModelEnd;
     }
     private const string PageModelFront =
         @"using huqiang.Core.HGUI;
@@ -27,7 +27,8 @@ public class ";
     public override void Initial(Transform parent, object dat = null)
     {
         base.Initial(parent, dat);
-        view = LoadUI<View>(""baseUI"", ""page"");//""baseUI""创建的bytes文件名,""page""为创建的页面名
+        view = LoadUI<View>(""baseUI"", """;
+    private const string PageModelEnd = @""");//""baseUI""创建的bytes文件名,""page""为创建的页面名
     }
     //语言切换功能用
     public override void ChangeLanguage()

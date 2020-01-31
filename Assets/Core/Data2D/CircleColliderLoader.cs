@@ -24,7 +24,7 @@ namespace huqiang.Data2D
     }
     public class CircleColliderLoader:DataLoader
     {
-        public unsafe override void LoadToObject(FakeStruct fake, Component game)
+        public unsafe override void LoadToComponent(FakeStruct fake, Component game, FakeStruct main)
         {
             CircleColliderData* data = (CircleColliderData*)fake.ip;
             var obj = game.GetComponent<CircleCollider2D>();

@@ -17,6 +17,7 @@ namespace huqiang.UIComposite
     }
     public class StackPanel:Composite
     {
+        int c = 0;
         public override void Initial(FakeStruct mod, UIElement script)
         {
             base.Initial(mod, script);
@@ -81,6 +82,15 @@ namespace huqiang.UIComposite
                     son.localScale = Vector3.one;
                     sy -= h;
                 }
+            }
+        }
+        public override void Update(float time)
+        {
+            var a = Enity.transform.childCount;
+            if (a != c)
+            {
+                c = a;
+                Order();
             }
         }
     }

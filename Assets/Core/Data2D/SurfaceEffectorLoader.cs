@@ -18,7 +18,7 @@ namespace huqiang.Data2D
     }
     public class SurfaceEffectorLoader:DataLoader
     {
-        public unsafe override void LoadToObject(FakeStruct fake, Component game)
+        public unsafe override void LoadToComponent(FakeStruct fake, Component game,FakeStruct main)
         {
             var data = (SurfaceEffectorData*)fake.ip;
             var obj = game.GetComponent<SurfaceEffector2D>();

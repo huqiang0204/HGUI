@@ -24,7 +24,7 @@ namespace huqiang.Data2D
     }
     public class PointEffectorLoader:DataLoader
     {
-        public unsafe override void LoadToObject(FakeStruct fake, Component game)
+        public unsafe override void LoadToComponent(FakeStruct fake, Component game, FakeStruct main)
         {
             PointEffectorData* data = (PointEffectorData*)fake.ip;
             var obj = game.GetComponent<PointEffector2D>();

@@ -15,8 +15,8 @@ namespace huqiang.Data
     public abstract class DataLoader
     {
         public GameobjectBuffer gameobjectBuffer;
-        public virtual void LoadToObject(FakeStruct fake, Component com) { }
-        public virtual void LoadToObject(FakeStruct fake,Component com,Initializer initializer) { }
-        public virtual FakeStruct LoadFromObject(Component com,DataBuffer buffer) { return null; }
+        public virtual void LoadToComponent(FakeStruct fake, Component com, FakeStruct main) { }
+        public virtual void LoadToObject(FakeStruct fake, Component com, Initializer initializer) { }
+        public virtual FakeStruct LoadFromObject(Component com, DataBuffer buffer) { return null; }
     }
 }

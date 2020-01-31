@@ -29,11 +29,84 @@ namespace huqiang.Core.HGUI
         TreeView,
         UIDate,
         UIPalette,
-        ScrollYExtand
+        ScrollYExtand,
+        DropDown,
+        StackPanel,
+        TabControl,
+        DockPanel,
+        DesignedDockPanel
     }
     public class UIElement:MonoBehaviour
     {
         #region static method
+        public static Coordinates GetGlobaInfo(Transform trans, bool Includeroot = true)
+        {
+            Transform[] buff = new Transform[32];
+            buff[0] = trans;
+            var parent = trans.parent;
+            int max = 1;
+            if (parent != null)
+                for (; max < 32; max++)
+                {
+                    buff[max] = parent;
+                    parent = parent.parent;
+                    if (parent == null)
+                        break;
+                }
+            Vector3 pos, scale;
+            Quaternion quate;
+            if (Includeroot)
+            {
+                var p = buff[max];
+                pos = p.localPosition;
+                scale = p.localScale;
+                quate = p.localRotation;
+                max--;
+            }
+            else
+            {
+                pos = Vector3.zero;
+                scale = Vector3.one;
+                quate = Quaternion.identity;
+                max--;
+            }
+            for (; max >= 0; max--)
+            {
+                var rt = buff[max];
+                Vector3 p = rt.localPosition;
+                Vector3 o = Vector3.zero;
+                o.x = p.x * scale.x;
+                o.y = p.y * scale.y;
+                o.z = p.z * scale.z;
+                pos += quate * o;
+                quate *= rt.localRotation;
+                Vector3 s = rt.localScale;
+                scale.x *= s.x;
+                scale.y *= s.y;
+            }
+            Coordinates coord = new Coordinates();
+            coord.Postion = pos;
+            coord.quaternion = quate;
+            coord.Scale = scale;
+            return coord;
+        }
+        public static Vector3 ScreenToLocal(Transform trans, Vector3 v)
+        {
+            var g = GetGlobaInfo(trans,false);
+            v -= g.Postion;
+            if (g.Scale.x != 0)
+                v.x /= g.Scale.x;
+            else v.x = 0;
+            if (g.Scale.y != 0)
+                v.y /= g.Scale.y;
+            else v.y = 0;
+            if (g.Scale.z != 0)
+                v.z /= g.Scale.z;
+            else v.z = 0;
+            var q = Quaternion.Inverse(g.quaternion);
+            v = q * v;
+            return v;
+        }
         //protected static ThreadMission thread = new ThreadMission("async");
         public static Vector2[] Anchors = new[] { new Vector2(0.5f, 0.5f), new Vector2(0, 0.5f),new Vector2(1, 0.5f),
         new Vector2(0.5f, 1),new Vector2(0.5f, 0), new Vector2(0, 0), new Vector2(0, 1), new Vector2(1, 0), new Vector2(1, 1)};
@@ -323,7 +396,7 @@ namespace huqiang.Core.HGUI
         public UserEvent userEvent;
         public Composite composite;
         internal int PipelineIndex;
-        public virtual Color32 Chromatically { get; set; }
+        public virtual Color32 MainColor { get; set; }
         public T RegEvent<T>(FakeStruct fake = null) where T : UserEvent, new()
         {
             var t = userEvent as T;
@@ -333,7 +406,7 @@ namespace huqiang.Core.HGUI
             t.Context = this;
             t.Initial(fake);
             userEvent = t;
-            t.g_color = Chromatically;
+            t.g_color = MainColor;
             return t;
         }
 
@@ -389,7 +462,29 @@ namespace huqiang.Core.HGUI
                 case CompositeType.ScrollYExtand:
                     new ScrollYExtand().Initial(ex,script);
                     break;
+                case CompositeType.DropDown:
+                    new DropdownEx().Initial(ex,script);
+                    break;
+                case CompositeType.StackPanel:
+                    new StackPanel().Initial(ex,script);
+                    break;
+                case CompositeType.TabControl:
+                    new TabControl().Initial(ex,script);
+                    break;
+                case CompositeType.DockPanel:
+                    new DockPanel().Initial(ex,script);
+                    break;
+                case CompositeType.DesignedDockPanel:
+                    new DesignedDockPanel().Initial(ex,script);
+                    break;
             }
+        }
+        protected virtual void Update()
+        {
+            if (userEvent != null)
+                userEvent.Update();
+            if (composite != null)
+                composite.Update(UserAction.TimeSlice);
         }
     }
 }

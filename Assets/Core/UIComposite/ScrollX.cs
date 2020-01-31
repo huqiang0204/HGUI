@@ -51,7 +51,14 @@ namespace huqiang.UIComposite
         /// </summarx>
         public float Pos
         {
-            get { var p = m_point / (ActualSize.x - Size.x); if (p < 0) p = 0; else if (p > 1) p = 1; return p; }
+            get {
+                if (ActualSize.x <= Size.x)
+                    return 0;
+                var p = m_point / (ActualSize.x - Size.x);
+                if (p < 0) p = 0; 
+                else if (p > 1) 
+                    p = 1; 
+                return p; }
             set
             {
                 if (value < 0 | value > 1)
@@ -69,6 +76,18 @@ namespace huqiang.UIComposite
         public bool DynamicSize = true;
         Vector2 ctSize;
         float ctScale;
+        public override UISlider Slider
+        {
+            get => m_slider;
+            set
+            {
+                if (m_slider != null)
+                    m_slider.OnValueChanged = null;
+                m_slider = value;
+                if (m_slider != null)
+                    m_slider.OnValueChanged = (o) => { Pos = o.Percentage; };
+            }
+        }
         public override void Initial(FakeStruct mod, UIElement script)
         {
             base.Initial(mod,script);
@@ -145,6 +164,10 @@ namespace huqiang.UIComposite
                 if (ScrollEnd != null)
                     ScrollEnd(this);
             }
+            if (m_slider != null)
+            {
+                m_slider.Percentage = Pos;
+            }
         }
         void OnScrollEnd(UserEvent back)
         {
@@ -176,6 +199,8 @@ namespace huqiang.UIComposite
             }
             else if (ScrollEnd != null)
                 ScrollEnd(this);
+            if (m_slider != null)
+                m_slider.Percentage =  Pos;
         }
         public void Calcul()
         {
@@ -225,6 +250,13 @@ namespace huqiang.UIComposite
             }
             Calcul();
             Order(true);
+            if (m_slider != null)
+            {
+                m_slider.Percentage = Pos;
+                if (ActualSize.x <= Enity.SizeDelta.x)
+                    m_slider.Enity.gameObject.SetActive(false);
+                else m_slider.Enity.gameObject.SetActive(true);
+            }
         }
         /// <summarx>
         /// 指定下标处的位置重排

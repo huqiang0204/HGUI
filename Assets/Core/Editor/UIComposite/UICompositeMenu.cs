@@ -22,6 +22,8 @@ public static class UICompositeMenu
     private const string circlesm = "Circle-Small";
     private const string magicstick = "Magic-Stick";
     private const string box = "Border2";
+    private const string diamond = "Diamond-Outline5";
+    private const string star = "Star";
 
     [MenuItem("GameObject/HGUI/Canvas", false, 0)]
     static public void AddCanvas(MenuCommand menuCommand)
@@ -38,49 +40,51 @@ public static class UICompositeMenu
     [MenuItem("GameObject/HGUI/Page", false, 1)]
     static public void AddPage(MenuCommand menuCommand)
     {
-        string path = EditorUtility.SaveFilePanel("CreatePage", Application.dataPath,"page", "cs");
+        GameObject parent = menuCommand.context as GameObject;
+        string pagename = "page";
+        bool root = false;
+        if(parent!=null)
+        {
+            if (parent.GetComponent<HCanvas>() == null)
+            {
+                pagename = parent.name;
+            }
+            else root = true;
+        }
+        string path = EditorUtility.SaveFilePanel("CreatePage", Application.dataPath,pagename, "cs");
         FileStream fs1 = new FileStream(path, FileMode.Create, FileAccess.Write);//创建写入文件 
         StreamWriter sw = new StreamWriter(fs1);
         var paths = path.Split('/');
         var classname = paths[paths.Length - 1];
         classname = classname.Substring(0, classname.Length - 3);
-        sw.WriteLine(UIPageModel.GetPageModel(classname));//开始写入值
+        if(root)
+            sw.WriteLine(UIPageModel.GetPageModel(classname, classname));//开始写入值
+        else sw.WriteLine(UIPageModel.GetPageModel(classname,pagename));//开始写入值
         sw.Close();
         fs1.Close();
         Debug.Log(classname + ".cs Create done");
-        GameObject parent = menuCommand.context as GameObject;
-        var go = new GameObject(classname, typeof(UIElement));
-        var trans = go.transform;
-        if (parent != null)
-        {
-            HCanvas canvas = parent.GetComponent<HCanvas>();
-            if (canvas != null)
-                trans.SetParent(canvas.transform);
-            else
-            {
-                canvas = UnityEngine.Object.FindObjectOfType<HCanvas>();
-                if (canvas != null)
-                    trans.SetParent(canvas.transform);
-                else
-                {
-                    //创建Canvas并设置父级
-                }
-            }
-        }
-        else
+     
+        if(parent==null)
         {
             var canvas = UnityEngine.Object.FindObjectOfType<HCanvas>();
+            var go = new GameObject(classname, typeof(UIElement));
+            var trans = go.transform;
             if (canvas != null)
                 trans.SetParent(canvas.transform);
-            else
-            {
-                //创建Canvas并设置父级
-            }
+            trans.localPosition = Vector3.zero;
+            trans.localScale = Vector3.one;
+            trans.localRotation = Quaternion.identity;
         }
-
-        trans.localPosition = Vector3.zero;
-        trans.localScale = Vector3.one;
-        trans.localRotation = Quaternion.identity;
+        else if(root)
+        {
+            var go = new GameObject(classname, typeof(UIElement));
+            var trans = go.transform;
+            trans.SetParent(parent.transform);
+            trans.localPosition = Vector3.zero;
+            trans.localScale = Vector3.one;
+            trans.localRotation = Quaternion.identity;
+        }
+        AssetDatabase.Refresh();
     }
     [MenuItem("GameObject/HGUI/Empty", false, 2)]
     static public void AddEmpty(MenuCommand menuCommand)
@@ -188,7 +192,7 @@ public static class UICompositeMenu
         image.Sprite = EditorModelManager.FindSprite(icons, background);
         image.SprType = SpriteType.Filled;
         image.FillMethod = FillMethod.Horizontal;
-        image.Chromatically = new Color32(94, 137, 197, 255);
+        image.MainColor = new Color32(94, 137, 197, 255);
 
         var Nob = new GameObject("Nob", typeof(HImage));
         image = Nob.GetComponent<HImage>();
@@ -198,7 +202,7 @@ public static class UICompositeMenu
         son.localPosition = new Vector3(200, 0, 0);
         son.localScale = Vector3.one;
         son.localRotation = Quaternion.identity;
-        image.Chromatically = Color.green;
+        image.MainColor = Color.green;
         image.Sprite = EditorModelManager.FindSprite(icons, leaves);
         return go;
     }
@@ -216,7 +220,7 @@ public static class UICompositeMenu
             rect.localRotation = Quaternion.identity;
         }
     }
-    static GameObject CreateSliderV()
+    static GameObject CreateSliderV(float startOffset=-15,float endOffset=-15)
     {
         var go = new GameObject("SliderV", typeof(HImage));
         HImage image = go.GetComponent<HImage>();
@@ -225,8 +229,8 @@ public static class UICompositeMenu
         var rect = image.transform;
 
         var help = go.AddComponent<SliderHelper>();
-        help.StartOffset.y = -15;
-        help.EndOffset.y = -15;
+        help.StartOffset.y = startOffset;
+        help.EndOffset.y = endOffset;
         image.Sprite = EditorModelManager.FindSprite(icons, background);
         image.SprType = SpriteType.Sliced;
 
@@ -241,17 +245,17 @@ public static class UICompositeMenu
         image.Sprite = EditorModelManager.FindSprite(icons, background);
         image.SprType = SpriteType.Filled;
         image.FillMethod = FillMethod.Vertical;
-        image.Chromatically = new Color32(94, 137, 197, 255);
+        image.MainColor = new Color32(94, 137, 197, 255);
 
         var Nob = new GameObject("Nob", typeof(HImage));
         image = Nob.GetComponent<HImage>();
         image.SizeDelta = new Vector2(30, 30);
         son = image.transform;
         son.SetParent(rect);
-        son.localPosition = new Vector3(0, 200, 0);
+        son.localPosition = new Vector3(0, 200+startOffset, 0);
         son.localScale = Vector3.one;
         son.localRotation = Quaternion.identity;
-        image.Chromatically = Color.green;
+        image.MainColor = Color.green;
         image.Sprite = EditorModelManager.FindSprite(icons, ufo);
         return go;
     }
@@ -259,81 +263,18 @@ public static class UICompositeMenu
     static public void AddScroll(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;
-        var Scroll = CreateScroll();
+        Transform pt = null;
         if (parent != null)
-        {
-            var rect = Scroll.transform;
-            rect.SetParent(parent.transform);
-            rect.localPosition = Vector3.zero;
-            rect.localScale = Vector3.one;
-            rect.localRotation = Quaternion.identity;
-        }
-    }
-    static GameObject CreateScroll()
-    {
-        var ss = new GameObject("Scroll");
-        var img = ss.AddComponent<HImage>();
-        img.Mask = true;
-        img.SizeDelta = new Vector2(400,400);
-        img.compositeType = CompositeType.ScrollY;
-        ss.AddComponent<ScrollHelper>();
-        var rect = img.transform;
-        var Item = new GameObject("Item");
-        var fr = Item.AddComponent<UIElement>();
-        fr.SizeDelta = new Vector2(80, 80);
-        var son = fr.transform;
-        son.SetParent(rect);
-        son.localPosition = Vector3.zero;
-        son.localScale = Vector3.one;
-        son.localRotation = Quaternion.identity;
-        return ss;
-    }
-    //[MenuItem("GameObject/UIComposite/ScrollY", false, 4)]
-    static public void AddScrollY(MenuCommand menuCommand)
-    {
-        GameObject parent = menuCommand.context as GameObject;
-        var Scroll = new GameObject("ScrollY", typeof(RectTransform));
-        if (parent != null)
-            Scroll.transform.SetParent(parent.transform);
-        Scroll.transform.localPosition = Vector3.zero;
-        Scroll.transform.localScale = Vector3.one;
+            pt = parent.transform;
+        var scroll = UICreator.CreateHImage(Vector3.zero, new Vector2(400, 400), "gridScroll", pt);
+        scroll.Mask = true;
+        scroll.MainColor = new Color32(224, 224, 224, 255);
+        scroll.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        scroll.compositeType = CompositeType.GridScroll;
+        scroll.Sprite = EditorModelManager.FindSprite(icons, background);
+        scroll.SprType = SpriteType.Sliced;
 
-        var ss = new GameObject("Scroll", typeof(RectTransform));
-        RectTransform rect = ss.transform as RectTransform;
-        rect.SetParent(Scroll.transform);
-        rect.sizeDelta = new Vector2(400, 400);
-        rect.localPosition = Vector3.zero;
-        rect.localScale = Vector3.one;
-        var Item = new GameObject("Item", typeof(RectTransform));
-        var fr = Item.transform as RectTransform;
-        fr.sizeDelta = new Vector2(80, 80);
-        fr.SetParent(rect);
-        fr.localPosition = Vector3.zero;
-        fr.localScale = Vector3.one;
-
-        ss = new GameObject("Slider", typeof(RectTransform));
-        var fn = ss.transform as RectTransform;
-        fn.sizeDelta = new Vector2(20, 400);
-        fn.SetParent(Scroll.transform);
-        fn.localPosition = new Vector3(190, 0, 0);
-        fn.localScale = Vector3.one;
-        var img = ss.AddComponent<HImage>();
-        img.Sprite = EditorModelManager.FindSprite(icons, background);
-        img.SprType = SpriteType.Sliced;
-        img.Chromatically = new Color32(152, 152, 152, 255);
-        var help = ss.AddComponent<SliderHelper>();
-        help.direction = UISlider.Direction.Vertical;
-        help.StartOffset.y = 15;
-        help.EndOffset.y = 15;
-
-        var Nob = new GameObject("Nob", typeof(RectTransform));
-        fn = Nob.transform as RectTransform;
-        fn.sizeDelta = new Vector2(30, 30);
-        fn.SetParent(ss.transform);
-        fn.localPosition = new Vector3(0, -185, 0);
-        fn.localScale = Vector3.one;
-        img = Nob.AddComponent<HImage>();
-        img.Sprite = EditorModelManager.FindSprite(icons, circlesm);
+        CreateItem(scroll.transform, "Item");
     }
     [MenuItem("GameObject/HGUI/UIRocker", false, 9)]
     static public void AddRocker(MenuCommand menuCommand)
@@ -362,7 +303,6 @@ public static class UICompositeMenu
         son.localScale = Vector3.one;
        
     }
-
     [MenuItem("GameObject/HGUI/TreeView", false, 10)]
     static public void AddTreeView(MenuCommand menuCommand)
     {
@@ -573,39 +513,70 @@ public static class UICompositeMenu
         fn.localScale = Vector3.one;
         img = Nob.AddComponent<HImage>();
         img.SizeDelta= new Vector2(30, 30);
-        img.Chromatically = new Color(1, 1, 1, 1f);
+        img.MainColor = new Color(1, 1, 1, 1f);
         img.Sprite = aim;
 
         palette.AddComponent<PaletteHelper>().Initial();
     }
-    [MenuItem("GameObject/HGUI/ScrollYExtand", false, 13)]
+    [MenuItem("GameObject/HGUI/ScrollY", false, 13)]
+    static public void AddScrollY(MenuCommand menuCommand)
+    {
+        GameObject parent = menuCommand.context as GameObject;
+        Transform pt = null;
+        if (parent != null)
+            pt = parent.transform;
+        var scroll = UICreator.CreateHImage(Vector3.zero, new Vector2(400, 400), "ScrollY", pt);
+        scroll.Mask = true;
+        scroll.MainColor = new Color32(224, 224, 224, 255);
+        scroll.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        scroll.compositeType = CompositeType.ScrollY;
+        scroll.Sprite = EditorModelManager.FindSprite(icons, background);
+        scroll.SprType = SpriteType.Sliced;
+        scroll.Pivot = new Vector2(0.5f,1);
+
+        var item =CreateItem(scroll.transform, "Item");
+        item.transform.localPosition = new Vector3(0,-200,0);
+
+        var slider = UICreator.CreateHImage(new Vector3(190, -200, 0), new Vector2(20, 400), "Slider", scroll.transform);
+        slider.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        slider.compositeType = CompositeType.Slider;
+        slider.Sprite = scroll.Sprite;
+        slider.SprType = SpriteType.Sliced;
+        slider.MainColor = 0x295B7680.ToColor();
+
+        var help = slider.gameObject.AddComponent<SliderHelper>();
+        help.direction = UISlider.Direction.Vertical;
+
+        var Nob = UICreator.CreateHImage(new Vector3(0, 185, 0), new Vector2(20, 30), "Nob", slider.transform);
+        Nob.MainColor = 0x5F5263ff.ToColor();
+        Nob.Sprite = EditorModelManager.FindSprite(icons, background);
+        Nob.SprType = SpriteType.Sliced;
+    }
+    [MenuItem("GameObject/HGUI/ScrollYExtand", false, 14)]
     static public void AddScrollYExtand(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;
-        var scroll = new GameObject("scrollEx");
-        var main = scroll.AddComponent<HImage>();
-        main.SizeDelta = new Vector2(400,800);
-        main.Pivot = new Vector2(0.5f,1);
-        main.Mask = true;
-        main.Chromatically = new Color32(54,54,54,255);
-        main.eventType = huqiang.Core.HGUI.EventType.UserEvent;
-        main.compositeType = CompositeType.ScrollYExtand;
-        var trans = scroll.transform;
+        Transform pt = null;
         if (parent != null)
-            trans.SetParent(parent.transform);
-        trans.localPosition = new Vector3(0,400,0);
-        trans.localScale = Vector3.one;
-        trans.localRotation = Quaternion.identity;
+            pt = parent.transform;
+        var scroll = UICreator.CreateHImage(new Vector3(0,400,0), new Vector2(400, 800), "ScrollEx", pt);
+        scroll.Mask = true;
+        scroll.MainColor = new Color32(224, 224, 224, 255);
+        scroll.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        scroll.compositeType = CompositeType.ScrollYExtand;
+        scroll.Sprite = EditorModelManager.FindSprite(icons, background);
+        scroll.SprType = SpriteType.Sliced;
+        scroll.Pivot = new Vector2(0.5f, 1);
 
-        CreateItem(trans,"Title");
-        var item= CreateItem(trans, "Item");
-        item.localPosition = new Vector3(0,-100, 0);
-        var tail = CreateItem(trans,"Tail");
-        tail.localPosition = new Vector3(0,-200,0);
+        CreateItemE(scroll.transform,"Title");
+        var item= CreateItemE(scroll.transform, "Item");
+        item.transform.localPosition = new Vector3(0,-100, 0);
+        var tail = CreateItemE(scroll.transform,"Tail");
+        tail.transform.localPosition = new Vector3(0,-200,0);
 
         var body = new GameObject("Body");
         var son = body.transform;
-        son.SetParent(trans);
+        son.SetParent(scroll.transform);
         son.localPosition = new Vector3(0, -300, 0);
         son.localScale = Vector3.one;
         son.localRotation = Quaternion.identity;
@@ -614,367 +585,290 @@ public static class UICompositeMenu
         ui.Pivot = new Vector2(0.5f,1);
         ui.Mask = true;
     }
-    static Transform CreateItem(Transform parent,string name)
+    static UIElement CreateItemE(Transform parent, string name)
     {
-        var mod = new GameObject(name);
-        var trans = mod.transform;
-        trans.SetParent(parent);
+        var mod = UICreator.CreateElement(Vector3.zero, new Vector2(400, 100), name, parent);
+        mod.Pivot = new Vector2(0.5f,1);
+
+        var img = UICreator.CreateHImage(Vector3.zero, new Vector2(400, 90), "Image", mod.transform);
+        img.Pivot = new Vector2(0.5f,1);
+        img.MainColor = new Color32(68, 68, 68, 255);
+        img.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        img.Sprite = EditorModelManager.FindSprite(icons, background);
+        img.SprType = SpriteType.Sliced;
+
+        var txt = UICreator.CreateHText(Vector3.zero, new Vector2(400, 80), "Text", mod.transform);
+        txt.Pivot = new Vector2(0.5f,1);
+        txt.Text = name;
+        txt.FontSize = 30;
+        txt.TextAnchor = TextAnchor.MiddleLeft;
+        return mod;
+    }
+    [MenuItem("GameObject/HGUI/ScrollX", false, 15)]
+    static public void AddScrollX(MenuCommand menuCommand)
+    {
+        GameObject parent = menuCommand.context as GameObject;
+        Transform pt = null;
+        if (parent != null)
+            pt = parent.transform;
+        var scroll = UICreator.CreateHImage(Vector3.zero,new Vector2(400,400),"ScrollX",pt);
+        scroll.Mask = true;
+        scroll.MainColor = new Color32(224, 224, 224, 255);
+        scroll.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        scroll.compositeType = CompositeType.ScrollX;
+        scroll.Sprite = EditorModelManager.FindSprite(icons, background);
+        scroll.SprType = SpriteType.Sliced;
+
+        CreateItem(scroll.transform, "Item");
+
+        var slider = UICreator.CreateHImage(new Vector3(0, -190, 0),new Vector2(400,20),"Slider",scroll.transform);
+        slider.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        slider.compositeType = CompositeType.Slider;
+        slider.Sprite = scroll.Sprite;
+        slider.SprType = SpriteType.Sliced;
+        slider.MainColor = 0x295B7680.ToColor();
+
+        var help = slider.gameObject.AddComponent<SliderHelper>();
+
+        var Nob = UICreator.CreateHImage(new Vector3(-185, 0, 0), new Vector2(30, 20), "Nob", slider.transform);
+        Nob.MainColor = 0x5F5263ff.ToColor();
+        Nob.Sprite = EditorModelManager.FindSprite(icons, background);
+        Nob.SprType = SpriteType.Sliced;
+    }
+    static UIElement CreateItem(Transform parent,string name)
+    {
+        var mod = UICreator.CreateElement(Vector3.zero,new Vector2(100,100),name,parent);
+
+        var img = UICreator.CreateHImage(Vector3.zero,new Vector2(90,90),"Image",mod.transform);
+        img.MainColor = new Color32(68,68,68,255);
+        img.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        img.Sprite = EditorModelManager.FindSprite(icons, background);
+        img.SprType = SpriteType.Sliced;
+
+        var txt = UICreator.CreateHText(Vector3.zero,new Vector2(80,80),"Text",mod.transform);
+        txt.Text = name;
+        txt.FontSize = 30;
+        txt.TextAnchor = TextAnchor.MiddleLeft;
+        return mod;
+    }
+    [MenuItem("GameObject/HGUI/DropDown", false, 16)]
+    static public void AddDropDown(MenuCommand menuCommand)
+    {
+        GameObject parent = menuCommand.context as GameObject;
+
+        var ss = new GameObject("DropDown");
+        Transform rect = ss.transform;
+        var drop = ss.AddComponent<HImage>();
+        drop.SizeDelta=new Vector2(300,60);
+        drop.Sprite = EditorModelManager.FindSprite(icons, background);
+        drop.SprType = SpriteType.Sliced;
+        drop.MainColor = new Color32(224,224,224,255);
+        drop.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        drop.compositeType = CompositeType.DropDown;
+        if (parent != null)
+            rect.SetParent(parent.transform);
+        rect.localPosition = Vector3.zero;
+        rect.localScale = Vector3.one;
+        rect.localRotation = Quaternion.identity;
+
+        var txt = UICreator.CreateHText(Vector3.zero, Vector2.zero, "Label", rect);
+        txt.TextAnchor = TextAnchor.MiddleLeft;
+        txt.FontSize = 36;
+        txt.marginType = MarginType.Margin;
+        txt.margin = new Margin(20, 100, 5, 5);
+        txt.Text = "Label";
+        txt.MainColor = Color.black;
+
+        var img = UICreator.CreateHImage(Vector3.zero, new Vector2(50, 50), "Arrow", rect);
+        img.SizeDelta = new Vector2(50,50);
+        img.Sprite = EditorModelManager.FindSprite(icons, diamond);
+        img.anchorPointType = AnchorPointType.Right;
+        img.anchorType = AnchorType.Alignment;
+        img.MainColor = Color.black;
+
+        var main = UICreator.CreateHImage(new Vector3(0,-34,0), new Vector2(300, 300), "Scroll", rect);
+        main.Pivot = new Vector2(0.5f, 1);
+        main.Mask = true;
+        main.MainColor = new Color32(224, 224, 224, 255);
+        main.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        main.compositeType = CompositeType.ScrollY;
+        main.Sprite = EditorModelManager.FindSprite(icons, background);
+        main.SprType = SpriteType.Sliced;
+
+        var item = UICreator.CreateElement(new Vector3(0, -150, 0), new Vector2(300, 60), "Item", main.transform);
+        item.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        img = UICreator.CreateHImage(Vector3.zero,new Vector2(290,50),"Image",item.transform);
+        img.Sprite = EditorModelManager.FindSprite(icons, background);
+        img.SprType = SpriteType.Sliced;
+        txt = UICreator.CreateHText(Vector3.zero, Vector2.zero, "Text", item.transform);
+        txt.marginType = MarginType.Margin;
+        txt.margin = new Margin(60,60,5,5);
+        txt.MainColor = Color.black;
+        txt.Text = "Option";
+        txt.FontSize = 32;
+        txt.TextAnchor = TextAnchor.MiddleLeft;
+        img= UICreator.CreateHImage(Vector3.zero, new Vector2(30, 30), "Check", item.transform);
+        img.Sprite = EditorModelManager.FindSprite(icons, star);
+        img.anchorType = AnchorType.Alignment;
+        img.anchorOffset.x = 20;
+        img.anchorPointType = AnchorPointType.Left;
+        img.MainColor = Color.black;
+
+        var slider = UICreator.CreateHImage(new Vector3(140,-150,0), new Vector2(20, 300), "Slider", main.transform);
+        slider.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        slider.compositeType = CompositeType.Slider;
+        slider.Sprite = EditorModelManager.FindSprite(icons, background);
+        slider.SprType = SpriteType.Sliced;
+        slider.MainColor = 0x295B7680.ToColor();
+
+        var help = slider.gameObject.AddComponent<SliderHelper>();
+        help.direction = UISlider.Direction.Vertical;
+    
+
+        var Nob = UICreator.CreateHImage(new Vector3(0, 135, 0), new Vector2(20, 30), "Nob", slider.transform);
+        Nob.MainColor = 0x5F5263ff.ToColor();
+        Nob.Sprite = EditorModelManager.FindSprite(icons, background);
+        Nob.SprType = SpriteType.Sliced;
+    }
+    [MenuItem("GameObject/HGUI/TabControl", false, 17)]
+    static public void AddTabControl(MenuCommand menuCommand)
+    {
+        GameObject parent = menuCommand.context as GameObject;
+        Transform pt = null;
+        if (parent != null)
+            pt = parent.transform;
+        CreateTabControl(pt);
+    }
+    static UIElement CreateTabControl(Transform parent)
+    {
+        var tab = UICreator.CreateHImage(Vector3.zero, new Vector2(800, 800), "TabControl",parent);
+        tab.Mask = true;
+        tab.MainColor = new Color32(204, 204, 204, 255);
+        tab.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        tab.compositeType = CompositeType.TabControl;
+        tab.Sprite = EditorModelManager.FindSprite(icons, background);
+        tab.SprType = SpriteType.Sliced;
+
+        var head = UICreator.CreateElement(Vector3.zero, new Vector2(100, 44), "Head", tab.transform);
+        head.marginType = MarginType.MarginX;
+        head.anchorType = AnchorType.Alignment;
+        head.anchorPointType = AnchorPointType.Top;
+
+        var items = UICreator.CreateElement(Vector3.zero, new Vector2(800, 42), "Items", head.transform);
+        items.marginType = MarginType.Margin;
+        items.margin.down = 2;
+        items.compositeType = CompositeType.StackPanel;
+
+        var line = UICreator.CreateHImage(Vector3.zero, new Vector2(100, 2), "Line", head.transform);
+        line.anchorType = AnchorType.Alignment;
+        line.anchorPointType = AnchorPointType.Down;
+        line.marginType = MarginType.MarginX;
+
+        var item = UICreator.CreateElement(new Vector3(-350, 380), new Vector2(100, 40), "Item", tab.transform);
+
+        var img = UICreator.CreateHImage(Vector3.zero, new Vector2(100, 40), "Image", item.transform);
+        img.MainColor = new Color32(168, 168, 168, 255);
+
+        var txt = UICreator.CreateHText(Vector3.zero, new Vector2(80, 40), "Text", item.transform);
+        txt.MainColor = Color.black;
+        txt.Text = "Label";
+        txt.FontSize = 24;
+        txt.TextAnchor = TextAnchor.MiddleLeft;
+
+        var content = UICreator.CreateElement(Vector3.zero, new Vector2(800, 756), "Content", tab.transform);
+        content.marginType = MarginType.Margin;
+        content.margin.top = 44;
+        return tab;
+    }
+    [MenuItem("GameObject/HGUI/DockPanel", false, 18)]
+    static public void AddDockPanel(MenuCommand menuCommand)
+    {
+        var game = menuCommand.context as GameObject;
+        Transform pt = null;
+        if (game != null)
+            pt = game.transform;
+        CreateDockPanel(pt);
+    }
+    static UIElement CreateDockPanel(Transform parent)
+    {
+        var dock = UICreator.CreateHImage(Vector3.zero, new Vector2(800, 800), "DockPanel", parent);
+        dock.MainColor = new Color32(56, 56, 56, 255);
+        dock.compositeType = CompositeType.DockPanel;
+        dock.Sprite = EditorModelManager.FindSprite(icons, background);
+        dock.SprType = SpriteType.Sliced;
+
+
+        var AreaLevel = new GameObject("AreaLevel");
+        var trans = AreaLevel.transform;
+        trans.SetParent(dock.transform);
         trans.localPosition = Vector3.zero;
         trans.localScale = Vector3.one;
         trans.localRotation = Quaternion.identity;
-        var ui = mod.AddComponent<UIElement>();
-        ui.SizeDelta = new Vector2(400,100);
-        ui.Pivot = new Vector2(0.5f, 1);
 
-        var img = new GameObject("Image");
-        var son = img.transform;
-        son.SetParent(trans);
-        son.localPosition = new Vector3(0,-50, 0);
-        son.localScale = Vector3.one;
-        son.localRotation = Quaternion.identity;
-        ui = img.AddComponent<HImage>();
-        ui.SizeDelta = new Vector2(400,90);
-        ui.Chromatically = new Color32(4,30,65,255);
-        ui.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        var LineLevel = new GameObject("LineLevel");
+        trans = LineLevel.transform;
+        trans.SetParent(dock.transform);
+        trans.localPosition = Vector3.zero;
+        trans.localScale = Vector3.one;
+        trans.localRotation = Quaternion.identity;
 
-        var txt = new GameObject("Text");
-        son = txt.transform;
-        son.SetParent(trans);
-        son.localPosition = new Vector3(0, -50, 0);
-        son.localScale = Vector3.one;
-        son.localRotation = Quaternion.identity;
-        var ht = txt.AddComponent<HText>();
-        ht.SizeDelta = new Vector2(400, 80);
-        ht.Text = name;
-        ht.FontSize = 30;
-
-        return trans;
+        var Line = UICreator.CreateHImage(Vector3.zero,new Vector2(800,8),"Line", dock.transform);
+        Line.MainColor = Color.black;
+        UICreator.CreateHImage(new Vector3(0,-60,0), new Vector2(100, 100), "Area", dock.transform);
+ 
+        return dock;
     }
-    //[MenuItem("GameObject/UIComposite/DropDown", false, 9)]
-    //static public void AddDropDown(MenuCommand menuCommand)
-    //{
-    //    GameObject parent = menuCommand.context as GameObject;
-    //    var ss = new GameObject("DropDownEx", typeof(RectTransform));
-    //    RectTransform rect = ss.transform as RectTransform;
-    //    rect.sizeDelta = new Vector2(400, 40);
-    //    if (parent != null)
-    //        rect.SetParent(parent.transform);
+    [MenuItem("GameObject/HGUI/DesignedDockPanel", false, 19)]
+    static public void AddDesignedDockPanel(MenuCommand menuCommand)
+    {
+        var game = menuCommand.context as GameObject;
+        Transform pt = null;
+        if (game != null)
+            pt = game.transform;
+        var dock = CreateDockPanel(pt);
+        dock.name = "DesignedDockPanel";
+        dock.compositeType = CompositeType.DesignedDockPanel;
 
-    //    var label = new GameObject("Label", typeof(RectTransform));
-    //    var fr = label.transform as RectTransform;
-    //    fr.sizeDelta = new Vector2(400, 40);
-    //    fr.SetParent(rect);
-    //    fr.localPosition = Vector3.zero;
-    //    fr.localScale = Vector3.one;
-    //    var txt = label.AddComponent<Text>();
-    //    txt.alignment = TextAnchor.MiddleLeft;
-    //    txt.fontSize = 24;
+        var drag = UICreator.CreateHImage(Vector3.zero, new Vector2(40, 40), "Drag", dock.transform);
+        drag.Sprite = EditorModelManager.FindSprite(icons, file);
 
-    //    var Scroll = new GameObject("Scroll", typeof(RectTransform));
-    //    RectTransform scr = Scroll.transform as RectTransform;
-    //    scr.sizeDelta = new Vector2(400, 400);
-    //    scr.SetParent(rect);
-    //    scr.localPosition = new Vector3(0, -220, 0);
-    //    scr.localScale = Vector3.one;
-    //    ss.AddComponent<RectMask2D>();
+        CreateAuxiliary(dock.transform);
+    }
 
-    //    var Item = new GameObject("Item", typeof(RectTransform));
-    //    fr = Item.transform as RectTransform;
-    //    fr.sizeDelta = new Vector2(400, 40);
-    //    fr.SetParent(scr);
-    //    fr.localPosition = Vector3.zero;
-    //    fr.localScale = Vector3.one;
-    //}
-    //[MenuItem("GameObject/UIComposite/TabControl", false, 10)]
-    //static public void AddLayout(MenuCommand menuCommand)
-    //{
-    //    var parent = menuCommand.context as GameObject;
-    //    if (parent == null)
-    //        return;
-    //    var tab = new GameObject("TabControl", typeof(RectTransform));
-    //    tab.transform.SetParent(parent.transform);
-    //    var ss = tab.AddComponent<SizeScaleEx>();
-    //    ss.marginType = MarginType.Margin;
+    static void CreateAuxiliary(Transform parent)
+    {
+        var aux = UICreator.CreateElement(Vector3.zero, new Vector2(800, 800), "Auxiliary", parent);
+        aux.marginType = MarginType.Margin;
 
-    //    var Head = new GameObject("Head", typeof(RectTransform));
-    //    Head.transform.SetParent(tab.transform);
-    //    (Head.transform as RectTransform).sizeDelta = new Vector2(100, 60);
+        var tab = CreateTabControl(aux.transform);
+        tab.marginType = MarginType.Margin;
 
-    //    var Items = new GameObject("Items");
-    //    Items.transform.SetParent(Head.transform);
-    //    Items.transform.localPosition = Vector3.zero;
-    //    ss = Items.AddComponent<SizeScaleEx>();
-    //    ss.marginType = MarginType.MarginX;
+        var item = tab.transform.Find("Item");
 
-    //    var Item = new GameObject("Item", typeof(RectTransform));
-    //    Item.transform.SetParent(Head.transform);
-    //    Item.transform.localPosition = Vector3.zero;
-    //    (Item.transform as RectTransform).sizeDelta = new Vector2(100, 50);
+        var clo = UICreator.CreateHImage(new Vector3(41.5f,0,0),new Vector2(30,30),"Close",item);
+        clo.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        clo.Sprite = EditorModelManager.FindSprite(icons, close);
 
-    //    var back = new GameObject("Back", typeof(RectTransform));
-    //    back.transform.SetParent(Item.transform);
-    //    var img = back.AddComponent<Image>();
-    //    img.color = 0x2555FFff.ToColor();
-    //    ss = back.AddComponent<SizeScaleEx>();
-    //    ss.marginType = MarginType.Margin;
+        var Cover = UICreator.CreateHImage(Vector3.zero,new Vector2(30,30),"Cover",aux.transform);
+        Cover.MainColor= new Color32(128, 128, 128, 128);
 
-    //    var label = new GameObject("Label", typeof(RectTransform));
-    //    label.transform.SetParent(Item.transform);
-    //    (label.transform as RectTransform).sizeDelta = new Vector2(100, 50);
-    //    label.transform.localPosition = new Vector3(-20, 0, 0);
-    //    var txt = label.AddComponent<Text>();
-    //    txt.alignment = TextAnchor.MiddleLeft;
-    //    txt.fontSize = 30;
+        var Docker = UICreator.CreateElement(Vector3.zero, new Vector2(800, 800), "Docker",aux.transform);
 
-    //    var line = new GameObject("Line", typeof(RectTransform));
-    //    line.transform.SetParent(Head.transform);
-    //    (line.transform as RectTransform).sizeDelta = new Vector2(100, 4);
-    //    line.transform.localPosition = new Vector3(0, -24, 0);
-    //    ss = line.AddComponent<SizeScaleEx>();
-    //    ss.marginType = MarginType.MarginX;
-
-    //    var content = new GameObject("Content", typeof(RectTransform));
-    //    content.transform.SetParent(tab.transform);
-    //    content.transform.localPosition = Vector3.zero;
-    //}
-    //[MenuItem("GameObject/UIComposite/DropdownEx", false, 11)]
-    //static public void AddDropdownEx(MenuCommand menuCommand)
-    //{
-    //    GameObject parent = menuCommand.context as GameObject;
-    //    var drop = new GameObject("DropdownEx", typeof(RectTransform));
-    //    RectTransform dt = drop.transform as RectTransform;
-    //    if (parent != null)
-    //        dt.SetParent(parent.transform);
-    //    dt.sizeDelta = new Vector2(400, 60);
-    //    var Label = new GameObject("Label", typeof(RectTransform), typeof(Text));
-    //    var st = Label.transform as RectTransform;
-    //    st.SetParent(dt);
-    //    st.localPosition = new Vector3(-30, 0, 0);
-    //    st.localScale = Vector3.one;
-    //    st.sizeDelta = new Vector2(340, 40);
-    //    var txt = Label.GetComponent<Text>();
-    //    txt.color = Color.white;
-    //    txt.fontSize = 32;
-    //    txt.text = "Label";
-    //    txt.alignment = TextAnchor.MiddleCenter;
-
-    //    var Close = new GameObject("Menu", typeof(RectTransform), typeof(Image));
-    //    st = Close.transform as RectTransform;
-    //    st.SetParent(dt);
-    //    st.localPosition = new Vector3(170, 0, 0);
-    //    st.localScale = new Vector3(1, 1, 1);
-    //    st.sizeDelta = new Vector2(48, 36);
-    //    var img = Close.GetComponent<Image>();
-    //    img.color = Color.white;
-    //    img.sprite = EditorModelManager.FindSprite(icons, list);
-
-    //    var ss = new GameObject("Scroll", typeof(RectTransform));
-    //    RectTransform rect = ss.transform as RectTransform;
-    //    rect.sizeDelta = new Vector2(400, 400);
-    //    rect.SetParent(dt);
-    //    rect.localPosition = new Vector3(0, -230, 0);
-    //    rect.localScale = Vector3.one;
-    //    ss.AddComponent<RectMask2D>();
-    //    var Item = new GameObject("Item", typeof(RectTransform));
-    //    var fr = Item.transform as RectTransform;
-    //    fr.sizeDelta = new Vector2(400, 80);
-    //    fr.SetParent(rect);
-    //    fr.localPosition = Vector3.zero;
-    //    fr.localScale = Vector3.one;
-
-    //    Label = new GameObject("Label", typeof(RectTransform), typeof(Text));
-    //    st = Label.transform as RectTransform;
-    //    st.SetParent(fr);
-    //    st.localPosition = new Vector3(-30, 0, 0);
-    //    st.localScale = Vector3.one;
-    //    st.sizeDelta = new Vector2(400, 60);
-    //    txt = Label.GetComponent<Text>();
-    //    txt.color = Color.white;
-    //    txt.fontSize = 32;
-    //    txt.text = "Label";
-    //    txt.alignment = TextAnchor.MiddleCenter;
-
-    //    dt.localPosition = Vector3.zero;
-    //    dt.localScale = Vector3.one;
-    //}
-    //[MenuItem("GameObject/UIComposite/DockPanel", false, 13)]
-    //static public void AddDockPanel(MenuCommand menuCommand)
-    //{
-    //    var game = menuCommand.context as GameObject;
-    //    if (game == null)
-    //        return;
-    //    CreateDockPanel(game);
-    //}
-    //[MenuItem("GameObject/UIComposite/DesignedDockPanel", false, 14)]
-    //static public void AddDesignedDockPanel(MenuCommand menuCommand)
-    //{
-    //    var game = menuCommand.context as GameObject;
-    //    if (game == null)
-    //        return;
-    //    var obj = CreateDockPanel(game);
-    //    CreateAuxiliary(obj);
-
-    //    var Drag = new GameObject("Drag", typeof(RectTransform), typeof(Image));
-    //    var st = Drag.transform as RectTransform;
-    //    st.SetParent(obj.transform);
-    //    st.localScale = Vector3.one;
-    //    st.sizeDelta = new Vector2(60, 60);
-    //    var img = Drag.GetComponent<Image>();
-    //    img.color = Color.green;
-    //    img.sprite = EditorModelManager.FindSprite(icons, file);
-    //}
-    //static GameObject CreateDockPanel(GameObject parent)
-    //{
-    //    var dp = new GameObject("DockPanel", typeof(RectTransform));
-    //    RectTransform rect = dp.transform as RectTransform;
-    //    rect.sizeDelta = new Vector2(1920, 1080);
-    //    if (parent != null)
-    //        rect.SetParent(parent.transform);
-    //    var sse = dp.AddComponent<SizeScaleEx>();
-    //    sse.anchorPointType = AnchorPointType.Cneter;
-    //    sse.marginType = MarginType.Margin;
-    //    sse.parentType = ParentType.Tranfrom;
-    //    sse.DesignSize = new Vector2(1920, 1080);
-
-    //    var AreaLevel = new GameObject("AreaLevel", typeof(RectTransform));
-    //    AreaLevel.transform.SetParent(rect);
-    //    var LineLevel = new GameObject("LineLevel", typeof(RectTransform));
-    //    LineLevel.transform.SetParent(rect);
-    //    var Line = new GameObject("Line", typeof(RectTransform), typeof(Image));
-    //    Line.transform.SetParent(rect);
-    //    Line.GetComponent<Image>().color = new Color32(64, 64, 64, 255);
-    //    var Area = new GameObject("Area", typeof(RectTransform), typeof(Image));
-    //    Area.transform.SetParent(rect);
-    //    return dp;
-    //}
-    //static void CreateAuxiliary(GameObject parent)
-    //{
-    //    Sprite bk = EditorModelManager.FindSprite(icons, background);
-    //    var rect = parent.transform;
-    //    var Auxiliary = new GameObject("Auxiliary", typeof(RectTransform));
-    //    Auxiliary.transform.SetParent(rect);
-    //    CreateDockTabControl(Auxiliary);
-    //    var ss = Auxiliary.AddComponent<SizeScaleEx>();
-    //    ss.marginType = MarginType.Margin;
-
-
-    //    var Cover = new GameObject("Cover", typeof(RectTransform), typeof(RawImage));
-    //    Cover.transform.SetParent(Auxiliary.transform);
-    //    Cover.GetComponent<RawImage>().color = new Color32(128, 128, 128, 128);
-
-    //    var Docker = new GameObject("Docker", typeof(RectTransform));
-    //    Docker.transform.SetParent(Auxiliary.transform);
-
-    //    var Center = new GameObject("Center", typeof(RectTransform), typeof(Image));
-    //    var st = Center.transform as RectTransform;
-    //    st.SetParent(Docker.transform);
-    //    st.localPosition = Vector3.zero;
-    //    st.localScale = Vector3.one;
-    //    st.sizeDelta = new Vector2(100, 100);
-    //    var img = Center.GetComponent<Image>();
-    //    img.color = new Color32(59, 87, 255, 128);
-    //    img.sprite = bk;
-
-    //    var Left = new GameObject("Left", typeof(RectTransform), typeof(Image));
-    //    st = Left.transform as RectTransform;
-    //    st.SetParent(Docker.transform);
-    //    st.localPosition = new Vector3(-90, 0, 0);
-    //    st.localScale = Vector3.one;
-    //    st.sizeDelta = new Vector2(60, 100);
-    //    img = Left.GetComponent<Image>();
-    //    img.color = new Color32(59, 87, 255, 128);
-    //    img.sprite = bk;
-
-    //    var Top = new GameObject("Top", typeof(RectTransform), typeof(Image));
-    //    st = Top.transform as RectTransform;
-    //    st.SetParent(Docker.transform);
-    //    st.localPosition = new Vector3(0, 90, 0);
-    //    st.localScale = Vector3.one;
-    //    st.sizeDelta = new Vector2(100, 60);
-    //    img = Top.GetComponent<Image>();
-    //    img.color = new Color32(59, 87, 255, 128);
-    //    img.sprite = bk;
-
-    //    var Right = new GameObject("Right", typeof(RectTransform), typeof(Image));
-    //    st = Right.transform as RectTransform;
-    //    st.SetParent(Docker.transform);
-    //    st.localPosition = new Vector3(90, 0, 0);
-    //    st.localScale = Vector3.one;
-    //    st.sizeDelta = new Vector2(60, 100);
-    //    img = Right.GetComponent<Image>();
-    //    img.color = new Color32(59, 87, 255, 128);
-    //    img.sprite = bk;
-
-    //    var Down = new GameObject("Down", typeof(RectTransform), typeof(Image));
-    //    st = Down.transform as RectTransform;
-    //    st.SetParent(Docker.transform);
-    //    st.localPosition = new Vector3(0, -90, 0);
-    //    st.localScale = Vector3.one;
-    //    st.sizeDelta = new Vector2(100, 60);
-    //    img = Down.GetComponent<Image>();
-    //    img.color = new Color32(59, 87, 255, 128);
-    //    img.sprite = bk;
-    //}
-    //static void CreateDockTabControl(GameObject parent)
-    //{
-    //    var tab = new GameObject("TabControl", typeof(RectTransform));
-    //    tab.transform.SetParent(parent.transform);
-    //    var ss = tab.AddComponent<SizeScaleEx>();
-    //    ss.marginType = MarginType.Margin;
-
-    //    var Head = new GameObject("Head", typeof(RectTransform));
-    //    Head.transform.SetParent(tab.transform);
-    //    (Head.transform as RectTransform).sizeDelta = new Vector2(100, 60);
-
-    //    var Items = new GameObject("Items", typeof(RectTransform));
-    //    Items.transform.SetParent(Head.transform);
-    //    Items.transform.localPosition = Vector3.zero;
-    //    (Items.transform as RectTransform).sizeDelta = new Vector2(100, 50);
-    //    ss = Items.AddComponent<SizeScaleEx>();
-    //    ss.marginType = MarginType.MarginX;
-    //    Items.AddComponent<UILayout>().type = huqiang.UI.LayoutType.StackPanelH;
-    //    Items.AddComponent<RectMask2D>();
-
-
-    //    var Item = new GameObject("Item", typeof(RectTransform));
-    //    Item.transform.SetParent(Head.transform);
-    //    Item.transform.localPosition = Vector3.zero;
-    //    (Item.transform as RectTransform).sizeDelta = new Vector2(100, 50);
-
-    //    var back = new GameObject("Back", typeof(RectTransform));
-    //    back.transform.SetParent(Item.transform);
-    //    var img = back.AddComponent<Image>();
-    //    img.color = 0x2555FFff.ToColor();
-    //    ss = back.AddComponent<SizeScaleEx>();
-    //    ss.marginType = MarginType.MarginY;
-
-    //    var label = new GameObject("Label", typeof(RectTransform));
-    //    label.transform.SetParent(Item.transform);
-    //    (label.transform as RectTransform).sizeDelta = new Vector2(60, 50);
-    //    label.transform.localPosition = new Vector3(-20, 0, 0);
-    //    var txt = label.AddComponent<Text>();
-    //    txt.alignment = TextAnchor.MiddleLeft;
-    //    txt.fontSize = 30;
-
-    //    var clo = new GameObject("Close", typeof(RectTransform));
-    //    clo.transform.SetParent(Item.transform);
-    //    (clo.transform as RectTransform).sizeDelta = new Vector2(40, 40);
-    //    clo.transform.localPosition = new Vector3(30, 0, 0);
-    //    img = clo.AddComponent<Image>();
-    //    img.color = Color.white;
-    //    img.sprite = EditorModelManager.FindSprite(icons, close);
-
-    //    var line = new GameObject("Line", typeof(RectTransform));
-    //    line.transform.SetParent(Head.transform);
-    //    (line.transform as RectTransform).sizeDelta = new Vector2(100, 4);
-    //    line.transform.localPosition = new Vector3(0, -24, 0);
-    //    ss = line.AddComponent<SizeScaleEx>();
-    //    ss.marginType = MarginType.MarginX;
-    //    img = line.AddComponent<Image>();
-    //    img.color = 0x5379FFff.ToColor();
-
-    //    var content = new GameObject("Content", typeof(RectTransform));
-    //    content.transform.SetParent(tab.transform);
-    //    content.transform.localPosition = Vector3.zero;
-    //}
+        var bk= EditorModelManager.FindSprite(icons, background);
+        var Center = UICreator.CreateHImage(Vector3.zero, new Vector2(80, 80), "Center", Docker.transform);
+        Center.Sprite = bk;
+        Center.MainColor = 0x69DCF8d0.ToColor();
+        var left = UICreator.CreateHImage(new Vector3(-80,0,0), new Vector2(50, 100), "Left", Docker.transform);
+        left.Sprite = bk;
+        left.MainColor = 0x69DCF8d0.ToColor();
+        var top = UICreator.CreateHImage(new Vector3(0, 80, 0), new Vector2(100, 50), "Top", Docker.transform);
+        top.Sprite = bk;
+        top.MainColor = 0x69DCF8d0.ToColor();
+        var right = UICreator.CreateHImage(new Vector3(80, 0, 0), new Vector2(50, 100), "Right", Docker.transform);
+        right.Sprite = bk;
+        right.MainColor = 0x69DCF8d0.ToColor();
+        var down = UICreator.CreateHImage(new Vector3(0, -80, 0), new Vector2(100, 50), "Down", Docker.transform);
+        down.Sprite = bk;
+        down.MainColor = 0x69DCF8d0.ToColor();
+    }
 }

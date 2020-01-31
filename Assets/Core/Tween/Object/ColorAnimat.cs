@@ -17,12 +17,9 @@ namespace huqiang
         }
         public override void Play()
         {
-            lifetime = 0;
             playing = true;
         }
         public Action<ColorAnimat> PlayOver;
-        float lifetime = 0;
-        int index = 0;
         public float Interval = 100;
         public bool autoHide;
         public Color StartColor;
@@ -45,7 +42,7 @@ namespace huqiang
                     if (!Loop & c_time >= m_time)
                     {
                         playing = false;
-                        Target.Chromatically = EndColor;
+                        Target.MainColor = EndColor;
                         if (PlayOver != null)
                             PlayOver(this);
                     }
@@ -57,7 +54,7 @@ namespace huqiang
                         if (Linear != null)
                             r = Linear(this, r);
                         Color v = EndColor - StartColor;
-                        Target.Chromatically = StartColor + v * r;
+                        Target.MainColor = StartColor + v * r;
                     }
                 }
             }

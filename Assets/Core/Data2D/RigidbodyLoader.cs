@@ -35,7 +35,7 @@ namespace huqiang.Data2D
     }
     public class RigidbodyLoader:DataLoader
     {
-        public unsafe override void LoadToObject(FakeStruct fake, Component game)
+        public unsafe override void LoadToComponent(FakeStruct fake, Component game, FakeStruct main)
         {
             var data = (RigibodyData*)fake.ip;
             var obj = game.GetComponent<Rigidbody2D>();

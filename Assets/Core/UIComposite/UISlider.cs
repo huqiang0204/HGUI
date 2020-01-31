@@ -38,15 +38,19 @@ namespace huqiang.UIComposite
             {
                 if (info.direction == Direction.Horizontal)
                 {
-                    //float w =Model.data.sizeDelta.x;
-                    //Nob.data.sizeDelta.x = value * w;
-                    //ApplyValue();
+                    float w = Enity.SizeDelta.x;
+                    var size = Nob.SizeDelta;
+                    size.x = value * w;
+                    Nob.SizeDelta = size;
+                    ApplyValue();
                 }
                 else
                 {
-                    //float w = Model.data.sizeDelta.y;
-                    //Nob.data.sizeDelta.y = value * w;
-                    //ApplyValue();
+                    float w = Enity.SizeDelta.y;
+                    var size = Nob.SizeDelta;
+                    size.y = value * w;
+                    Nob.SizeDelta = size;
+                    ApplyValue();
                 }
             }
         }
@@ -73,7 +77,7 @@ namespace huqiang.UIComposite
             callBack.Drag = callBack.DragEnd = Draging;
             callBack.PointerDown = PointDown;
             callBack.AutoColor = false;
-            var tmp = trans.Find("Fill");
+            var tmp = trans.Find("FillImage");
             if (tmp != null)
                 FillImage = tmp.GetComponent<HImage>();
             tmp = trans.Find("Nob");

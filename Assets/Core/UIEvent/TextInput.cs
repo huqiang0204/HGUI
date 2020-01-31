@@ -303,13 +303,13 @@ namespace huqiang.UIEvent
             string str = GetShowString();
             if (str == ""&! Editing)
             {
-                TextCom.Chromatically = TipColor;
+                TextCom.MainColor = TipColor;
                 TextCom.Text = m_TipString;
                 InputCaret.CaretStyle = 0;
             }
             else
             {
-                TextCom.Chromatically = textColor;
+                TextCom.MainColor = textColor;
                 if (contentType == ContentType.Password)
                     TextCom.Text = new string('*',str.Length);
                 else TextCom.Text = str;

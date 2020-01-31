@@ -15,6 +15,7 @@ namespace huqiang.Core.HGUI
         public FillMethod fillMethod;
         public Int32 fillOrigin;//方向
         public float pixelsPerUnit;
+        public bool preserveAspect;
         public static int Size = sizeof(HImageData);
         public static int ElementSize = Size / 4;
     }
@@ -39,6 +40,7 @@ namespace huqiang.Core.HGUI
             tar.m_fillMethod = src->fillMethod;
             tar.m_fillOrigin = src->fillOrigin;
             tar.m_pixelsPerUnit = src->pixelsPerUnit;
+            tar.m_preserveAspect = src->preserveAspect;
         }
         protected unsafe void SaveHImage(FakeStruct fake, HImage src)
         {
@@ -50,11 +52,12 @@ namespace huqiang.Core.HGUI
             tar->fillMethod = src.m_fillMethod;
             tar->fillOrigin = src.m_fillOrigin;
             tar->pixelsPerUnit = src.m_pixelsPerUnit;
+            tar->preserveAspect = src.m_preserveAspect;
             var sprite = src.m_sprite;
             if (sprite != null)
                 tar->Sprite = fake.buffer.AddData(sprite.name);
         }
-        public unsafe override void LoadToObject(FakeStruct fake, Component com)
+        public unsafe override void LoadToComponent(FakeStruct fake, Component com,FakeStruct main)
         {
             HImage image = com.GetComponent<HImage>();
             if (image == null)
@@ -62,6 +65,7 @@ namespace huqiang.Core.HGUI
             LoadScript(fake.ip, image);
             LoadHGraphics(fake, image);
             LoadHImage(fake, image);
+            image.Initial(main);
         }
         public unsafe override FakeStruct LoadFromObject(Component com, DataBuffer buffer)
         {

@@ -341,5 +341,12 @@ namespace huqiang.Core.HGUI
                 size.x = cha.cursorPos.x + cha.charWidth * 1.1f + size.x * 0.5f;
             }
         }
+        public void GetPreferredWidth(ref Vector2 size, string str)
+        {
+            GetGenerationSettings(ref size, ref settings);
+            var gen = Generator;
+            float w = gen.GetPreferredWidth(str, settings);
+            size.x = w;
+        }
     }
 }

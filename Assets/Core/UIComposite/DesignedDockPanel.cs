@@ -265,40 +265,26 @@ namespace huqiang.UIComposite
             //var t = UICreator.CreateElement(Vector3.zero,Vector2.zero, name);
             //t.marginType = MarginType.Margin;
             con.Content = control.Content;
-            //con.Back = item.Find("Back");
+            con.Back = item.transform.Find("Image").GetComponent<HImage>();
 
-            //con.Label = item.Find("Label");
-            //var txt = con.Label.GetComponent<HText>();
-            //txt.text = name;
-            //txt.AsyncGetTextSizeX((o,e)=> {
-            //    o.model.data.sizeDelta = e;
-            //    OrderHeadLabel(con);
-            //});
-            //con.Close = item.Find("Close");
-            if (con.Close != null)
+            con.Label = item.transform.Find("Text").GetComponent<HText>();
+            var txt = con.Label.GetComponent<HText>();
+            txt.Text = name;
+            Vector2 v = txt.SizeDelta;
+            txt.GetPreferredWidth(ref v, name);
+            con.Back.SizeDelta = item.SizeDelta = new Vector2(v.x + 40, v.y);
+            
+            var clo = item.transform.Find("Close");
+            if (clo != null)
             {
+                con.Close = clo.GetComponent<UIElement>();
                 con.Close.RegEvent<UserEvent>();
                 con.Close.userEvent.Click = CloseClick;
                 con.Close.userEvent.DataContext = con;
+                clo.localPosition = new Vector3(v.x * 0.5f + 8, 0, 0);
             }
             control.AddContent(con);
             return con;
-        }
-        /// <summary>
-        /// 标签页排列
-        /// </summary>
-        /// <param name="obj"></param>
-        public void OrderHeadLabel(ItemContent ic)
-        {
-            //var w = ic.Label.data.sizeDelta.x;
-            //ic.Item.data.sizeDelta.x = w + 48;
-            //ic.Back.data.sizeDelta.x = w + 48;
-            //ic.Close.data.localPosition.x = w * 0.5f;
-            //ic.Item.IsChanged = true;
-            //ic.Back.IsChanged = true;
-            //ic.Close.IsChanged = true;
-            //if (control.panel != null)
-            //    control.panel.IsChanged = true;
         }
         public void AddContent(ItemContent con)
         {

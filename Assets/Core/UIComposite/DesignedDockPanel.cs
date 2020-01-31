@@ -25,6 +25,7 @@ namespace huqiang.UIComposite
             MainContent = new DesignedDockAuxiliary(this);
             MainContent.Initial(MainArea, trans.Find("Auxiliary").GetComponent<UIElement>());
             contents.Add(MainContent);
+            MainContent.SetParent(MainArea);
         }
         public void ShowAllDocker()
         {
@@ -337,7 +338,7 @@ namespace huqiang.UIComposite
             var go = HGUIManager.GameBuffer.Clone(layout.Auxiliary);
             var trans = go.transform;
             trans.SetParent(area.model.transform);
-            trans.localScale = Vector3.zero;
+            trans.localScale = Vector3.one;
             trans.localRotation = Quaternion.identity;
             var au =go.GetComponent<UIElement>();
             var con = new DesignedDockAuxiliary(layout);

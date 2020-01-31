@@ -199,7 +199,7 @@ namespace huqiang.UIComposite
             if (curContent != null)
             {
                 curContent.Content.gameObject.SetActive(false);
-                curContent.Back.gameObject.SetActive(false);
+                curContent.Content.gameObject.SetActive(false);
             }
             curContent = content;
             curContent.Content.gameObject.SetActive(true);

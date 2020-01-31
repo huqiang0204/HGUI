@@ -32,7 +32,9 @@ namespace huqiang.Core.HGUI
         ScrollYExtand,
         DropDown,
         StackPanel,
-        TabControl
+        TabControl,
+        DockPanel,
+        Layout
     }
     public class UIElement:MonoBehaviour
     {
@@ -400,6 +402,9 @@ namespace huqiang.Core.HGUI
                     break;
                 case CompositeType.TabControl:
                     new TabControl().Initial(ex,script);
+                    break;
+                case CompositeType.DockPanel:
+                    new DockPanel().Initial(ex,script);
                     break;
             }
         }

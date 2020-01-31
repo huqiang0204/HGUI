@@ -84,6 +84,7 @@ public static class UICompositeMenu
             trans.localScale = Vector3.one;
             trans.localRotation = Quaternion.identity;
         }
+        AssetDatabase.Refresh();
     }
     [MenuItem("GameObject/HGUI/Empty", false, 2)]
     static public void AddEmpty(MenuCommand menuCommand)
@@ -774,15 +775,44 @@ public static class UICompositeMenu
         content.marginType = MarginType.Margin;
         content.margin.top = 44;
     }
+    [MenuItem("GameObject/HGUI/DockPanel", false, 18)]
+    static public void AddDockPanel(MenuCommand menuCommand)
+    {
+        var game = menuCommand.context as GameObject;
+        Transform pt = null;
+        if (game != null)
+            pt = game.transform;
+        CreateDockPanel(pt);
+    }
+    static UIElement CreateDockPanel(Transform parent)
+    {
+        var dock = UICreator.CreateHImage(Vector3.zero, new Vector2(800, 800), "DockPanel", parent);
+        dock.MainColor = new Color32(56, 56, 56, 255);
+        dock.compositeType = CompositeType.DockPanel;
+        dock.Sprite = EditorModelManager.FindSprite(icons, background);
+        dock.SprType = SpriteType.Sliced;
 
-    //[MenuItem("GameObject/UIComposite/DockPanel", false, 13)]
-    //static public void AddDockPanel(MenuCommand menuCommand)
-    //{
-    //    var game = menuCommand.context as GameObject;
-    //    if (game == null)
-    //        return;
-    //    CreateDockPanel(game);
-    //}
+
+        var AreaLevel = new GameObject("AreaLevel");
+        var trans = AreaLevel.transform;
+        trans.SetParent(dock.transform);
+        trans.localPosition = Vector3.zero;
+        trans.localScale = Vector3.one;
+        trans.localRotation = Quaternion.identity;
+
+        var LineLevel = new GameObject("LineLevel");
+        trans = LineLevel.transform;
+        trans.SetParent(dock.transform);
+        trans.localPosition = Vector3.zero;
+        trans.localScale = Vector3.one;
+        trans.localRotation = Quaternion.identity;
+
+        var Line = UICreator.CreateHImage(Vector3.zero,new Vector2(800,8),"Line", dock.transform);
+        Line.MainColor = Color.black;
+        UICreator.CreateHImage(new Vector3(0,-60,0), new Vector2(100, 100), "Area", dock.transform);
+ 
+        return dock;
+    }
     //[MenuItem("GameObject/UIComposite/DesignedDockPanel", false, 14)]
     //static public void AddDesignedDockPanel(MenuCommand menuCommand)
     //{
@@ -801,30 +831,7 @@ public static class UICompositeMenu
     //    img.color = Color.green;
     //    img.sprite = EditorModelManager.FindSprite(icons, file);
     //}
-    //static GameObject CreateDockPanel(GameObject parent)
-    //{
-    //    var dp = new GameObject("DockPanel", typeof(RectTransform));
-    //    RectTransform rect = dp.transform as RectTransform;
-    //    rect.sizeDelta = new Vector2(1920, 1080);
-    //    if (parent != null)
-    //        rect.SetParent(parent.transform);
-    //    var sse = dp.AddComponent<SizeScaleEx>();
-    //    sse.anchorPointType = AnchorPointType.Cneter;
-    //    sse.marginType = MarginType.Margin;
-    //    sse.parentType = ParentType.Tranfrom;
-    //    sse.DesignSize = new Vector2(1920, 1080);
 
-    //    var AreaLevel = new GameObject("AreaLevel", typeof(RectTransform));
-    //    AreaLevel.transform.SetParent(rect);
-    //    var LineLevel = new GameObject("LineLevel", typeof(RectTransform));
-    //    LineLevel.transform.SetParent(rect);
-    //    var Line = new GameObject("Line", typeof(RectTransform), typeof(Image));
-    //    Line.transform.SetParent(rect);
-    //    Line.GetComponent<Image>().color = new Color32(64, 64, 64, 255);
-    //    var Area = new GameObject("Area", typeof(RectTransform), typeof(Image));
-    //    Area.transform.SetParent(rect);
-    //    return dp;
-    //}
     //static void CreateAuxiliary(GameObject parent)
     //{
     //    Sprite bk = EditorModelManager.FindSprite(icons, background);

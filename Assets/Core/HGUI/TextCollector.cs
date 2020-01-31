@@ -72,7 +72,7 @@ namespace huqiang.Core.HGUI
                 {
                     for (int j = 0; j < c; j++)
                         buf[j].Populate();
-                    if (buf[0] != null)
+                    if (buf.Length>0)
                     {
                         var font = buf[0].Font;
                         if (font != null)

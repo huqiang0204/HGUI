@@ -142,20 +142,6 @@ namespace huqiang.UIComposite
             if (curContent.Back != null)
                 curContent.Back.gameObject.SetActive(true);
             contents.Add(table);
-            //if (panel != null)
-            //    panel.IsChanged = true;
-        }
-        /// <summary>
-        /// 添加外部标签页
-        /// </summary>
-        /// <param name="content"></param>
-        /// <param name="mod"></param>
-        public void AddContent(Transform content, Transform mod)
-        {
-            if (Head == null)
-                return;
-            mod.SetParent(Head.transform);
-            //panel.IsChanged = true;
         }
         /// <summary>
         /// 移除某个标签和其内容
@@ -172,7 +158,6 @@ namespace huqiang.UIComposite
                 if (curContent.Back != null)
                     curContent.Back.gameObject.SetActive(true);
             }
-            //panel.IsChanged = true;
         }
         /// <summary>
         /// 释放某个标签和其内容,其对象会被回收
@@ -181,8 +166,8 @@ namespace huqiang.UIComposite
         public void ReleseContent(TableContent table)
         {
             contents.Remove(table);
-            //table.Content.transform.SetParent(null);
-            //table.Item.transform.SetParent(null);
+            if (table == curContent)
+                curContent = null;
             HGUIManager.GameBuffer.RecycleGameObject(table.Content.gameObject);
             HGUIManager.GameBuffer.RecycleGameObject(table.Item.gameObject);
         }
@@ -198,8 +183,10 @@ namespace huqiang.UIComposite
         {
             if (curContent != null)
             {
-                curContent.Content.gameObject.SetActive(false);
-                curContent.Content.gameObject.SetActive(false);
+                if (curContent.Content != null)
+                    curContent.Content.gameObject.SetActive(false);
+                if (curContent.Back != null)
+                    curContent.Back.gameObject.SetActive(false);
             }
             curContent = content;
             curContent.Content.gameObject.SetActive(true);

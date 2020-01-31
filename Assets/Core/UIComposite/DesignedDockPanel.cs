@@ -262,9 +262,10 @@ namespace huqiang.UIComposite
             item.userEvent.DragEnd = HeadDragEnd;
             item.userEvent.DataContext = con;
 
-            //var t = UICreator.CreateElement(Vector3.zero,Vector2.zero, name);
-            //t.marginType = MarginType.Margin;
-            con.Content = control.Content;
+            var content = UICreator.CreateElement(Vector3.zero,Vector2.zero,"Content",control.Content.transform);
+            content.marginType = MarginType.Margin;
+
+            con.Content = content;
             con.Back = item.transform.Find("Image").GetComponent<HImage>();
 
             con.Label = item.transform.Find("Text").GetComponent<HText>();
@@ -297,14 +298,14 @@ namespace huqiang.UIComposite
         public void RemoveContent(TabControl.TableContent con)
         {
             control.RemoveContent(con);
-            //con.Item.SetParent(null);
-            //con.Content.SetParent(null);
-            //if(control.contents.Count==0)
-            //{
-            //    dockArea.Dispose();
-            //    layout.contents.Remove(this);
-            //    layout.Refresh();
-            //}
+            con.Item.transform.SetParent(null);
+            con.Content.transform.SetParent(null);
+            if (control.contents.Count == 0)
+            {
+                dockArea.Dispose();
+                layout.contents.Remove(this);
+                layout.Refresh();
+            }
         }
         public void ShowContent(TabControl.TableContent con)
         {

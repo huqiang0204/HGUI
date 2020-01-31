@@ -72,7 +72,7 @@ namespace huqiang.Data
                     {
                         var loader = gameobjectBuffer.GetDataLoader(type);
                         if (loader != null)
-                            loader.LoadToObject(fs, com);
+                            loader.LoadToComponent(fs, com, fake);
                     }
                 }
             }

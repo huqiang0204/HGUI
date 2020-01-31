@@ -20,7 +20,7 @@ namespace huqiang.Data2D
     }
     public class WheelJointLoader:DataLoader
     {
-        public unsafe override void LoadToObject(FakeStruct fake, Component game)
+        public unsafe override void LoadToComponent(FakeStruct fake, Component game,FakeStruct main)
         {
             var data = *(WheelJointData*)fake.ip;
             var obj = game.GetComponent<WheelJoint2D>();

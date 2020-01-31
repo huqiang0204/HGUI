@@ -25,26 +25,27 @@ public class LayoutPage:UIPage
     {
         var area = view.Layout.MainContent;
         area.AddContent("page0");
-        var d = area.AddArea(DockpanelArea.Dock.Down, 0.3f);
-        var context = d.AddContent("page1");
+        //var d = area.AddArea(DockpanelArea.Dock.Down, 0.3f);
+        //var context = d.AddContent("page1");
 
-        d.model.MainColor = Color.red;
-        var one = d.AddArea(DockpanelArea.Dock.Right, 0.4f);
-        context = one.AddContent("page2");
-        context.LoadPopWindow<GridTestWindow>();
-        //d.Refresh();
+        //d.model.MainColor = Color.red;
+        //var one = d.AddArea(DockpanelArea.Dock.Right, 0.4f);
+        //context = one.AddContent("page2");
+        //context.LoadPopWindow<GridTestWindow>();
+        ////d.Refresh();
 
-        one.model.MainColor = Color.green;
-        var top = area.AddArea(DockpanelArea.Dock.Top, 0.2f);
-        top.AddContent("page3");
+        //one.model.MainColor = Color.green;
+        //var top = area.AddArea(DockpanelArea.Dock.Top, 0.2f);
+        //top.AddContent("page3");
 
-        top.model.MainColor = Color.yellow;
-        var l = top.AddArea(DockpanelArea.Dock.Left, 0.4f);
-        l.model.MainColor = Color.blue;
-        l.control.headDock = TabControl.HeadDock.Down;
+        //top.model.MainColor = Color.yellow;
+        //var l = top.AddArea(DockpanelArea.Dock.Left, 0.4f);
+        //l.model.MainColor = Color.blue;
+        //l.control.headDock = TabControl.HeadDock.Down;
 
-        context = l.AddContent("page5");
-        context.LoadPopWindow<GridTestWindow2>();
+        //context = l.AddContent("page5");
+        //context.LoadPopWindow<GridTestWindow2>();
+        view.Layout.Refresh();
     }
 }
 public class GridTestWindow : PopWindow

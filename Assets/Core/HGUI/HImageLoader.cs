@@ -57,7 +57,7 @@ namespace huqiang.Core.HGUI
             if (sprite != null)
                 tar->Sprite = fake.buffer.AddData(sprite.name);
         }
-        public unsafe override void LoadToObject(FakeStruct fake, Component com)
+        public unsafe override void LoadToComponent(FakeStruct fake, Component com,FakeStruct main)
         {
             HImage image = com.GetComponent<HImage>();
             if (image == null)
@@ -65,6 +65,7 @@ namespace huqiang.Core.HGUI
             LoadScript(fake.ip, image);
             LoadHGraphics(fake, image);
             LoadHImage(fake, image);
+            image.Initial(main);
         }
         public unsafe override FakeStruct LoadFromObject(Component com, DataBuffer buffer)
         {

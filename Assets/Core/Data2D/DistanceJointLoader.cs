@@ -23,7 +23,7 @@ namespace huqiang.Data2D
     }
     public class DistanceJointLoader:DataLoader
     {
-        public unsafe override void LoadToObject(FakeStruct fake, Component game)
+        public unsafe override void LoadToComponent(FakeStruct fake, Component game, FakeStruct main)
         {
             DistanceJointData* data = (DistanceJointData*)fake.ip;
             var obj = game.GetComponent<DistanceJoint2D>();

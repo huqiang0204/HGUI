@@ -462,7 +462,7 @@ namespace huqiang.UIComposite
             area.SetTopLine(Top);
             area.SetDownLine(Down);
             SetLeftLine(line);
-            UIElement.ResizeChild(model);
+            //UIElement.ResizeChild(model);
             return area;
         }
         DockpanelArea AddRightArea(float r)
@@ -475,7 +475,7 @@ namespace huqiang.UIComposite
             area.SetTopLine(Top);
             area.SetDownLine(Down);
             SetRightLine(line);
-            UIElement.ResizeChild(model);
+            //UIElement.ResizeChild(model);
             return area;
         }
         DockpanelArea AddTopArea(float r)
@@ -488,7 +488,7 @@ namespace huqiang.UIComposite
             area.SetTopLine(Top);
             area.SetDownLine(line);
             SetTopLine(line);
-            UIElement.ResizeChild(model);
+            //UIElement.ResizeChild(model);
             return area;
         }
         DockpanelArea AddDownArea(float r)
@@ -501,7 +501,7 @@ namespace huqiang.UIComposite
             area.SetTopLine(line);
             area.SetDownLine(Down);
             SetDownLine(line);
-            UIElement.ResizeChild(model);
+            //UIElement.ResizeChild(model);
             return area;
         }
         public void Dispose()
@@ -622,7 +622,6 @@ namespace huqiang.UIComposite
         }
         void InitialArea()
         {
-            var m = HGUIManager.GameBuffer.Clone(AreaMod).GetComponent<UIElement>();
             DockpanelArea area = new DockpanelArea(this);
             area.Left = Left;
             area.Right = Right;

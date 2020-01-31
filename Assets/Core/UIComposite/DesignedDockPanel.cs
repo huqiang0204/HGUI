@@ -334,7 +334,12 @@ namespace huqiang.UIComposite
         public DesignedDockAuxiliary AddArea(DockpanelArea.Dock dock, float r = 0.5f)
         {
             var area = dockArea.AddArea(dock,r);
-            var au = HGUIManager.GameBuffer.Clone(layout.Auxiliary).GetComponent<UIElement>();
+            var go = HGUIManager.GameBuffer.Clone(layout.Auxiliary);
+            var trans = go.transform;
+            trans.SetParent(area.model.transform);
+            trans.localScale = Vector3.zero;
+            trans.localRotation = Quaternion.identity;
+            var au =go.GetComponent<UIElement>();
             var con = new DesignedDockAuxiliary(layout);
             con.Initial(area, au);
             layout.contents.Add(con);

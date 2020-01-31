@@ -80,7 +80,7 @@ namespace huqiang.Core.HGUI
             tar->m_fontSize = src.m_fontSize;
             tar->m_align = src.m_align;
         }
-        public unsafe override void LoadToObject(FakeStruct fake, Component com)
+        public unsafe override void LoadToComponent(FakeStruct fake, Component com,FakeStruct main)
         {
             HText image = com.GetComponent<HText>();
             if (image == null)
@@ -88,6 +88,7 @@ namespace huqiang.Core.HGUI
             LoadScript(fake.ip, image);
             LoadHGraphics(fake, image);
             LoadHText(fake, image);
+            image.Initial(main);
         }
         public unsafe override FakeStruct LoadFromObject(Component com, DataBuffer buffer)
         {

@@ -17,7 +17,7 @@ namespace huqiang.Data2D
     }
     public class ConstantForceLoader:DataLoader
     {
-        public unsafe override void LoadToObject(FakeStruct fake, Component game)
+        public unsafe override void LoadToComponent(FakeStruct fake, Component game, FakeStruct main)
         {
             ConstantForceData* data = (ConstantForceData*)fake.ip;
             var obj = game.GetComponent<ConstantForce2D>();

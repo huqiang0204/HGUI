@@ -21,7 +21,7 @@ namespace huqiang.Data2D
     }
     public class FrictionJointLoader:DataLoader
     {
-        public unsafe override void LoadToObject(FakeStruct fake, Component game)
+        public unsafe override void LoadToComponent(FakeStruct fake, Component game, FakeStruct main)
         {
             FrictionJointData* data = (FrictionJointData*)fake.ip;
             var obj = game.GetComponent<FrictionJoint2D>();

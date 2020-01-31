@@ -23,7 +23,7 @@ namespace huqiang.Data2D
     }
     public class AreaEffectLoader:DataLoader
     {
-        public unsafe override void LoadToObject(FakeStruct fake,Component game)
+        public unsafe override void LoadToComponent(FakeStruct fake,Component game, FakeStruct main)
         {
             AreaEffectData* data = (AreaEffectData*)fake.ip;
             var obj = game.GetComponent<AreaEffector2D>();

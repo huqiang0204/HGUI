@@ -20,7 +20,7 @@ namespace huqiang.Data2D
     }
     public class BuoyancyLoader:DataLoader
     {
-        public unsafe override void LoadToObject(FakeStruct fake,Component game)
+        public unsafe override void LoadToComponent(FakeStruct fake,Component game, FakeStruct main)
         {
             BuoyancyData* data = (BuoyancyData*)fake.ip;
             var obj = game.GetComponent<BuoyancyEffector2D>();

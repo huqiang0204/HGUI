@@ -98,13 +98,14 @@ namespace huqiang.Core.HGUI
             tar->color = src.m_color;
             tar->uvRect = src.uvrect;
         }
-        public unsafe override void LoadToObject(FakeStruct fake, Component com)
+        public unsafe override void LoadToComponent(FakeStruct fake, Component com, FakeStruct main)
         {
             var hg = com.GetComponent<HGraphics>();
             if (hg == null)
                 return;
             LoadScript(fake.ip, hg);
             LoadHGraphics(fake, hg);
+            hg.Initial(main);
         }
         public unsafe override FakeStruct LoadFromObject(Component com, DataBuffer buffer)
         {

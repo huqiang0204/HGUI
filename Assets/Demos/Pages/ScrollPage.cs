@@ -7,7 +7,7 @@ using huqiang;
 using huqiang.Data;
 using System.Collections.Generic;
 
-public class Scrollex:UIPage
+public class ScrollPage:UIPage
 {
     //反射UI界面上的物体
     class View

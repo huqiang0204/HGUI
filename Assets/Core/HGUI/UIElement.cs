@@ -34,7 +34,8 @@ namespace huqiang.Core.HGUI
         StackPanel,
         TabControl,
         DockPanel,
-        DesignedDockPanel
+        DesignedDockPanel, 
+        DragContent
     }
     public class UIElement:MonoBehaviour
     {
@@ -468,6 +469,9 @@ namespace huqiang.Core.HGUI
                 case CompositeType.StackPanel:
                     new StackPanel().Initial(ex,script);
                     break;
+                case CompositeType.DragContent:
+                    new DragContent().Initial(ex,script);
+                    break;
                 case CompositeType.TabControl:
                     new TabControl().Initial(ex,script);
                     break;
@@ -477,6 +481,7 @@ namespace huqiang.Core.HGUI
                 case CompositeType.DesignedDockPanel:
                     new DesignedDockPanel().Initial(ex,script);
                     break;
+                    
             }
         }
         protected virtual void Update()

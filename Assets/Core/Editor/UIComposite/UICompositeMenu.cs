@@ -834,7 +834,6 @@ public static class UICompositeMenu
 
         CreateAuxiliary(dock.transform);
     }
-
     static void CreateAuxiliary(Transform parent)
     {
         var aux = UICreator.CreateElement(Vector3.zero, new Vector2(800, 800), "Auxiliary", parent);

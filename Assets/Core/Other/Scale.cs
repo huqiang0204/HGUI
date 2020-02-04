@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -164,4 +165,15 @@ public class Scale
         }
         return false;
     }
+    public static float ScreenSize 
+    {
+        get
+        {
+            float w = Screen.width;
+            float h = Screen.height;
+            float r = Mathf.Sqrt(w * w + h * h);
+            return r /Screen.dpi;
+        }
+    }
+ 
 }

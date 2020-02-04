@@ -58,9 +58,7 @@ namespace huqiang.Core.HGUI
                     TxtCollector.Next();
                 var txt = script as HText;
                 if (txt != null)
-                {
                     TxtCollector.AddText(txt);
-                }
             }
             PipeLine[index].script = script;
             int c = trans.childCount;
@@ -88,6 +86,7 @@ namespace huqiang.Core.HGUI
             TextInput.Dispatch();
             InputCaret.UpdateCaret();
             ThreadMission.ExtcuteMain();
+      
         }
         private void LateUpdate()
         {

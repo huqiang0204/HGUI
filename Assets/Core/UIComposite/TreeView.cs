@@ -1,6 +1,7 @@
 ﻿using huqiang.Core.HGUI;
 using huqiang.Data;
 using huqiang.UIEvent;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,13 +13,113 @@ namespace huqiang.UIComposite
         public string content;
         public Vector2 offset;
         public List<TreeViewNode> child = new List<TreeViewNode>();
+        public void Add(TreeViewNode node)
+        {
+            if (node != null)
+            {
+                child.Add(node);
+                node.parent = this;
+            }
+        }
+        public void SetParent(TreeViewNode node)
+        {
+            if (parent != node)
+                parent.child.Remove(this);
+            if (node != null)
+                node.child.Add(this);
+        }
+        public TreeViewNode parent { get; private set; }
+        public int[] Level
+        {
+            get
+            {
+                List<int> tmp = new List<int>();
+                var p = parent;
+                var s = this;
+                for (int i = 0; i < 1024; i++)
+                {
+                    if (p != null)
+                    {
+                        tmp.Add(p.child.IndexOf(s));
+                        s = p;
+                        p = p.parent;
+                    }
+                    else break;
+                }
+                if (tmp.Count > 0)
+                {
+                    int c = tmp.Count;
+                    int e = c - 1;
+                    int[] buf = new int[c];
+                    for (int i = 0; i < buf.Length; i++)
+                    {
+                        buf[i] = tmp[e];
+                        e--;
+                    }
+                    return buf;
+                }
+                else return new int[1];
+
+            }
+        }
+        public TreeViewNode Find(int[] level)
+        {
+            int l = level.Length;
+            TreeViewNode p = this;
+            for (int i = 0; i < l; i++)
+            {
+                int c = level[i];
+                if (c < 0)
+                    return null;
+                else if (c >= p.child.Count)
+                    return null;
+                p = p.child[c];
+            }
+            return p;
+        }
+        public void Expand()
+        {
+            var p = parent;
+            for (int i = 0; i < 1024; i++)
+            {
+                if (p == null)
+                    return;
+                p.extand = true;
+                p = p.parent;
+            }
+        }
     }
     public class TreeViewItem
     {
         public GameObject target;
         public HText text;
-        public UserEvent callBack;
+        public UserEvent Item;
         public TreeViewNode node;
+    }
+    public class TVConstructor
+    {
+        public UIInitializer initializer;
+        public virtual TreeViewItem Create() { return null; }
+        public virtual void Update(TreeViewItem obj, TreeViewNode dat) { }
+    }
+    public class TVMiddleware<T, U> : TVConstructor where T : TreeViewItem, new() where U : TreeViewNode, new()
+    {
+        public TVMiddleware()
+        {
+            initializer = new UIInitializer(typeof(T));
+        }
+        public override TreeViewItem Create()
+        {
+            var t = new T();
+            initializer.Reset(t);
+            return t;
+        }
+        public Action<T, U> Invoke;
+        public override void Update(TreeViewItem obj, TreeViewNode dat)
+        {
+            if (Invoke != null)
+                Invoke(obj as T, dat as U);
+        }
     }
     public class TreeView : Composite
     {
@@ -26,13 +127,15 @@ namespace huqiang.UIComposite
         Vector2 contentSize;
         public Vector2 ItemSize;
         public TreeViewNode nodes;
-        public float ItemHigh = 16;
+        public float ItemHigh = 30;
         public UserEvent eventCall;//scrollY自己的按钮
         public FakeStruct ItemMod;
         float m_pointY;
         float m_pointX;
         public SwapBuffer<TreeViewItem, TreeViewNode> swap;
         QueueBuffer<TreeViewItem> queue;
+        public Action<TreeView, TreeViewItem> SelectChanged;
+        public TreeViewNode SelectNode { get; set; }
         public TreeView()
         {
             swap = new SwapBuffer<TreeViewItem, TreeViewNode>(512);
@@ -56,11 +159,6 @@ namespace huqiang.UIComposite
                 unsafe { ItemSize = ((TransfromData*)ItemMod.ip)->size; }
                 ItemHigh = ItemSize.y;
             }
-        }
-        void Draging(UserEvent back, UserAction action, Vector2 v)
-        {
-            back.DecayRateY = 0.998f;
-            Scrolling(back, v);
         }
         /// <summary>
         /// 
@@ -140,6 +238,8 @@ namespace huqiang.UIComposite
                         item = CreateItem();
                         swap.Push(item);
                         item.node = node;
+                        if (creator != null)
+                            creator.Update(item,node);
                         if (item.text != null)
                         {
                             if (node.child.Count > 0)
@@ -147,7 +247,7 @@ namespace huqiang.UIComposite
                             else item.text.Text = node.content;
                         }
                     }
-                    var m = item.callBack.Context;
+                    var m = item.Item.Context;
                     m.transform.localPosition = new Vector3(node.offset.x, hy - dy - ItemHigh * 0.5f, 0);
                 }
         }
@@ -159,6 +259,12 @@ namespace huqiang.UIComposite
                 it.target.SetActive(true);
                 return it;
             }
+            if (creator != null)
+            {
+                var t = creator.Create();
+                HGUIManager.GameBuffer.Clone(ItemMod,creator.initializer);
+                return t;
+            }
             var go = HGUIManager.GameBuffer.Clone(ItemMod);
             var trans = go.transform;
             trans.SetParent(Enity.transform);
@@ -167,16 +273,10 @@ namespace huqiang.UIComposite
             TreeViewItem a = new TreeViewItem();
             a.target = go;
             a.text = go.GetComponent<HText>();
-            a.callBack = a.text.RegEvent<UserEvent>();
-            a.callBack.Click = (o, e) => {
-                var item = o.DataContext as TreeViewItem;
-                if (item.node != null)
-                {
-                    item.node.extand = !item.node.extand;
-                    Refresh();
-                }
-            };
-            a.callBack.DataContext = a;
+            a.Item = a.text.RegEvent<UserEvent>();
+            a.Item.Click = DefultItemClick;
+            a.Item.DataContext = a;
+            a.Item.UseAssignSize = true;
             return a;
         }
         protected void LimitX(UserEvent callBack, float x)
@@ -269,6 +369,25 @@ namespace huqiang.UIComposite
                 if (contentSize.y > Enity.SizeDelta.y)
                     m_pointY = value * (contentSize.y - Enity.SizeDelta.y);
             }
+        }
+        public void DefultItemClick(UserEvent o, UserAction e)
+        {
+            var item = o.DataContext as TreeViewItem;
+            if (item.node != null)
+            {
+                item.node.extand = !item.node.extand;
+                Refresh();
+                SelectNode = item.node;
+            }
+            if (SelectChanged != null)
+                SelectChanged(this, item);
+        }
+        TVConstructor creator;
+        public void SetItemUpdate<T, U>(Action<T, U> action) where T : TreeViewItem, new() where U : TreeViewNode, new()
+        {
+            var m = new TVMiddleware<T, U>();
+            m.Invoke = action;
+            creator = m;
         }
     }
 }

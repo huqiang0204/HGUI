@@ -9,8 +9,15 @@ namespace huqiang.UIComposite
 {
     public class TreeViewNode
     {
-        public bool extand;
+        /// <summary>
+        /// 展开
+        /// </summary>
+        public bool expand;
         public string content;
+        /// <summary>
+        /// 绑定的数据,联系上下文
+        /// </summary>
+        public object context;
         public Vector2 offset;
         public List<TreeViewNode> child = new List<TreeViewNode>();
         public void Add(TreeViewNode node)
@@ -84,7 +91,7 @@ namespace huqiang.UIComposite
             {
                 if (p == null)
                     return;
-                p.extand = true;
+                p.expand = true;
                 p = p.parent;
             }
         }
@@ -218,7 +225,7 @@ namespace huqiang.UIComposite
             UpdateItem(node);
             level++;
             high += ItemHigh;
-            if (node.extand)
+            if (node.expand)
                 for (int i = 0; i < node.child.Count; i++)
                     high = CalculHigh(node.child[i], level, high);
             float x = level * ItemHigh + ItemSize.x;
@@ -375,7 +382,7 @@ namespace huqiang.UIComposite
             var item = o.DataContext as TreeViewItem;
             if (item.node != null)
             {
-                item.node.extand = !item.node.extand;
+                item.node.expand = !item.node.expand;
                 Refresh();
                 SelectNode = item.node;
             }

@@ -113,7 +113,7 @@ namespace huqiang.UIComposite
     {
         public TVMiddleware()
         {
-            initializer = new UIInitializer(typeof(T));
+            initializer = new UIInitializer(TempReflection.ObjectFields(typeof(T)));
         }
         public override TreeViewItem Create()
         {
@@ -148,9 +148,9 @@ namespace huqiang.UIComposite
             swap = new SwapBuffer<TreeViewItem, TreeViewNode>(512);
             queue = new QueueBuffer<TreeViewItem>(256);
         }
-        public override void Initial(FakeStruct fake,UIElement script)
+        public override void Initial(FakeStruct fake, UIElement script)
         {
-            base.Initial(fake,script);
+            base.Initial(fake, script);
             eventCall = script.RegEvent<UserEvent>();
             eventCall.Drag = (o, e, s) => { Scrolling(o, s); };
             eventCall.DragEnd = (o, e, s) => { Scrolling(o, s); };
@@ -189,6 +189,7 @@ namespace huqiang.UIComposite
         {
             if (nodes == null)
                 return;
+            Size = Enity.SizeDelta;
             hy = Size.y * 0.5f;
             hx = Size.x * 0.5f;
             contentSize.x = ItemSize.x;
@@ -245,14 +246,19 @@ namespace huqiang.UIComposite
                         item = CreateItem();
                         swap.Push(item);
                         item.node = node;
-                        if (creator != null)
-                            creator.Update(item,node);
-                        if (item.text != null)
+                    }
+                    if (creator != null)
+                        creator.Update(item, node);
+                    if (item.text != null)
+                    {
+                        if (node.child.Count > 0)
                         {
-                            if (node.child.Count > 0)
-                                item.text.Text = "▷ " + node.content;
-                            else item.text.Text = node.content;
+                            if (node.expand)
+                                item.text.Text = "▼ " + node.content;
+                            else
+                                item.text.Text = "► " + node.content;
                         }
+                        else item.text.Text = node.content;
                     }
                     var m = item.Item.Context;
                     m.transform.localPosition = new Vector3(node.offset.x, hy - dy - ItemHigh * 0.5f, 0);
@@ -269,22 +275,29 @@ namespace huqiang.UIComposite
             if (creator != null)
             {
                 var t = creator.Create();
-                HGUIManager.GameBuffer.Clone(ItemMod,creator.initializer);
+                t.target = HGUIManager.GameBuffer.Clone(ItemMod, creator.initializer);
+                var trans = t.target.transform;
+                trans.SetParent(Enity.transform);
+                trans.localScale = Vector3.one;
+                trans.localRotation = Quaternion.identity;
                 return t;
             }
-            var go = HGUIManager.GameBuffer.Clone(ItemMod);
-            var trans = go.transform;
-            trans.SetParent(Enity.transform);
-            trans.localScale = Vector3.one;
-            trans.localRotation = Quaternion.identity;
-            TreeViewItem a = new TreeViewItem();
-            a.target = go;
-            a.text = go.GetComponent<HText>();
-            a.Item = a.text.RegEvent<UserEvent>();
-            a.Item.Click = DefultItemClick;
-            a.Item.DataContext = a;
-            a.Item.UseAssignSize = true;
-            return a;
+            else
+            {
+                var go = HGUIManager.GameBuffer.Clone(ItemMod);
+                var trans = go.transform;
+                trans.SetParent(Enity.transform);
+                trans.localScale = Vector3.one;
+                trans.localRotation = Quaternion.identity;
+                TreeViewItem a = new TreeViewItem();
+                a.target = go;
+                a.text = go.GetComponent<HText>();
+                a.Item = a.text.RegEvent<UserEvent>();
+                a.Item.Click = DefultItemClick;
+                a.Item.DataContext = a;
+                return a;
+            }
+
         }
         protected void LimitX(UserEvent callBack, float x)
         {
@@ -336,8 +349,10 @@ namespace huqiang.UIComposite
             }
             m_pointY += y;
         }
-        public float PercentageX {
-            get {
+        public float PercentageX
+        {
+            get
+            {
                 float o = contentSize.x - Enity.SizeDelta.x;
                 if (o < 0)
                     return 0;
@@ -346,12 +361,13 @@ namespace huqiang.UIComposite
                     o = 1;
                 return o;
             }
-            set {
+            set
+            {
                 if (value < 0)
                     value = 0;
                 else if (value > 1)
                     value = 1;
-                if(contentSize.x>Enity.SizeDelta.x)
+                if (contentSize.x > Enity.SizeDelta.x)
                     m_pointX = value * (contentSize.x - Enity.SizeDelta.x);
             }
         }

@@ -95,7 +95,12 @@ public class UIBase
     }
     public virtual void ReSize()
     {
-        
+        if (Main != null)
+        {
+            var ele = Main.GetComponent<UIElement>();
+            if (ele != null)
+                UIElement.Resize(ele);
+        }
     }
     public virtual void Update(float time)
     {

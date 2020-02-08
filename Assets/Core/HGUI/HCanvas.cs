@@ -77,7 +77,7 @@ namespace huqiang.Core.HGUI
   
         protected override void Update()
         {
-            CheckSize();
+           
             UserAction.Update();
             Keyboard.InfoCollection();
             DispatchUserAction();
@@ -86,7 +86,6 @@ namespace huqiang.Core.HGUI
             TextInput.Dispatch();
             InputCaret.UpdateCaret();
             ThreadMission.ExtcuteMain();
-      
         }
         private void LateUpdate()
         {
@@ -99,6 +98,7 @@ namespace huqiang.Core.HGUI
             TxtCollector.GenerateTexture();
             SubMission(null);
             ApplyMeshRenderer();
+            ApplyToCamera();
         }
         MeshFilter meshFilter;
         MeshRenderer renderer;
@@ -139,7 +139,7 @@ namespace huqiang.Core.HGUI
             if (renderer != null)
                 renderer.materials = MatCollector.GenerateMaterial();
         }
-        void CheckSize()
+        public void ApplyToCamera()
         {
             switch (renderMode)
             {
@@ -389,7 +389,7 @@ namespace huqiang.Core.HGUI
                 scripts[i].MainUpdate();
             TxtCollector.GenerateTexture();
             SubMission(null);
-            CheckSize();
+            ApplyToCamera();
             ApplyShareMesh();
         }
         void ApplyShareMesh()

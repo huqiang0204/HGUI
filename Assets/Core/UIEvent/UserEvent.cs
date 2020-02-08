@@ -16,7 +16,7 @@ namespace huqiang.UIEvent
             if (root.script != null)
             {
                  int c = root.childCount;
-                for (int i = c+1; i >0; i--)
+                for (int i = c; i >0; i--)
                 {
                     try
                     {

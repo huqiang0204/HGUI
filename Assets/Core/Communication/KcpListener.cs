@@ -24,11 +24,11 @@ namespace huqiang
         }
         public void Start()
         {
-            if (_port == 0)
-                _port = FreePort.FindNextAvailableUDPPort(10000);
             IPEndPoint ip = new IPEndPoint(IPAddress.Any, _port);
             soc = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp); //new UdpClient(_port);//new IPEndPoint(IPAddress.Parse(ip),
-            soc.Bind(ip);
+            if (_port > 0)
+                soc.Bind(ip);
+            else _port = (soc.LocalEndPoint as IPEndPoint).Port;
             soc.ReceiveTimeout = 1000;
             running = true;
             if (thread == null)

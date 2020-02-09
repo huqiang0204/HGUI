@@ -139,7 +139,7 @@ namespace huqiang.Core.HGUI
             if (renderer != null)
                 renderer.materials = MatCollector.GenerateMaterial();
         }
-        public void ApplyToCamera()
+        void ApplyToCamera()
         {
             switch (renderMode)
             {

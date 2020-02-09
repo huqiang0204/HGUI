@@ -95,7 +95,7 @@ namespace huqiang.Core.HGUI
             return 0;
         }
 
-        public const char emSpace ='@' ;//'\u2001';
+        public const char emSpace = '@';//'\u2001';☀@
         public static string CheckEmoji(string str, List<EmojiInfo> list)
         {
             if (str == ""|str==null)

@@ -192,7 +192,6 @@ namespace huqiang.Core.HGUI
             HVertex[] hv = new HVertex[c];
            
             int e = c / 4;
-           
             for (int i = 0; i < c; i++)
             {
                 hv[i].position = verts[i].position;
@@ -204,7 +203,7 @@ namespace huqiang.Core.HGUI
             int b = emojis.Count;
             for (int i=0; i < emojis.Count; i++)
             {
-                if (emojis[i].pos > e)
+                if (emojis[i].pos >= e)
                 {
                     b = i;
                     break;
@@ -333,7 +332,7 @@ namespace huqiang.Core.HGUI
         {
             GetGenerationSettings(ref size, ref settings);
             var gen = Generator;
-            float h = gen.GetPreferredHeight(str, settings);
+            float h = gen.GetPreferredHeight(new EmojiString(str).FilterString, settings);
             size.y = h;
             if (gen.lineCount == 1)
             {
@@ -345,7 +344,7 @@ namespace huqiang.Core.HGUI
         {
             GetGenerationSettings(ref size, ref settings);
             var gen = Generator;
-            float w = gen.GetPreferredWidth(str, settings);
+            float w = gen.GetPreferredWidth(new EmojiString(str).FilterString, settings);
             size.x = w;
         }
     }

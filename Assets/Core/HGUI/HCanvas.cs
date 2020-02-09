@@ -27,7 +27,14 @@ namespace huqiang.Core.HGUI
             max = 0;
             TxtCollector.Clear();
             Collection(transform, -1, 0);
-            TxtCollector.GenerateTexture(true);
+            try
+            {
+                TxtCollector.GenerateTexture(true);
+            }
+            catch
+            {
+
+            }
         }
         private void OnDestroy()
         {
@@ -85,6 +92,20 @@ namespace huqiang.Core.HGUI
             TextInput.Dispatch();
             InputCaret.UpdateCaret();
             ThreadMission.ExtcuteMain();
+            CheckSize();
+        }
+        void CheckSize()
+        {
+            float w = Screen.width;
+            float h = Screen.height;
+            if (Scale.ScreenWidth != w | Scale.ScreenHeight != h)
+            {
+                Scale.ScreenWidth = w;
+                Scale.ScreenHeight = h;
+                m_sizeDelta = new Vector2(w,h);
+                if (UIPage.CurrentPage != null)
+                    UIPage.CurrentPage.ReSize();
+            }
         }
         private void LateUpdate()
         {

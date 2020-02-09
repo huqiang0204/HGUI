@@ -19,7 +19,7 @@ public class MainScript : HCanvas
         //{
         //    UIPage.LoadPage<ChatPage>();
         //};
-        UIPage.LoadPage<ChatPage>();
+        UIPage.LoadPage<StartPage>();
     }
     private void OnDestroy()
     {

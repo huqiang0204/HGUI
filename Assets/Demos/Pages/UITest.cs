@@ -17,9 +17,25 @@ public class UITest : TestPageHelper
         //Scale.DpiScale = true;
 #endif
 #if UNITY_EDITOR
-        UIPage.LoadPage<ScrollPage>();
+        UIPage.LoadPage<StartPage>();
 #else
-        ElementAsset.LoadAssetsAsync("base.unity3d",(o,e)=> { UIPage.LoadPage<ChatPage>(); });
+        //ElementAsset.LoadAssetsAsync("base.unity3d",(o,e)=> { UIPage.LoadPage<ChatPage>(); });
 #endif
+    }
+    public override void OnUpdate()
+    {
+        Resize();
+    }
+    void Resize()
+    {
+        float w = Screen.width;
+        float h = Screen.height;
+        if (Scale.ScreenWidth != w | Scale.ScreenHeight != h)
+        {
+            Scale.ScreenWidth = w;
+            Scale.ScreenHeight = h;
+            if (UIPage.CurrentPage != null)
+                UIPage.CurrentPage.ReSize();
+        }
     }
 }

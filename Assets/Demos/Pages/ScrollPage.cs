@@ -16,6 +16,8 @@ public class ScrollPage:UIPage
         public ScrollY scroll;
         public DropdownEx dropDown;
         public ScrollX scrollX;
+        public UserEvent last;
+        public UserEvent next;
     }
     class TitleItem
     {
@@ -34,6 +36,8 @@ public class ScrollPage:UIPage
         view = LoadUI<View>("baseUI", "scrollex");//"baseUI"创建的bytes文件名,"page"为创建的页面名
         InitialScrollEx();
         InitialScrollY();
+        view.last.Click = (o, e) => { LoadPage<DrawingPage>(); };
+        view.next.Click = (o, e) => { LoadPage<TabPage>(); };
     }
     void InitialScrollEx()
     {

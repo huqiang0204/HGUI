@@ -5,6 +5,8 @@ using huqiang.UIComposite;
 using huqiang.UIEvent;
 using huqiang;
 using huqiang.Data;
+using Assets.Scripts;
+
 public class DrawingPage:UIPage
 {
     //反射UI界面上的物体
@@ -15,6 +17,8 @@ public class DrawingPage:UIPage
         public UISlider paintSize;
         public HText size;
         public HImage color;
+        public UserEvent last;
+        public UserEvent next;
     }
     View view;
     public override void Initial(Transform parent, object dat = null)
@@ -22,6 +26,8 @@ public class DrawingPage:UIPage
         base.Initial(parent, dat);
         view = LoadUI<View>("baseUI", "drawing");//"baseUI"创建的bytes文件名,"page"为创建的页面名
         InitialUI();
+        view.last.Click = (o, e) => { LoadPage<ChatPage>(); };
+        view.next.Click = (o, e) => { LoadPage<ScrollPage>(); };
     }
     void InitialUI()
     {

@@ -283,7 +283,7 @@ namespace huqiang.UIEvent
         public bool entry { get; protected set; }
         private int index;
         public bool AutoColor = true;
-        internal Color g_color;
+        internal Color g_color = Color.white;
         public object DataContext;
 
         public Action<UserEvent, UserAction> PointerDown;

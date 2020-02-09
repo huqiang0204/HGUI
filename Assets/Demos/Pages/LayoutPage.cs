@@ -6,6 +6,7 @@ using huqiang.UIEvent;
 using huqiang;
 using huqiang.Data;
 using System.Collections.Generic;
+using Assets.Scripts;
 
 public class LayoutPage:UIPage
 {
@@ -13,6 +14,8 @@ public class LayoutPage:UIPage
     class View
     {
         public DesignedDockPanel Layout;
+        public UserEvent last;
+        public UserEvent next;
     }
     View view;
     public override void Initial(Transform parent, object dat = null)
@@ -20,6 +23,8 @@ public class LayoutPage:UIPage
         base.Initial(parent, dat);
         view = LoadUI<View>("baseUI", "layout");//"baseUI"创建的bytes文件名,"page"为创建的页面名
         InitialLayout();
+        view.last.Click = (o, e) => { LoadPage<DockPage>(); };
+        view.next.Click = (o, e) => { LoadPage<StartPage>(); };
     }
     void InitialLayout()
     {

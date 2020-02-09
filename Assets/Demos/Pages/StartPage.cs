@@ -15,8 +15,9 @@ namespace Assets.Scripts
         {
             public HImage scrolly;
             public HImage scrollx;
-            public HImage slider;
             public HImage grid;
+            public UserEvent last;
+            public UserEvent next;
         }
         View view;
         class ItemView
@@ -44,6 +45,8 @@ namespace Assets.Scripts
             grid.BindingData = data;
             grid.SetItemUpdate<ItemView, string>(ItemUpdate);
             grid.Refresh();
+            view.last.Click = (o, e) => { LoadPage<LayoutPage>(); };
+            view.next.Click = (o, e) => { LoadPage<TestUPage>(); };
         }
         void ItemUpdate(ItemView item,string dat,int index)
         {

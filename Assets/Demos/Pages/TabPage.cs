@@ -11,6 +11,8 @@ public class TabPage:UIPage
     class View
     {
         public UIElement tab;
+        public UserEvent last;
+        public UserEvent next;
     }
     View view;
     public override void Initial(Transform parent, object dat = null)
@@ -18,6 +20,8 @@ public class TabPage:UIPage
         base.Initial(parent, dat);
         view = LoadUI<View>("baseUI", "tabcontroll");//"baseUI"创建的bytes文件名,"page"为创建的页面名
         InitialTab();
+        view.last.Click = (o, e) => { LoadPage<ScrollPage>(); };
+        view.next.Click = (o, e) => { LoadPage<DockPage>(); };
     }
     void InitialTab()
     {

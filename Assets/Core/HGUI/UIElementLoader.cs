@@ -47,6 +47,7 @@ namespace huqiang.Core.HGUI
             tar.compositeType = src->compositeType;
             tar.userEvent = null;
             tar.composite = null;
+            tar.SizeChanged = null;
         }
         protected unsafe void SaveScript(byte* ip, UIElement src)
         {

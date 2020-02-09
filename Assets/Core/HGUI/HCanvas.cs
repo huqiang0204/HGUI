@@ -77,7 +77,6 @@ namespace huqiang.Core.HGUI
   
         protected override void Update()
         {
-           
             UserAction.Update();
             Keyboard.InfoCollection();
             DispatchUserAction();

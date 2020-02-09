@@ -60,8 +60,12 @@ namespace huqiang.Core.HGUI
                         var scr = com.GetComponent<UIElement>();
                         if (scr != null)
                         {
-                            if(scr.userEvent==null)
-                                scr.userEvent= Activator.CreateInstance(m.FieldType) as UserEvent;
+                            if (scr.userEvent == null)
+                            { 
+                                scr.userEvent = Activator.CreateInstance(m.FieldType) as UserEvent;
+                                scr.userEvent.Context = scr;
+                                scr.userEvent.g_color = scr.MainColor;
+                            }
                             m.Value = scr.userEvent;
                         }
                     }

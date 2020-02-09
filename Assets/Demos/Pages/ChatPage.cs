@@ -21,6 +21,8 @@ namespace Assets.Scripts
             public UIElement right;
             public UIElement treeView;
             public HImage send;
+            public UserEvent last;
+            public UserEvent next;
         }
   
         class ChatItem
@@ -58,42 +60,8 @@ namespace Assets.Scripts
             base.Initial(parent, dat);
             view = LoadUI<View>("baseUI", "chat");
             InitialChat();
-            InitialTreeView();
-        }
-        void InitialTreeView()
-        {
-            TreeViewNode node = new TreeViewNode();
-            node.content = "root";
-            for (int i = 0; i < 10; i++)
-            {
-                TreeViewNode son = new TreeViewNode();
-                son.content = i.ToString() + "第一层";
-                node.child.Add(son);
-                for (int j = 0; j < 6; j++)
-                {
-                    TreeViewNode r = new TreeViewNode();
-                    r.content = j.ToString() + "第二层";
-                    son.child.Add(r);
-                    for (int k = 0; k < 3; k++)
-                    {
-                        TreeViewNode n = new TreeViewNode();
-                        n.content = k.ToString() + "第三层";
-                        r.child.Add(n);
-                        TreeViewNode f = new TreeViewNode();
-                        f.content = "第四层";
-                        n.child.Add(f);
-                        TreeViewNode fi = new TreeViewNode();
-                        fi.content = "第五层";
-                        f.child.Add(fi);
-                        TreeViewNode s = new TreeViewNode();
-                        s.content = "第六层";
-                        fi.child.Add(s);
-                    }
-                }
-            }
-            var tree = view.treeView.composite as TreeView;
-            tree.nodes = node;
-            tree.Refresh();
+            view.last.Click = (o, e) => { LoadPage<TestUPage>(); };
+            view.next.Click = (o, e) => { LoadPage<DrawingPage>(); };
         }
         void InitialChat()
         {

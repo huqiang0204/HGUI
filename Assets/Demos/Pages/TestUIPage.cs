@@ -14,6 +14,8 @@ namespace Assets.Scripts
         class View
         {
             public HText  textinput;
+            public UserEvent last;
+            public UserEvent next;
         }
         View view;
 
@@ -21,6 +23,8 @@ namespace Assets.Scripts
         {
             base.Initial(parent, dat);
             view = LoadUI<View>("baseUI", "test");
+            view.last.Click = (o, e) => { LoadPage<StartPage>(); };
+            view.next.Click = (o, e) => { LoadPage<ChatPage>(); };
         }
     }
 }

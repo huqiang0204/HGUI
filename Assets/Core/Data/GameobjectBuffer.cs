@@ -211,7 +211,9 @@ namespace huqiang.Data
             for (int i = p.childCount - 1; i >= 0; i--)
                 RecycleGameObject(p.GetChild(i).gameObject);
             if (ins != null)
+            { 
                 p.SetParent(CycleBuffer);
+            }
             else
                 GameObject.Destroy(game);
         }

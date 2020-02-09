@@ -11,6 +11,8 @@ public class DockPage:UIPage
     class View
     {
         public DockPanel dock;
+        public UserEvent last;
+        public UserEvent next;
     }
     View view;
     public override void Initial(Transform parent, object dat = null)
@@ -18,6 +20,8 @@ public class DockPage:UIPage
         base.Initial(parent, dat);
         view = LoadUI<View>("baseUI", "dockpanel");//"baseUI"创建的bytes文件名,"page"为创建的页面名
         InitialDockPanel();
+        view.last.Click = (o, e) => { LoadPage<TabPage>(); };
+        view.next.Click = (o, e) => { LoadPage<LayoutPage>(); };
     }
     void InitialDockPanel()
     {

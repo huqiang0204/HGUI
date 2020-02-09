@@ -169,7 +169,6 @@ namespace huqiang.UIComposite
             int c = Main.childCount;
             if (c > 0)
             {
-                
                 var it = Main.Find("Item").gameObject;
                 HGUIManager.GameBuffer.RecycleGameObject(it);
                 var sli = Main.Find("Slider");

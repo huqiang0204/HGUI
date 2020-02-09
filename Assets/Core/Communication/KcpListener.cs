@@ -26,9 +26,9 @@ namespace huqiang
         {
             IPEndPoint ip = new IPEndPoint(IPAddress.Any, _port);
             soc = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp); //new UdpClient(_port);//new IPEndPoint(IPAddress.Parse(ip),
-            if (_port > 0)
-                soc.Bind(ip);
-            else _port = (soc.LocalEndPoint as IPEndPoint).Port;
+            soc.Bind(ip);
+            if (_port == 0)
+                _port = (soc.LocalEndPoint as IPEndPoint).Port;
             soc.ReceiveTimeout = 1000;
             running = true;
             if (thread == null)

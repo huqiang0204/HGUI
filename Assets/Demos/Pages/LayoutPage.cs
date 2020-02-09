@@ -24,7 +24,7 @@ public class LayoutPage:UIPage
         view = LoadUI<View>("baseUI", "layout");//"baseUI"创建的bytes文件名,"page"为创建的页面名
         InitialLayout();
         view.last.Click = (o, e) => { LoadPage<DockPage>(); };
-        view.next.Click = (o, e) => { LoadPage<StartPage>(); };
+        view.next.Click = (o, e) => { LoadPage<TreeViewPage>(); };
     }
     void InitialLayout()
     {

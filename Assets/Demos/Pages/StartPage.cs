@@ -45,7 +45,7 @@ namespace Assets.Scripts
             grid.BindingData = data;
             grid.SetItemUpdate<ItemView, string>(ItemUpdate);
             grid.Refresh();
-            view.last.Click = (o, e) => { LoadPage<LayoutPage>(); };
+            view.last.Click = (o, e) => { LoadPage<TreeViewPage>(); };
             view.next.Click = (o, e) => { LoadPage<TestUPage>(); };
         }
         void ItemUpdate(ItemView item,string dat,int index)

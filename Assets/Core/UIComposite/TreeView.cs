@@ -99,7 +99,7 @@ namespace huqiang.UIComposite
     public class TreeViewItem
     {
         public GameObject target;
-        public HText text;
+        public HText Text;
         public UserEvent Item;
         public TreeViewNode node;
     }
@@ -249,16 +249,16 @@ namespace huqiang.UIComposite
                     }
                     if (creator != null)
                         creator.Update(item, node);
-                    if (item.text != null)
+                    if (item.Text != null)
                     {
                         if (node.child.Count > 0)
                         {
                             if (node.expand)
-                                item.text.Text = "▼ " + node.content;
+                                item.Text.Text = "▼ " + node.content;
                             else
-                                item.text.Text = "► " + node.content;
+                                item.Text.Text = "► " + node.content;
                         }
-                        else item.text.Text = node.content;
+                        else item.Text.Text = node.content;
                     }
                     var m = item.Item.Context;
                     m.transform.localPosition = new Vector3(node.offset.x, hy - dy - ItemHigh * 0.5f, 0);
@@ -291,8 +291,8 @@ namespace huqiang.UIComposite
                 trans.localRotation = Quaternion.identity;
                 TreeViewItem a = new TreeViewItem();
                 a.target = go;
-                a.text = go.GetComponent<HText>();
-                a.Item = a.text.RegEvent<UserEvent>();
+                a.Text = go.GetComponent<HText>();
+                a.Item = a.Text.RegEvent<UserEvent>();
                 a.Item.Click = DefultItemClick;
                 a.Item.DataContext = a;
                 return a;

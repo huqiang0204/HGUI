@@ -169,7 +169,7 @@ namespace huqiang.UIComposite
         void OrderHead()
         {
             float x = m_pointX;
-            float os = 0;
+            float os  = Enity.SizeDelta.x * -0.5f;
             for (int i = 0; i < columns.Count; i++)
             {
                 var col = columns[i];

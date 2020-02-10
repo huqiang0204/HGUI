@@ -91,7 +91,7 @@ namespace huqiang.Core.HGUI
                 m_dirty = true;
             } }
         [SerializeField]
-        FontStyle m_fontStyle;
+        internal FontStyle m_fontStyle;
         public FontStyle FontStyle {
             get => m_fontStyle;
             set {

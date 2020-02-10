@@ -35,7 +35,8 @@ namespace huqiang.Core.HGUI
         TabControl,
         DockPanel,
         DesignedDockPanel, 
-        DragContent
+        DragContent,
+        DataGrid
     }
     public class UIElement:MonoBehaviour
     {
@@ -481,7 +482,9 @@ namespace huqiang.Core.HGUI
                 case CompositeType.DesignedDockPanel:
                     new DesignedDockPanel().Initial(ex,script);
                     break;
-                    
+                case CompositeType.DataGrid:
+                    new DataGrid().Initial(ex,script);
+                    break;
             }
         }
         protected virtual void Update()

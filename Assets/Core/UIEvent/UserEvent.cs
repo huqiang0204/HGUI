@@ -97,17 +97,8 @@ namespace huqiang.UIEvent
                     ue.GlobalPosition = o;
                     ue.GlobalRotation = q;
                     bool inside = false;
-                    float w, h;
-                    if (ue.UseAssignSize)
-                    {
-                        w = ue.boxSize.x * s.x;
-                        h = ue.boxSize.y * s.y;
-                    }
-                    else
-                    {
-                        w = script.SizeDelta.x * s.x;
-                        h = script.SizeDelta.y * s.y;
-                    }
+                    float w = (script.SizeDelta.x + ue.BoxAdjuvant.x) * s.x;
+                    float h = (script.SizeDelta.y + ue.BoxAdjuvant.y) * s.y;
                     if (ue.IsCircular)
                     {
                         float x = action.CanPosition.x - o.x;
@@ -210,7 +201,10 @@ namespace huqiang.UIEvent
         int yTime;
         float lastX;
         float lastY;
-        public Vector2 boxSize;
+        /// <summary>
+        /// 当物体的实际尺寸很小,很难点中时,是用此字段扩大点击范围,也可以是负数,缩小范围
+        /// </summary>
+        public Vector2 BoxAdjuvant;
         Vector2 maxVelocity;
         Vector2 sDistance;
         Vector2 mVelocity;
@@ -274,10 +268,6 @@ namespace huqiang.UIEvent
         /// 允许事件穿透
         /// </summary>
         public bool Penetrate = false;
-        /// <summary>
-        ///  使用指定尺寸
-        /// </summary>
-        public bool UseAssignSize = false;
 
         public bool IsCircular = false;
         public bool entry { get; protected set; }

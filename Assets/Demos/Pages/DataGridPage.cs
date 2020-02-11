@@ -21,9 +21,12 @@ public class DataGridPage:UIPage
     }
     void InitialDataGrid()
     {
-        DataGridColumn column = new DataGridColumn();
-        column.Head = "姓名";
-        view.grid.AddColumn(column);
+        for(int i=0;i<20;i++)
+        {
+            DataGridColumn column = new DataGridColumn();
+            column.Head = "姓名";
+            view.grid.AddColumn(column);
+        }
         view.grid.Refresh();
     }
 }

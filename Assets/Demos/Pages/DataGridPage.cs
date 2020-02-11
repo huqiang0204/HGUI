@@ -21,12 +21,29 @@ public class DataGridPage:UIPage
     }
     void InitialDataGrid()
     {
+        DataGridColumn column = new DataGridColumn();
+        column.Head = "姓名";
+        view.grid.AddColumn(column);
+        column = new DataGridColumn();
+        column.Head = "年龄";
+        view.grid.AddColumn(column);
+        column = new DataGridColumn();
+        column.Head = "性别";
+        view.grid.AddColumn(column);
+        column = new DataGridColumn();
+        column.Head = "身高";
+        view.grid.AddColumn(column);
+        column = new DataGridColumn();
+        column.Head = "婚否";
+        view.grid.AddColumn(column);
         for(int i=0;i<20;i++)
-        {
-            DataGridColumn column = new DataGridColumn();
-            column.Head = "姓名";
-            view.grid.AddColumn(column);
-        }
+        view.grid.AddRow(
+            new DataGridItemContext() { Text="胡强"},
+            new DataGridItemContext() { Text="28"},
+            new DataGridItemContext() { Text="男"},
+            new DataGridItemContext() { Text="168"},
+            new DataGridItemContext() { Text="单身贵族"}
+            );
         view.grid.Refresh();
     }
 }

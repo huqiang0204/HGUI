@@ -43,6 +43,7 @@ namespace huqiang
             //udp服务器端口绑定
             IPEndPoint ip = new IPEndPoint(IPAddress.Any, port);
             soc = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp); //new UdpClient(_port);//new IPEndPoint(IPAddress.Parse(ip),
+            soc.ReceiveTimeout = 1000;
             soc.Bind(ip);
 
             running = true;
@@ -138,10 +139,17 @@ namespace huqiang
             IPEndPoint ip = new IPEndPoint(IPAddress.Any, 0);
             while (running)
             {
+                EndPoint end = ip;
+                int len = 0;
                 try
                 {
-                    EndPoint end = ip;
-                    int len = soc.ReceiveFrom(buffer, ref end);//接收数据报
+                     len = soc.ReceiveFrom(buffer, ref end);//接收数据报
+                } 
+                catch
+                {
+                }
+                try
+                {
                     if (len > 0)
                     {
                         byte[] dat = new byte[len];

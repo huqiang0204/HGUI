@@ -40,6 +40,7 @@ namespace huqiang
             }
             soc = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             soc.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+            soc.ReceiveTimeout = 2000;
             //端点
             endPoint= new IPEndPoint(IPAddress.Parse(ip), port);
             //绑定
@@ -100,9 +101,8 @@ namespace huqiang
                     var client = soc.Accept();
                     CreateLink(client);
                 }
-                catch (Exception ex)
+                catch 
                 {
-                    UnityEngine.Debug.Log(ex.StackTrace);
                 }
             }
         }

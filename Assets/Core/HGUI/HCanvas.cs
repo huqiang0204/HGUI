@@ -91,8 +91,8 @@ namespace huqiang.Core.HGUI
                 UIPage.CurrentPage.Update(UserAction.TimeSlice);
             TextInput.Dispatch();
             InputCaret.UpdateCaret();
-            ThreadMission.ExtcuteMain();
             CheckSize();
+            ThreadMission.ExtcuteMain();
         }
         void CheckSize()
         {

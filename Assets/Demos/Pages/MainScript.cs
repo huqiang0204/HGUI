@@ -8,8 +8,9 @@ public class MainScript : HCanvas
 {
     public TextAsset baseUI;
     // Start is called before the first frame update
-    void Start()
+    protected override void Start()
     {
+        base.Start();
         App.Initial(transform);
         HGUIManager.LoadModels(baseUI.bytes, "baseUI");
 #if UNITY_EDITOR
@@ -21,8 +22,9 @@ public class MainScript : HCanvas
         //};
         UIPage.LoadPage<StartPage>();
     }
-    private void OnDestroy()
+   protected override void OnDestroy()
     {
+        base.OnDestroy();
         App.Dispose();
     }
 }

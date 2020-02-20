@@ -5,12 +5,16 @@ using huqiang.UIComposite;
 using huqiang.UIEvent;
 using huqiang;
 using huqiang.Data;
+using Assets.Scripts;
+
 public class DataGridPage:UIPage
 {
     //反射UI界面上的物体
     class View
     {
         public DataGrid grid;
+        public UserEvent last;
+        public UserEvent next;
     }
     View view;
     public override void Initial(Transform parent, object dat = null)
@@ -18,6 +22,8 @@ public class DataGridPage:UIPage
         base.Initial(parent, dat);
         view = LoadUI<View>("baseUI", "datagrid");//"baseUI"创建的bytes文件名,"page"为创建的页面名
         InitialDataGrid();
+        view.last.Click = (o, e) => { LoadPage<TreeViewPage>(); };
+        view.next.Click = (o, e) => { LoadPage<StartPage>(); };
     }
     void InitialDataGrid()
     {

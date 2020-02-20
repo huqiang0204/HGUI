@@ -17,7 +17,7 @@ namespace huqiang.Core.HGUI
         public UserAction[] inputs;
         public bool PauseEvent;
         public UserAction.InputType inputType = UserAction.InputType.OnlyMouse;
-        private void Start()
+        protected virtual void Start()
         {
             Font.textureRebuilt += FontTextureRebuilt;
         }
@@ -36,7 +36,7 @@ namespace huqiang.Core.HGUI
 
             }
         }
-        private void OnDestroy()
+        protected virtual void OnDestroy()
         {
             Font.textureRebuilt -= FontTextureRebuilt;
         }

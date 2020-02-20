@@ -36,7 +36,7 @@ public class TreeViewPage:UIPage
         InitalTreeView();
         view.back.Click = RayCast;
         view.last.Click = (o, e) => { LoadPage<LayoutPage>(); };
-        view.next.Click = (o, e) => { LoadPage<StartPage>(); };
+        view.next.Click = (o, e) => { LoadPage<DataGridPage>(); };
     }
     void InitalTreeView()
     {

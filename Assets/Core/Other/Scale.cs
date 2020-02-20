@@ -175,5 +175,22 @@ public class Scale
             return r /Screen.dpi;
         }
     }
- 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="norSize">5</param>
+    /// <param name="minSize">4</param>
+    /// <param name="maxSize">7</param>
+    /// <returns></returns>
+    public static float GetScreenScale(float norSize,float minSize,float maxSize)
+    {
+        float s = Screen.width * Screen.width + Screen.height * Screen.height;
+        float r = Mathf.Sqrt(s);
+        if (r > maxSize)
+            r = maxSize;
+        else if (r < minSize)
+            r = minSize;
+        r /= norSize;
+        return r;
+    }
 }

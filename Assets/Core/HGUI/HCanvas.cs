@@ -10,6 +10,7 @@ namespace huqiang.Core.HGUI
     {
         public Camera camera;
         public RenderMode renderMode;
+        public static HCanvas MainCanvas;
         HGUIElement[] PipeLine = new HGUIElement[4096];
         UIElement[] scripts = new UIElement[4096];
         int point = 0;

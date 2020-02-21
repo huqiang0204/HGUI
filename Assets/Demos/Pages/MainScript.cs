@@ -3,6 +3,8 @@ using huqiang.Data;
 using UnityEngine;
 using huqiang.Core.HGUI;
 using Assets.Scripts;
+using System.Collections.Generic;
+using System.Management;
 
 public class MainScript : HCanvas
 {

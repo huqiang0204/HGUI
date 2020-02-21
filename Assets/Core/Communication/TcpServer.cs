@@ -22,7 +22,7 @@ namespace huqiang
         PackType packType;
         IPEndPoint endPoint;
         int tCount;
-        public TcpServer(string ip, int port,PackType type = PackType.All, int thread = 8)
+        public TcpServer(string ip, int port,PackType type = PackType.Part, int thread = 8)
         {
             tCount = thread;
             packType = type;

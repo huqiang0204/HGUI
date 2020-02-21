@@ -15,7 +15,7 @@ namespace huqiang
         TcpEnvelope envelope=new TcpEnvelope();
         internal Socket Link;
         byte[] buff;
-        public void SetSocket(Socket soc,IPEndPoint end,PackType pack=PackType.All,int buffsize=4096)
+        public void SetSocket(Socket soc,IPEndPoint end,PackType pack=PackType.Part,int buffsize=4096)
         {
             Link = soc;
             envelope.type = pack;

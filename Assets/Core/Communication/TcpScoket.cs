@@ -21,7 +21,7 @@ namespace huqiang
         public bool isConnection { get { if (client == null) return false; return client.Connected; } }
         IPEndPoint iep;
         Queue<SocData> queue;
-        public TcpSocket(int bs = 262144,PackType type = PackType.All,int es = 262144)
+        public TcpSocket(int bs = 262144,PackType type = PackType.Part,int es = 262144)
         {
             buffer = new byte[bs];
             if(type!=PackType.None)

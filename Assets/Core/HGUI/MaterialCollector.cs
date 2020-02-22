@@ -21,7 +21,7 @@ namespace huqiang.Core.HGUI
         public TextureInfo[] textures;
         public MaterialInfo[] materials;
         int[] table;
-        int max = 0;
+        int max = -1;
         internal List<int[]> submesh = new List<int[]>();
         public MaterialCollector(int length = 1024)
         {

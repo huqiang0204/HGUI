@@ -32,7 +32,7 @@ namespace huqiang.Core.HGUI
         internal static Material GetNextMaterial()
         {
             Material mat;
-            if(point==materials.Count)
+            if(point == materials.Count)
             {
                 mat = new Material(DefShader);
                 materials.Add(mat);
@@ -45,8 +45,8 @@ namespace huqiang.Core.HGUI
                     mat = new Material(DefShader);
                     materials[point] = mat;
                 }
-                point++;
             }
+            point++;
             return mat;
         }
     }

@@ -25,9 +25,19 @@ UDP，TCP，KCP，数据封包，线程池，等等
 
 #### 使用说明
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+1.  首先在你的Editor界面编辑你的UI
+2.  在canvas上面添加TestPageHelper，或其子类
+3.  将你的AssetBundle打包至StreamingAssets文件夹中，打包的UI需要关联AssetBundle中的资源
+4.  点击TestPageHelper的Inspector面板中的create按钮，UI数据包将默认生成在AssetsBundle文件夹中
+5.  生成成功会得到一个bytes文件，具体使用看我demo，在app中
+6.  将bytes数据加载到管理器HGUIManager.LoadModels(baseUI.bytes, "baseUI");
+7.  异步加载你的相关Assetbundle，完毕后加载页面
+    ElementAsset.LoadAssetsAsync("base.unity3d").PlayOver = (o, e) =>
+    {
+        UIPage.LoadPage<StartPage>();
+    };
+8.  或者你没有AssetBundle，可以直接加载页面UIPage.LoadPage<StartPage>();
+9.  UI管理方面有自己的回收池，切换界面使用UIPage.LoadPage即可
 
 #### 参与贡献
 

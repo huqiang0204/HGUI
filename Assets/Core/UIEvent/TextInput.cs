@@ -273,7 +273,7 @@ namespace huqiang.UIEvent
                         }
                         else if (state == EditState.NewLine)
                         {
-                            InputEvent.OnInputChanged("\r");
+                            InputEvent.OnInputChanged("\n");
                         }
                     }
                 InputEvent.Refresh();

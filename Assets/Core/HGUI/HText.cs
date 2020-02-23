@@ -9,6 +9,147 @@ namespace huqiang.Core.HGUI
     public class HText:HGraphics
     {
         static Font defFont;
+        static char[] key_noMesh = new char[] { ' ' ,'\n', '\r' };
+        static List<int> bufferA = new List<int>();
+        static List<int> bufferB = new List<int>();
+        static void CreateEmojiMesh(HText text)
+        {
+            if (text.verts == null)
+                return;
+            bufferA.Clear();
+            bufferB.Clear();
+            var emojis = text.emojiString.emojis;
+            var str = text.emojiString.FilterString;
+            var verts = text.verts;
+            int c = verts.Length;
+            if (c == 0)
+            {
+                text.vertices = null;
+                text.tris = null;
+                return;
+            }
+            HVertex[] hv = new HVertex[c];
+            
+            int e = c / 4;
+            for (int i = 0; i < c; i++)
+            {
+                hv[i].position = verts[i].position;
+                hv[i].color = verts[i].color;
+                hv[i].uv = verts[i].uv0;
+                hv[i].uv4.x = 1;
+                hv[i].uv4.y = 1;
+            }
+            if(emojis.Count>0)
+            {
+                var info = emojis[0];
+                Color col = Color.white;
+                int p = 0;
+                int si = 0;
+                int len = str.Length;
+                for (int i = 0; i < len; i++)
+                {
+                    bool yes = true;
+                    
+                    for(int j=0;j<key_noMesh.Length;j++)
+                    {
+                        if(key_noMesh[j]==str[i])
+                        {
+                            yes = false;
+                            break;
+                        }
+                    }
+                    if (yes)
+                    {
+                        if (i == info.pos)
+                        {
+                            int o = p * 4;
+                            hv[o].uv = info.uv[0];
+                            hv[o].color = col;
+                            hv[o].picture = 1;
+                            o++;
+                            hv[o].uv = info.uv[1];
+                            hv[o].color = col;
+                            hv[o].picture = 1;
+                            o++;
+                            hv[o].uv = info.uv[2];
+                            hv[o].color = col;
+                            hv[o].picture = 1;
+                            o++;
+                            hv[o].uv = info.uv[3];
+                            hv[o].color = col;
+                            hv[o].picture = 1;
+                            si++;
+                            if (si < emojis.Count)
+                                info = emojis[si];
+                            int s = p * 4;
+                            bufferB.Add(s);
+                            bufferB.Add(s + 1);
+                            bufferB.Add(s + 2);
+                            bufferB.Add(s + 2);
+                            bufferB.Add(s + 3);
+                            bufferB.Add(s);
+                        }
+                        else
+                        {
+                            int s = p * 4;
+                            bufferA.Add(s);
+                            bufferA.Add(s + 1);
+                            bufferA.Add(s + 2);
+                            bufferA.Add(s + 2);
+                            bufferA.Add(s + 3);
+                            bufferA.Add(s);
+                        }
+                        p++;
+                        if (p >= e)
+                            break;
+                    }
+                }
+                if(bufferB.Count>0)
+                {
+                    if (text.subTris == null)
+                        text.subTris = new int[2][];
+                    text.subTris[0] = bufferA.ToArray();
+                    text.subTris[1] = bufferB.ToArray();
+                    text.tris = null;
+                }
+                else
+                {
+                    text.tris = bufferA.ToArray();
+                    text.subTris = null;
+                }
+            }
+            else
+            {
+                text.tris = CreateTri(c);
+                text.subTris = null;
+            }
+            text.vertices = hv;
+        }
+        static int[] CreateTri(int len)
+        {
+            int c = len / 4;
+            if (c < 0)
+                return null;
+            int max = c * 6;
+            int[] tri = new int[max];
+            for (int i = 0; i < c; i++)
+            {
+                int p = i * 4;
+                int s = i * 6;
+                tri[s] = p;
+                s++;
+                tri[s] = p + 1;
+                s++;
+                tri[s] = p + 2;
+                s++;
+                tri[s] = p + 2;
+                s++;
+                tri[s] = p + 3;
+                s++;
+                tri[s] = p;
+            }
+            return tri;
+        }
         public static Font DefaultFont
         {
             get
@@ -177,147 +318,7 @@ namespace huqiang.Core.HGUI
                 m_vertexChange = false;
             }
         }
-        static void CreateEmojiMesh(HText text)
-        {
-            if (text.verts == null)
-                return;
-            var emojis = text.emojiString.emojis;
-            var verts = text.verts;
-            int c = verts.Length;
-            if (c == 0)
-            {
-                text.vertices = null;
-                text.tris = null;
-                return;
-            }
-            HVertex[] hv = new HVertex[c];
-           
-            int e = c / 4;
-            for (int i = 0; i < c; i++)
-            {
-                hv[i].position = verts[i].position;
-                hv[i].color = verts[i].color;
-                hv[i].uv = verts[i].uv0;
-                hv[i].uv4.x = 1;
-                hv[i].uv4.y = 1;
-            }
-            int b = emojis.Count;
-            for (int i=0; i < emojis.Count; i++)
-            {
-                if (emojis[i].pos >= e)
-                {
-                    b = i;
-                    break;
-                }
-            }
-            if (b > 0)
-            {
-                int be = b;
-                b  *= 6;
-                int all = e * 6;
-                int a = all - b;
-                int[] triA = new int[a];
-                int[] triB = new int[b];
-
-                int[] offset = new int[c];
-                var info = emojis[0];
-                int si = 1;
-                int ap = 0;
-                int bp = 0;
-                Color col = Color.white;
-                col.a = text.m_color.a;
-                for (int i = 0; i < e; i++)
-                {
-                    if (i == info.pos)
-                    {
-                        int o = i * 4;
-                        hv[o].uv = info.uv[0];
-                        hv[o].color = col;
-                        hv[o].picture = 1;
-                        o++;
-                        hv[o].uv = info.uv[1];
-                        hv[o].color = col;
-                        hv[o].picture = 1;
-                        o++;
-                        hv[o].uv = info.uv[2];
-                        hv[o].color = col;
-                        hv[o].picture = 1;
-                        o++;
-                        hv[o].uv = info.uv[3];
-                        hv[o].color = col;
-                        hv[o].picture = 1;
-                        if (si < be)
-                            info = emojis[si];
-                        si++;
-                        int p = i * 4;
-                        triB[bp] = p;
-                        bp++;
-                        triB[bp] = p + 1;
-                        bp++;
-                        triB[bp] = p + 2;
-                        bp++;
-                        triB[bp] = p + 2;
-                        bp++;
-                        triB[bp] = p + 3;
-                        bp++;
-                        triB[bp] = p;
-                        bp++;
-                    }
-                    else
-                    {
-                        int p = i * 4;
-                        triA[ap] = p;
-                        ap++;
-                        triA[ap] = p + 1;
-                        ap++;
-                        triA[ap] = p + 2;
-                        ap++;
-                        triA[ap] = p + 2;
-                        ap++;
-                        triA[ap] = p + 3;
-                        ap++;
-                        triA[ap] = p;
-                        ap++;
-                    }
-                }
-                if (text.subTris == null)
-                    text.subTris = new int[2][];
-                text.subTris[0] = triA;
-                text.subTris[1] = triB;
-                text.tris = null;
-            }
-            else
-            {
-                text.tris = CreateTri(c);
-                text.subTris = null;
-            }
-            text.vertices = hv;
-        }
-        static int[] CreateTri(int len)
-        {
-            int c = len / 4;
-            if (c < 0)
-                return null;
-            int max = c * 6;
-            int[] tri = new int[max];
-            for (int i = 0; i < c; i++)
-            {
-                int p = i * 4;
-                int s = i * 6;
-                tri[s] = p;
-                s++;
-                tri[s] = p + 1;
-                s++;
-                tri[s] = p + 2;
-                s++;
-                tri[s] = p + 2;
-                s++;
-                tri[s] = p + 3;
-                s++;
-                tri[s] = p;
-            }
-            return tri;
-        }
+       
         public void Reset()
         {
             STexture = UnityEngine.Resources.Load<Texture>("Emoji");

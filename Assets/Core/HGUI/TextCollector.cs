@@ -10,6 +10,7 @@ namespace huqiang.Core.HGUI
         struct TextInfo
         {
             public HText[] texts;
+            public bool[] state;
             public int max;
             public bool end;
         }
@@ -18,16 +19,18 @@ namespace huqiang.Core.HGUI
         int point;
         int max;
         int top = 0;
-        public void AddText(HText text)
+        public void AddText(HText text,bool active)
         {
             var buf = buffer[point].texts;
             if (buf == null)
             {
                 buf = new HText[1024];
+                buffer[point].state = new bool[1024];
                 buffer[point].texts = buf;
             }
             int top = buffer[point].max;
             buf[top] = text;
+            buffer[point].state[top] = active;
             buffer[point].max++;
         }
         public void Clear()
@@ -74,6 +77,7 @@ namespace huqiang.Core.HGUI
             {
                 int c = buffer[i].max;
                 var buf = buffer[i].texts;
+                var state = buffer[i].state;
                 bool dirty = force;
                 if (!force)
                 {
@@ -89,7 +93,8 @@ namespace huqiang.Core.HGUI
                 if (dirty)
                 {
                     for (int j = 0; j < c; j++)
-                        buf[j].Populate();
+                        if (state[j])
+                            buf[j].Populate();
                     if (buf.Length>0)
                     {
                         var font = buf[0].Font;

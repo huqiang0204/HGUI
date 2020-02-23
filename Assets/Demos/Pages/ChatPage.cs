@@ -72,6 +72,7 @@ namespace Assets.Scripts
             option.SelectChanged = SelectChanged;
             option.Selecet = view.right.userEvent;
             input = view.input.userEvent as TextInput;
+           
             input.OnSubmit = OnSubmit;
             container = view.chatbox.composite as UIContainer;
             other = container.RegLinker<ChatItem, ChatData>("other");
@@ -110,16 +111,15 @@ namespace Assets.Scripts
             {
                 case "left":
                     ChatData chat = new ChatData();
-                    chat.name = "胡江海";
+                    chat.name = "江海胡";
                     chat.content = str;
-                    other.AddData(chat);
                     other.AddAndMove(chat);
                     break;
                 case "center":
                     break;
                 case "right":
                     chat = new ChatData();
-                    chat.name = "江海胡";
+                    chat.name = "胡强";
                     chat.content = str;
                     self.AddAndMove(chat);
                     //container.Move(0);

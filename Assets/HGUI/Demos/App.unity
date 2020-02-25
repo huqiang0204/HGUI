@@ -98,7 +98,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_UseShadowmask: 0
+  m_UseShadowmask: 1
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -2258,7 +2258,6 @@ MonoBehaviour:
   m_RequiresDepthTextureOption: 2
   m_RequiresOpaqueTextureOption: 2
   m_CameraType: 0
-  m_CameraOutput: 0
   m_Cameras: []
   m_RendererIndex: -1
   m_VolumeLayerMask:
@@ -2270,6 +2269,7 @@ MonoBehaviour:
   m_AntialiasingQuality: 2
   m_StopNaN: 0
   m_Dithering: 0
+  m_ClearDepth: 1
   m_RequiresDepthTexture: 0
   m_RequiresColorTexture: 0
   m_Version: 2
@@ -2585,7 +2585,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d7a347dae1722e4c94b8e7377a72834, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_sizeDelta: {x: 1536, y: 864}
+  m_sizeDelta: {x: 1920, y: 1080}
   Pivot: {x: 0.5, y: 0.5}
   DesignSize: {x: 1, y: 1}
   scaleType: 0
@@ -2616,7 +2616,7 @@ Transform:
   m_GameObject: {fileID: 2016797732}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1, z: -9.69}
-  m_LocalScale: {x: 0.0004142432, y: 0.0004142432, z: 0.0004142432}
+  m_LocalScale: {x: 0.00033139455, y: 0.00033139455, z: 0.00033139455}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2

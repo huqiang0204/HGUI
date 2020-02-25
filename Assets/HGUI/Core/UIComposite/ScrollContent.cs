@@ -143,10 +143,20 @@ namespace huqiang.UIComposite
         }
         public object GetData(int index)
         {
+            if (index < 0)
+                return null;
             if (dataList != null)
-                return dataList[index];
+            {
+                if (index >= dataList.Count)
+                    return null;
+                return dataList[index]; 
+            }
             if (array != null)
-                return array.GetValue(index);
+            {
+                if (index >= array.Length)
+                    return null;
+                return array.GetValue(index); 
+            }
             return null;
         }
         public Vector2 ItemOffset = Vector2.zero;

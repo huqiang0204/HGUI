@@ -28,6 +28,16 @@ namespace huqiang.UIComposite
                 callBack.Drag = Drag;
 
                 direction = dir;
+                switch(dir)
+                {
+                    case Direction.Horizontal:
+                        callBack.BoxAdjuvant = new Vector2(0,8);
+                        break;
+                    case Direction.Vertical:
+                        callBack.BoxAdjuvant = new Vector2(8, 0);
+                        break;
+                           
+                }
 #if UNITY_EDITOR || UNITY_STANDALONE_WIN
                 //callBack.PointerEntry = (o, e) => {
                 //    ThreadMission.InvokeToMain((y) => {

@@ -86,6 +86,7 @@ namespace huqiang.Core.HGUI
   
         protected override void Update()
         {
+            MainCanvas = this;
             UserAction.Update();
             Keyboard.InfoCollection();
             DispatchUserAction();
@@ -339,7 +340,7 @@ namespace huqiang.Core.HGUI
                 action.LoadMouse();
             }
         }
-        void ClearAllAction()
+        public void ClearAllAction()
         {
             if (inputs != null)
                 for (int i = 0; i < inputs.Length; i++)

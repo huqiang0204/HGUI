@@ -15,7 +15,6 @@ public class BezierPathEidtor : Editor
         {
             AddNode((target as BezierPath).nodes);
         }
-        //(target as BezierPath).ShowLine();
     }
     void AddNode(List<BezierNode> nodes)
     {

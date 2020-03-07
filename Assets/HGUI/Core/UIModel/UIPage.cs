@@ -29,6 +29,8 @@ public class UIPage : UIBase
             CurrentPage.Show(dat);
             return;
         }
+        if (HCanvas.MainCanvas != null)//释放当前页面所有事件
+            HCanvas.MainCanvas.ClearAllAction();
         if (CurrentPage != null)
         {
             CurrentPage.Save();

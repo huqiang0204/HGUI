@@ -48,7 +48,17 @@ namespace huqiang.Data
             coordinate.quat.w = 1;
             coordinate.color = DefColor;
         }
-
+        public MeshData(byte[] data)
+        {
+            coordinate.scale = Vector3.one;
+            coordinate.quat.w = 1;
+            coordinate.color = DefColor;
+            unsafe
+            {
+                fixed (byte* bp = &data[0])
+                    LoadFromBytes(bp);
+            }
+        }
         public unsafe byte* LoadFromBytes(byte* bp)
         {
             int seg = *(Int32*)bp;
@@ -477,6 +487,7 @@ namespace huqiang.Data
                 }
                 mesh.vertex = me.vertices;
                 mesh.normals = me.normals;
+                mesh.uv = me.uv;
                 mesh.subMeshCount = me.subMeshCount;
                 if (mesh.subMeshCount > 1)
                 {

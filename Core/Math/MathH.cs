@@ -216,6 +216,31 @@ namespace huqiang
             return p;
         }
         /// <summary>
+        /// 二阶贝塞尔曲线的切线
+        /// </summary>
+        /// <param name="t">比率</param>
+        /// <param name="p0">起点</param>
+        /// <param name="p1">中间点1</param>
+        /// <param name="p2">中间点2</param>
+        /// <param name="p3">结束点</param>
+        /// <returns></returns>
+        public static Vector3 BezierTangent(float t,ref Vector3 p0,ref Vector3 p1,ref Vector3 p2,ref Vector3 p3)
+        {
+            float u = 1 - t;
+            float uu = u * u;
+            float tu = t * u;
+            float tt = t * t;
+
+            Vector3 P = p0 * 3 * uu * (-1.0f);
+            P += p1 * 3 * (uu - 2 * tu);
+            P += p2 * 3 * (2 * tu - tt);
+            P += p3 * 3 * tt;
+
+            //返回单位向量
+            return P.normalized;
+        }
+
+        /// <summary>
         /// 欧拉角转四元数
         /// </summary>
         /// <param name="euler"></param>

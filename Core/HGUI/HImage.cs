@@ -126,6 +126,10 @@ namespace huqiang.Core.HGUI
         public float FillAmount {
             get => m_fillAmount;
             set {
+                if (value < 0)
+                    value = 0;
+                else if (value > 1)
+                    value = 1;
                 m_fillAmount = value;
                 m_vertexChange = true;
             } }

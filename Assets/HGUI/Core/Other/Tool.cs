@@ -1,4 +1,5 @@
-﻿using System;
+﻿using huqiang.Data;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -409,6 +410,53 @@ namespace huqiang
                 s++;
             }
             return new string(result);
+        }
+        public static Vector2[] CalculUV(Rect sr, float w, float h)
+        {
+            float x = sr.x;
+            float rx = sr.width + x;
+            float y = sr.y;
+            float ty = sr.height + y;
+            x /= w;
+            rx /= w;
+            y /= h;
+            ty /= h;
+            Vector2[] uv = new Vector2[4];
+            uv[0].x = x;
+            uv[0].y = ty;
+            uv[1].x = rx;
+            uv[1].y = ty;
+            uv[2].x = rx;
+            uv[2].y = y;
+            uv[3].x = x;
+            uv[3].y = y;
+            return uv;
+        }
+        public static Vector2[][] CalculUVS(SpriteRectInfo[] sprites)
+        {
+            Vector2[][] uvs = new Vector2[sprites.Length][];
+            for(int i=0;i<sprites.Length;i++)
+            {
+                float x = sprites[i].rect.x;
+                float rx = sprites[i].rect.width + x;
+                float y = sprites[i].rect.y;
+                float ty = sprites[i].rect.height + y;
+                x /= sprites[i].txtSize.x;
+                rx /= sprites[i].txtSize.x;
+                y /= sprites[i].txtSize.y;
+                ty /= sprites[i].txtSize.y;
+                Vector2[] uv = new Vector2[4];
+                uv[0].x = x;
+                uv[0].y = y;
+                uv[1].x = x;
+                uv[1].y = ty;
+                uv[2].x = rx;
+                uv[2].y = ty;
+                uv[3].x = rx;
+                uv[3].y = y;
+                uvs[i] = uv;
+            }
+            return uvs;
         }
     }
 }

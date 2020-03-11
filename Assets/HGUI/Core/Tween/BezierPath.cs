@@ -1,9 +1,11 @@
-﻿using System;
+﻿using huqiang;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
 
+[ExecuteInEditMode]
 public class BezierPath : MonoBehaviour
 {
     public List<BezierNode> nodes = new List<BezierNode>();

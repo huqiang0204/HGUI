@@ -86,6 +86,7 @@ namespace huqiang.Core.HGUI
   
         protected override void Update()
         {
+            MainCanvas = this;
             UserAction.Update();
             Keyboard.InfoCollection();
             DispatchUserAction();

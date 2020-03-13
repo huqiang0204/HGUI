@@ -51,6 +51,12 @@ namespace Assets.Scripts
         void ItemUpdate(ItemView item,string dat,int index)
         {
             item.t1.Text = dat;
+            item.img.DataContext = index;
+            item.img.Click = ItemClick;
+        }
+        void ItemClick(UserEvent user,UserAction action)
+        {
+            Debug.Log("Item: "+(int)user.DataContext+" Click !");
         }
     }
 }

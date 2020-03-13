@@ -244,7 +244,6 @@ namespace huqiang.UIEvent
         }
         public float DecayRateX = 0.998f;
         public float DecayRateY = 0.998f;
-        public float speed = 1f;
         public Vector2 RawPosition { get; protected set; }
         Vector2 LastPosition;
         public int HoverTime { get; protected set; }

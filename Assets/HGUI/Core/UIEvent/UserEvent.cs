@@ -13,6 +13,8 @@ namespace huqiang.UIEvent
         internal static void DispatchEvent(UserAction action, HGUIElement[] pipeLine)
         {
             HGUIElement root = pipeLine[0];
+            float s = HCanvas.MainCanvas.PhysicalScale;
+            Vector3 a= new Vector3(s,s,s);
             if (root.script != null)
             {
                  int c = root.childCount;
@@ -20,7 +22,7 @@ namespace huqiang.UIEvent
                 {
                     try
                     {
-                        if (DispatchEvent(pipeLine, i, Vector3.zero, Vector3.one, Quaternion.identity, action))
+                        if (DispatchEvent(pipeLine, i, Vector3.zero, a, Quaternion.identity, action))
                             return;
                     }
                     catch (Exception ex)

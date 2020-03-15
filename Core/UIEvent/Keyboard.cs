@@ -62,7 +62,7 @@ namespace huqiang.UIEvent
             {
                 if(m_touch!=null)
                 {
-                    if(m_touch.active)
+                    if (m_touch.active)
                     {
 #if !UNITY_STANDALONE_WIN
                         targetDisplay = m_touch.targetDisplay;
@@ -74,7 +74,12 @@ namespace huqiang.UIEvent
                         TouchString = str;
                         canGetSelection = m_touch.canGetSelection;
                         status = m_touch.status;
+                        if (status == TouchScreenKeyboard.Status.Done)
+                        {
+                            m_touch.active = false;
+                        }
                     }
+                    else status = TouchScreenKeyboard.Status.LostFocus;
                     active = m_touch.active;
                 }
             }

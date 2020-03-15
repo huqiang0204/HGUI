@@ -244,11 +244,10 @@ namespace huqiang.UIEvent
                 if (!InputEvent.ReadOnly)
                     if (!InputEvent.Pressed)
                     {
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN
                         var state = KeyPressed();
                         if (state == EditState.Continue)
                         {
-
-#if UNITY_EDITOR || UNITY_STANDALONE_WIN
                             if (Keyboard.InputChanged)
                             {
                                 if (Keyboard.InputString == "")
@@ -258,13 +257,6 @@ namespace huqiang.UIEvent
                                 else
                                     InputEvent.OnInputChanged(Keyboard.InputString);
                             }
-#else
-                                InputEvent.TouchInputChanged(Keyboard.TouchString);
-                                if (Keyboard.status == TouchScreenKeyboard.Status.Done)
-                                    if (InputEvent.OnSubmit != null)
-                                        InputEvent.OnSubmit(InputEvent);
-#endif
-                            
                         }
                         else if (state == EditState.Finish)
                         {
@@ -275,6 +267,12 @@ namespace huqiang.UIEvent
                         {
                             InputEvent.OnInputChanged("\n");
                         }
+#else
+                            InputEvent.TouchInputChanged(Keyboard.TouchString);
+                            if (Keyboard.status == TouchScreenKeyboard.Status.Done)
+                                if (InputEvent.OnSubmit != null)
+                                    InputEvent.OnSubmit(InputEvent);
+#endif
                     }
                 InputEvent.Refresh();
             }

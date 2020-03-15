@@ -166,6 +166,7 @@ namespace huqiang.UIComposite
                 unsafe { ItemSize = ((TransfromData*)ItemMod.ip)->size; }
                 ItemHigh = ItemSize.y;
             }
+            Enity.SizeChanged = (o) => { Refresh(); };
         }
         /// <summary>
         /// 

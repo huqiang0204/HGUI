@@ -242,9 +242,10 @@ namespace huqiang.UIEvent
             if (InputEvent != null)
             {
                 if (!InputEvent.ReadOnly)
+                {
                     if (!InputEvent.Pressed)
                     {
-#if UNITY_EDITOR || UNITY_STANDALONE_WIN
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR
                         var state = KeyPressed();
                         if (state == EditState.Continue)
                         {
@@ -268,16 +269,22 @@ namespace huqiang.UIEvent
                             InputEvent.OnInputChanged("\n");
                         }
 #else
-                            InputEvent.TouchInputChanged(Keyboard.TouchString);
-                            if (Keyboard.status == TouchScreenKeyboard.Status.Done)
-                                if (InputEvent.OnSubmit != null)
-                                    InputEvent.OnSubmit(InputEvent);
+                        InputEvent.TouchInputChanged(Keyboard.TouchString);
+                        if (Keyboard.status == TouchScreenKeyboard.Status.Done)
+                        {
+                            if (InputEvent.OnSubmit != null)
+                                InputEvent.OnSubmit(InputEvent);
+                            InputEvent.Refresh();
+                            InputEvent = null;
+                            return;
+                        }
 #endif
                     }
+                }
                 InputEvent.Refresh();
             }
         }
-        #endregion
+#endregion
 
         string m_TipString = "";
         public string InputString { get { return Text.FullString; }

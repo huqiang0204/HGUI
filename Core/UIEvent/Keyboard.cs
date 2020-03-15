@@ -25,7 +25,7 @@ namespace huqiang.UIEvent
         public static string CorrectionTouch;
         public static bool InputChanged;
         static TouchScreenKeyboard m_touch;
-        static bool _touch = false;
+        public static bool _touch = false;
         public static IMECompositionMode iME;
         public static string systemCopyBuffer;
         public static void InfoCollection()
@@ -74,10 +74,6 @@ namespace huqiang.UIEvent
                         TouchString = str;
                         canGetSelection = m_touch.canGetSelection;
                         status = m_touch.status;
-                        if (status == TouchScreenKeyboard.Status.Done)
-                        {
-                            m_touch.active = false;
-                        }
                     }
                     else status = TouchScreenKeyboard.Status.LostFocus;
                     active = m_touch.active;

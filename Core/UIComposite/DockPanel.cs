@@ -606,6 +606,7 @@ namespace huqiang.UIComposite
             HGUIManager.GameBuffer.RecycleGameObject(mod.Find("Area").gameObject);
             InitialFixLine();
             InitialArea();
+            Enity.SizeChanged = SizeChanged;
         }
         void InitialFixLine()
         {

@@ -11,7 +11,7 @@ namespace huqiang.Core.HGUI
         public Camera camera;
         [Range(0.1f, 3)]
         public float PhysicalScale = 1;
-        public Vector2 A = new Vector2(4,0.8f);//贝塞尔曲线起点
+        public Vector2 A = new Vector2(4,0.9f);//贝塞尔曲线起点
         public Vector2 B = new Vector2(6,1f);
         public Vector2 C = new Vector2(8,1.2f);
         public Vector2 D = new Vector2(10,1.5f);//贝塞尔曲线终点

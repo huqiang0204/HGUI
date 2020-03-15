@@ -172,7 +172,11 @@ public class Scale
             float w = Screen.width;
             float h = Screen.height;
             float r = Mathf.Sqrt(w * w + h * h);
+#if UNITY_EDITOR
+            return r / 334;
+#else
             return r /Screen.dpi;
+#endif
         }
     }
     /// <summary>

@@ -287,11 +287,7 @@ namespace huqiang.Core.HGUI
                 if (t != null)
                     psize = t.SizeDelta;
             }
-            if (script.DesignSize.x == 0)
-                script.DesignSize.x = 1;
-            if (script.DesignSize.y == 0)
-                script.DesignSize.y = 1;
-            Scaling(script, script.scaleType, psize, script.DesignSize);
+            //Scaling(script, script.scaleType, psize, script.DesignSize);
             switch (script.anchorType)
             {
                 case AnchorType.None:
@@ -371,7 +367,7 @@ namespace huqiang.Core.HGUI
         internal Vector2 m_sizeDelta = new Vector2(100,100);
         public virtual Vector2 SizeDelta { get => m_sizeDelta; set => m_sizeDelta = value; }
         public Vector2 Pivot = new Vector2(0.5f, 0.5f);
-        public Vector2 DesignSize;
+        //public Vector2 DesignSize;
         public ScaleType scaleType;
         public AnchorType anchorType;
         public AnchorPointType anchorPointType;

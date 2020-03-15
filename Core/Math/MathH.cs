@@ -216,6 +216,30 @@ namespace huqiang
             return p;
         }
         /// <summary>
+        /// 二阶贝塞尔曲线
+        /// </summary>
+        /// <param name="t">比率</param>
+        /// <param name="p0">起点</param>
+        /// <param name="p1">中间点1</param>
+        /// <param name="p2">中间点2</param>
+        /// <param name="p3">结束点</param>
+        /// <returns></returns>
+        public static Vector2 BezierPoint(float t, ref Vector2 p0, ref Vector2 p1, ref Vector2 p2, ref Vector2 p3)
+        {
+            float u = 1 - t;
+            float tt = t * t;
+            float uu = u * u;
+            float uuu = uu * u;
+            float ttt = tt * t;
+
+            Vector2 p = uuu * p0; //first term
+            p += 3 * uu * t * p1; //second term
+            p += 3 * u * tt * p2; //third term
+            p += ttt * p3; //fourth term
+
+            return p;
+        }
+        /// <summary>
         /// 二阶贝塞尔曲线的切线
         /// </summary>
         /// <param name="t">比率</param>

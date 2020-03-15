@@ -11,6 +11,13 @@ namespace huqiang.Core.HGUI
         public Camera camera;
         [Range(0.1f, 3)]
         public float PhysicalScale = 1;
+        public Vector2 A = new Vector2(4,0.8f);//贝塞尔曲线起点
+        public Vector2 B = new Vector2(6,1f);
+        public Vector2 C = new Vector2(8,1.2f);
+        public Vector2 D = new Vector2(10,1.5f);//贝塞尔曲线终点
+        public float DesignPhysicalScale = 10;//默认设计的移动设备尺寸
+        //默认设计的移动设备分辨率,即ppi=Mathf.Sqrt(1920*1920+1080*1080)/10=220
+        public Vector2 DesignSize = new Vector2(1920,1080);
         public RenderMode renderMode;
         public static HCanvas MainCanvas;
         HGUIElement[] PipeLine = new HGUIElement[4096];
@@ -184,12 +191,37 @@ namespace huqiang.Core.HGUI
             {
                 int w = cam.pixelWidth;
                 int h = cam.pixelHeight;
+
+
+#if UNITY_IPHONE || UNITY_ANDROID
+                float ss = Mathf.Sqrt(w * w + h * h);
+#if UNITY_EDITOR
+                ss /= 334;
+#else
+               ss/=Screen.dpi;
+#endif
+                float ps = 1;
+                float r = (ss - A.x) / (D.x - A.x);
+                if (r < 0)
+                {
+                    ps = A.y;
+                }
+                else if (r > 1)
+                {
+                    ps = D.y;
+                }
+                else
+                {
+                    ps = MathH.BezierPoint(r,ref A,ref B,ref C,ref D).y;
+                }
+                PhysicalScale = ps;
+#else
                 float ps = PhysicalScale;
                 if (ps < 0.01f)
                     ps = 0.01f;
+#endif
                 m_sizeDelta.x = w / ps;
                 m_sizeDelta.y = h / ps;
-
                 if(cam.orthographic)
                 {
                     float os = cam.orthographicSize * 2;
@@ -216,7 +248,7 @@ namespace huqiang.Core.HGUI
                 }
             }
         }
-        #region 鼠标和触屏事件
+#region 鼠标和触屏事件
         /// <summary>
         /// 派发用户输入指令信息
         /// </summary>
@@ -354,8 +386,8 @@ namespace huqiang.Core.HGUI
                 for (int i = 0; i < inputs.Length; i++)
                     inputs[i].Clear();
         }
-        #endregion
-        #region UI绘制与合批
+#endregion
+#region UI绘制与合批
         void SubMission(object obj)
         {
             int len = max;
@@ -391,8 +423,8 @@ namespace huqiang.Core.HGUI
             uv4.Clear();
             colors.Clear();
         }
-        #endregion
-        #region 编辑器状态刷新网格
+#endregion
+#region 编辑器状态刷新网格
 #if UNITY_EDITOR
         public void Refresh()
         {
@@ -458,6 +490,6 @@ namespace huqiang.Core.HGUI
                 mr.sharedMaterials = MatCollector.GenerateMaterial();
         }
 #endif
-        #endregion
+#endregion
     }
 }

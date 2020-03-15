@@ -13,7 +13,6 @@ namespace huqiang.Core.HGUI
     {
         public Vector2 m_sizeDelta;
         public Vector2 Pivot;
-        public Vector2 DesignSize;
         public ScaleType scaleType;
         public AnchorType anchorType;
         public AnchorPointType anchorPointType;
@@ -34,7 +33,6 @@ namespace huqiang.Core.HGUI
             var src = (UIElementData*)ip;
             tar.m_sizeDelta = src->m_sizeDelta;
             tar.Pivot = src->Pivot;
-            tar.DesignSize = src->DesignSize;
             tar.scaleType = src->scaleType;
             tar.anchorType = src->anchorType;
             tar.anchorPointType = src->anchorPointType;
@@ -54,7 +52,6 @@ namespace huqiang.Core.HGUI
             UIElementData* tar = (UIElementData*)ip;
             tar->m_sizeDelta = src.m_sizeDelta;
             tar->Pivot = src.Pivot;
-            tar->DesignSize = src.DesignSize;
             tar->scaleType = src.scaleType;
             tar->anchorType = src.anchorType;
             tar->anchorPointType = src.anchorPointType;

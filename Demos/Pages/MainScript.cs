@@ -5,6 +5,7 @@ using huqiang.Core.HGUI;
 using Assets.Scripts;
 using System.Collections.Generic;
 using System.Management;
+using Assets.Net;
 
 public class MainScript : HCanvas
 {
@@ -23,6 +24,7 @@ public class MainScript : HCanvas
         //    UIPage.LoadPage<ChatPage>();
         //};
         UIPage.LoadPage<StartPage>();
+        KcpDataControll.Instance.Connection("192.168.0.144", 8899);
     }
    protected override void OnDestroy()
     {

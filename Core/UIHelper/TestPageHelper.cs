@@ -68,7 +68,7 @@ public class TestPageHelper:UICompositeHelp
     public virtual void OnUpdate()
     {
     }
-    private void OnDestroy()
+    public virtual void OnDestroy()
     {
         App.Dispose();
         AssetBundle.UnloadAllAssetBundles(true);

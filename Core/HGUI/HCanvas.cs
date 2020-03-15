@@ -15,9 +15,6 @@ namespace huqiang.Core.HGUI
         public Vector2 B = new Vector2(6,1f);
         public Vector2 C = new Vector2(8,1.2f);
         public Vector2 D = new Vector2(10,1.5f);//贝塞尔曲线终点
-        public float DesignPhysicalScale = 10;//默认设计的移动设备尺寸
-        //默认设计的移动设备分辨率,即ppi=Mathf.Sqrt(1920*1920+1080*1080)/10=220
-        public Vector2 DesignSize = new Vector2(1920,1080);
         public RenderMode renderMode;
         public static HCanvas MainCanvas;
         HGUIElement[] PipeLine = new HGUIElement[4096];
@@ -108,13 +105,12 @@ namespace huqiang.Core.HGUI
         }
         void CheckSize()
         {
-            float w = Screen.width;
-            float h = Screen.height;
+            float w = m_sizeDelta.x;
+            float h = m_sizeDelta.y;
             if (Scale.ScreenWidth != w | Scale.ScreenHeight != h)
             {
                 Scale.ScreenWidth = w;
                 Scale.ScreenHeight = h;
-                m_sizeDelta = new Vector2(w,h);
                 if (UIPage.CurrentPage != null)
                     UIPage.CurrentPage.ReSize();
             }

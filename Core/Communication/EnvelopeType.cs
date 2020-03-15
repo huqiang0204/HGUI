@@ -17,5 +17,6 @@ namespace huqiang
         public const byte AesString = 7;
         public const byte Success = 128;
         public const byte Failed = 129;
+        public const byte Heart = 130;
     }
 }

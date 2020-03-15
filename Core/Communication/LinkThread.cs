@@ -1,5 +1,7 @@
-﻿using System;
+﻿using huqiang.Data;
+using System;
 using System.Collections.Generic;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
@@ -60,23 +62,36 @@ namespace huqiang
         {
             get { return buffer[index]; }
         }
-        public void SendAll(KcpListener soc, byte[] data)
-        {
-            for (int i = 0; i < top; i++)
-            {
-                var l = buffer[i];
-                if (l != null)
-                    soc.Send(data, l.endpPoint);
-            }
-        }
-        public void SendAll(KcpListener soc, byte[][] data)
+        public void SendAll(Socket soc, byte[][] data)
         {
             for (int i = 0; i < top; i++)
             {
                 var l = buffer[i];
                 if (l != null)
                     for (int j = 0; j < data.Length; j++)
-                        soc.Send(data[j], l.endpPoint);
+                        soc.SendTo(data[j], l.endpPoint);
+            }
+        }
+        public void SendAll(Socket soc, long now)
+        {
+            for (int i = 0; i < top; i++)
+            {
+                var l = buffer[i];
+                if (l != null)
+                {
+                    l.Send(soc, now);
+                }
+            }
+        }
+        public void AddMsg(byte[][] dat, long now,UInt16 msgID)
+        {
+            for (int i = 0; i < top; i++)
+            {
+                var l = buffer[i];
+                if (l != null)
+                {
+                    l.AddMsg(dat, now,msgID);
+                }
             }
         }
         public void Recive()
@@ -87,18 +102,32 @@ namespace huqiang
                 var c = buffer[i];
                 if (c != null)
                 {
-                    c.Recive(now);
+                    try
+                    {
+                        c.Recive(now);
+                    }catch
+                    {
+                    }
                 }
             }
         }
     }
     public class LinkThread<T> : LinkBuffer<T> where T :NetworkLink, new()
     {
-        ThreadEx thread;
+        class Mission
+        {
+            public Action<object> action;
+            public object data;
+        }
+        public int Id;
+        Thread thread;
+        public Socket soc;
+        QueueBuffer<Mission> queue = new QueueBuffer<Mission>();
         public LinkThread(int size =2048):base (size)
         {
             running = true;
-            thread = new ThreadEx(Run);
+            thread = new Thread(Run);
+            Id = thread.ManagedThreadId;
             thread.Start();
         }
         void Run()
@@ -109,17 +138,41 @@ namespace huqiang
                 try
                 {
                     Recive();
+                    int c = queue.Count;
+                    for(int i=0;i<c;i++)
+                    {
+                       var mis =  queue.Dequeue();
+                        if (mis != null)
+                            if (mis.action != null)
+                                mis.action(mis.data);
+                    }
                 }
                 catch (Exception ex)
                 {
-                    UnityEngine.Debug.Log(ex.StackTrace);
+                    
+                }
+                try
+                {
+                    if (soc != null)
+                        SendAll(soc, now);
+                }
+                catch
+                {
+
                 }
                 long t = DateTime.Now.Ticks;
                 t -= now;
                 t /= 10000;
                 if (t < 10)
-                    ThreadEx.Sleep(1);
+                    Thread.Sleep(1);
             }
+        }
+        public void AddMission(Action<object> action,object obj)
+        {
+            Mission mis = new Mission();
+            mis.action = action;
+            mis.data = obj;
+            queue.Enqueue(mis);
         }
     }
 }

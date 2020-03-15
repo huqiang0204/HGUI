@@ -11,15 +11,13 @@ namespace huqiang
     {
         public static KcpListener Instance;
         public Socket soc;
-        public ThreadEx thread;
+        public Thread thread;
         protected bool running;
-        int remotePort;
         int _port;
         public int Port { get { return _port; } }
         public KcpEnvelope envelope = new KcpEnvelope();
-        public KcpListener(int port = 0,int remote=0)
+        public KcpListener(int port = 0)
         {
-            remotePort = remote;
             _port = port;
         }
         public void Start()
@@ -34,7 +32,7 @@ namespace huqiang
             if (thread == null)
             {
                 //创建消息接收线程
-                thread = new ThreadEx(Run);
+                thread = new Thread(Run);
                 thread.Start();
             }
         }
@@ -53,7 +51,6 @@ namespace huqiang
                         len = soc.ReceiveFrom(buffer, ref end);//接收数据报
                     }
                     catch {
-                        //System.Diagnostics.Debug.WriteLine("time out");
                     } 
                     if(len>0)
                     {
@@ -65,7 +62,7 @@ namespace huqiang
                 }
                 catch (Exception ex)
                 {
-                    UnityEngine.Debug.Log(ex.StackTrace);
+                   
                 }
             }
         }
@@ -73,11 +70,7 @@ namespace huqiang
         {
             running = false;
             thread = null;
-#if UNITY_WSA
-            soc.Dispose();
-#else
             soc.Close();
-#endif
         }
         public virtual void Dispatch(byte[] dat, IPEndPoint endPoint)
         {
@@ -93,6 +86,9 @@ namespace huqiang
             soc.SendTo(data,  ip);
         }
         public virtual void RemoveLink(KcpLink link)
+        {
+        }
+        public virtual void Broadcast(byte[] dat,byte type)
         {
         }
     }

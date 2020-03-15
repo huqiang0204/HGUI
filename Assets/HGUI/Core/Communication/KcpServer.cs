@@ -6,10 +6,11 @@ namespace huqiang
 {
     public class KcpServer<T>:KcpListener where T:KcpLink,new()
     {
+        static Random random = new Random();
         public static int SingleCount = 2048;
         public LinkThread<T>[] linkBuff;
-        int tCount=0;
-        public KcpServer(int port = 0, int remote = 0) :base(port,remote)
+        int tCount = 0;
+        public KcpServer(int port = 0) :base(port)
         {
             Instance = this;
             Day = DateTime.Now.Day;
@@ -17,27 +18,27 @@ namespace huqiang
         public void Run(int threadCount = 8,int threadbuff = 2048)
         {
             tCount = threadCount;
-            if(tCount>0)
+            Start();
+            if (tCount > 0)
             {
                 linkBuff = new LinkThread<T>[threadCount];
                 for (int i = 0; i < threadCount; i++)
+                {
                     linkBuff[i] = new LinkThread<T>(threadbuff);
+                    linkBuff[i].soc = soc;
+                }
             }
             else
             {
                 tCount = 1;
                 linkBuff = new LinkThread<T>[1];
                 linkBuff[0] = new LinkThread<T>();
+                linkBuff[0].soc = soc;
             }
-            Start();
         }
         public void Close()
         {
-#if UNITY_WSA
-            soc.Dispose();
-#else
             soc.Close();
-#endif
         }
         //设置用户的udp对象用于发送消息
         public T FindOrCreateLink(IPEndPoint ep)
@@ -53,6 +54,12 @@ namespace huqiang
             if (link == null)
             {
                 link = new T();
+                byte[] key = new byte[32];
+                random.NextBytes(key);
+                link.Key = key;
+                byte[] iv = new byte[16];
+                random.NextBytes(iv);
+                link.Iv = iv;
                 link.envelope = new KcpEnvelope();
                 link.kcp = this;
                 link.ConnectTime = DateTime.Now.Ticks;
@@ -91,11 +98,7 @@ namespace huqiang
         public override void Dispose()
         {
             base.Dispose();
-#if UNITY_WSA
-            soc.Dispose();
-#else
             soc.Close();
-#endif
             Instance = null;
             for (int i = 0; i < tCount; i++)
                 linkBuff[i].running = false;
@@ -123,31 +126,28 @@ namespace huqiang
         ThreadTimer timer;
         static byte[] Heart = new byte[1];
         static int Day;
+        static byte[][] HeartData;
         /// <summary>
         /// 开启心跳,防止超时断线
         /// </summary>
         public void OpenHeart()
         {
-            if(timer==null)
+            HeartData = Envelope.PackAll(Heart, EnvelopeType.Heart, 0, 1472);
+            if (timer==null)
             {
                 timer = new ThreadTimer(1000);
                 timer.Tick = (o,e) => {
                     try
                     {
-                        var dat = envelope.Pack(Heart, EnvelopeType.Mate);
-                        Broadcast(dat);
+                        for (int i = 0; i < tCount; i++)
+                        {
+                            linkBuff[i].SendAll(soc, HeartData);
+                        }
                     }
                     catch
                     {
                     }
                 };
-            }
-        }
-        public void Broadcast(byte[][] dat)
-        {
-            for (int i = 0; i < tCount; i++)
-            {
-                linkBuff[i].SendAll(this, dat);
             }
         }
         /// <summary>
@@ -159,6 +159,27 @@ namespace huqiang
             {
                 timer.Dispose();
                 timer = null;
+            }
+        }
+        UInt16 bid = 60000;
+        public override void Broadcast(byte[] dat, byte type)
+        {
+            var tmp = Envelope.PackAll(dat, type, bid, 1472);
+            long now = DateTime.Now.Ticks;
+            for (int i = 0; i < tCount; i++)
+            {
+                linkBuff[i].AddMsg(tmp, now,bid);
+            }
+            bid++;
+            if (bid > 64000)
+                bid = 60000;
+        }
+        public void SendAll()
+        {
+            long now = DateTime.Now.Ticks;
+            for (int i = 0; i < tCount; i++)
+            {
+                linkBuff[i].SendAll(soc, now);
             }
         }
     }

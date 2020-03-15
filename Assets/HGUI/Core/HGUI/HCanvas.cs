@@ -9,6 +9,8 @@ namespace huqiang.Core.HGUI
     public class HCanvas:UIElement
     {
         public Camera camera;
+        [Range(0.1f, 3)]
+        public float PhysicalScale = 1;
         public RenderMode renderMode;
         public static HCanvas MainCanvas;
         HGUIElement[] PipeLine = new HGUIElement[4096];
@@ -182,12 +184,17 @@ namespace huqiang.Core.HGUI
             {
                 int w = cam.pixelWidth;
                 int h = cam.pixelHeight;
-                m_sizeDelta.x = w;
-                m_sizeDelta.y = h;
+                float ps = PhysicalScale;
+                if (ps < 0.01f)
+                    ps = 0.01f;
+                m_sizeDelta.x = w / ps;
+                m_sizeDelta.y = h / ps;
+
                 if(cam.orthographic)
                 {
                     float os = cam.orthographicSize * 2;
                     float s = os / (float)h;
+                    s *= ps;
                     transform.localScale = new Vector3(s, s, s);
                     Vector3 pos = cam.transform.position;
                     Vector3 forward = cam.transform.forward;
@@ -200,6 +207,7 @@ namespace huqiang.Core.HGUI
                     float s = 2 / (float)h;
                     float o = MathH.Tan(cam.fieldOfView) / near;
                     s /= o;
+                    s *= ps;
                     transform.localScale = new Vector3(s, s, s);
                     Vector3 pos = cam.transform.position;
                     Vector3 forward = cam.transform.forward;

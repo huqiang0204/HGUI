@@ -19,16 +19,16 @@ namespace huqiang
     public class UdpServer
     {
         Socket soc;
-        ThreadEx thread;
+        Thread thread;
         int remotePort;
         Queue<SocData> queue;
         public bool Packaging = true;
         bool running;
         bool auto;
         PackType packType = PackType.All;
-        Int16 id = 10000;
-        static Int16 MinID=11000;
-        static Int16 MaxID = 21000;
+        UInt16 id = 10000;
+        static UInt16 MinID=11000;
+        static UInt16 MaxID = 21000;
         /// <summary>
         /// UdpServer构造
         /// </summary>
@@ -43,16 +43,15 @@ namespace huqiang
             //udp服务器端口绑定
             IPEndPoint ip = new IPEndPoint(IPAddress.Any, port);
             soc = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp); //new UdpClient(_port);//new IPEndPoint(IPAddress.Parse(ip),
-            soc.ReceiveTimeout = 1000;
             soc.Bind(ip);
-
+            soc.ReceiveTimeout = 1000;
             running = true;
             auto = subThread;
             links = new List<UdpLink>();
             if (thread == null)
             {
                 //创建消息接收线程
-                thread = new ThreadEx(Run);
+                thread = new Thread(Run);
                 thread.Start();
             }
         }
@@ -64,7 +63,7 @@ namespace huqiang
                     var all = Envelope.SubVolume(dat, tag, id, 1472);
                     for (int i = 0; i < all.Length; i++)
                         soc.SendTo(all[i],  ip);
-                    id+=(Int16)all.Length;
+                    id+=(UInt16)all.Length;
                     if (id > MaxID)
                         id = MinID;
                     break;
@@ -76,7 +75,7 @@ namespace huqiang
                     all = Envelope.PackAll(dat, tag, id, 1472);//1472-25
                     for (int i = 0; i < all.Length; i++)
                         soc.SendTo(all[i],  ip);
-                    id += (Int16)all.Length;
+                    id += (UInt16)all.Length;
                     if (id > MaxID)
                         id = MinID;
                     break;
@@ -139,17 +138,10 @@ namespace huqiang
             IPEndPoint ip = new IPEndPoint(IPAddress.Any, 0);
             while (running)
             {
-                EndPoint end = ip;
-                int len = 0;
                 try
                 {
-                     len = soc.ReceiveFrom(buffer, ref end);//接收数据报
-                } 
-                catch
-                {
-                }
-                try
-                {
+                    EndPoint end = ip;
+                    int len = soc.ReceiveFrom(buffer, ref end);//接收数据报
                     if (len > 0)
                     {
                         byte[] dat = new byte[len];
@@ -173,7 +165,7 @@ namespace huqiang
                 }
                 catch (Exception ex)
                 {
-                    UnityEngine.Debug.Log(ex.StackTrace);
+                    
                 }
             }
         }
@@ -214,11 +206,7 @@ namespace huqiang
         }
         public void Close()
         {
-#if UNITY_WSA
-            soc.Dispose();
-#else
             soc.Close();
-#endif
             running = false;
         }
         public List<UdpLink> links;

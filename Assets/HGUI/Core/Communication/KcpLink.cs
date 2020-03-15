@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.Sockets;
 using System.Text;
 
 namespace huqiang
@@ -9,8 +10,10 @@ namespace huqiang
     public class KcpLink:NetworkLink
     {
         internal KcpListener kcp;
+        public Int64 id;
         public string uniId;
-
+        public byte[] Key;
+        public byte[] Iv;
         public KcpEnvelope envelope = new KcpEnvelope();
      
         public QueueBuffer<byte[]> metaData = new QueueBuffer<byte[]>();
@@ -40,7 +43,11 @@ namespace huqiang
                 if (now - lastTime > TimeOut)
                 {
                     envelope.Clear();
-                    Disconnect();
+                    if (_connect)
+                    {
+                        Disconnect();
+                        _connect = false;
+                    }
                 }
             }
             else {
@@ -65,25 +72,29 @@ namespace huqiang
                 {
                 }
             }
-            var ss= envelope.GetFailedData(now);//获取超时未反馈的数据
-            if(ss!=null)
-                for(int i=0;i<ss.Length;i++)
-                    kcp.soc.SendTo(ss[i],endpPoint);//重新发送超时的数据
-            ss = envelope.ValidateData.ToArray();
-            envelope.ValidateData.Clear();//获取接收成功的数据
-            for (int i = 0; i < ss.Length; i++)
-                kcp.soc.SendTo(ss[i],  endpPoint);//通知对方接收数据成功
         }
-        public void Send(byte[] data, byte type)
+        /// <summary>
+        /// 支持数据长度30Mb 30000 * 1024
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public virtual bool Send(byte[] data, byte type)
         {
-            try
-            {
-                var ss = envelope.Pack(data, type);
-                for (int i = 0; i < ss.Length; i++)
-                    kcp.soc.SendTo(ss[i], endpPoint);
-            }catch(Exception )
-            {
-            }
+            if (data.Length > 30000 * 1024)
+                return false;
+            envelope.Pack(data, type);
+            //for (int i = 0; i < ss.Length; i++)
+            //    kcp.soc.SendTo(ss[i], endpPoint);
+            return true;
+        }
+        public override void AddMsg(byte[][] dat, long now,UInt16 msgID)
+        {
+            envelope.AddMsg(dat,now,msgID);
+        }
+        public override void Send(Socket soc, long now)
+        {
+            envelope.Send(soc,now,endpPoint);
         }
         public virtual void Awake()
         {
@@ -93,7 +104,7 @@ namespace huqiang
         }
         public virtual void Disconnect()
         {
-            kcp.RemoveLink(this);
+            _connect = false;
         }
         public virtual void ConnectionOK()
         {
@@ -103,6 +114,12 @@ namespace huqiang
         }
         public virtual void Dispose()
         {
+            envelope.Dispose();
+            envelope = null;
+            if (metaData != null)
+                metaData.Clear();
+            metaData = null;
+            kcp = null;
         }
         public void Redirect(int ciP,int cport)
         {

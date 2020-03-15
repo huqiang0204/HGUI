@@ -11,7 +11,7 @@ namespace huqiang
     public class UdpSocket
     {
         Socket soc;
-        ThreadEx thread;
+        Thread thread;
         TcpEnvelope envelope;
         IPEndPoint endPoint;
         public bool Packaging = false;
@@ -37,7 +37,7 @@ namespace huqiang
             auto = subThread;
             if (thread == null)
             {
-                thread = new ThreadEx(Run);
+                thread = new Thread(Run);
                 thread.Start();
             }
             queue = new QueueBuffer<SocData>();
@@ -74,7 +74,7 @@ namespace huqiang
                 }
                 catch (Exception ex)
                 {
-                    UnityEngine.Debug.Log(ex.StackTrace);
+                   
                 }
             }
         }
@@ -112,11 +112,7 @@ namespace huqiang
         }
         public void Close()
         {
-#if UNITY_WSA
-            soc.Dispose();
-#else
-           soc.Close();
-#endif
+            soc.Close();
             running = false;
         }
         public bool Send(byte[] dat, IPEndPoint point, byte tag)
@@ -133,7 +129,7 @@ namespace huqiang
                 else soc.SendTo(dat, point);
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return false;
             }

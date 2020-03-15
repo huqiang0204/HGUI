@@ -16,7 +16,7 @@ namespace huqiang
     {
         const int bufferSize = 262144;
         TcpEnvelope envelope;
-        ThreadEx thread;
+        Thread thread;
         private Socket client = null;
         public bool isConnection { get { if (client == null) return false; return client.Connected; } }
         IPEndPoint iep;
@@ -44,11 +44,7 @@ namespace huqiang
                     {
                         if (client.Connected)
                             client.Shutdown(SocketShutdown.Both);
-#if UNITY_WSA
-                      client.Dispose();
-#else
-            client.Close();
-#endif
+                        client.Close();
                     }
                     break;
                 }
@@ -61,11 +57,7 @@ namespace huqiang
                         {
                             if (client.Connected)
                                 client.Shutdown(SocketShutdown.Both);
-#if UNITY_WSA
-                            client.Dispose();
-#else
-            client.Close();
-#endif
+                            client.Close();
                             Connect();
                         }
                     }
@@ -73,13 +65,9 @@ namespace huqiang
                     {
                         try
                         {
-#if UNITY_WSA
-                            client.Dispose();
-#else
-            client.Close();
-#endif
+                            client.Close();
                         }
-                        catch (Exception)
+                        catch (Exception ex)
                         {
                         }
                         Connect();
@@ -116,11 +104,7 @@ namespace huqiang
             catch (Exception ex)
             {
                 reConnect = true;
-#if UNITY_WSA
-                client.Dispose();
-#else
-            client.Close();
-#endif
+                client.Close();
                 if (ConnectFaild != null)
                     ConnectFaild(ex.StackTrace);
             }
@@ -160,7 +144,7 @@ namespace huqiang
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 //if (ConnectFaild != null)
                 //    ConnectFaild(ex.StackTrace);
@@ -174,7 +158,7 @@ namespace huqiang
                 try
                 {
                    obj = SelfAnalytical(data, tag);
-                }catch(Exception)
+                }catch(Exception ex)
                 {
                 }
             }
@@ -230,7 +214,7 @@ namespace huqiang
             iep = remote;
             if (thread == null)
             {
-                thread = new ThreadEx(Run);
+                thread = new Thread(Run);
                 thread.Start();
             }
         }
@@ -275,7 +259,7 @@ namespace huqiang
                 }
                 else client.Send(data);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 reConnect = true;
                 return false;

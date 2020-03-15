@@ -7,23 +7,24 @@ namespace huqiang
     public struct EnvelopeItem
     {
         public EnvelopeHead head;
-        public Int32 part;
-        public Int32 rcvLen;
+        public UInt32 part;
+        public UInt32 rcvLen;
         public byte[] buff;
         public long time;
         public Int32[] checks;
+        public bool done;//保留一定时效
     }
     public class TcpEnvelope
     {
-        public  static Int16 MinID = 22000;
-        public static Int16 MaxID = 32000;
+        public  static UInt16 MinID = 22000;
+        public static UInt16 MaxID = 32000;
 
         public PackType type = PackType.All;
         protected EnvelopeItem[] pool = new EnvelopeItem[128];
         protected int remain = 0;
         protected byte[] buffer;
-        protected Int16 id = 22000;
-        protected Int16 Fragment = 1460;
+        protected UInt16 id = 22000;
+        protected UInt16 Fragment = 1460;
         /// <summary>
         /// Solution Slices Segment
         /// </summary>
@@ -39,7 +40,7 @@ namespace huqiang
         public virtual byte[][] Pack(byte[] dat, byte tag)
         {
             var all = Envelope.Pack(dat, tag, type, id,Fragment);
-            id += (Int16)all.Length;
+            id += (UInt16)all.Length;
             if (id >= MaxID)
                 id = MinID;
             return all;
@@ -66,7 +67,6 @@ namespace huqiang
                 remain = 0;
                 return null;
             }
-         
         }
         protected List<EnvelopeData> OrganizeSubVolume(List<EnvelopePart> list, int fs)
         {
@@ -146,13 +146,17 @@ namespace huqiang
                 pool[i].head.MsgID = 0;
             }
         }
+        ~TcpEnvelope()
+        {
+            Clear();
+        }
     }
     public class UdpEnvelope:TcpEnvelope
     {
         public UdpEnvelope()
         {
             Fragment = 1472;
-            sss = 1401;
+            sss = 1403;
         }
     }
 }

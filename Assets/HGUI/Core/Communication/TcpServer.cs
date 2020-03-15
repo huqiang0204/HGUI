@@ -18,7 +18,7 @@ namespace huqiang
         /// </summary>
         public static TcpServer<T> Instance;
 
-        ThreadEx server;
+        Thread server;
         PackType packType;
         IPEndPoint endPoint;
         int tCount;
@@ -26,21 +26,9 @@ namespace huqiang
         {
             tCount = thread;
             packType = type;
-            if (tCount > 0)
-            {
-                linkBuff = new LinkThread<T>[tCount];
-                for (int i = 0; i < tCount; i++)
-                    linkBuff[i] = new LinkThread<T>(SingleCount);
-            }
-            else
-            {
-                tCount = 1;
-                linkBuff = new LinkThread<T>[1];
-                linkBuff[0] = new LinkThread<T>(SingleCount);
-            }
+      
             soc = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             soc.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-            soc.ReceiveTimeout = 2000;
             //端点
             endPoint= new IPEndPoint(IPAddress.Parse(ip), port);
             //绑定
@@ -50,16 +38,33 @@ namespace huqiang
             }
             catch (Exception ex)
             {
-                UnityEngine.Debug.Log(ex.StackTrace);
+                
             }
             soc.Listen(0);
+            soc.ReceiveTimeout = 1000;
             Instance = this;
+            if (tCount > 0)
+            {
+                linkBuff = new LinkThread<T>[tCount];
+                for (int i = 0; i < tCount; i++)
+                {
+                    linkBuff[i] = new LinkThread<T>(SingleCount);
+                    linkBuff[i].soc = soc;
+                }
+            }
+            else
+            {
+                tCount = 1;
+                linkBuff = new LinkThread<T>[1];
+                linkBuff[0] = new LinkThread<T>(SingleCount);
+                linkBuff[0].soc = soc;
+            }
         }
         public void Start()
         {
             if(server==null)
             {
-                server = new ThreadEx(AcceptClient);
+                server = new Thread(AcceptClient);
                 server.Start();
             }
             if(threadTimer==null)
@@ -73,7 +78,7 @@ namespace huqiang
                     }
                     catch (Exception ex)
                     {
-                        UnityEngine.Debug.Log(ex.StackTrace);
+                        
                     }
                 };
             }
@@ -82,10 +87,9 @@ namespace huqiang
         byte[] nil = { 0 };
         public void Dispose()
         {
-#if !UNITY_WSA
-          soc.Disconnect(true);
-#endif
+            soc.Disconnect(true);
             soc.Dispose();
+            server.Abort();
             Instance = null;
             for (int i = 0; i < tCount; i++)
                 linkBuff[i].running = false;
@@ -101,8 +105,9 @@ namespace huqiang
                     var client = soc.Accept();
                     CreateLink(client);
                 }
-                catch 
+                catch (Exception ex)
                 {
+                    
                 }
             }
         }

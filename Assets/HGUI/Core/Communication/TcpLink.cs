@@ -53,7 +53,7 @@ namespace huqiang
             }
             catch (Exception ex)
             {
-                UnityEngine.Debug.Log(ex.StackTrace);
+               
                 return -1;
             }
             return 0;
@@ -74,7 +74,7 @@ namespace huqiang
             }
             catch (Exception ex)
             {
-                UnityEngine.Debug.Log(ex.StackTrace);
+             
                 return -1;
             }
             return 0;
@@ -87,26 +87,13 @@ namespace huqiang
         {
             if (Link != null)
                 lock (Link)
-                {
-#if UNITY_WSA
-                    Link.Dispose();
-#else
-            Link.Close();
-#endif
-                }
-
+                    Link.Close();
         }
         public virtual void Dispose()
         {
             if (Link != null)
                 lock (Link)
-                {
-#if UNITY_WSA
-                    Link.Dispose();
-#else
-            Link.Close();
-#endif
-                }
+                    Link.Close();
         }
         public override void Recive(long time)
         {
@@ -130,9 +117,8 @@ namespace huqiang
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
             }
         }
         public virtual void Dispatch( byte[] dat, byte tag)

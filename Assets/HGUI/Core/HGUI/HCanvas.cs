@@ -96,6 +96,7 @@ namespace huqiang.Core.HGUI
             UserAction.Update();
             Keyboard.InfoCollection();
             DispatchUserAction();
+            AnimationManage.Manage.Update();
             if (UIPage.CurrentPage != null)
                 UIPage.CurrentPage.Update(UserAction.TimeSlice);
             TextInput.Dispatch();

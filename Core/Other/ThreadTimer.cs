@@ -32,19 +32,17 @@ namespace huqiang
         }
         void Run()
         {
-            int tick = DateTime.Now.Millisecond;
+            long tick = DateTime.Now.Ticks;
             while (run)
             {
                 auto.WaitOne(1);
-                var t = DateTime.Now.Millisecond;
-                int v = t - tick;
-                if (v < 0)
-                    v += 1000;
-                if (v > m_inter)
+                var l = DateTime.Now.Ticks;
+                int t = (int)((l - tick) / 10000);
+                if (t > m_inter)
                 {
-                    tick = t;
+                    tick = l;
                     if (Tick != null)
-                        Tick(this,v);
+                        Tick(this, t);
                 }
             }
         }

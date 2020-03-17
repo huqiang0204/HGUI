@@ -834,5 +834,10 @@ namespace huqiang.UIEvent
                 ShowStart = 0;
             ShowChanged = true;
         }
+        public static void Clear()
+        {
+            InputEvent = null;
+            InputCaret.Hide();
+        }
     }
 }

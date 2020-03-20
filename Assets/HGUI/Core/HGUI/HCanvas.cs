@@ -23,7 +23,6 @@ namespace huqiang.Core.HGUI
         int max;
         public UserAction[] inputs;
         public bool PauseEvent;
-        public UserAction.InputType inputType = UserAction.InputType.OnlyMouse;
         protected virtual void Start()
         {
             Font.textureRebuilt += FontTextureRebuilt;
@@ -251,19 +250,16 @@ namespace huqiang.Core.HGUI
         /// </summary>
         void DispatchUserAction()
         {
-            if (inputType == UserAction.InputType.OnlyMouse)
-            {
-                DispatchMouse();
-            }
-            else if (inputType == UserAction.InputType.OnlyTouch)
-            {
-                DispatchTouch();
-            }
-            else
-            {
-                DispatchWin();
-            }
-            if(PauseEvent)
+#if UNITY_STANDALONE_WIN
+            DispatchWin();
+#elif UNITY_EDITOR
+            DispatchMouse();
+#elif UNITY_IPHONE || UNITY_ANDROID
+            DispatchTouch();
+#else
+            DispatchMouse();
+#endif
+            if (PauseEvent)
                 return;
             for (int i = 0; i < inputs.Length; i++)
             {

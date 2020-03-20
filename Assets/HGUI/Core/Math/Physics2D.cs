@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace huqiang
 {
-    public class Physics2D
+    public partial class Physics2D
     {
         #region collision check
         /// <summary>
@@ -149,7 +149,8 @@ namespace huqiang
         }
         public static bool CircleToCircle(Vector2 A, Vector2 B, float radiusA, float radiusB)
         {
-            return radiusA + radiusB > Mathf.Sqrt((A.x - B.x) * (A.x - B.x) + (A.y - B.y) * (A.y - B.y));
+            float r = radiusA + radiusB;
+            return r * r > (A.x - B.x) * (A.x - B.x) + (A.y - B.y) * (A.y - B.y);
         }
         public static Vector2 RotatePoint2(ref Vector2 p, ref Vector2 location, float angle)//a=绝对角度 d=直径
         {
@@ -984,13 +985,13 @@ namespace huqiang
                 x = C.x - P[i].x;
                 y = C.y - P[i].y;
                 x = x * x + y * y;
-                if (x <= r2)
+                if (x <= r2)//如果点在圆内
                     return true;
                 d[i] = x;
                 if (x < z)
                 {
                     z = x;
-                    id = i;
+                    id = i;//与圆最近的点
                 }
             }
             int p1 = id - 1;
@@ -1120,66 +1121,13 @@ namespace huqiang
             return false;
         }
         /// <summary>
-        /// 圆与线相交
-        /// </summary>
-        /// <param name="C"></param>
-        /// <param name="r"></param>
-        /// <param name="A"></param>
-        /// <param name="B"></param>
-        /// <returns></returns>
-        public static bool CircleToLineB(Vector2 C, float r, Vector2 A, Vector2 B, ref Vector2 p0, ref Vector2 p1, ref Vector2 p2)
-        {
-            float o = r * r;
-            Vector2 v1 = A - C;
-            float a = v1.x * v1.x + v1.y * v1.y;
-            if (a <= o)
-            {
-                p1 = A;//A点在圆里面
-            }
-            Vector2 v2 = B - C;
-            float b = v2.x * v2.x + v2.y * v2.y;
-            if (b <= o)
-            {
-                p2 = B;//B点在圆里面
-            }
-            Vector2 v3 = C - A;
-            Vector2 v4 = B - A;
-            float sl = v4.x * v4.x + v4.y * v4.y;
-            float l = Mathf.Sqrt(sl);
-            Vector2 p = Vector3.Project(v3, v4);
-            float pl = Mathf.Sqrt(p.x * p.x + p.y * p.y) / l;//百分比位置
-            if (Vector2.Dot(v3, v4) < 0)//反方向
-                pl = -pl;
-            p.x += A.x;
-            p.y += A.y;//实际投影位置
-            v2.x = p.x - C.x;
-            v2.y = p.y - C.y;
-            float sp = v2.x * v2.x + v2.y * v2.y;//圆心投影的长度的平方
-            if (sp < o)//如过小于半径的平方
-            {
-                float ol = o - sp;
-                var v = v4.normalized;
-                float sx = v.x * v.x + v.y * v.y;
-                float os = Mathf.Sqrt(ol / sx);
-                float pos = os / l;
-                v *= os;
-                p0 = p;
-                if (pl - pos > 0 & pl - pos < 1)
-                    p1 = p - v;
-                if (pl + pos > 0 & pl + pos < 1)
-                    p2 = p + v;
-                return true;
-            }
-            return false;
-        }
-        /// <summary>
         /// 检测一个点是否在线段上
         /// </summary>
         /// <param name="dot">点</param>
         /// <param name="a">线段起点</param>
         /// <param name="b">线段终点</param>
         /// <returns></returns>
-        public static bool DotToLine(ref Vector2 dot, ref Vector2 a, ref Vector2 b)
+        public static bool DotToLine(ref Vector2 dot, ref Vector2 a,ref Vector2 b)
         {
             float dx = dot.x - a.x;
             float dy = dot.y - a.y;
@@ -1243,42 +1191,6 @@ namespace huqiang
         /// <param name="o"></param>
         /// <returns></returns>
         public static bool LineToLine(ref Vector2 a, ref Vector2 b, ref Vector2 c, ref Vector2 d, ref Vector2 o)//相交线相交点
-        {
-            float ax = b.x - a.x;
-            float ay = b.y - a.y;
-            float cx = d.x - c.x;
-            float cy = d.y - c.y;
-            //(V1.y*V2.x-V1.x*V2.y)
-            float y = ay * cx - ax * cy;
-            if (y == 0)
-                return false;
-            //((B.y-A.y)*V2.x+(A.x-B.x)*V2.y)
-            float x = (c.y - a.y) * cx + (a.x - c.x) * cy;
-            float r = x / y;
-            if (r >= 0 & r <= 1)
-            {
-                if (cx == 0)
-                {
-                    //x2=(A.y+x1*V1.y-B.y)/V2.y
-                    y = (a.y - c.y + r * ay) / cy;
-                }
-                else
-                {
-                    //x2=(A.x+x1*V1.x-B.x)/V2.x
-                    y = (a.x - c.x + r * ax) / cx;
-                }
-                //location.x=A.x+x1*V1.x
-                //location.y=A.x+x1*V1.y
-                if (y >= 0 & y <= 1)
-                {
-                    o.x = a.x + r * ax;
-                    o.y = a.y + r * ay;
-                    return true;
-                }
-            }
-            return false;
-        }
-        public static bool LineToLine(ref Vector3 a, ref Vector3 b, ref Vector3 c, ref Vector3 d, ref Vector3 o)//相交线相交点
         {
             float ax = b.x - a.x;
             float ay = b.y - a.y;

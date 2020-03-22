@@ -242,6 +242,7 @@ namespace huqiang.Core.HGUI
                     transform.position = pos + forward * near;
                     transform.forward = forward;
                 }
+                transform.rotation = cam.transform.rotation;
             }
         }
 #region 鼠标和触屏事件

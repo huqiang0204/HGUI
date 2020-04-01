@@ -109,7 +109,6 @@ namespace huqiang.Core.HGUI
             v = q * v;
             return v;
         }
-        //protected static ThreadMission thread = new ThreadMission("async");
         public static Vector2[] Anchors = new[] { new Vector2(0.5f, 0.5f), new Vector2(0, 0.5f),new Vector2(1, 0.5f),
         new Vector2(0.5f, 1),new Vector2(0.5f, 0), new Vector2(0, 0), new Vector2(0, 1), new Vector2(1, 0), new Vector2(1, 1)};
         public static void Scaling(UIElement script, ScaleType type, Vector2 pSize, Vector2 ds)

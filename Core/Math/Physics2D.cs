@@ -124,6 +124,31 @@ namespace huqiang
             }
             return count % 2 > 0 ? true : false;
         }
+        /// <summary>
+        ///  检测一个点是否在多边形里面
+        /// </summary>
+        /// <param name="A">多边形,按顺序连接</param>
+        /// <param name="B">点</param>
+        /// <returns>在里面返回true，反之返回false</returns>
+        public unsafe static bool DotToPolygon(Vector3* A, int len, Vector2 B)
+        {
+            int count = 0;
+            for (int i = 0; i < len; i++)
+            {
+                Vector2 p1 = A[i];
+                Vector2 p2 = i == len - 1 ? A[0] : A[i + 1];
+                if (B.y >= p1.y & B.y <= p2.y | B.y >= p2.y & B.y <= p1.y)
+                {
+                    float t = (B.y - p1.y) / (p2.y - p1.y);
+                    float xt = p1.x + t * (p2.x - p1.x);
+                    if (B.x == xt)
+                        return true;
+                    if (B.x < xt)
+                        count++;
+                }
+            }
+            return count % 2 > 0 ? true : false;
+        }
         public static bool DotToPolygon(Vector2 origin, Vector2[] A, Vector2 B)//offset
         {
             int count = 0;
@@ -978,7 +1003,6 @@ namespace huqiang
             Vector2 A = new Vector2();
             Vector2 B = new Vector2();
             float z = 1000000, r2 = r * r, x = 0, y = 0;
-            float[] d = new float[P.Length];
             int id = 0;
             for (int i = 0; i < P.Length; i++)
             {
@@ -987,7 +1011,7 @@ namespace huqiang
                 x = x * x + y * y;
                 if (x <= r2)//如果点在圆内
                     return true;
-                d[i] = x;
+                DB[i] = x;
                 if (x < z)
                 {
                     z = x;
@@ -998,8 +1022,8 @@ namespace huqiang
             if (p1 < 0)
                 p1 = P.Length - 1;
             float a, b, c;
-            c = d[p1];
-            a = d[id];
+            c = DB[p1];
+            a = DB[id];
             B = P[id];
             A = P[p1];
             x = B.x - A.x;
@@ -1022,7 +1046,7 @@ namespace huqiang
                 p1 = id + 1;
                 if (p1 == P.Length)
                     p1 = 0;
-                c = d[p1];
+                c = DB[p1];
                 A = P[p1];
                 x = B.x - A.x;
                 x *= x;
@@ -1041,6 +1065,83 @@ namespace huqiang
                 }
             }
             return DotToPolygon(P, new Vector2(C.x, C.y));//circle inside polygon
+        }
+        /// <summary>
+        /// 圆与多边形相交
+        /// </summary>
+        /// <param name="C"></param>
+        /// <param name="r"></param>
+        /// <param name="P"></param>
+        /// <returns></returns>
+        public unsafe static bool CircleToPolygon(Vector2 C, float r, Vector3* P, int len)
+        {
+            if (len <= 0)
+                return false;
+            Vector2 A = Vector2.zero;
+            Vector2 B = Vector2.zero;
+            float z = 1000000, r2 = r * r, x = 0, y = 0;
+            int id = 0;
+            for (int i = 0; i < len; i++)
+            {
+                x = C.x - P[i].x;
+                y = C.y - P[i].y;
+                x = x * x + y * y;
+                if (x <= r2)//如果点在圆内
+                    return true;
+                DB[i] = x;
+                if (x < z)
+                {
+                    z = x;
+                    id = i;//与圆最近的点
+                }
+            }
+            int p1 = id - 1;
+            if (p1 < 0)
+                p1 = len - 1;
+            float a, b, c;
+            c = DB[p1];
+            a = DB[id];
+            B = P[id];
+            A = P[p1];
+            x = B.x - A.x;
+            x *= x;
+            y = B.y - A.y;
+            y *= y;
+            b = x + y;
+            x = c - a;
+            if (x < 0)
+                x = -x;
+            if (x <= b)
+            {
+                y = b + c - a;
+                y = y * y / 4 / b;
+                if (c - y <= r2)
+                    return true;
+            }
+            else
+            {
+                p1 = id + 1;
+                if (p1 == len)
+                    p1 = 0;
+                c = DB[p1];
+                A = P[p1];
+                x = B.x - A.x;
+                x *= x;
+                y = B.y - A.y;
+                y *= y;
+                b = x + y;
+                x = c - a;
+                if (x < 0)
+                    x = -x;
+                if (x <= b)
+                {
+                    y = b + c - a;
+                    y = y * y / 4 / b;
+                    if (c - y <= r2)
+                        return true;
+                }
+            }
+            return DotToPolygon(P,len, new Vector2(C.x, C.y));//circle inside polygon
         }
         /// <summary>
         /// 圆与线相交

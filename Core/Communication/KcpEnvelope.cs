@@ -1,4 +1,5 @@
-﻿using System;
+﻿using huqiang.Data;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
@@ -22,7 +23,7 @@ namespace huqiang
         UInt16[] delays = new UInt16[256];//时延统计
         public static UInt16 MinID = 34000;
         public static UInt16 MaxID = 44000;
-     
+        public QueueBuffer<EnvelopeData> QueueBuf = new QueueBuffer<EnvelopeData>(64);
         List<DataItem> sendBuffer = new List<DataItem>();
         public List<byte[]> ValidateData = new List<byte[]>();
         protected UInt16 id = 34000;
@@ -65,7 +66,7 @@ namespace huqiang
                         pool[i].head.MsgID = 0;
             }
         }
-        public List<EnvelopeData> Unpack(byte[] dat, int len,long now)
+        public void Unpack(byte[] dat, int len, long now)
         {
             try
             {
@@ -78,36 +79,34 @@ namespace huqiang
                     var item = dats[c];
                     UInt16 tag = item.head.Type;
                     byte type = item.type;
-                    if(type == EnvelopeType.Heart)//这是一个心跳包
+                    if (type == EnvelopeType.Heart)//这是一个心跳包
                     {
                         dats.RemoveAt(c);
                     }
                     else
                     if (type == EnvelopeType.Success)//这是一个数据接收成功的回执
                     {
-                        Success(item.head.MsgID, item.head.CurPart,now);
+                        Success(item.head.MsgID, item.head.CurPart, now);
                         dats.RemoveAt(c);
                     }
-                    else 
+                    else
                     {
                         var tmp = Envelope.PackAll(EnvelopeType.Success, item.head.MsgID, item.head.CurPart);
                         ValidateData.Add(tmp);
                     }
                 }
-                return OrganizeSubVolume(dats, 1403);
+                OrganizeSubVolume(dats, 1403);
             }
             catch
             {
                 remain = 0;
-                return null;
             }
         }
         int point;
-        protected List<EnvelopeData> OrganizeSubVolume(List<EnvelopePart> list, int fs)
+        protected void OrganizeSubVolume(List<EnvelopePart> list, int fs)
         {
             if (list != null)
             {
-                List<EnvelopeData> datas = new List<EnvelopeData>();
                 for (int j = 0; j < list.Count; j++)
                 {
                     var item = list[j];
@@ -118,6 +117,8 @@ namespace huqiang
                         {
                             if (item.head.MsgID == pool[i].head.MsgID)
                             {
+                                if (pool[i].buff == null)
+                                    goto label;
                                 if (Envelope.SetChecked(pool[i].checks, item.head.CurPart))
                                 {
                                     Envelope.CopyToBuff(pool[i].buff, item.data, 0, item.head, fs);
@@ -129,8 +130,8 @@ namespace huqiang
                                         data.data = pool[i].buff;
                                         data.type = (byte)(pool[i].head.Type);
                                         pool[i].buff = null;
-                                        pool[i].checks = null;
-                                        datas.Add(data);
+                                        //pool[i].checks = null;
+                                        QueueBuf.Enqueue(data);
                                         pool[i].done = true;
                                     }
                                 }
@@ -138,7 +139,7 @@ namespace huqiang
                             }
                         }
                         int s = point;
-                        for(int i=0;i<128;i++)
+                        for (int i = 0; i < 128; i++)
                         {
                             if (pool[s].head.MsgID == 0 | pool[s].done)
                             { point = s; break; }
@@ -154,19 +155,18 @@ namespace huqiang
                         Envelope.CopyToBuff(pool[s].buff, item.data, 0, item.head, fs);
                         int c = ap / 32 + 1;
                         pool[s].checks = new Int32[c];
+                        Envelope.SetChecked(pool[s].checks, item.head.CurPart);
                     }
                     else
                     {
                         EnvelopeData data = new EnvelopeData();
                         data.data = item.data;
                         data.type = (byte)(item.head.Type);
-                        datas.Add(data);
+                        QueueBuf.Enqueue(data);
                     }
                 label:;
                 }
-                return datas;
             }
-            return null;
         }
         public void Clear()
         {

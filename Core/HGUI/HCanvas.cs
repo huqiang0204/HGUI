@@ -8,6 +8,7 @@ namespace huqiang.Core.HGUI
 {
     public class HCanvas:UIElement
     {
+        //protected static ThreadMission thread = new ThreadMission("UI");
         public Camera camera;
         [Range(0.1f, 3)]
         public float PhysicalScale = 1;
@@ -39,7 +40,6 @@ namespace huqiang.Core.HGUI
             }
             catch
             {
-
             }
         }
         protected virtual void OnDestroy()

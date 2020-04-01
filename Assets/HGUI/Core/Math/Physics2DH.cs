@@ -11,6 +11,10 @@ namespace huqiang
     /// </summary>
     public partial class Physics2D
     {
+        //[ThreadStatic]
+        static Vector3[] VB = new Vector3[512];
+        //[ThreadStatic]
+        static float[] DB = new float[512];
         public static bool CircleToCircle(Vector2 A, Vector2 B, float radiusA, float radiusB,ref  Vector2 p0,ref Vector2 p1)
         {
             float r = radiusA + radiusB;
@@ -125,6 +129,78 @@ namespace huqiang
                 return true;
             }
             return false;
+        }
+        public unsafe static bool PToP3B(Vector3* A, int aLen, Vector3* B, int bLen, ref Vector3 la, ref Vector3 lb)
+        {
+            bool re = false;
+            for (int i = 0; i < bLen; i++)
+            {
+                if (i == bLen - 1)
+                {
+                    VB[i].x = B[0].x - B[i].x;
+                    VB[i].y = B[0].y - B[i].y;
+                }
+                else
+                {
+                    VB[i].x = B[i + 1].x - B[i].x;
+                    VB[i].y = B[i + 1].y - B[i].y;
+                }
+            }
+            for (int i = 0; i < aLen; i++)
+            {
+                Vector2 VA = Vector2.zero;
+                if (i == aLen - 1)
+                {
+                    VA.x = A[0].x - A[i].x;
+                    VA.y = A[0].y - A[i].y;
+                }
+                else
+                {
+                    VA.x = A[i + 1].x - A[i].x;
+                    VA.y = A[i + 1].y - A[i].y;
+                }
+                for (int c = 0; c < bLen; c++)
+                {
+                    //(V1.y*V2.x-V1.x*V2.y)
+                    float y = VA.y * VB[c].x - VA.x * VB[c].y;
+                    if (y == 0)
+                        break;
+                    //((B.y-A.y)*V2.x+(A.x-B.x)*V2.y)
+                    float x = (B[c].y - A[i].y) * VB[c].x + (A[i].x - B[c].x) * VB[c].y;
+                    float d = x / y;
+                    if (d >= 0 & d <= 1)
+                    {
+                        if (VB[c].x == 0)
+                        {
+                            //x2=(A.y+x1*V1.y-B.y)/V2.y
+                            y = (A[i].y - B[c].y + d * VA.y) / VB[c].y;
+                        }
+                        else
+                        {
+                            //x2=(A.x+x1*V1.x-B.x)/V2.x
+                            y = (A[i].x - B[c].x + d * VA.x) / VB[c].x;
+                        }
+                        //location.x=A.x+x1*V1.x
+                        //location.y=A.x+x1*V1.y
+                        if (y >= 0 & y <= 1)
+                        {
+                            if (re)
+                            {
+                                lb.x = A[i].x + d * VA.x;
+                                lb.y = A[i].y + d * VA.y;
+                                return true;
+                            }
+                            else
+                            {
+                                la.x = A[i].x + d * VA.x;
+                                la.y = A[i].y + d * VA.y;
+                                re = true;
+                            }
+                        }
+                    }
+                }
+            }
+            return re;
         }
     }
 }

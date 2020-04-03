@@ -23,7 +23,6 @@ public class ScrollPage:UIPage
     {
         public UserEvent Image;
         public HText Text;
-        
     }
     class SubItem
     {
@@ -44,6 +43,7 @@ public class ScrollPage:UIPage
         List<ScrollYExtand.DataTemplate> datas = new List<ScrollYExtand.DataTemplate>();
         ScrollYExtand.DataTemplate tmp = new ScrollYExtand.DataTemplate();
         tmp.Title = "test1";
+        tmp.Tail = "over1";
         List<string> list = new List<string>();
         for (int i = 0; i < 22; i++)
             list.Add("tttt" + i.ToString());
@@ -53,6 +53,7 @@ public class ScrollPage:UIPage
 
         tmp = new ScrollYExtand.DataTemplate();
         tmp.Title = "test2";
+        tmp.Tail = "over2";
         list = new List<string>();
         for (int i = 0; i < 11; i++)
             list.Add("tttt" + i.ToString());
@@ -62,6 +63,7 @@ public class ScrollPage:UIPage
 
         tmp = new ScrollYExtand.DataTemplate();
         tmp.Title = "test3";
+        tmp.Tail = "over3";
         list = new List<string>();
         for (int i = 0; i < 7; i++)
             list.Add("tttt" + i.ToString());
@@ -73,6 +75,7 @@ public class ScrollPage:UIPage
         scrollY.BindingData = datas;
         scrollY.SetTitleUpdate<TitleItem, ScrollYExtand.DataTemplate>(TitleUpdate);
         scrollY.SetItemUpdate<SubItem, string>(ItemUpdate);
+        scrollY.SetTailUpdate<TitleItem, ScrollYExtand.DataTemplate>(TailUpdate);
         scrollY.Refresh();
     }
     ScrollYExtand.DataTemplate current;
@@ -98,6 +101,10 @@ public class ScrollPage:UIPage
                     current = null;
             }
         };
+    }
+    void TailUpdate(TitleItem title, ScrollYExtand.DataTemplate data, int index)
+    {
+        title.Text.Text = data.Tail as string;
     }
     void ItemUpdate(SubItem item, string data, int index)
     {

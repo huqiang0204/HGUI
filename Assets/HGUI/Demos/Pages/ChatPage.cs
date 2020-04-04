@@ -132,7 +132,8 @@ namespace Assets.Scripts
             if (data.conSize == Vector2.zero)
             {
                 Vector2 size = new Vector2(360, 60);
-                chat.content.GetPreferredHeight(ref size, data.content);
+                chat.content.GetPreferredSize(ref size, data.content);
+                size.x += 8;
                 size.y += 8;
                 data.conSize = size;
             }

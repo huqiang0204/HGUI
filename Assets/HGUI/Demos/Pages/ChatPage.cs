@@ -81,7 +81,8 @@ namespace Assets.Scripts
             self = container.RegLinker<ChatItem, ChatData>("self");
             self.CalculItemHigh = GetContentSize;
             self.ItemUpdate = ItemUpdate;
-            container.RegLinker<TipItem, TipData>("tip");
+            tip = container.RegLinker<TipItem, TipData>("tip");
+            tip.ItemUpdate = TipItemUpdate;
             view.send.userEvent.Click = (o, e) => {OnSubmit(input); };
         }
         void SelectChanged(OptionGroup option,UserAction action)
@@ -116,13 +117,16 @@ namespace Assets.Scripts
                     other.AddAndMove(chat);
                     break;
                 case "center":
+                    TipData t = new TipData();
+                    str= DateTime.Now.ToString();
+                    t.content = str;
+                    tip.AddAndMove(t);
                     break;
                 case "right":
                     chat = new ChatData();
                     chat.name = "胡强";
                     chat.content = str;
                     self.AddAndMove(chat);
-                    //container.Move(0);
                     break;
             }
             input.InputString = "";
@@ -143,7 +147,7 @@ namespace Assets.Scripts
             s.y += 10;
             chat.box.SizeDelta = s;
             var ui = chat.box.transform.parent.GetComponent<UIElement>();
-            s.y += 40;
+            s.y += 60;
             s.x = 600;
             ui.SizeDelta = s;
             UIElement.ResizeChild(ui);
@@ -153,6 +157,10 @@ namespace Assets.Scripts
         {
             chat.content.Text = data.content;
             chat.name.Text = data.name;
+        }
+        void TipItemUpdate(TipItem tip, TipData data, int index)
+        {
+            tip.content.Text = data.content;
         }
         float GetTipSize(TipItem tip,TipData data)
         {

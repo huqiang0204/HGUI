@@ -11,7 +11,8 @@ namespace huqiang.UIComposite
         public Transform Nob;
         public UserEvent callBack;
         float _r;
-        public float Radius { get { return _r; }set { _r = value;_s = _r * _r; } }
+        public float Radius { get { return _r; }set { if (value <= 0) value = 0.01f; _r = value;_s = _r * _r; } }
+        public float Slider { get { return Mathf.Sqrt(vector.x * vector.x + vector.y * vector.y) / _r; } }
         public enum Direction
         {
             None,Up,RifhtUp,Right,RightDown,Down,LeftDown,Left,LeftUp
@@ -40,6 +41,8 @@ namespace huqiang.UIComposite
             callBack.PointerDown = PointDown;
             callBack.IsCircular = true;
             _r = Enity.SizeDelta.x * 0.5f;
+            if (_r <= 0)
+                _r = 0.01f;
             _s = _r * _r;
             Nob = Enity.transform.Find("Nob");
         }

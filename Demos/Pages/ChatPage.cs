@@ -71,6 +71,7 @@ namespace Assets.Scripts
             option.AddEvent(view.center.userEvent);
             option.SelectChanged = SelectChanged;
             option.Selecet = view.right.userEvent;
+
             input = view.input.userEvent as TextInput;
            
             input.OnSubmit = OnSubmit;

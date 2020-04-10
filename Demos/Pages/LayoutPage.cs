@@ -37,7 +37,6 @@ public class LayoutPage:UIPage
         var one = d.AddArea(DockpanelArea.Dock.Right, 0.4f);
         context = one.AddContent("page2");
         context.LoadPopWindow<GridTestWindow>();
-        //d.Refresh();
 
         one.model.MainColor = Color.green;
         var top = area.AddArea(DockpanelArea.Dock.Top, 0.2f);

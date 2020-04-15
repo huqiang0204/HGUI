@@ -54,9 +54,9 @@ namespace Assets.Scripts
             item.img.DataContext = index;
             item.img.Click = ItemClick;
         }
-        void ItemClick(UserEvent user,UserAction action)
+        void ItemClick(UserEvent user, UserAction action)
         {
-            Debug.Log("Item: "+(int)user.DataContext+" Click !");
+            Debug.Log("Item: " + (int)user.DataContext + " Click !");
         }
     }
 }

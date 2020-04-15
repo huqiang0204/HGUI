@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using huqiang;
+using huqiang.Data;
 using huqiang.UIEvent;
 using UnityEngine;
 
@@ -8,6 +9,25 @@ namespace huqiang.Core.HGUI
 {
     public class HCanvas:UIElement
     {
+        class TempBuffer
+        {
+            public int Max;
+            public TempBuffer(int len=4096)
+            {
+                Max = len;
+                PipeLine = new HGUIElement[len];
+                scripts = new UIElement[len];
+            }
+            public HGUIElement[] PipeLine;
+            public UIElement[] scripts;
+            public List<Vector3> vertex = new List<Vector3>();
+            public List<Vector2> uv = new List<Vector2>();
+            public List<Vector2> uv1 = new List<Vector2>();
+            public List<Vector2> uv2 = new List<Vector2>();
+            public List<Vector2> uv3 = new List<Vector2>();
+            public List<Vector2> uv4 = new List<Vector2>();
+            public List<Color32> colors = new List<Color32>();
+        }
         //protected static ThreadMission thread = new ThreadMission("UI");
         public Camera camera;
         [Range(0.1f, 3)]
@@ -18,6 +38,9 @@ namespace huqiang.Core.HGUI
         public Vector2 D = new Vector2(10,1.3f);//贝塞尔曲线终点
         public RenderMode renderMode;
         public static HCanvas MainCanvas;
+        //public bool SubBatch;//是否开启子线程合批处理,开启后画面会延迟一帧
+        //LoopBuffer<HGUIElement[]> loopBuffer = new LoopBuffer<HGUIElement[]>(3);
+        QueueBuffer<TempBuffer> Main,Sub;
         HGUIElement[] PipeLine = new HGUIElement[4096];
         UIElement[] scripts = new UIElement[4096];
         int point = 0;
@@ -27,6 +50,8 @@ namespace huqiang.Core.HGUI
         protected virtual void Start()
         {
             Font.textureRebuilt += FontTextureRebuilt;
+            Main = new QueueBuffer<TempBuffer>();
+            Sub = new QueueBuffer<TempBuffer>();
         }
         void FontTextureRebuilt(Font font)
         {
@@ -124,7 +149,7 @@ namespace huqiang.Core.HGUI
             for (int i = 0; i < max; i++)
                 scripts[i].MainUpdate();
             TxtCollector.GenerateTexture();
-            SubMission(null);
+            Batch();
             ApplyMeshRenderer();
             ApplyToCamera();
         }
@@ -145,14 +170,14 @@ namespace huqiang.Core.HGUI
                 mesh.Clear();
                 if (vertex != null)
                 {
-                    mesh.vertices = vertex.ToArray();
-                    mesh.uv = uv.ToArray();
-                    mesh.uv2 = uv1.ToArray();
-                    mesh.uv3 = uv2.ToArray();
-                    mesh.uv4 = uv3.ToArray();
-                    mesh.uv5 = uv4.ToArray();
-                    mesh.colors32 = colors.ToArray();
-                   
+                    mesh.SetVertices(vertex);
+                    mesh.SetUVs(0, uv);
+                    mesh.SetUVs(1, uv1);
+                    mesh.SetUVs(2, uv2);
+                    mesh.SetUVs(3, uv3);
+                    mesh.SetUVs(4, uv4);
+                    mesh.SetColors(colors);
+
                     var submesh= MatCollector.submesh;
                     if (submesh != null)
                     {
@@ -382,7 +407,7 @@ namespace huqiang.Core.HGUI
         }
 #endregion
 #region UI绘制与合批
-        void SubMission(object obj)
+        void Batch()
         {
             int len = max;
             if (scripts != null)
@@ -396,6 +421,23 @@ namespace huqiang.Core.HGUI
             }
             ClearMesh();
             HBatch.Batch(this, PipeLine);
+        }
+        void SubBatch(object obj)
+        {
+            var m = Sub.Dequeue();
+            if(m!=null)
+            {
+                PipeLine = m.PipeLine;
+                scripts = m.scripts;
+                vertex = m.vertex;
+                uv = m.uv;
+                uv1 = m.uv1;
+                uv2 = m.uv2;
+                uv3 = m.uv3;
+                colors = m.colors;
+                Batch();
+                Main.Enqueue(m);
+            }
         }
         internal TextCollector TxtCollector = new TextCollector();
         internal List<Vector3> vertex = new List<Vector3>();
@@ -445,7 +487,7 @@ namespace huqiang.Core.HGUI
             for (int i = 0; i < max; i++)
                 scripts[i].MainUpdate();
             TxtCollector.GenerateTexture();
-            SubMission(null);
+            Batch();
             ApplyToCamera();
             ApplyShareMesh();
         }
@@ -463,13 +505,13 @@ namespace huqiang.Core.HGUI
                 mesh.Clear();
                 if (vertex != null)
                 {
-                    mesh.vertices = vertex.ToArray();
-                    mesh.uv = uv.ToArray();
-                    mesh.uv2 = uv1.ToArray();
-                    mesh.uv3 = uv2.ToArray();
-                    mesh.uv4 = uv3.ToArray();
-                    mesh.uv5 = uv4.ToArray();
-                    mesh.colors32 = colors.ToArray();
+                    mesh.SetVertices(vertex);
+                    mesh.SetUVs(0, uv);
+                    mesh.SetUVs(1, uv1);
+                    mesh.SetUVs(2, uv2);
+                    mesh.SetUVs(3, uv3);
+                    mesh.SetUVs(4, uv4);
+                    mesh.SetColors(colors);
                     var submesh = MatCollector.submesh;
                     if (submesh != null)
                     {

@@ -339,15 +339,14 @@ namespace huqiang.Core.HGUI
                 case MarginType.MarginRatioY:
                     break;
             }
-            if (script.scaleType != ScaleType.None | script.anchorType != AnchorType.None | script.marginType != MarginType.None)
+            if (script.scaleType != ScaleType.None | script.anchorType != AnchorType.None | script.marginType != MarginType.None|child)
             {
-                if (child)
-                    for (int i = 0; i < rect.childCount; i++)
-                    {
-                        var ss = rect.GetChild(i).GetComponent<UIElement>();
-                        if (ss != null)
-                            Resize(ss, child);
-                    }
+                for (int i = 0; i < rect.childCount; i++)
+                {
+                    var ss = rect.GetChild(i).GetComponent<UIElement>();
+                    if (ss != null)
+                        Resize(ss, child);
+                }
                 script.ReSized();
             }
         }

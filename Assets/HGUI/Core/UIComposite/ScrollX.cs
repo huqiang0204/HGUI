@@ -111,7 +111,6 @@ namespace huqiang.UIComposite
             Size = Enity.SizeDelta;
             eventCall.CutRect = true;
             Enity.SizeChanged = (o) => {
-                Size = Enity.SizeDelta;
                 Refresh(m_point,0);
             };
         }
@@ -234,7 +233,7 @@ namespace huqiang.UIComposite
         public override void Refresh(float x = 0, float y = 0)
         {
             m_point = x;
-         
+            Size = Enity.SizeDelta;
             ActualSize = Vector2.zero;
             if (DataLength == 0)
             {

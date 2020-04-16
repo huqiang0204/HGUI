@@ -261,16 +261,17 @@ namespace huqiang.Core.HGUI
             float px = rect.localPosition.x;
             rect.localPosition = new Vector3(px, oy, 0);
         }
-        public static void Resize(UIElement script,bool child = true)
+        public static void Resize(UIElement script, bool child = true)
         {
             Transform rect = script.transform;
             Vector3 loclpos = rect.localPosition;
             Vector2 psize = Vector2.zero;
+            Vector2 v = script.m_sizeDelta;
             var pp = Anchors[0];
             if (script.parentType == ParentType.Tranfrom)
             {
                 var p = rect.parent;
-                if(p!=null)
+                if (p != null)
                 {
                     var t = p.GetComponent<UIElement>();
                     if (t != null)
@@ -339,15 +340,25 @@ namespace huqiang.Core.HGUI
                 case MarginType.MarginRatioY:
                     break;
             }
-            if (script.scaleType != ScaleType.None | script.anchorType != AnchorType.None | script.marginType != MarginType.None|child)
+            if (child)
+                ResizeChild(rect, child);
+            else if (script.scaleType != ScaleType.None | script.anchorType != AnchorType.None | script.marginType != MarginType.None)
             {
-                for (int i = 0; i < rect.childCount; i++)
-                {
-                    var ss = rect.GetChild(i).GetComponent<UIElement>();
-                    if (ss != null)
-                        Resize(ss, child);
-                }
-                script.ReSized();
+                ResizeChild(rect, false);
+                if (v != script.m_sizeDelta)
+                    script.ReSized();
+            }
+        }
+        public static void ResizeChild(Transform trans, bool child = true)
+        {
+            for (int i = 0; i < trans.childCount; i++)
+            {
+                var son = trans.GetChild(i);
+                var ss = son.GetComponent<UIElement>();
+                if (ss != null)
+                    Resize(ss, child);
+                else if (child)
+                    ResizeChild(son, child);
             }
         }
         public static void ResizeChild(UIElement script, bool child = true)

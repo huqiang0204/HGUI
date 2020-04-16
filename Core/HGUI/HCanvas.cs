@@ -53,8 +53,10 @@ namespace huqiang.Core.HGUI
             Main = new QueueBuffer<TempBuffer>();
             Sub = new QueueBuffer<TempBuffer>();
         }
+        int Late;
         void FontTextureRebuilt(Font font)
         {
+            Late = 2;
             point = 1;
             max = 0;
             TxtCollector.Clear();
@@ -148,7 +150,13 @@ namespace huqiang.Core.HGUI
             Collection(transform, -1, 0);
             for (int i = 0; i < max; i++)
                 scripts[i].MainUpdate();
-            TxtCollector.GenerateTexture();
+            if(Late>-1)
+            {
+                Late--;
+            }
+            if (Late == 0)
+                TxtCollector.GenerateTexture(true);
+            else TxtCollector.GenerateTexture(false);
             Batch();
             ApplyMeshRenderer();
             ApplyToCamera();

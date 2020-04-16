@@ -93,22 +93,31 @@ namespace huqiang.Core.HGUI
                 if (dirty)
                 {
                     for (int j = 0; j < c; j++)
+                    {
+                        if(force)
+                            buf[j].Populate();
+                        else
                         if (state[j])
                             buf[j].Populate();
-                    if (buf.Length>0)
+                    }
+                    if(buf!=null)
                     {
-                        var font = buf[0].Font;
-                        if (font != null)
+                        if (buf.Length > 0)
                         {
-                            var tex = font.material.mainTexture;
-                            var id = tex.GetInstanceID();
-                            for (int j = 0; j < c; j++)
+                            var font = buf[0].Font;
+                            if (font != null)
                             {
-                                buf[j].texIds[0] = id;
-                                buf[j].textures[0] = tex;
+                                var tex = font.material.mainTexture;
+                                var id = tex.GetInstanceID();
+                                for (int j = 0; j < c; j++)
+                                {
+                                    buf[j].texIds[0] = id;
+                                    buf[j].textures[0] = tex;
+                                }
                             }
                         }
                     }
+                   
                 }
             }
         }

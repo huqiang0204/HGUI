@@ -13,9 +13,9 @@ namespace Assets.Scripts
     {
         class View
         {
-            public HImage scrolly;
-            public HImage scrollx;
-            public HImage grid;
+            public ScrollY scrolly;
+            public ScrollX scrollx;
+            public GridScroll grid;
             public UserEvent last;
             public UserEvent next;
         }
@@ -32,15 +32,15 @@ namespace Assets.Scripts
             List<string> data = new List<string>();
             for (int i = 1000; i < 1200; i++)
                 data.Add(i.ToString()+"😄");
-            var scrolly = view.scrolly.composite as ScrollY;
+            var scrolly = view.scrolly;
             scrolly.BindingData = data;
             scrolly.SetItemUpdate<ItemView, string>(ItemUpdate);
             scrolly.Refresh();
-            var scrollx = view.scrollx.composite as ScrollX;
+            var scrollx = view.scrollx;
             scrollx.BindingData = data;
             scrollx.SetItemUpdate<ItemView, string>(ItemUpdate);
             scrollx.Refresh();
-            var grid = view.grid.composite as GridScroll;
+            var grid = view.grid;
             grid.Column = 10;
             grid.BindingData = data;
             grid.SetItemUpdate<ItemView, string>(ItemUpdate);
@@ -54,9 +54,9 @@ namespace Assets.Scripts
             item.img.DataContext = index;
             item.img.Click = ItemClick;
         }
-        void ItemClick(UserEvent user,UserAction action)
+        void ItemClick(UserEvent user, UserAction action)
         {
-            Debug.Log("Item: "+(int)user.DataContext+" Click !");
+            Debug.Log("Item: " + (int)user.DataContext + " Click !");
         }
     }
 }

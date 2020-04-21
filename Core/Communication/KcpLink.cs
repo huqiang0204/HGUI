@@ -1,6 +1,5 @@
 ﻿using huqiang.Data;
 using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -34,10 +33,6 @@ namespace huqiang
         public override void Recive(long now)
         {
             int c = metaData.Count;
-            byte[][] tmp = new byte[c][];
-            lock (metaData)
-                for (int i = 0; i < c; i++)
-                    tmp[i] = metaData.Dequeue();
             if (c == 0)
             {
                 if (now - lastTime > TimeOut)
@@ -50,7 +45,8 @@ namespace huqiang
                     }
                 }
             }
-            else {
+            else
+            {
                 lastTime = now;
                 if (!_connect)
                     ConnectionOK();
@@ -58,19 +54,25 @@ namespace huqiang
             }
             for (int i = 0; i < c; i++)
             {
-                var list = envelope.Unpack(tmp[i], tmp[i].Length,now);
-                try
+                var dat = metaData.Dequeue();
+                if (dat != null)
+                    envelope.Unpack(dat, dat.Length, now);
+            }
+            var queue = envelope.QueueBuf;
+            c = queue.Count;
+            try
+            {
+                for (int i = 0; i < c; i++)
                 {
-                    if (list != null)
-                        for (int j = 0; j < list.Count; j++)
+                    var dat = queue.Dequeue();
+                    if (dat != null)
                     {
-                        var dat = list[j];
                         Dispatch(dat.data, dat.type);
                     }
                 }
-                catch
-                {
-                }
+            }
+            catch
+            {
             }
         }
         /// <summary>

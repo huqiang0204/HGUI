@@ -336,11 +336,11 @@ namespace huqiang.Core.HGUI
             var gen = Generator;
             float h = gen.GetPreferredHeight(new EmojiString(str).FilterString, settings);
             size.y = h;
-            if (gen.lineCount == 1)
-            {
-                var cha = gen.characters[gen.characterCountVisible];
-                size.x = cha.cursorPos.x + cha.charWidth * 1.1f + size.x * 0.5f;
-            }
+            //if (gen.lineCount == 1)
+            //{
+            //    var cha = gen.characters[gen.characterCountVisible];
+            //    size.x = cha.cursorPos.x + cha.charWidth * 1.1f + size.x * 0.5f;
+            //}
         }
         public void GetPreferredWidth(ref Vector2 size, string str)
         {
@@ -348,6 +348,14 @@ namespace huqiang.Core.HGUI
             var gen = Generator;
             float w = gen.GetPreferredWidth(new EmojiString(str).FilterString, settings);
             size.x = w;
+        }
+        public void GetPreferredSize(ref Vector2 size, string str)
+        {
+            GetGenerationSettings(ref size, ref settings);
+            var gen = Generator;
+            var fs = new EmojiString(str).FilterString;
+            size.x = gen.GetPreferredWidth(fs, settings);
+            size.y = gen.GetPreferredHeight(fs, settings);
         }
     }
 }

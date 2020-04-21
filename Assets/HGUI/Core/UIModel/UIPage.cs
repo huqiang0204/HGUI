@@ -1,6 +1,7 @@
 ﻿using huqiang;
 using huqiang.Core.HGUI;
 using huqiang.UIComposite;
+using huqiang.UIEvent;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -31,6 +32,7 @@ public class UIPage : UIBase
         }
         if (HCanvas.MainCanvas != null)//释放当前页面所有事件
             HCanvas.MainCanvas.ClearAllAction();
+        TextInput.Clear();
         if (CurrentPage != null)
         {
             CurrentPage.Save();
@@ -51,6 +53,9 @@ public class UIPage : UIBase
                     CurrentPage.Show(dat);
                     return;
                 }
+            if (HCanvas.MainCanvas != null)//释放当前页面所有事件
+                HCanvas.MainCanvas.ClearAllAction();
+            TextInput.Clear();
             if (CurrentPage != null)
                 CurrentPage.Dispose();
             var t = Activator.CreateInstance(type) as UIPage;

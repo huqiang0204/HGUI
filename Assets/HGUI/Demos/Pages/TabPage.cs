@@ -10,7 +10,7 @@ public class TabPage:UIPage
     //反射UI界面上的物体
     class View
     {
-        public UIElement tab;
+        public TabControl tab;
         public UserEvent last;
         public UserEvent next;
     }
@@ -25,7 +25,7 @@ public class TabPage:UIPage
     }
     void InitialTab()
     {
-        TabControl tab = view.tab.composite as TabControl;
+        TabControl tab = view.tab;
         var img = UICreator.CreateHImage(Vector3.zero,Vector2.zero,"con1",null);
         img.marginType = MarginType.Margin;
         img.MainColor = Color.red;

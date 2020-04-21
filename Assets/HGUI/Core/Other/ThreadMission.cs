@@ -141,7 +141,7 @@ namespace huqiang
                     return;
                 }
             }
-            var mis = new ThreadMission(null);
+            var mis = new ThreadMission(tag);
             mis.AddSubMission(action, dat, wait);
             threads.Add(mis);
         }

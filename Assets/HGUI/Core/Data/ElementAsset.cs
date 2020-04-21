@@ -224,7 +224,7 @@ namespace huqiang.Data
                                         {
                                             unsafe
                                             {
-                                                Data.SpriteData.SpriteDataS* sp = (Data.SpriteData.SpriteDataS*)fsa[j];
+                                                SpriteDataS* sp =(SpriteDataS*)fsa[j];
                                                 txtSize = sp->txtSize;
                                                 rect= sp->rect;
                                                 pivot = sp->pivot;
@@ -239,9 +239,9 @@ namespace huqiang.Data
                 }
             }
         }
-        public static SpriteRectInfo[] FindSpriteUVs(string tName, string[] sns)
+        public static SpriteDataS[] FindSpriteUVs(string tName, string[] sns)
         {
-            SpriteRectInfo[] infos = new SpriteRectInfo[sns.Length];
+            SpriteDataS[] infos = new SpriteDataS[sns.Length];
             for (int k = 0; k < SpriteDatas.Count; k++)
             {
                 var fs = SpriteDatas[k].buffer.fakeStruct;
@@ -267,16 +267,12 @@ namespace huqiang.Data
                                             {
                                                 unsafe
                                                 {
-                                                    Data.SpriteData.SpriteDataS* sp = (Data.SpriteData.SpriteDataS*)fsa[j];
-                                                    infos[t].txtSize = sp->txtSize;
-                                                    infos[t].rect = sp->rect;
-                                                    infos[t].pivot = sp->pivot;
+                                                    infos[t]= *(SpriteDataS*)fsa[j];
                                                 }
                                                 break;
                                             }
                                         }
                                     }
-
                                 }
                                 break;
                             }

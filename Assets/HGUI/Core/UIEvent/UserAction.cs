@@ -9,10 +9,6 @@ namespace huqiang.UIEvent
 {
     public class UserAction
     {
-        public enum InputType
-        {
-            OnlyMouse, OnlyTouch, Blend
-        }
         public static float Accelerationtime = 60;
         public static int TimeSlice;
         public static int LastTime;

@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace huqiang
 {
-    public class Physics2D
+    public partial class Physics2D
     {
         #region collision check
         /// <summary>
@@ -124,15 +124,30 @@ namespace huqiang
             }
             return count % 2 > 0 ? true : false;
         }
-        public static Vector2[] GetPointsOffset(Vector3 location, Vector2[] offsest)
+        /// <summary>
+        ///  检测一个点是否在多边形里面
+        /// </summary>
+        /// <param name="A">多边形,按顺序连接</param>
+        /// <param name="B">点</param>
+        /// <returns>在里面返回true，反之返回false</returns>
+        public unsafe static bool DotToPolygon(Vector3* A, int len, Vector2 B)
         {
-            Vector2[] temp = new Vector2[offsest.Length];
-            for (int i = 0; i < temp.Length; i++)
+            int count = 0;
+            for (int i = 0; i < len; i++)
             {
-                temp[i].x = location.x + offsest[i].x;
-                temp[i].y = location.y + offsest[i].y;
+                Vector2 p1 = A[i];
+                Vector2 p2 = i == len - 1 ? A[0] : A[i + 1];
+                if (B.y >= p1.y & B.y <= p2.y | B.y >= p2.y & B.y <= p1.y)
+                {
+                    float t = (B.y - p1.y) / (p2.y - p1.y);
+                    float xt = p1.x + t * (p2.x - p1.x);
+                    if (B.x == xt)
+                        return true;
+                    if (B.x < xt)
+                        count++;
+                }
             }
-            return temp;
+            return count % 2 > 0 ? true : false;
         }
         public static bool DotToPolygon(Vector2 origin, Vector2[] A, Vector2 B)//offset
         {
@@ -159,7 +174,8 @@ namespace huqiang
         }
         public static bool CircleToCircle(Vector2 A, Vector2 B, float radiusA, float radiusB)
         {
-            return radiusA + radiusB > Mathf.Sqrt((A.x - B.x) * (A.x - B.x) + (A.y - B.y) * (A.y - B.y));
+            float r = radiusA + radiusB;
+            return r * r > (A.x - B.x) * (A.x - B.x) + (A.y - B.y) * (A.y - B.y);
         }
         public static Vector2 RotatePoint2(ref Vector2 p, ref Vector2 location, float angle)//a=绝对角度 d=直径
         {
@@ -375,7 +391,7 @@ namespace huqiang
             return true;
         }
         /// <summary>
-        /// 多边形与多边形相交
+        /// 多边形与多边形相交,返回相交的第一个点
         /// </summary>
         /// <param name="A"></param>
         /// <param name="B"></param>
@@ -463,7 +479,7 @@ namespace huqiang
             return false;
         }
         /// <summary>
-        /// 多边形与多边形相交
+        /// 多边形与多边形相交,返回相交的两个点
         /// </summary>
         /// <param name="A"></param>
         /// <param name="B"></param>
@@ -751,6 +767,87 @@ namespace huqiang
             return false;
         }
         /// <summary>
+        /// 多边形与多边形相交,返回相交的两个点
+        /// </summary>
+        /// <param name="A"></param>
+        /// <param name="B"></param>
+        /// <param name="la"></param>
+        /// <param name="lb"></param>
+        /// <returns></returns>
+        public static bool PToP3A(Vector3[] A, Vector3[] B, ref Vector3 la, ref Vector3 lb)
+        {
+            bool re = false;
+            Vector2[] VB = new Vector2[B.Length];
+            for (int i = 0; i < B.Length; i++)
+            {
+                if (i == B.Length - 1)
+                {
+                    VB[i].x = B[0].x - B[i].x;
+                    VB[i].y = B[0].y - B[i].y;
+                }
+                else
+                {
+                    VB[i].x = B[i + 1].x - B[i].x;
+                    VB[i].y = B[i + 1].y - B[i].y;
+                }
+            }
+            for (int i = 0; i < A.Length; i++)
+            {
+                Vector2 VA = new Vector2();
+                if (i == A.Length - 1)
+                {
+                    VA.x = A[0].x - A[i].x;
+                    VA.y = A[0].y - A[i].y;
+                }
+                else
+                {
+                    VA.x = A[i + 1].x - A[i].x;
+                    VA.y = A[i + 1].y - A[i].y;
+                }
+                for (int c = 0; c < B.Length; c++)
+                {
+                    //(V1.y*V2.x-V1.x*V2.y)
+                    float y = VA.y * VB[c].x - VA.x * VB[c].y;
+                    if (y == 0)
+                        break;
+                    //((B.y-A.y)*V2.x+(A.x-B.x)*V2.y)
+                    float x = (B[c].y - A[i].y) * VB[c].x + (A[i].x - B[c].x) * VB[c].y;
+                    float d = x / y;
+                    if (d >= 0 & d <= 1)
+                    {
+                        if (VB[c].x == 0)
+                        {
+                            //x2=(A.y+x1*V1.y-B.y)/V2.y
+                            y = (A[i].y - B[c].y + d * VA.y) / VB[c].y;
+                        }
+                        else
+                        {
+                            //x2=(A.x+x1*V1.x-B.x)/V2.x
+                            y = (A[i].x - B[c].x + d * VA.x) / VB[c].x;
+                        }
+                        //location.x=A.x+x1*V1.x
+                        //location.y=A.x+x1*V1.y
+                        if (y >= 0 & y <= 1)
+                        {
+                            if (re)
+                            {
+                                lb.x = A[i].x + d * VA.x;
+                                lb.y = A[i].y + d * VA.y;
+                                return true;
+                            }
+                            else
+                            {
+                                la.x = A[i].x + d * VA.x;
+                                la.y = A[i].y + d * VA.y;
+                                re = true;
+                            }
+                        }
+                    }
+                }
+            }
+            return re;
+        }
+        /// <summary>
         /// 三角形和多边形相交
         /// </summary>
         /// <param name="A"></param>
@@ -829,7 +926,7 @@ namespace huqiang
         {
             Vector2 A = new Vector2();
             Vector2 B = new Vector2();
-            float z = 10, r2 = r * r, x = 0, y = 0;
+            float z = 100000, r2 = r * r, x = 0, y = 0;
             float[] d = new float[P.Length];
             int id = 0;
             for (int i = 0; i < P.Length; i++)
@@ -838,7 +935,7 @@ namespace huqiang
                 y = C.y - P[i].y;
                 x = x * x + y * y;
                 if (x <= r2)
-                    return true;
+                    return true;//多边形的点在圆里面
                 d[i] = x;
                 if (x < z)
                 {
@@ -905,29 +1002,28 @@ namespace huqiang
         {
             Vector2 A = new Vector2();
             Vector2 B = new Vector2();
-            float z = 10, r2 = r * r, x = 0, y = 0;
-            float[] d = new float[P.Length];
+            float z = 1000000, r2 = r * r, x = 0, y = 0;
             int id = 0;
             for (int i = 0; i < P.Length; i++)
             {
                 x = C.x - P[i].x;
                 y = C.y - P[i].y;
                 x = x * x + y * y;
-                if (x <= r2)
+                if (x <= r2)//如果点在圆内
                     return true;
-                d[i] = x;
+                DB[i] = x;
                 if (x < z)
                 {
                     z = x;
-                    id = i;
+                    id = i;//与圆最近的点
                 }
             }
             int p1 = id - 1;
             if (p1 < 0)
                 p1 = P.Length - 1;
             float a, b, c;
-            c = d[p1];
-            a = d[id];
+            c = DB[p1];
+            a = DB[id];
             B = P[id];
             A = P[p1];
             x = B.x - A.x;
@@ -950,7 +1046,7 @@ namespace huqiang
                 p1 = id + 1;
                 if (p1 == P.Length)
                     p1 = 0;
-                c = d[p1];
+                c = DB[p1];
                 A = P[p1];
                 x = B.x - A.x;
                 x *= x;
@@ -969,6 +1065,83 @@ namespace huqiang
                 }
             }
             return DotToPolygon(P, new Vector2(C.x, C.y));//circle inside polygon
+        }
+        /// <summary>
+        /// 圆与多边形相交
+        /// </summary>
+        /// <param name="C"></param>
+        /// <param name="r"></param>
+        /// <param name="P"></param>
+        /// <returns></returns>
+        public unsafe static bool CircleToPolygon(Vector2 C, float r, Vector3* P, int len)
+        {
+            if (len <= 0)
+                return false;
+            Vector2 A = Vector2.zero;
+            Vector2 B = Vector2.zero;
+            float z = 1000000, r2 = r * r, x = 0, y = 0;
+            int id = 0;
+            for (int i = 0; i < len; i++)
+            {
+                x = C.x - P[i].x;
+                y = C.y - P[i].y;
+                x = x * x + y * y;
+                if (x <= r2)//如果点在圆内
+                    return true;
+                DB[i] = x;
+                if (x < z)
+                {
+                    z = x;
+                    id = i;//与圆最近的点
+                }
+            }
+            int p1 = id - 1;
+            if (p1 < 0)
+                p1 = len - 1;
+            float a, b, c;
+            c = DB[p1];
+            a = DB[id];
+            B = P[id];
+            A = P[p1];
+            x = B.x - A.x;
+            x *= x;
+            y = B.y - A.y;
+            y *= y;
+            b = x + y;
+            x = c - a;
+            if (x < 0)
+                x = -x;
+            if (x <= b)
+            {
+                y = b + c - a;
+                y = y * y / 4 / b;
+                if (c - y <= r2)
+                    return true;
+            }
+            else
+            {
+                p1 = id + 1;
+                if (p1 == len)
+                    p1 = 0;
+                c = DB[p1];
+                A = P[p1];
+                x = B.x - A.x;
+                x *= x;
+                y = B.y - A.y;
+                y *= y;
+                b = x + y;
+                x = c - a;
+                if (x < 0)
+                    x = -x;
+                if (x <= b)
+                {
+                    y = b + c - a;
+                    y = y * y / 4 / b;
+                    if (c - y <= r2)
+                        return true;
+                }
+            }
+            return DotToPolygon(P,len, new Vector2(C.x, C.y));//circle inside polygon
         }
         /// <summary>
         /// 圆与线相交
@@ -1024,19 +1197,19 @@ namespace huqiang
             y *= y;
             float a = x + y;
             if (a <= r)
-                return true;
+                return true;//B点在圆里面
             x = A.x - C.x;
             x *= x;
             y = A.y - C.y;
             y *= y;
             float c = x + y;
             if (c <= r)
-                return true;
+                return true;//A点在圆里面
             x = B.x - A.x;
             x *= x;
             y = B.y - A.y;
             y *= y;
-            float b = x + y;
+            float b = x + y;//线段的长度
             x = c - a;
             if (x < 0)
                 x = -x;

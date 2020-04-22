@@ -261,7 +261,7 @@ namespace huqiang.Core.HGUI
             float px = rect.localPosition.x;
             rect.localPosition = new Vector3(px, oy, 0);
         }
-        public static void Resize(UIElement script, bool child = true)
+        public static void Resize(UIElement script,bool child = true)
         {
             Transform rect = script.transform;
             Vector3 loclpos = rect.localPosition;
@@ -271,7 +271,7 @@ namespace huqiang.Core.HGUI
             if (script.parentType == ParentType.Tranfrom)
             {
                 var p = rect.parent;
-                if (p != null)
+                if(p!=null)
                 {
                     var t = p.GetComponent<UIElement>();
                     if (t != null)
@@ -354,11 +354,11 @@ namespace huqiang.Core.HGUI
             for (int i = 0; i < trans.childCount; i++)
             {
                 var son = trans.GetChild(i);
-                var ss = son.GetComponent<UIElement>();
+                var ss =son.GetComponent<UIElement>();
                 if (ss != null)
                     Resize(ss, child);
                 else if (child)
-                    ResizeChild(son, child);
+                    ResizeChild(son,child);
             }
         }
         public static void ResizeChild(UIElement script, bool child = true)
@@ -402,6 +402,7 @@ namespace huqiang.Core.HGUI
         public bool Mask;
         public UserEvent userEvent;
         public Composite composite;
+        public FakeStruct mod;
         internal int PipelineIndex;
         public virtual Color32 MainColor { get; set; }
         public T RegEvent<T>(FakeStruct fake = null) where T : UserEvent, new()

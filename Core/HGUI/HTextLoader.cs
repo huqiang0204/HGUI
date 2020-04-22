@@ -88,6 +88,7 @@ namespace huqiang.Core.HGUI
             HText image = com.GetComponent<HText>();
             if (image == null)
                 return;
+            image.mod = fake;
             LoadScript(fake.ip, image);
             LoadHGraphics(fake, image);
             LoadHText(fake, image);

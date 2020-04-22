@@ -16,8 +16,11 @@ namespace huqiang.Core.HGUI
         public Int32 STexture;
         public Int32 TTexture;
         public Int32 FTexture;
-        public Color color;
+        public Color32 color;
         public Vector4 uvRect;
+        public bool Shadow;
+        public Vector2 shadowOffsset;
+        public Color32 shadowColor;
         public static int Size = sizeof(HGraphicsData);
         public static int ElementSize = Size / 4;
     }
@@ -56,6 +59,9 @@ namespace huqiang.Core.HGUI
             else tar.Material = null;
             tar.m_color = src->color;
             tar.uvrect = src->uvRect;
+            tar.Shadow = src->Shadow;
+            tar.shadowOffsset = src->shadowOffsset;
+            tar.shadowColor = src->shadowColor;
         }
         protected unsafe void SaveHGraphics(FakeStruct fake, HGraphics src)
         {
@@ -97,12 +103,16 @@ namespace huqiang.Core.HGUI
                 tar->shader = buffer.AddData(src.m_material.shader.name);
             tar->color = src.m_color;
             tar->uvRect = src.uvrect;
+            tar->Shadow = src.Shadow;
+            tar->shadowOffsset = src.shadowOffsset;
+            tar->shadowColor = src.shadowColor;
         }
         public unsafe override void LoadToComponent(FakeStruct fake, Component com, FakeStruct main)
         {
             var hg = com.GetComponent<HGraphics>();
             if (hg == null)
                 return;
+            hg.mod = fake;
             LoadScript(fake.ip, hg);
             LoadHGraphics(fake, hg);
             hg.Initial(main);

@@ -35,6 +35,7 @@ namespace huqiang.UIComposite
         public override void Initial(FakeStruct fake,UIElement element)
         {
             base.Initial(fake,element);
+            element.SizeChanged = (o) => { Refresh(); };
             eventCall = Enity.RegEvent<UserEvent>();
             eventCall.Drag = (o, e, s) => { Scrolling(o, s); };
             eventCall.DragEnd = (o, e, s) => { Scrolling(o, s); };

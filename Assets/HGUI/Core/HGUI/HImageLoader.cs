@@ -62,6 +62,7 @@ namespace huqiang.Core.HGUI
             HImage image = com.GetComponent<HImage>();
             if (image == null)
                 return;
+            image.mod = fake;
             LoadScript(fake.ip, image);
             LoadHGraphics(fake, image);
             LoadHImage(fake, image);

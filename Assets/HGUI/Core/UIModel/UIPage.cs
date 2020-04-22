@@ -90,11 +90,6 @@ public class UIPage : UIBase
         if (CurrentPage != null)
             CurrentPage.Update(time);
     }
-    public static void MainRefresh(float time)
-    {
-        if (CurrentPage != null)
-            CurrentPage.MainUpdate(time);
-    }
     public UIPage()
     {
         pops = new List<PopWindow>();
@@ -261,12 +256,5 @@ public class UIPage : UIBase
     {
         if (currentPop != null)
             currentPop.Update(time);
-    }
-    /// <summary>
-    /// 主线程更新
-    /// </summary>
-    /// <param name="time"></param>
-    public virtual void MainUpdate(float time)
-    {
     }
 }

@@ -66,6 +66,7 @@ namespace huqiang.Core.HGUI
         public unsafe override void LoadToComponent(FakeStruct fake, Component com, FakeStruct main)
         {
             var ui = com.GetComponent<UIElement>();
+            ui.mod = fake;
             LoadScript(fake.ip, ui);
             ui.Initial(main);
         }

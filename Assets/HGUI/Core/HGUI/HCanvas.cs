@@ -150,13 +150,13 @@ namespace huqiang.Core.HGUI
             Collection(transform, -1, 0);
             for (int i = 0; i < max; i++)
                 scripts[i].MainUpdate();
-            if(Late>-1)
-            {
-                Late--;
-            }
-            if (Late == 0)
+            //if(Late>-1)
+            //{
+            //    Late--;
+            //}
+            //if (Late == 0)
                 TxtCollector.GenerateTexture(true);
-            else TxtCollector.GenerateTexture(false);
+            //else TxtCollector.GenerateTexture(false);
             Batch();
             ApplyMeshRenderer();
             ApplyToCamera();

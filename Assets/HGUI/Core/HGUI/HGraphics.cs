@@ -103,6 +103,9 @@ namespace huqiang.Core.HGUI
                     texIds[3] = 0;
             }
         }
+        public bool Shadow;
+        public Vector2 shadowOffsset=new Vector2(1,-1);
+        public Color32 shadowColor=new Color32(0,0,0,255);
         public override void ReSized()
         {
             base.ReSized();

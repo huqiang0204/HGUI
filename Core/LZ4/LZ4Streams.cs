@@ -50,11 +50,11 @@ namespace huqiang.LZ4
             }
             return null;
         }
-        public static void CompressFolder(string folder, string filePath)
+        public static void CompressFolder(string folder, string savePath)
         {
-            if (File.Exists(filePath))
-                File.Delete(filePath);
-            var fs = File.Create(filePath);
+            if (File.Exists(savePath))
+                File.Delete(savePath);
+            var fs = File.Create(savePath);
             List<string> files = new List<string>();
             EncodeFiles(folder, folder, files, fs);
             int len = (int)fs.Length;

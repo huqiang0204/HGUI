@@ -7,20 +7,23 @@ using UnityEngine;
 
 namespace huqiang.UIComposite
 {
+    public class PopItemMod
+    {
+        public UserEvent Item;
+        public HText Text;
+        public Transform Check;
+        [NonSerialized]
+        public object data;
+        [NonSerialized]
+        public int Index;
+    }
     public class DropdownEx : Composite
     {
-        public class PopItemMod
-        {
-            public UserEvent Item;
-            public HText Text;
-            public Transform Check;
-            [NonSerialized]
-            public object data;
-            [NonSerialized]
-            public int Index;
-        }
         HText Label;
         ScrollY m_scroll;
+        /// <summary>
+        /// 用于更新Item的方法推荐使用SetItemUpdate<T, U>()where T:PopItemMod,new()
+        /// </summary>
         public ScrollY scrollY
         {
             get { return m_scroll; }
@@ -123,7 +126,7 @@ namespace huqiang.UIComposite
             }
         }
         GameObject Checked;
-        void ItemUpdate(PopItemMod g,object o, int index)
+        public void ItemUpdate(PopItemMod g,object o, int index)
         {
             PopItemMod item = g as PopItemMod;
             if (item == null)
@@ -173,7 +176,6 @@ namespace huqiang.UIComposite
             }
             if (OnSelectChanged != null)
                 OnSelectChanged(this, mod.data);
-            //scrollY.Enity.gameObject.SetActive(false);
             showAni = -1;
             showTime = 0;
         }

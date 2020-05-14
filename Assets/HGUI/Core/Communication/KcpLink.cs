@@ -37,6 +37,7 @@ namespace huqiang
             {
                 if (now - lastTime > TimeOut)
                 {
+                    lastTime = now;
                     envelope.Clear();
                     if (_connect)
                     {

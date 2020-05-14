@@ -54,8 +54,8 @@ namespace huqiang
                 {
                     case PackType.Part:
                         return OrganizeSubVolume(Envelope.UnpackPart(dat, len, buffer, ref remain, Fragment), Fragment - 16);
-                    case PackType.Total:
-                        return Envelope.UnpackInt(dat, len, buffer, ref remain);
+                    //case PackType.Total:
+                    //    return Envelope.UnpackInt(dat, len, buffer, ref remain);
                     case PackType.All:
                         var list = Envelope.UnpackInt(dat, len, buffer, ref remain);
                         return OrganizeSubVolume(Envelope.EnvlopeDataToPart(list), sss);

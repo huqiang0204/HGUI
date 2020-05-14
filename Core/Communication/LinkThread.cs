@@ -147,7 +147,7 @@ namespace huqiang
                                 mis.action(mis.data);
                     }
                 }
-                catch (Exception ex)
+                catch
                 {
                     
                 }

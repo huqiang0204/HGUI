@@ -9,6 +9,7 @@ using UnityEngine;
 public class StackPanelHelper:UICompositeHelp
 {
     public Direction direction = Direction.Horizontal;
+    public float spacing = 0;
     void Order()
     {
         switch (direction)
@@ -42,7 +43,7 @@ public class StackPanelHelper:UICompositeHelp
                 float os = sx + w * 0.5f;
                 son.localPosition = new Vector3(os,0,0);
                 son.localScale = Vector3.one;
-                sx += w;
+                sx += w+spacing;
             }
         }
     }
@@ -67,7 +68,7 @@ public class StackPanelHelper:UICompositeHelp
                 float os = sy - h * 0.5f;
                 son.localPosition = new Vector3(0, os, 0);
                 son.localScale = Vector3.one;
-                sy -= h;
+                sy -= h+spacing;
             }
         }
     }

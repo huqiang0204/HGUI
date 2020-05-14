@@ -101,7 +101,7 @@ public class AssetBundleCreate : Editor {
             AssetBundleBuild[] abb = new AssetBundleBuild[1];
             abb[0].assetBundleName = o_file;
             abb[0].assetNames = names.ToArray();
-            BuildPipeline.BuildAssetBundles(o_folder, abb, BuildAssetBundleOptions.ChunkBasedCompression, target);
+            BuildPipeline.BuildAssetBundles(o_folder, abb, BuildAssetBundleOptions.UncompressedAssetBundle, target);
             Debug.Log("打包完成");
         }
     }

@@ -114,10 +114,15 @@ namespace huqiang.Core.HGUI
         public void CombinationMaterial(HGraphics graphics, int[] tris, ref int offset, ref Vector4 clip)
         {
             int id = graphics.MatID;
+#if UNITY_EDITOR
+            var mat = graphics.Material;
+            if (mat != null)
+                id = mat.GetInstanceID();
+#endif
             if (id == 0)//使用默认材质球
             {
                 bool mask = graphics.Mask;
-                if (CombinationMaterial(graphics.textures[0], graphics.texIds[0], graphics.fillColors[0], ref offset, ref clip,mask))
+                if (CombinationMaterial(graphics.textures[0], graphics.texIds[0], graphics.fillColors[0], ref offset, ref clip, mask))
                 {
                     CombinationMesh(tris);
                 }
@@ -132,12 +137,18 @@ namespace huqiang.Core.HGUI
             {
                 if (max > -1)
                     CompeleteSub();
+                CombinationMesh(tris);
                 CombinationMaterial(graphics.Material, id, ref clip);
             }
         }
         public void CombinationMaterial(HGraphics graphics, int[][] trisArray, int[] offsets, ref Vector4 clip)
         {
             int id = graphics.MatID;
+#if UNITY_EDITOR
+            var mat = graphics.Material;
+            if (mat != null)
+                id = mat.GetInstanceID();
+#endif
             if (id == 0)//使用默认材质球
             {
                 if (trisArray != null)
@@ -146,7 +157,7 @@ namespace huqiang.Core.HGUI
                     bool mask = graphics.Mask;
                     for (int i = 0; i < c; i++)
                     {
-                        if (CombinationMaterial(graphics.textures[i], graphics.texIds[i],graphics.fillColors[i], ref offsets[i], ref clip, mask))
+                        if (CombinationMaterial(graphics.textures[i], graphics.texIds[i], graphics.fillColors[i], ref offsets[i], ref clip, mask))
                         {
                             CombinationMesh(trisArray[i]);
                         }
@@ -164,6 +175,8 @@ namespace huqiang.Core.HGUI
             {
                 if (max > -1)
                     CompeleteSub();
+                for (int i = 0; i < trisArray.Length; i++)
+                    CombinationMesh(trisArray[i]);
                 CombinationMaterial(graphics.Material, id, ref clip);
             }
         }

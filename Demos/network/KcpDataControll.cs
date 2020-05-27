@@ -57,7 +57,8 @@ namespace Assets.Net
             if (data.Length > 30000 * 1024)
                 return false;
             envelope.Pack(data, type);
-            return envelope.Send(kcp.soc, DateTime.Now.Ticks,endpPoint);
+            envelope.Send(kcp.soc, DateTime.Now.Ticks,endpPoint);
+            return true;
         }
         public override void Disconnect()
         {

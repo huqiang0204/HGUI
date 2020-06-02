@@ -22,6 +22,7 @@ namespace huqiang.Core.HGUI
         public int m_fontSize;
         public bool m_align;
         public FontStyle m_fontStyle;
+        public ContentSizeFitter sizeFitter;
         public static int Size = sizeof(HTextData);
         public static int ElementSize = Size / 4;
     }
@@ -66,6 +67,7 @@ namespace huqiang.Core.HGUI
             tar.m_fontSize = src->m_fontSize;
             tar.m_align = src->m_align;
             tar.m_fontStyle = src->m_fontStyle;
+            tar.sizeFitter = src->sizeFitter;
         }
         protected unsafe void SaveHText(FakeStruct fake, HText src)
         {
@@ -82,6 +84,7 @@ namespace huqiang.Core.HGUI
             tar->m_fontSize = src.m_fontSize;
             tar->m_align = src.m_align;
             tar->m_fontStyle = src.m_fontStyle;
+            tar->sizeFitter = src.sizeFitter;
         }
         public unsafe override void LoadToComponent(FakeStruct fake, Component com,FakeStruct main)
         {

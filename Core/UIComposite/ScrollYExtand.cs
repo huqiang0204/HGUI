@@ -44,19 +44,11 @@ namespace huqiang.UIComposite
             eventCall.ForceEvent = true;
             Size = Enity.SizeDelta;
             eventCall.CutRect = true;
-            HGUIManager.GameBuffer.RecycleChild(Enity.gameObject);
-            BodyParent = HGUIManager.GameBuffer.CreateNew(1).transform;
-            BodyParent.SetParent(Enity.transform);
-            BodyParent.localPosition = Vector3.zero;
-            BodyParent.localScale = Vector3.one;
-            BodyParent.localRotation = Quaternion.identity;
-            BodyParent.name = "Bodys";
-            TitleParent = HGUIManager.GameBuffer.CreateNew(1).transform;
-            TitleParent.SetParent(Enity.transform);
-            TitleParent.localPosition = Vector3.zero;
-            TitleParent.localScale = Vector3.one;
-            TitleParent.localRotation = Quaternion.identity;
-            TitleParent.name = "Titles";
+            var trans = element.transform;
+            BodyParent = trans.Find("Bodys");
+            TitleParent = trans.Find("Titles");
+            HGUIManager.GameBuffer.RecycleChild(Enity.gameObject,new string[]{ "Bodys", "Titles" });
+           
             TitleMod =  HGUIManager.FindChild(fake,"Title");
             ItemMod = HGUIManager.FindChild(fake, "Item");
             TailMod = HGUIManager.FindChild(fake, "Tail");

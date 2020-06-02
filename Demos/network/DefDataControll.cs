@@ -1,5 +1,6 @@
 ﻿using huqiang.Core.HGUI;
 using huqiang.Data;
+using huqiang.UIModel;
 using System;
 using System.Collections.Generic;
 using UnityEngine;

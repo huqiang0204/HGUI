@@ -168,8 +168,8 @@ namespace huqiang.Core.HGUI
             float apy = p.y;
             float alx = ax * -apx;
             float ady = ay * -apy;
-            float aox = ax * apx;//原点x
-            float aoy = ay * apy;//原点y
+            //float aox = ax * apx;//原点x
+            //float aoy = ay * apy;//原点y
 
             float x = script.SizeDelta.x;
             float y = script.SizeDelta.y;
@@ -178,8 +178,8 @@ namespace huqiang.Core.HGUI
             float lx = x * -px;
             float dy = y * -py;
 
-            float ox = x * px;//原点x
-            float oy = y * py;//原点y
+            //float ox = x * px;//原点x
+            //float oy = y * py;//原点y
 
             switch (type)
             {
@@ -287,6 +287,47 @@ namespace huqiang.Core.HGUI
                 if (t != null)
                     psize = t.SizeDelta;
             }
+            switch (script.marginType)
+            {
+                case MarginType.None:
+                    break;
+                case MarginType.Margin:
+                    var mar = script.margin;
+                    if (script.parentType == ParentType.BangsScreen)
+                        if (Scale.ScreenHeight / Scale.ScreenWidth > 2f)
+                            mar.top += 88;
+                    MarginEx(script, mar, pp, psize);
+                    break;
+                case MarginType.MarginRatio:
+                    mar = new Margin();
+                    mar.left = script.margin.left * psize.x;
+                    mar.right = script.margin.right * psize.x;
+                    mar.top = script.margin.top * psize.y;
+                    if (script.parentType == ParentType.BangsScreen)
+                        if (Scale.ScreenHeight / Scale.ScreenWidth > 2f)
+                            mar.top += 88;
+                    mar.down = script.margin.down * psize.y;
+                    MarginEx(script, mar, pp, psize);
+                    break;
+                case MarginType.MarginX:
+                    mar = script.margin;
+                    if (script.parentType == ParentType.BangsScreen)
+                        if (Scale.ScreenHeight / Scale.ScreenWidth > 2f)
+                            mar.top += 88;
+                    MarginX(script, mar, pp, psize);
+                    break;
+                case MarginType.MarginY:
+                    mar = script.margin;
+                    if (script.parentType == ParentType.BangsScreen)
+                        if (Scale.ScreenHeight / Scale.ScreenWidth > 2f)
+                            mar.top += 88;
+                    MarginY(script, mar, pp, psize);
+                    break;
+                case MarginType.MarginRatioX:
+                    break;
+                case MarginType.MarginRatioY:
+                    break;
+            }
             //Scaling(script, script.scaleType, psize, script.DesignSize);
             switch (script.anchorType)
             {
@@ -298,6 +339,64 @@ namespace huqiang.Core.HGUI
                 case AnchorType.Alignment:
                     AlignmentEx(script, script.anchorPointType, script.anchorOffset, pp, psize);
                     break;
+            }
+           
+            if (child)
+                ResizeChild(rect, child);
+            else if (script.scaleType != ScaleType.None | script.anchorType != AnchorType.None | script.marginType != MarginType.None)
+            {
+                ResizeChild(rect, false);
+                if (v != script.m_sizeDelta)
+                    script.ReSized();
+            }
+        }
+        public static void ResizeChild(Transform trans, bool child = true)
+        {
+            for (int i = 0; i < trans.childCount; i++)
+            {
+                var son = trans.GetChild(i);
+                var ss =son.GetComponent<UIElement>();
+                if (ss != null)
+                    Resize(ss, child);
+                else if (child)
+                    ResizeChild(son,child);
+            }
+        }
+        public static void ResizeChild(UIElement script, bool child = true)
+        {
+            var rect = script.transform;
+            for (int i = 0; i < rect.childCount; i++)
+            {
+                var ss = rect.GetChild(i).GetComponent<UIElement>();
+                if (ss != null)
+                    Resize(ss, child);
+            }
+        }
+        public static void Margin(UIElement script)
+        {
+            Transform rect = script.transform;
+            Vector3 loclpos = rect.localPosition;
+            Vector2 psize = Vector2.zero;
+            Vector2 v = script.m_sizeDelta;
+            var pp = Anchors[0];
+            if (script.parentType == ParentType.Tranfrom)
+            {
+                var p = rect.parent;
+                if (p != null)
+                {
+                    var t = p.GetComponent<UIElement>();
+                    if (t != null)
+                    {
+                        psize = t.SizeDelta;
+                        pp = t.Pivot;
+                    }
+                }
+            }
+            else
+            {
+                var t = rect.root.GetComponent<UIElement>();
+                if (t != null)
+                    psize = t.SizeDelta;
             }
             switch (script.marginType)
             {
@@ -340,35 +439,43 @@ namespace huqiang.Core.HGUI
                 case MarginType.MarginRatioY:
                     break;
             }
-            if (child)
-                ResizeChild(rect, child);
-            else if (script.scaleType != ScaleType.None | script.anchorType != AnchorType.None | script.marginType != MarginType.None)
-            {
-                ResizeChild(rect, false);
-                if (v != script.m_sizeDelta)
-                    script.ReSized();
-            }
         }
-        public static void ResizeChild(Transform trans, bool child = true)
+        public static void Dock(UIElement script)
         {
-            for (int i = 0; i < trans.childCount; i++)
+            Transform rect = script.transform;
+            Vector3 loclpos = rect.localPosition;
+            Vector2 psize = Vector2.zero;
+            Vector2 v = script.m_sizeDelta;
+            var pp = Anchors[0];
+            if (script.parentType == ParentType.Tranfrom)
             {
-                var son = trans.GetChild(i);
-                var ss =son.GetComponent<UIElement>();
-                if (ss != null)
-                    Resize(ss, child);
-                else if (child)
-                    ResizeChild(son,child);
+                var p = rect.parent;
+                if (p != null)
+                {
+                    var t = p.GetComponent<UIElement>();
+                    if (t != null)
+                    {
+                        psize = t.SizeDelta;
+                        pp = t.Pivot;
+                    }
+                }
             }
-        }
-        public static void ResizeChild(UIElement script, bool child = true)
-        {
-            var rect = script.transform;
-            for (int i = 0; i < rect.childCount; i++)
+            else
             {
-                var ss = rect.GetChild(i).GetComponent<UIElement>();
-                if (ss != null)
-                    Resize(ss, child);
+                var t = rect.root.GetComponent<UIElement>();
+                if (t != null)
+                    psize = t.SizeDelta;
+            }
+            switch (script.anchorType)
+            {
+                case AnchorType.None:
+                    break;
+                case AnchorType.Anchor:
+                    AnchorEx(script, script.anchorPointType, script.anchorOffset, pp, psize);
+                    break;
+                case AnchorType.Alignment:
+                    AlignmentEx(script, script.anchorPointType, script.anchorOffset, pp, psize);
+                    break;
             }
         }
         #endregion

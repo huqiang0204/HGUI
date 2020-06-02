@@ -5,6 +5,8 @@ using huqiang.UIComposite;
 using huqiang.UIEvent;
 using huqiang;
 using huqiang.Data;
+using huqiang.UIModel;
+
 public class ButtonPage:UIPage
 {
     //反射UI界面上的物体

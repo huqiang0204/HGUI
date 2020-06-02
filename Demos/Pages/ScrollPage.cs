@@ -6,6 +6,7 @@ using huqiang.UIEvent;
 using huqiang;
 using huqiang.Data;
 using System.Collections.Generic;
+using huqiang.UIModel;
 
 public class ScrollPage:UIPage
 {

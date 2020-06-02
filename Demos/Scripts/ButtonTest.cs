@@ -1,4 +1,5 @@
 ﻿using huqiang.Data;
+using huqiang.UIModel;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;

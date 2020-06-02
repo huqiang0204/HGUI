@@ -271,7 +271,7 @@ namespace huqiang.Core.HGUI
                 m_align = value;
                 m_dirty = true;
             } }
-
+        public ContentSizeFitter sizeFitter;
         public static TextGenerationSettings settings;
         public void GetGenerationSettings(ref Vector2 size, ref TextGenerationSettings sett)
         {
@@ -299,9 +299,32 @@ namespace huqiang.Core.HGUI
         public void Populate()
         {
             emojiString.FullString = m_text;
+            var str = emojiString.FilterString;
+            if(sizeFitter!=ContentSizeFitter.None)
+            {
+                if (marginType != MarginType.None)
+                    Margin(this);
+                GetGenerationSettings(ref m_sizeDelta, ref settings);
+                var gen = Generator;
+                if (sizeFitter==ContentSizeFitter.Horizoantal)
+                {
+                    m_sizeDelta.x = gen.GetPreferredWidth(str, settings);
+                }
+               else if(sizeFitter==ContentSizeFitter.Vertical)
+                {
+                    m_sizeDelta.y = gen.GetPreferredHeight(str, settings);
+                }else if(sizeFitter == ContentSizeFitter.Both)
+                {
+                    float w = gen.GetPreferredWidth(str, settings);
+                    if (w < m_sizeDelta.x)
+                        m_sizeDelta.x = w;
+                    m_sizeDelta.y = gen.GetPreferredHeight(str, settings);
+                }
+                Dock(this);
+            }
             GetGenerationSettings(ref m_sizeDelta,ref settings);
             var g = Generator;
-            g.Populate(emojiString.FilterString, settings);
+            g.Populate(str, settings);
             verts = g.verts.ToArray();
             uILines = g.lines.ToArray();
             uIChars = g.characters.ToArray();
@@ -336,11 +359,6 @@ namespace huqiang.Core.HGUI
             var gen = Generator;
             float h = gen.GetPreferredHeight(new EmojiString(str).FilterString, settings);
             size.y = h;
-            //if (gen.lineCount == 1)
-            //{
-            //    var cha = gen.characters[gen.characterCountVisible];
-            //    size.x = cha.cursorPos.x + cha.charWidth * 1.1f + size.x * 0.5f;
-            //}
         }
         public void GetPreferredWidth(ref Vector2 size, string str)
         {
@@ -358,4 +376,12 @@ namespace huqiang.Core.HGUI
             size.y = gen.GetPreferredHeight(fs, settings);
         }
     }
+    public enum ContentSizeFitter
+    { 
+       None,
+       Horizoantal,
+       Vertical,
+       Both
+    }
+
 }

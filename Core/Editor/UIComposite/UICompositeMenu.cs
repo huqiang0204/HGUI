@@ -568,6 +568,18 @@ public static class UICompositeMenu
         scroll.SprType = SpriteType.Sliced;
         scroll.Pivot = new Vector2(0.5f, 1);
 
+        var bds = UICreator.CreateElement(Vector3.zero, new Vector2(400, 100), "Bodys",  scroll.transform);
+        bds.anchorType = AnchorType.Alignment;
+        bds.anchorPointType = AnchorPointType.Top;
+        bds.marginType = MarginType.MarginX;
+        bds.Pivot = new Vector2(0.5f,1);
+
+        bds = UICreator.CreateElement(Vector3.zero, new Vector2(400, 100), "Titles", scroll.transform);
+        bds.anchorType = AnchorType.Alignment;
+        bds.anchorPointType = AnchorPointType.Top;
+        bds.marginType = MarginType.MarginX;
+        bds.Pivot = new Vector2(0.5f, 1);
+
         CreateItemE(scroll.transform,"Title");
         var item= CreateItemE(scroll.transform, "Item");
         item.transform.localPosition = new Vector3(0,-100, 0);

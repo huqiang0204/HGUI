@@ -5,6 +5,7 @@ using huqiang.Core.HGUI;
 using Assets.Scripts;
 using System.Collections.Generic;
 using Assets.Net;
+using huqiang.UIModel;
 
 public class MainScript : HCanvas
 {

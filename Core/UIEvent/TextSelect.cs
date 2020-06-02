@@ -142,6 +142,8 @@ namespace huqiang.UIEvent
         }
         protected void SetSetting()
         {
+            if (TextCom == null)
+                return;
             settings.resizeTextMinSize = 2;
             settings.resizeTextMaxSize = 40;
             settings.scaleFactor = 1;
@@ -540,6 +542,8 @@ namespace huqiang.UIEvent
         {
             get 
             {
+                if (lines == null)
+                    return 0;
                 return lines[StartPress.Row].StartIndex + StartPress.Offset; 
             }
             set { SetIndex(ref StartPress, value); }

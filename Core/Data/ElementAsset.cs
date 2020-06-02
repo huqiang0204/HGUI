@@ -14,16 +14,15 @@ namespace huqiang.Data
     }
     public class ElementAsset
     {
-        public static Progress LoadAssetsAsync(string name,Action<Progress,AssetBundleCreateRequest> callback=null)
+        public static Progress LoadAssetsAsync(string path,Action<Progress,AssetBundleCreateRequest> callback=null)
         {
             Progress pro = new Progress();
-            pro.Play(LoadAssets(name));
+            pro.Play(LoadAssets(path));
             pro.PlayOver = callback;
             return pro;
         }
-        public static AssetBundleCreateRequest LoadAssets(string name)
+        public static AssetBundleCreateRequest LoadAssets(string path)
         {
-            string path = Application.streamingAssetsPath + "/" + name;  // 其他平台
             return AssetBundle.LoadFromFileAsync(path);
         }
         public static List<AssetBundle> bundles = new List<AssetBundle>();

@@ -122,7 +122,7 @@ namespace huqiang.Core.HGUI
             if (id == 0)//使用默认材质球
             {
                 bool mask = graphics.Mask;
-                if (CombinationMaterial(graphics.textures[0], graphics.texIds[0], graphics.fillColors[0], ref offset, ref clip, mask))
+                if (CombinationMaterial(graphics.textures[0], graphics.texIds[0], graphics.fillColors[0], ref offset, ref clip,mask))
                 {
                     CombinationMesh(tris);
                 }
@@ -138,6 +138,7 @@ namespace huqiang.Core.HGUI
                 if (max > -1)
                     CompeleteSub();
                 CombinationMesh(tris);
+                graphics.Material.SetTexture(tc[0], graphics.textures[0]);
                 CombinationMaterial(graphics.Material, id, ref clip);
             }
         }
@@ -157,7 +158,7 @@ namespace huqiang.Core.HGUI
                     bool mask = graphics.Mask;
                     for (int i = 0; i < c; i++)
                     {
-                        if (CombinationMaterial(graphics.textures[i], graphics.texIds[i], graphics.fillColors[i], ref offsets[i], ref clip, mask))
+                        if (CombinationMaterial(graphics.textures[i], graphics.texIds[i],graphics.fillColors[i], ref offsets[i], ref clip, mask))
                         {
                             CombinationMesh(trisArray[i]);
                         }
@@ -177,6 +178,7 @@ namespace huqiang.Core.HGUI
                     CompeleteSub();
                 for (int i = 0; i < trisArray.Length; i++)
                     CombinationMesh(trisArray[i]);
+                graphics.Material.SetTexture(tc[0],graphics.textures[0]);
                 CombinationMaterial(graphics.Material, id, ref clip);
             }
         }

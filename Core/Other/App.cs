@@ -1,6 +1,7 @@
 ﻿using huqiang.Data;
 using UnityEngine;
 using huqiang.Core.HGUI;
+using huqiang.UIModel;
 
 namespace huqiang
 {

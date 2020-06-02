@@ -69,6 +69,7 @@ namespace huqiang.Core.HGUI
                                 scr.userEvent = Activator.CreateInstance(m.FieldType) as UserEvent;
                                 scr.userEvent.Context = scr;
                                 scr.userEvent.g_color = scr.MainColor;
+                                scr.userEvent.Initial(fake);
                             }
                             m.Value = scr.userEvent;
                         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using huqiang;
 using huqiang.Data;
 using huqiang.UIEvent;
+using huqiang.UIModel;
 using UnityEngine;
 
 namespace huqiang.Core.HGUI
@@ -30,6 +31,7 @@ namespace huqiang.Core.HGUI
         }
         //protected static ThreadMission thread = new ThreadMission("UI");
         public Camera camera;
+        public Vector2 DesignSize = new Vector2(1920, 1080);
         [Range(0.1f, 3)]
         public float PhysicalScale = 1;
         public Vector2 A = new Vector2(4,0.9f);//贝塞尔曲线起点
@@ -150,13 +152,7 @@ namespace huqiang.Core.HGUI
             Collection(transform, -1, 0);
             for (int i = 0; i < max; i++)
                 scripts[i].MainUpdate();
-            //if(Late>-1)
-            //{
-            //    Late--;
-            //}
-            //if (Late == 0)
-                TxtCollector.GenerateTexture(true);
-            //else TxtCollector.GenerateTexture(false);
+            TxtCollector.GenerateTexture(true);
             Batch();
             ApplyMeshRenderer();
             ApplyToCamera();
@@ -245,6 +241,13 @@ namespace huqiang.Core.HGUI
                 }
                 PhysicalScale = ps;
 #else
+                if(scaleType==ScaleType.FillX)
+                {
+                    PhysicalScale = w / DesignSize.x;
+                }else if(scaleType==ScaleType.FillY)
+                {
+                    PhysicalScale = h / DesignSize.y;
+                }
                 float ps = PhysicalScale;
                 if (ps < 0.01f)
                     ps = 0.01f;

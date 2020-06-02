@@ -4,6 +4,7 @@ using UnityEngine;
 using huqiang.UIComposite;
 using huqiang.UIEvent;
 using huqiang;
+using huqiang.UIModel;
 
 public class TabPage:UIPage
 {

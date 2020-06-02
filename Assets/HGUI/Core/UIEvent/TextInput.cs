@@ -314,6 +314,8 @@ namespace huqiang.UIEvent
             }
             else
             {
+                if (TextCom == null)
+                    return;
                 TextCom.MainColor = textColor;
                 if (contentType == ContentType.Password)
                     TextCom.Text = new string('*',str.Length);
@@ -619,6 +621,8 @@ namespace huqiang.UIEvent
         }
         public void SetPressPointer()
         {
+            if (TextCom == null)
+                return;
             int line = StartPress.Row - ShowStart;
             if(line>=0)
             {

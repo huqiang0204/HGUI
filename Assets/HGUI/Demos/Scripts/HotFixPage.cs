@@ -1,5 +1,6 @@
 ﻿using Assets.Game.HotFix;
 using huqiang.Core.HGUI;
+using huqiang.UIModel;
 using System;
 using System.Collections.Generic;
 using System.IO;

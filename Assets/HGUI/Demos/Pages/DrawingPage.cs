@@ -6,6 +6,7 @@ using huqiang.UIEvent;
 using huqiang;
 using huqiang.Data;
 using Assets.Scripts;
+using huqiang.UIModel;
 
 public class DrawingPage:UIPage
 {

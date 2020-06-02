@@ -25,13 +25,6 @@ namespace huqiang.UIComposite
         public virtual LinkerMod CreateUI() { return null; }
         public virtual float GetItemSize(object u) { return 40; }
         public virtual void RefreshItem(object t, object u, int index) { }
-        public virtual void SetEnityModel(Transform transform) 
-        {
-            enityModel = transform;
-            ElementCount = 0;
-            if (enityModel != null)
-                GetElementCount(transform);
-        }
         public void RecycleItem(LinkerMod mod)
         {
             buffer.Add(mod);
@@ -71,12 +64,21 @@ namespace huqiang.UIComposite
     {
         FakeStruct model;
         public Action<T, U, int> ItemUpdate;
-        public Func<T, U, float> CalculItemHigh;
+        public Func<U, float> CalculItemHigh;
         UIContainer con;
         UIInitializer initializer;
         T uiModel;
         private UILinker()
         {
+        }
+        public UILinker(UIContainer container, string mod)
+        {
+            if (container.model == null)
+                return;
+            con = container;
+            model = HGUIManager.FindChild(container.model,mod);
+            container.linkers.Add(this);
+            initializer = new UIInitializer(TempReflection.ObjectFields(typeof(T)));
         }
         public UILinker(UIContainer container, FakeStruct mod)
         {
@@ -93,21 +95,15 @@ namespace huqiang.UIComposite
         {
             con.AddData(this, dat);
         }
-        public void AddAndMove(U dat)
+        public void AddAndMove(U dat,float h)
         {
-            float h;
-            if (CalculItemHigh != null)
-                h = CalculItemHigh(uiModel, dat);
-            else
+            if (h <= 0)
                 unsafe { h = ((TransfromData*)model.ip)->size.y; }
             con.AddAndMove(this, dat, h);
         }
-        public void AddAndMoveEnd(U dat)
+        public void AddAndMoveEnd(U dat,float h)
         {
-            float h;
-            if (CalculItemHigh != null)
-                h = CalculItemHigh(uiModel, dat);
-            else
+            if (h<=0)
                 unsafe { h = ((TransfromData*)model.ip)->size.y; }
             con.AddAndMoveEnd(this, dat, h);
         }
@@ -132,7 +128,7 @@ namespace huqiang.UIComposite
         public override float GetItemSize(object u)
         {
             if (CalculItemHigh != null)
-                return CalculItemHigh(uiModel, u as U);
+                return CalculItemHigh(u as U);
             unsafe { return ((TransfromData*)model.ip)->size.y; }
         }
         public override void RefreshItem(object t, object u, int index)
@@ -140,31 +136,18 @@ namespace huqiang.UIComposite
             if (ItemUpdate != null)
                 ItemUpdate(t as T, u as U, index);
         }
-        public override void SetEnityModel(Transform transform)
-        {
-            enityModel = transform;
-            if (enityModel != null)
-            {
-                uiModel = new T();
-                initializer.ReflectionEnity(uiModel, transform);
-                GetElementCount(transform);
-            }
-        }
     }
     /// <summary>
     /// 对象型连接器，用用于热更新块
     /// </summary>
     public class ObjectLinker : Linker
     {
-        FakeStruct model;
         public Action<object, object, int> ItemUpdate;
         public Action<ObjectLinker, LinkerMod> ItemCreate;
-        public Func<object, object, float> CalculItemHigh;
+        public Func<object, float> CalculItemHigh;
         UIContainer con;
-        public ObjectLinker(UIContainer container, FakeStruct mod)
+        public ObjectLinker(UIContainer container)
         {
-            con = container;
-            model = mod;
             container.linkers.Add(this);
         }
         public void AddData(object dat)
@@ -173,8 +156,14 @@ namespace huqiang.UIComposite
         }
         public override LinkerMod CreateUI()
         {
+            for (int i = 0; i < buffer.Count; i++)
+                if (buffer[i].index < 0)
+                {
+                    var item = buffer[i];
+                    buffer.RemoveAt(i);
+                    return item;
+                }
             LinkerMod mod = new LinkerMod();
-            mod.main = HGUIManager.GameBuffer.Clone(model);
             if (ItemCreate != null)
                 ItemCreate(this, mod);
             return mod;
@@ -294,20 +283,7 @@ namespace huqiang.UIComposite
             eventCall.MouseWheel= (o,e) => { Move(e.MouseWheelDelta*100); };
             model = fake;
             var trans = Enity.transform;
-            for (int i = 0; i < trans.childCount; i++)
-                trans.GetChild(i).gameObject.SetActive(false);
-        }
-        public UILinker<T, U> RegLinker<T,U>(string ItemName)  where T : class, new() where U : class, new()
-        {
-            if (model == null)
-                return null;
-            var mod = HGUIManager.FindChild(model, ItemName);
-            if (mod == null)
-                return null;
-            var trans = Enity.transform.Find(ItemName);
-            UILinker<T, U> link = new UILinker<T, U>(this, mod);
-            link.SetEnityModel(trans);
-            return link;
+            HGUIManager.GameBuffer.RecycleChild(trans.gameObject);
         }
         public int DataCount { get { return datas.Count; } }
         public BindingData InsertData(Linker linker,object data)
@@ -733,50 +709,6 @@ namespace huqiang.UIComposite
                     }
                 }
             }
-            else
-            {
-                if (v.y < 0)
-                {
-                    if (eventCall.DecayRateY >= 0.95f)
-                    {
-                        if (OutBack())
-                        {
-                            eventCall.DecayRateY = 0.9f;
-                            eventCall.VelocityY = eventCall.VelocityY;
-                        }
-                    }
-                }
-                else if (v.y > 0)
-                {
-                    if (eventCall.DecayRateY >= 0.95f)
-                    {
-                        if (OutForward())
-                        {
-                            float l = y;
-                            int c = datas.Count - 1;
-                            float e = datas[c].offset + datas[c].high;
-                            float d = l - e + Point;
-                            if (d < 0.01f)
-                            {
-                                eventCall.VelocityY = 0;
-                            }
-                            else
-                            {
-                                eventCall.DecayRateY = 0.9f;
-                                eventCall.VelocityY = eventCall.VelocityY;
-                            }
-                        }
-                    }
-                }
-            }
         }
-        //void ReSized()
-        //{
-        //    for(int i=0;i<items.Count;i++)//重新计算内容的高度
-        //    {
-        //        var it = items[i];
-        //        it.binding.high = it.high = it.binding.linker.GetItemSize(it.Data);
-        //    }
-        //}
     }
 }

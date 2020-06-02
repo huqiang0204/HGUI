@@ -16,6 +16,7 @@ using huqiang.UIComposite;
 using huqiang.UIEvent;
 using huqiang;
 using huqiang.Data;
+using huqiang.UIModel;
 public class ";
     private const string PageModelRear = @":UIPage
 {

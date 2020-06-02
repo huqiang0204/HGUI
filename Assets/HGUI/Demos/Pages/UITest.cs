@@ -5,6 +5,7 @@ using UnityEngine;
 using huqiang;
 using Assets.Scripts;
 using huqiang.Communication;
+using huqiang.UIModel;
 
 public class UITest : TestPageHelper
 {

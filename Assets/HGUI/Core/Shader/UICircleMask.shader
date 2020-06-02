@@ -2,46 +2,29 @@
 {
 	Properties
 	{
-		[PerRendererData] _MainTex("Sprite Texture", 2D) = "white" {}
-		_Color("Tint", Color) = (1,1,1,1)
-			_Rdius("Rdius", Range(0,0.5)) = 0.5
-		_StencilComp("Stencil Comparison", Float) = 8
-		_Stencil("Stencil ID", Float) = 0
-		_StencilOp("Stencil Operation", Float) = 0
-		_StencilWriteMask("Stencil Write Mask", Float) = 255
-		_StencilReadMask("Stencil Read Mask", Float) = 255
-
-		_ColorMask("Color Mask", Float) = 15
-
-		[Toggle(UNITY_UI_ALPHACLIP)] _UseUIAlphaClip("Use Alpha Clip", Float) = 0
+		  [PerRendererData] _MainTex("Sprite Texture", 2D) = "white" {}
+		  [PerRendererData]_Color("Tint", Color) = (1,1,1,1)
+		  [PerRendererData]_Rdius("Rdius", Range(0,0.5)) = 0.5
+		 [PerRendererData]_Rect("_ClipRect",Vector) = (0,0,1,1)
+		 [PerRendererData]_FillColor("Fill color", Vector) = (0,0,0,0)
 	}
 
 		SubShader
 		{
 			Tags
 			{
-				"Queue" = "Transparent"
+				"Queue" = "Transparent+100"
 				"IgnoreProjector" = "True"
 				"RenderType" = "Transparent"
 				"PreviewType" = "Plane"
 				"CanUseSpriteAtlas" = "True"
 			}
 
-			Stencil
-			{
-				Ref[_Stencil]
-				Comp[_StencilComp]
-				Pass[_StencilOp]
-				ReadMask[_StencilReadMask]
-				WriteMask[_StencilWriteMask]
-			}
-
 			Cull Off
 			Lighting Off
 			ZWrite Off
-			ZTest[unity_GUIZTestMode]
+			ZTest Off //[unity_GUIZTestMode]
 			Blend SrcAlpha OneMinusSrcAlpha
-			ColorMask[_ColorMask]
 
 			Pass
 			{
@@ -58,9 +41,13 @@
 
 				struct appdata_t
 				{
-					float4 vertex   : POSITION;
-					float4 color    : COLOR;
-					float2 texcoord : TEXCOORD0;
+					float4 vertex  : POSITION;
+					float4 color  : COLOR;
+					float2 uv : TEXCOORD0;
+					float2 uv1 : TEXCOORD1;
+					float2 uv2 : TEXCOORD2;
+					float2 uv3 : TEXCOORD3;
+					float2 uv4 : TEXCOORD4;
 					UNITY_VERTEX_INPUT_INSTANCE_ID
 				};
 
@@ -68,40 +55,41 @@
 				{
 					float4 vertex   : SV_POSITION;
 					fixed4 color : COLOR;
-					float2 texcoord  : TEXCOORD0;
-					float4 worldPosition : TEXCOORD1;
+					float2 uv  : TEXCOORD0;
+					float2 uv1 : TEXCOORD1;
+					float2 uv2 : TEXCOORD2;
+					float2 uv3 : TEXCOORD3;
+					float2 uv4 : TEXCOORD4;
 					UNITY_VERTEX_OUTPUT_STEREO
 				};
 
+				sampler2D _MainTex;
+				float _Rdius;
 				fixed4 _Color;
-				fixed4 _TextureSampleAdd;
-				float4 _ClipRect;
-
+				float4 _Rect;
+				float4 _FillColor;
 				v2f vert(appdata_t IN)
 				{
 					v2f OUT;
 					UNITY_SETUP_INSTANCE_ID(IN);
 					UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(OUT);
-					OUT.worldPosition = IN.vertex;
-					OUT.vertex = UnityObjectToClipPos(OUT.worldPosition);
-					OUT.texcoord = IN.texcoord;
-					OUT.color = IN.color * _Color;
+					OUT.vertex = UnityObjectToClipPos(IN.vertex);
+					OUT.uv = IN.uv;
+					OUT.uv = IN.uv;
+					OUT.uv1 = IN.uv1;
+					OUT.uv2 = IN.uv2;
+					OUT.color = IN.color;
 					return OUT;
 				}
-
-				sampler2D _MainTex;
-				float _Rdius;
 				fixed4 frag(v2f IN) : SV_Target
 				{
-					half4 color = tex2D(_MainTex, IN.texcoord);
-					color.a *= UnityGet2DClipping(IN.worldPosition.xy, _ClipRect);
-					#ifdef UNITY_UI_ALPHACLIP
-					clip(color.a - 0.001);
-					#endif
-				    float x=IN.texcoord.x-0.5;
-					float y=IN.texcoord.y-0.5;
-					if(_Rdius*_Rdius<x*x+y*y)
-					color.a=0;
+					half4 color = tex2D(_MainTex, IN.uv);
+				    float x=IN.uv.x-0.5;
+					float y=IN.uv.y-0.5;
+					if (_Rdius * _Rdius < x * x + y * y)
+						color.a = 0;
+					if (IN.uv2.x < _Rect.x || IN.uv2.x > _Rect.z || IN.uv2.y < _Rect.y || IN.uv2.y > _Rect.w)
+						color.a = 0;
 					return color;
 				}
 			ENDCG

@@ -38,7 +38,7 @@ public class TextInputHelper:UICompositeHelp
         var txt = GetComponent<HText>();
         if (txt == null)
             return;
-        if (InputString == null | InputString == "")
+        if (InputString==null|InputString=="")
         {
             txt.Text = TipString;
             txt.MainColor = tipColor;

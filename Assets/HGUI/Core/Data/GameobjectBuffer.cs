@@ -5,6 +5,7 @@ using huqiang.Pool;
 using huqiang.UIEvent;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
@@ -226,6 +227,19 @@ namespace huqiang.Data
             for (int i = c; i >= 0; i--)
             {
                 RecycleGameObject(trans.GetChild(i).gameObject);
+            }
+        }
+        public void RecycleChild(GameObject game, string[] keep)
+        {
+            if (game == null)
+                return;
+            var trans = game.transform;
+            int c = trans.childCount - 1;
+            for (int i = c; i >= 0; i--)
+            {
+                var son = trans.GetChild(i);
+                if (!keep.Contains(son.name))
+                    RecycleGameObject(trans.GetChild(i).gameObject);
             }
         }
         public DataLoader FindDataLoader(Component com)

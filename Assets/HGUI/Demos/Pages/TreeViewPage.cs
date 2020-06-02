@@ -7,6 +7,7 @@ using huqiang;
 using huqiang.Data;
 using System.Collections.Generic;
 using Assets.Scripts;
+using huqiang.UIModel;
 
 public class TreeViewPage:UIPage
 {

@@ -5,7 +5,11 @@ using huqiang.Core.HGUI;
 using huqiang.Data;
 using huqiang.UIComposite;
 
+#if Hot
+namespace huqiang.HotUIModel
+#else
 namespace huqiang.UIModel
+#endif
 {
     public class HotConstructor<T, U> where T : class, new()
     {
@@ -14,7 +18,7 @@ namespace huqiang.UIModel
         {
             middle = new HotMiddleware();
             middle.Context = this;
-            middle.initializer = new UIInitializer(TempReflection.ObjectFields(typeof(T)));
+            middle.initializer = new UIInitializer(UIBase.ObjectFields(typeof(T)));
             middle.creator = Create;
             middle.caller = Call;
             Invoke = action;
@@ -38,7 +42,14 @@ namespace huqiang.UIModel
                 catch
                 {
                 }
-                Invoke(obj as T, u, index);
+                try
+                {
+                    Invoke(obj as T, u, index);
+                }
+                catch (Exception ex)
+                {
+                    UnityEngine.Debug.LogError(ex.StackTrace);
+                }
             }
         }
     }

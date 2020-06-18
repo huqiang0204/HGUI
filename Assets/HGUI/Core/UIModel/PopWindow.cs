@@ -1,7 +1,10 @@
 ﻿using System;
 using UnityEngine;
-
+#if Hot
+namespace huqiang.HotUIModel
+#else
 namespace huqiang.UIModel
+#endif
 {
     public class PopWindow : UIBase
     {

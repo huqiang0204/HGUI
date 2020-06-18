@@ -340,7 +340,8 @@ namespace huqiang.Core.HGUI
                     AlignmentEx(script, script.anchorPointType, script.anchorOffset, pp, psize);
                     break;
             }
-           
+            if (script.scaleType != ScaleType.None)
+                Scaling(script, script.scaleType, psize, script.m_sizeDelta);
             if (child)
                 ResizeChild(rect, child);
             else if (script.scaleType != ScaleType.None | script.anchorType != AnchorType.None | script.marginType != MarginType.None)

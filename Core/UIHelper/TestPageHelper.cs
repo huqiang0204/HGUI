@@ -38,6 +38,7 @@ public class TestPageHelper:UICompositeHelp
     private void Awake()
     {
         Initital();
+        HCanvas.MainCanvas = GetComponent<HCanvas>();
         LoadTestPage();
     }
     public void Initital()

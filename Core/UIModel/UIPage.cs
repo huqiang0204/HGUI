@@ -121,6 +121,7 @@ namespace huqiang.UIModel
         public override void ReSize() 
         {
             if (UIRoot != null)
+                if(HCanvas.MainCanvas!=null)
                 UIRoot.SizeDelta = HCanvas.MainCanvas.SizeDelta;
             base.ReSize(); 
             if (currentPop != null) 

@@ -16,6 +16,7 @@ namespace huqiang
         static void CreateUI() 
         {
             var page = new GameObject("page");
+            UIPage.UIRoot = page.AddComponent<UIElement>();
             UIPage.Root = page.transform;
             page.transform.SetParent(UIRoot);
             UIPage.Root.localPosition = Vector3.zero;

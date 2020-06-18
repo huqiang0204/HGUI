@@ -112,7 +112,7 @@ namespace huqiang.Data
                         sec.name = name;
                         sections.Add(sec);
                     }
-                    else if (sec != null)
+                    else if (str[0] != '#' & sec != null)
                     {
                         var kv = str.Split('=');
                         if (kv.Length > 1)

@@ -121,6 +121,7 @@ public static class UICompositeMenu
         trans.localPosition = Vector3.zero;
         trans.localScale = Vector3.one;
         trans.localRotation = Quaternion.identity;
+        go.GetComponent<HText>().SizeDelta = new Vector2(160,40);
     }
     [MenuItem("GameObject/HGUI/InputBox", false, 5)]
     static public void AddInputBox(MenuCommand menuCommand)

@@ -27,7 +27,7 @@ namespace huqiang.UIEvent
                     }
                     catch (Exception ex)
                     {
-                        Debug.Log(ex);
+                        Debug.LogError(ex.StackTrace);
                     }
                 }
             }

@@ -22,6 +22,7 @@ namespace huqiang.UIModel
             pages.Clear();
         }
         public static Transform Root { get; set; }
+        public static UIElement UIRoot;
         public static UIPage CurrentPage { get; private set; }
         public static void LoadPage<T>(object dat = null) where T : UIPage, new()
         {
@@ -39,9 +40,9 @@ namespace huqiang.UIModel
                 CurrentPage.Dispose();
             }
             var t = new T();
+            CurrentPage = t;
             t.Initial(Root, dat);
             t.ReSize();
-            CurrentPage = t;
         }
         public static void LoadPage(Type type, object dat = null)
         {
@@ -113,7 +114,14 @@ namespace huqiang.UIModel
         public virtual void Show(object dat = null)
         {
         }
-        public override void ReSize() { base.ReSize(); if (currentPop != null) currentPop.ReSize(); }
+        public override void ReSize() 
+        {
+            if (UIRoot != null)
+                UIRoot.m_sizeDelta = HCanvas.MainCanvas.m_sizeDelta;
+            base.ReSize(); 
+            if (currentPop != null) 
+                currentPop.ReSize();
+        }
         public override void Dispose()
         {
             if (pops != null)

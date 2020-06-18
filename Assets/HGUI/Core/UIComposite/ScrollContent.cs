@@ -191,25 +191,17 @@ namespace huqiang.UIComposite
         public Transform Main;
         protected UISlider m_slider;
         public virtual UISlider Slider { get; set; }
-        public override void Initial(FakeStruct mod, UIElement script)
+        public void SetItemMod(string name)
         {
-            base.Initial(mod,script);
-            Main = script.transform;
-            int c = Main.childCount;
-            if (c > 0)
+            if (BufferData == null)
+                return;
+            var mod = HGUIManager.FindChild(BufferData,name);
+            ItemMod = mod;
+            if(mod!=null)
             {
-                var it = Main.Find("Item").gameObject;
-                HGUIManager.GameBuffer.RecycleGameObject(it);
-                var sli = Main.Find("Slider");
-                if (sli != null)
-                {
-                    var ui = sli.GetComponent<UIElement>();
-                    Slider = ui.composite as UISlider;
-                }
-                ItemMod = HGUIManager.FindChild(mod, "Item");
                 unsafe
                 {
-                    ItemSize = ((TransfromData*)ItemMod.ip)->size;
+                    ItemSize = ((TransfromData*)mod.ip)->size;
                     var ex = mod.buffer.GetData(((TransfromData*)mod.ip)->ex) as FakeStruct;
                     if (ex != null)
                     {
@@ -219,6 +211,23 @@ namespace huqiang.UIComposite
                     }
                 }
             }
+        }
+        public override void Initial(FakeStruct mod, UIElement script)
+        {
+            base.Initial(mod,script);
+            Main = script.transform;
+            int c = Main.childCount;
+            if (c > 0)
+            {
+                var sli = Main.Find("Slider");
+                if (sli != null)
+                {
+                    var ui = sli.GetComponent<UIElement>();
+                    Slider = ui.composite as UISlider;
+                }
+            }
+            SetItemMod("Item");
+            HGUIManager.GameBuffer.RecycleChild(script.gameObject, new string[] { "Slider" });
         }
         public virtual void Refresh(float x = 0, float y = 0)
         {

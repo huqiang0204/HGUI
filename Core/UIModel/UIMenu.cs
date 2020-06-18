@@ -2,7 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+#if Hot
+namespace huqiang.HotUIModel
+#else
 namespace huqiang.UIModel
+#endif
 {
     public class UIMenu : UIBase
     {

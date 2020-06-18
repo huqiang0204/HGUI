@@ -4,7 +4,11 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+#if Hot
+namespace huqiang.HotUIModel
+#else
 namespace huqiang.UIModel
+#endif
 {
     public class UIPage : UIBase
     {
@@ -117,7 +121,7 @@ namespace huqiang.UIModel
         public override void ReSize() 
         {
             if (UIRoot != null)
-                UIRoot.m_sizeDelta = HCanvas.MainCanvas.m_sizeDelta;
+                UIRoot.SizeDelta = HCanvas.MainCanvas.SizeDelta;
             base.ReSize(); 
             if (currentPop != null) 
                 currentPop.ReSize();

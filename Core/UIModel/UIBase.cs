@@ -1,9 +1,13 @@
 ﻿using huqiang.Core.HGUI;
 using huqiang.Data;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
-
+#if Hot
+namespace huqiang.HotUIModel
+#else
 namespace huqiang.UIModel
+#endif
 {
     public class UIBase
     {
@@ -42,12 +46,28 @@ namespace huqiang.UIModel
         public GameObject Main { get; protected set; }
         public FakeStruct model { get; protected set; }
         protected UIBase UIParent;
-
+        public static TempReflection ObjectFields(Type type)
+        {
+            var fs = type.GetFields();
+            TempReflection temp = new TempReflection();
+            temp.Top = fs.Length;
+            ReflectionModel[] reflections = new ReflectionModel[temp.Top];
+            for (int i = 0; i < fs.Length; i++)
+            {
+                ReflectionModel r = new ReflectionModel();
+                r.field = fs[i];
+                r.FieldType = fs[i].FieldType;
+                r.name = fs[i].Name;
+                reflections[i] = r;
+            }
+            temp.All = reflections;
+            return temp;
+        }
         public T LoadUI<T>(string asset, string name) where T : class, new()
         {
             model = HGUIManager.FindModel(asset, name);
             T t = new T();
-            UIInitializer iInitializer = new UIInitializer(TempReflection.ObjectFields(typeof(T)));
+            UIInitializer iInitializer = new UIInitializer(ObjectFields(typeof(T)));
             iInitializer.Reset(t);
             Main = HGUIManager.GameBuffer.Clone(model, iInitializer);
             var trans = Main.transform;

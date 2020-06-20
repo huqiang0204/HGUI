@@ -38,33 +38,38 @@ namespace huqiang.Core.HGUI
                 var m = reflections.All[i];
                 if (m.name == com.name)
                 {
-                    if (typeof(Component).IsAssignableFrom(m.FieldType))
+                    if (m.FieldType == typeof(GameObject))
+                        m.Value = com.gameObject;
+                    else if (typeof(Component).IsAssignableFrom(m.FieldType))
                         m.Value = com.GetComponent(m.FieldType);
-                    else if(typeof(Composite).IsAssignableFrom(m.FieldType))
+                    else if (typeof(Composite).IsAssignableFrom(m.FieldType))
                     {
                         var scr = com.GetComponent<UIElement>();
                         if (scr != null)
                         {
-                            if(scr.composite==null)
+                            if (scr.composite == null)
                             {
                                 var obj = Activator.CreateInstance(m.FieldType) as Composite;
-                                obj.Initial(fake,scr);
+                                obj.Initial(fake, scr);
                                 m.Value = obj;
                             }
                             else
-                            m.Value = scr.composite;
+                                m.Value = scr.composite;
                         }
                     }
+                    else if (m.FieldType == typeof(FakeStruct))
+                        m.Value = fake;
                     else
                     {
                         var scr = com.GetComponent<UIElement>();
                         if (scr != null)
                         {
                             if (scr.userEvent == null)
-                            { 
+                            {
                                 scr.userEvent = Activator.CreateInstance(m.FieldType) as UserEvent;
                                 scr.userEvent.Context = scr;
                                 scr.userEvent.g_color = scr.MainColor;
+                                scr.userEvent.Initial(fake);
                             }
                             m.Value = scr.userEvent;
                         }

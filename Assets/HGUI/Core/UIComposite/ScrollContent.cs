@@ -24,8 +24,10 @@ namespace huqiang.UIComposite
     public class Constructor
     {
         public virtual object Create() { return null; }
-        public virtual void Call(object obj, object dat, int index) { }
-        public bool hotfix;
+        public virtual void Call(object obj, object dat, int index) {
+            if (Update != null)
+                Update(obj,dat,index);
+        }
         public bool create;
         public Action<object, object, int> Update;
         public Func<Transform, object> reflect;
@@ -53,11 +55,28 @@ namespace huqiang.UIComposite
                 {
                     u = (U)dat;
                 }
-                catch (Exception)
+                catch
                 {
                 }
                 Invoke(obj as T, u, index);
             }
+        }
+    }
+    public class HotMiddleware : Constructor
+    {
+        public object Context;
+        public Func<object> creator;
+        public Action<object, object, int> caller;
+        public override object Create()
+        {
+            if (creator == null)
+                return null;
+            return creator();
+        }
+        public override void Call(object obj, object dat, int index)
+        {
+            if (caller != null)
+                caller(obj, dat, index);
         }
     }
     public class ScrollContent: Composite
@@ -172,25 +191,17 @@ namespace huqiang.UIComposite
         public Transform Main;
         protected UISlider m_slider;
         public virtual UISlider Slider { get; set; }
-        public override void Initial(FakeStruct mod, UIElement script)
+        public void SetItemMod(string name)
         {
-            base.Initial(mod,script);
-            Main = script.transform;
-            int c = Main.childCount;
-            if (c > 0)
+            if (BufferData == null)
+                return;
+            var mod = HGUIManager.FindChild(BufferData,name);
+            ItemMod = mod;
+            if(mod!=null)
             {
-                var it = Main.Find("Item").gameObject;
-                HGUIManager.GameBuffer.RecycleGameObject(it);
-                var sli = Main.Find("Slider");
-                if (sli != null)
-                {
-                    var ui = sli.GetComponent<UIElement>();
-                    Slider = ui.composite as UISlider;
-                }
-                ItemMod = HGUIManager.FindChild(mod, "Item");
                 unsafe
                 {
-                    ItemSize = ((TransfromData*)ItemMod.ip)->size;
+                    ItemSize = ((TransfromData*)mod.ip)->size;
                     var ex = mod.buffer.GetData(((TransfromData*)mod.ip)->ex) as FakeStruct;
                     if (ex != null)
                     {
@@ -200,6 +211,23 @@ namespace huqiang.UIComposite
                     }
                 }
             }
+        }
+        public override void Initial(FakeStruct mod, UIElement script)
+        {
+            base.Initial(mod,script);
+            Main = script.transform;
+            int c = Main.childCount;
+            if (c > 0)
+            {
+                var sli = Main.Find("Slider");
+                if (sli != null)
+                {
+                    var ui = sli.GetComponent<UIElement>();
+                    Slider = ui.composite as UISlider;
+                }
+            }
+            SetItemMod("Item");
+            HGUIManager.GameBuffer.RecycleChild(script.gameObject, new string[] { "Slider" });
         }
         public virtual void Refresh(float x = 0, float y = 0)
         {
@@ -223,15 +251,7 @@ namespace huqiang.UIComposite
             ScrollItem a = new ScrollItem();
             if (creator != null)
             {
-                if (creator.hotfix)
-                {
-                    var go = HGUIManager.GameBuffer.Clone(ItemMod);
-                    if (creator.reflect != null)
-                        a.obj = creator.reflect(go.transform);
-                    else a.obj = go;
-                    a.target = go.transform;
-                }
-                else if (creator.create)
+                if (creator.create)
                 {
                     a.obj = creator.Create();
                     a.target = HGUIManager.GameBuffer.Clone(ItemMod, creator.initializer).transform;
@@ -268,14 +288,11 @@ namespace huqiang.UIComposite
         /// </summary>
         /// <param name="action"></param>
         /// <param name="reflect"></param>
-        public void SetItemUpdate(Action<object,object, int> action,Func<Transform,object> reflect)
+        public void SetItemUpdate(HotMiddleware constructor)
         {
             Clear();
-            //var m = new Middleware<ModelElement,object>();
-            //m.Update = action;
-            //m.hotfix = true;
-            //m.reflect = reflect;
-            //creator = m;
+            creator = constructor;
+            creator.create = true;
         }
         public virtual void Order(float os, bool force = false)
         {
@@ -511,15 +528,7 @@ namespace huqiang.UIComposite
         {
             if (creator != null)
             {
-                if(creator.hotfix)
-                {
-                    if (creator.Update != null)
-                        creator.Update(obj,dat,index);
-                }
-                else
-                {
-                    creator.Call(obj, dat, index);
-                }
+                creator.Call(obj, dat, index);
             }
         }
     }

@@ -125,6 +125,74 @@ namespace huqiang.Core.HGUI
             }
             text.vertices = hv;
         }
+        static void OutLineVertex(HVertex[] buf, int start, HVertex[] src, float x,float y,ref Color32 color)
+        {
+            int l = src.Length;
+            for(int i=0;i<l;i++)
+            {
+                buf[start] = src[i];
+                buf[start].position.x += x;
+                buf[start].position.y += y;
+                buf[start].color = color;
+                start++;
+            }
+        }
+        static void OutLineTris(int[] buf, int start, int[] src, int offset)
+        {
+            for(int i=0;i<src.Length;i++)
+            {
+                buf[start] = src[i] + offset;
+                start++;
+            }
+        }
+        static void CreateOutLine(HText text)
+        {
+            HVertex[] buf = text.vertices;
+            if (buf == null)
+                return;
+            int c = buf.Length;
+            HVertex[] tmp = new HVertex[c * 5];
+            float d = text.OutLine;
+            OutLineVertex(tmp, 0, buf, d, d, ref text.shadowColor);
+            OutLineVertex(tmp, c, buf, d, -d, ref text.shadowColor);
+            OutLineVertex(tmp, c * 2, buf, -d, -d, ref text.shadowColor);
+            OutLineVertex(tmp, c * 3, buf, -d, d, ref text.shadowColor);
+            int s = c * 4;
+            for (int i = 0; i < c; i++)
+            {
+                tmp[s] = buf[i];
+                s++;
+            }
+            text.vertices = tmp;
+            if (text.tris != null)
+            {
+                var src = text.tris;
+                int l = src.Length;
+                int[] tris = new int[l * 5];
+                OutLineTris(tris, 0, src, 0);
+                OutLineTris(tris, l, src, c);
+                OutLineTris(tris, l * 2, src, c * 2);
+                OutLineTris(tris, l * 3, src, c * 3);
+                OutLineTris(tris, l * 4, src, c * 4);
+                text.tris = tris;
+            }
+            else if (text.subTris != null)
+            {
+                var o = text.subTris;
+                for (int j = 0; j < o.Length; j++)
+                {
+                    var src = o[j];
+                    int l = src.Length;
+                    int[] tris = new int[l * 5];
+                    OutLineTris(tris, 0, src, 0);
+                    OutLineTris(tris, l, src, c);
+                    OutLineTris(tris, l * 2, src, c * 2);
+                    OutLineTris(tris, l * 3, src, c * 3);
+                    OutLineTris(tris, l * 4, src, c * 4);
+                    o[j] = tris;
+                }
+            }
+        }
         static int[] CreateTri(int len)
         {
             int c = len / 4;
@@ -271,7 +339,11 @@ namespace huqiang.Core.HGUI
                 m_align = value;
                 m_dirty = true;
             } }
-
+        public ContentSizeFitter sizeFitter;
+        /// <summary>
+        /// 慎用,顶点占用较多
+        /// </summary>
+        public float OutLine;
         public static TextGenerationSettings settings;
         public void GetGenerationSettings(ref Vector2 size, ref TextGenerationSettings sett)
         {
@@ -299,9 +371,32 @@ namespace huqiang.Core.HGUI
         public void Populate()
         {
             emojiString.FullString = m_text;
+            var str = emojiString.FilterString;
+            if(sizeFitter!=ContentSizeFitter.None)
+            {
+                if (marginType != MarginType.None)
+                    Margin(this);
+                GetGenerationSettings(ref m_sizeDelta, ref settings);
+                var gen = Generator;
+                if (sizeFitter==ContentSizeFitter.Horizoantal)
+                {
+                    m_sizeDelta.x = gen.GetPreferredWidth(str, settings);
+                }
+               else if(sizeFitter==ContentSizeFitter.Vertical)
+                {
+                    m_sizeDelta.y = gen.GetPreferredHeight(str, settings);
+                }else if(sizeFitter == ContentSizeFitter.Both)
+                {
+                    float w = gen.GetPreferredWidth(str, settings);
+                    if (w < m_sizeDelta.x)
+                        m_sizeDelta.x = w;
+                    m_sizeDelta.y = gen.GetPreferredHeight(str, settings);
+                }
+                Dock(this);
+            }
             GetGenerationSettings(ref m_sizeDelta,ref settings);
             var g = Generator;
-            g.Populate(emojiString.FilterString, settings);
+            g.Populate(str, settings);
             verts = g.verts.ToArray();
             uILines = g.lines.ToArray();
             uIChars = g.characters.ToArray();
@@ -315,6 +410,8 @@ namespace huqiang.Core.HGUI
             if (m_vertexChange)
             {
                 CreateEmojiMesh(this);
+                if (OutLine > 0)
+                    CreateOutLine(this);
                 m_vertexChange = false;
             }
         }
@@ -336,11 +433,6 @@ namespace huqiang.Core.HGUI
             var gen = Generator;
             float h = gen.GetPreferredHeight(new EmojiString(str).FilterString, settings);
             size.y = h;
-            //if (gen.lineCount == 1)
-            //{
-            //    var cha = gen.characters[gen.characterCountVisible];
-            //    size.x = cha.cursorPos.x + cha.charWidth * 1.1f + size.x * 0.5f;
-            //}
         }
         public void GetPreferredWidth(ref Vector2 size, string str)
         {
@@ -358,4 +450,12 @@ namespace huqiang.Core.HGUI
             size.y = gen.GetPreferredHeight(fs, settings);
         }
     }
+    public enum ContentSizeFitter
+    { 
+       None,
+       Horizoantal,
+       Vertical,
+       Both
+    }
+
 }

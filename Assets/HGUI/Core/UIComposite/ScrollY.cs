@@ -261,6 +261,8 @@ namespace huqiang.UIComposite
         void Order(bool force=false)
         {
             int len = DataLength;
+            if (len <= 0)
+                return;
             float ly = ctSize.y;
             int sr = (int)(m_point /ly);//起始索引
             int er = (int)((m_point + Size.y) / ly)+1;
@@ -311,7 +313,7 @@ namespace huqiang.UIComposite
             int row = index / Column;
             float dy = ly * row + oy;
             dy -= m_point;
-            float ss = (1 - Enity.Pivot.y) * Size.y - 0.5f * ly;//0.5f * Size.y 
+            float ss = (1 - Enity.Pivot.y) * Size.y;// + 0.5f * ly
             dy = ss - dy;
             float ox = (index%Column) * ctSize.x + ctSize.x * 0.5f + ItemOffset.x - Size.x * 0.5f;
             var a = PopItem(index);

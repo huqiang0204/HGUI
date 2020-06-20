@@ -1,6 +1,7 @@
 ﻿using huqiang.Core.HGUI;
 using huqiang.UIComposite;
 using huqiang.UIEvent;
+using huqiang.UIModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;

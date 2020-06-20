@@ -112,7 +112,7 @@ namespace huqiang.Data
                         sec.name = name;
                         sections.Add(sec);
                     }
-                    else if (sec != null)
+                    else if (str[0] != '#' & sec != null)
                     {
                         var kv = str.Split('=');
                         if (kv.Length > 1)
@@ -136,14 +136,15 @@ namespace huqiang.Data
                 }
             }
         }
-        public void RemoveSection(string name)
+        public bool RemoveSection(string name)
         {
             for(int i=0;i<sections.Count;i++)
                 if(sections[i].name==name)
                 {
                     sections.RemoveAt(i);
-                    return;
+                    return true;
                 }
+            return false;
         }
         public void AddSection(INISection section)
         {

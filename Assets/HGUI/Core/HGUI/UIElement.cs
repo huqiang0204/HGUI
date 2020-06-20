@@ -168,8 +168,8 @@ namespace huqiang.Core.HGUI
             float apy = p.y;
             float alx = ax * -apx;
             float ady = ay * -apy;
-            float aox = ax * apx;//原点x
-            float aoy = ay * apy;//原点y
+            //float aox = ax * apx;//原点x
+            //float aoy = ay * apy;//原点y
 
             float x = script.SizeDelta.x;
             float y = script.SizeDelta.y;
@@ -178,8 +178,8 @@ namespace huqiang.Core.HGUI
             float lx = x * -px;
             float dy = y * -py;
 
-            float ox = x * px;//原点x
-            float oy = y * py;//原点y
+            //float ox = x * px;//原点x
+            //float oy = y * py;//原点y
 
             switch (type)
             {
@@ -261,7 +261,7 @@ namespace huqiang.Core.HGUI
             float px = rect.localPosition.x;
             rect.localPosition = new Vector3(px, oy, 0);
         }
-        public static void Resize(UIElement script, bool child = true)
+        public static void Resize(UIElement script,bool child = true)
         {
             Transform rect = script.transform;
             Vector3 loclpos = rect.localPosition;
@@ -271,7 +271,7 @@ namespace huqiang.Core.HGUI
             if (script.parentType == ParentType.Tranfrom)
             {
                 var p = rect.parent;
-                if (p != null)
+                if(p!=null)
                 {
                     var t = p.GetComponent<UIElement>();
                     if (t != null)
@@ -286,18 +286,6 @@ namespace huqiang.Core.HGUI
                 var t = rect.root.GetComponent<UIElement>();
                 if (t != null)
                     psize = t.SizeDelta;
-            }
-            //Scaling(script, script.scaleType, psize, script.DesignSize);
-            switch (script.anchorType)
-            {
-                case AnchorType.None:
-                    break;
-                case AnchorType.Anchor:
-                    AnchorEx(script, script.anchorPointType, script.anchorOffset, pp, psize);
-                    break;
-                case AnchorType.Alignment:
-                    AlignmentEx(script, script.anchorPointType, script.anchorOffset, pp, psize);
-                    break;
             }
             switch (script.marginType)
             {
@@ -340,6 +328,20 @@ namespace huqiang.Core.HGUI
                 case MarginType.MarginRatioY:
                     break;
             }
+            //Scaling(script, script.scaleType, psize, script.DesignSize);
+            switch (script.anchorType)
+            {
+                case AnchorType.None:
+                    break;
+                case AnchorType.Anchor:
+                    AnchorEx(script, script.anchorPointType, script.anchorOffset, pp, psize);
+                    break;
+                case AnchorType.Alignment:
+                    AlignmentEx(script, script.anchorPointType, script.anchorOffset, pp, psize);
+                    break;
+            }
+            if (script.scaleType != ScaleType.None)
+                Scaling(script, script.scaleType, psize, script.m_sizeDelta);
             if (child)
                 ResizeChild(rect, child);
             else if (script.scaleType != ScaleType.None | script.anchorType != AnchorType.None | script.marginType != MarginType.None)
@@ -354,11 +356,11 @@ namespace huqiang.Core.HGUI
             for (int i = 0; i < trans.childCount; i++)
             {
                 var son = trans.GetChild(i);
-                var ss = son.GetComponent<UIElement>();
+                var ss =son.GetComponent<UIElement>();
                 if (ss != null)
                     Resize(ss, child);
                 else if (child)
-                    ResizeChild(son, child);
+                    ResizeChild(son,child);
             }
         }
         public static void ResizeChild(UIElement script, bool child = true)
@@ -369,6 +371,112 @@ namespace huqiang.Core.HGUI
                 var ss = rect.GetChild(i).GetComponent<UIElement>();
                 if (ss != null)
                     Resize(ss, child);
+            }
+        }
+        public static void Margin(UIElement script)
+        {
+            Transform rect = script.transform;
+            Vector3 loclpos = rect.localPosition;
+            Vector2 psize = Vector2.zero;
+            Vector2 v = script.m_sizeDelta;
+            var pp = Anchors[0];
+            if (script.parentType == ParentType.Tranfrom)
+            {
+                var p = rect.parent;
+                if (p != null)
+                {
+                    var t = p.GetComponent<UIElement>();
+                    if (t != null)
+                    {
+                        psize = t.SizeDelta;
+                        pp = t.Pivot;
+                    }
+                }
+            }
+            else
+            {
+                var t = rect.root.GetComponent<UIElement>();
+                if (t != null)
+                    psize = t.SizeDelta;
+            }
+            switch (script.marginType)
+            {
+                case MarginType.None:
+                    break;
+                case MarginType.Margin:
+                    var mar = script.margin;
+                    if (script.parentType == ParentType.BangsScreen)
+                        if (Scale.ScreenHeight / Scale.ScreenWidth > 2f)
+                            mar.top += 88;
+                    MarginEx(script, mar, pp, psize);
+                    break;
+                case MarginType.MarginRatio:
+                    mar = new Margin();
+                    mar.left = script.margin.left * psize.x;
+                    mar.right = script.margin.right * psize.x;
+                    mar.top = script.margin.top * psize.y;
+                    if (script.parentType == ParentType.BangsScreen)
+                        if (Scale.ScreenHeight / Scale.ScreenWidth > 2f)
+                            mar.top += 88;
+                    mar.down = script.margin.down * psize.y;
+                    MarginEx(script, mar, pp, psize);
+                    break;
+                case MarginType.MarginX:
+                    mar = script.margin;
+                    if (script.parentType == ParentType.BangsScreen)
+                        if (Scale.ScreenHeight / Scale.ScreenWidth > 2f)
+                            mar.top += 88;
+                    MarginX(script, mar, pp, psize);
+                    break;
+                case MarginType.MarginY:
+                    mar = script.margin;
+                    if (script.parentType == ParentType.BangsScreen)
+                        if (Scale.ScreenHeight / Scale.ScreenWidth > 2f)
+                            mar.top += 88;
+                    MarginY(script, mar, pp, psize);
+                    break;
+                case MarginType.MarginRatioX:
+                    break;
+                case MarginType.MarginRatioY:
+                    break;
+            }
+        }
+        public static void Dock(UIElement script)
+        {
+            Transform rect = script.transform;
+            Vector3 loclpos = rect.localPosition;
+            Vector2 psize = Vector2.zero;
+            Vector2 v = script.m_sizeDelta;
+            var pp = Anchors[0];
+            if (script.parentType == ParentType.Tranfrom)
+            {
+                var p = rect.parent;
+                if (p != null)
+                {
+                    var t = p.GetComponent<UIElement>();
+                    if (t != null)
+                    {
+                        psize = t.SizeDelta;
+                        pp = t.Pivot;
+                    }
+                }
+            }
+            else
+            {
+                var t = rect.root.GetComponent<UIElement>();
+                if (t != null)
+                    psize = t.SizeDelta;
+            }
+            switch (script.anchorType)
+            {
+                case AnchorType.None:
+                    break;
+                case AnchorType.Anchor:
+                    AnchorEx(script, script.anchorPointType, script.anchorOffset, pp, psize);
+                    break;
+                case AnchorType.Alignment:
+                    AlignmentEx(script, script.anchorPointType, script.anchorOffset, pp, psize);
+                    break;
             }
         }
         #endregion
@@ -402,6 +510,7 @@ namespace huqiang.Core.HGUI
         public bool Mask;
         public UserEvent userEvent;
         public Composite composite;
+        public FakeStruct mod;
         internal int PipelineIndex;
         public virtual Color32 MainColor { get; set; }
         public T RegEvent<T>(FakeStruct fake = null) where T : UserEvent, new()

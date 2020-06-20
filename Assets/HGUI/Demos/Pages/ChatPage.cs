@@ -5,6 +5,7 @@ using huqiang.UIComposite;
 using huqiang.UIEvent;
 using huqiang;
 using huqiang.Data;
+using huqiang.UIModel;
 
 namespace Assets.Scripts
 {
@@ -76,14 +77,14 @@ namespace Assets.Scripts
            
             input.OnSubmit = OnSubmit;
             container = view.chatbox.composite as UIContainer;
-            other = container.RegLinker<ChatItem, ChatData>("other");
-            other.CalculItemHigh = GetContentSize;
+            other = new UILinker<ChatItem, ChatData>(container, "other");
+            //other.CalculItemHigh = GetContentSize;
             other.ItemUpdate = ItemUpdate;
-            self = container.RegLinker<ChatItem, ChatData>("self");
-            self.CalculItemHigh = GetContentSize;
+            self = new UILinker<ChatItem, ChatData>(container, "self");
+            //self.CalculItemHigh = GetContentSize;
             self.ItemUpdate = ItemUpdate;
-            tip = container.RegLinker<TipItem, TipData>("tip");
-            tip.ItemUpdate = TipItemUpdate;
+            tip = new UILinker<TipItem, TipData>(container ,"tip");
+            //tip.ItemUpdate = TipItemUpdate;
             view.send.userEvent.Click = (o, e) => {OnSubmit(input); };
         }
         void SelectChanged(OptionGroup option,UserAction action)
@@ -115,19 +116,19 @@ namespace Assets.Scripts
                     ChatData chat = new ChatData();
                     chat.name = "江海胡";
                     chat.content = str;
-                    other.AddAndMove(chat);
+                    other.AddAndMove(chat,30);
                     break;
                 case "center":
                     TipData t = new TipData();
                     str= DateTime.Now.ToString();
                     t.content = str;
-                    tip.AddAndMove(t);
+                    tip.AddAndMove(t,30);
                     break;
                 case "right":
                     chat = new ChatData();
                     chat.name = "胡强";
                     chat.content = str;
-                    self.AddAndMove(chat);
+                    self.AddAndMove(chat,30);
                     break;
             }
             input.InputString = "";

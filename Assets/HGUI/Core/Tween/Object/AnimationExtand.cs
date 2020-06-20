@@ -226,5 +226,25 @@ namespace huqiang
             }
             ani.Play();
         }
+    
+        public static void DoFillAmount(this HImage img,float end, float time, float delay = 0,Action over = null)
+        {
+            if (img == null)
+                return;
+            var ani = AnimationManage.Manage.FindAni<FloatAnimat<HImage>>((o) => { return o.Target == img ? true : false; });
+            if (ani == null)
+                ani = new FloatAnimat<HImage>(img);
+            ani.Start = img.FillAmount;
+            ani.End = end;
+            ani.Time = time;
+            ani.Delay = delay;
+            ani.ValueChanged = (o, e) => { o.FillAmount = e; };
+            ani.PlayOver =(o,e)=>{ 
+                o.FillAmount = e;
+                if (over != null)
+                    over();
+                return true; };
+            ani.Play();
+        }
     }
 }

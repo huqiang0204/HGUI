@@ -24,15 +24,15 @@ namespace huqiang.Data
             var ss = key.Split('\\');
             if (ss.Length > 1)
             {
-                Add(ss[0],ss[1],value);
+                Add(ss[0],ss[1],value);//数组
             }
             else
             {
                 for (int i = 0; i < values.Count; i++)
                     if (values[i].key == key)
                     {
-                        values.RemoveAt(i);
-                        break;
+                        values[i].value = value;
+                        return;
                     }
                 var kv = new KeyValue();
                 kv.key = key;
@@ -40,6 +40,7 @@ namespace huqiang.Data
                 values.Add(kv);
             }
         }
+        //添加数组的值
         public void Add(string index,string key, string value)
         {
             IniMate mate = null;

@@ -202,5 +202,97 @@ namespace huqiang
             }
             return re;
         }
+        public unsafe static bool CircleToPolygonB(Vector2 C, float r, Vector3* P, int len,ref Vector3 pt)
+        {
+            if (len <= 0)
+                return false;
+            Vector2 A = Vector2.zero;
+            Vector2 B = Vector2.zero;
+            float z = 1000000, r2 = r * r, x = 0, y = 0;
+            int id = 0;
+            for (int i = 0; i < len; i++)
+            {
+                x = C.x - P[i].x;
+                y = C.y - P[i].y;
+                x = x * x + y * y;
+                if (x <= r2)//如果点在圆内
+                {
+                    pt = P[i];
+                    return true; 
+                }
+                DB[i] = x;
+                if (x < z)
+                {
+                    z = x;
+                    id = i;//与圆最近的点
+                }
+            }
+            int p1 = id - 1;
+            if (p1 < 0)
+                p1 = len - 1;
+            float a, b, c;
+            c = DB[p1];
+            a = DB[id];
+            B = P[id];
+            A = P[p1];
+            x = B.x - A.x;
+            x *= x;
+            y = B.y - A.y;
+            y *= y;
+            b = x + y;
+            x = c - a;
+            if (x < 0)
+                x = -x;
+            if (x <= b)
+            {
+                y = b + c - a;
+                y = y * y / 4 / b;
+                if (c - y <= r2)
+                {
+                    var v3 = B - A;
+                    var v4 = C - A;
+                    Vector2 p = Vector3.Project(v3, v4);
+                    pt.x = p.x + A.x;
+                    pt.y = p.y + A.y;
+                    return true;
+                }
+            }
+            else
+            {
+                p1 = id + 1;
+                if (p1 == len)
+                    p1 = 0;
+                c = DB[p1];
+                A = P[p1];
+                x = B.x - A.x;
+                x *= x;
+                y = B.y - A.y;
+                y *= y;
+                b = x + y;
+                x = c - a;
+                if (x < 0)
+                    x = -x;
+                if (x <= b)
+                {
+                    y = b + c - a;
+                    y = y * y / 4 / b;
+                    if (c - y <= r2)
+                    {
+                        var v3 = B - A;
+                        var v4 = C - A;
+                        Vector2 p = Vector3.Project(v3, v4);
+                        pt.x = p.x + A.x;
+                        pt.y = p.y + A.y;
+                        return true;
+                    }
+                }
+            }
+            if (DotToPolygon(P, len, new Vector2(C.x, C.y)))
+            {
+                pt = C;
+                return true;
+            }
+            return false;
+        }
     }
 }

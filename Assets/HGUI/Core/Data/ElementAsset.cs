@@ -14,19 +14,39 @@ namespace huqiang.Data
     }
     public class ElementAsset
     {
-        public static Progress LoadAssetsAsync(string name,Action<Progress,AssetBundleCreateRequest> callback=null)
+        public static Progress LoadAssetsAsync(string path,Action<Progress,AssetBundleCreateRequest> callback=null)
         {
             Progress pro = new Progress();
-            pro.Play(LoadAssets(name));
+            pro.Play(LoadAssets(path));
             pro.PlayOver = callback;
             return pro;
         }
-        public static AssetBundleCreateRequest LoadAssets(string name)
+        public static AssetBundleCreateRequest LoadAssets(string path)
         {
-            string path = Application.streamingAssetsPath + "/" + name;  // 其他平台
             return AssetBundle.LoadFromFileAsync(path);
         }
+        public static void AddBundle(string name)
+        {
+            var dic = Application.streamingAssetsPath;
+            dic += "/" + name;
+            var asset = AssetBundle.LoadFromFile(dic);
+            bundles.Add(asset);
+        }
         public static List<AssetBundle> bundles = new List<AssetBundle>();
+        public static T FindResource<T>(string bundle, string tname) where T : UnityEngine.Object
+        {
+            if (bundles == null)
+                return null;
+            for (int i = 0; i < bundles.Count; i++)
+            {
+                var tmp = bundles[i];
+                if (bundle == tmp.name)
+                {
+                    return tmp.LoadAsset<T>(tname);
+                }
+            }
+            return null;
+        }
         public static Texture FindTexture(string bundle, string tname)
         {
 #if UNITY_EDITOR

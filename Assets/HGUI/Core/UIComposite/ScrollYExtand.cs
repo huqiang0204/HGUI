@@ -35,6 +35,7 @@ namespace huqiang.UIComposite
         public override void Initial(FakeStruct fake,UIElement element)
         {
             base.Initial(fake,element);
+            element.SizeChanged = (o) => { Refresh(); };
             eventCall = Enity.RegEvent<UserEvent>();
             eventCall.Drag = (o, e, s) => { Scrolling(o, s); };
             eventCall.DragEnd = (o, e, s) => { Scrolling(o, s); };
@@ -43,19 +44,11 @@ namespace huqiang.UIComposite
             eventCall.ForceEvent = true;
             Size = Enity.SizeDelta;
             eventCall.CutRect = true;
-            HGUIManager.GameBuffer.RecycleChild(Enity.gameObject);
-            BodyParent = HGUIManager.GameBuffer.CreateNew(1).transform;
-            BodyParent.SetParent(Enity.transform);
-            BodyParent.localPosition = Vector3.zero;
-            BodyParent.localScale = Vector3.one;
-            BodyParent.localRotation = Quaternion.identity;
-            BodyParent.name = "Bodys";
-            TitleParent = HGUIManager.GameBuffer.CreateNew(1).transform;
-            TitleParent.SetParent(Enity.transform);
-            TitleParent.localPosition = Vector3.zero;
-            TitleParent.localScale = Vector3.one;
-            TitleParent.localRotation = Quaternion.identity;
-            TitleParent.name = "Titles";
+            var trans = element.transform;
+            BodyParent = trans.Find("Bodys");
+            TitleParent = trans.Find("Titles");
+            HGUIManager.GameBuffer.RecycleChild(Enity.gameObject,new string[]{ "Bodys", "Titles" });
+           
             TitleMod =  HGUIManager.FindChild(fake,"Title");
             ItemMod = HGUIManager.FindChild(fake, "Item");
             TailMod = HGUIManager.FindChild(fake, "Tail");
@@ -325,6 +318,13 @@ namespace huqiang.UIComposite
             m.Invoke = action;
             TitleCreator = m;
         }
+        public void SetTitleUpdate(HotMiddleware constructor)
+        {
+            for (int i = 0; i < Titles.Count; i++)
+                HGUIManager.GameBuffer.RecycleGameObject(Titles[i].target.gameObject);
+            Titles.Clear();
+            TitleCreator = constructor;
+        }
         public void SetItemUpdate<T, U>(Action<T, U, int> action) where T : class, new()
         {
             for (int i = 0; i < Items.Count; i++)
@@ -333,6 +333,13 @@ namespace huqiang.UIComposite
             var m = new Middleware<T, U>();
             m.Invoke = action;
             ItemCreator = m;
+        }
+        public void SetItemUpdate(HotMiddleware constructor)
+        {
+            for (int i = 0; i < Items.Count; i++)
+                HGUIManager.GameBuffer.RecycleGameObject(Items[i].target.gameObject);
+            Items.Clear();
+            ItemCreator = constructor;
         }
         public void SetTailUpdate<T, U>(Action<T, U, int> action) where T : class, new()
         {
@@ -343,19 +350,18 @@ namespace huqiang.UIComposite
             m.Invoke = action;
             TailCreator = m;
         }
+        public void SetTailUpdate(HotMiddleware constructor)
+        {
+            for (int i = 0; i < Tails.Count; i++)
+                HGUIManager.GameBuffer.RecycleGameObject(Tails[i].target.gameObject);
+            Tails.Clear();
+            TailCreator = constructor;
+        }
         protected void ItemUpdate(object obj, object dat, int index,Constructor con)
         {
             if (con != null)
             {
-                if (con.hotfix)
-                {
-                    if (con.Update != null)
-                        con.Update(obj, dat, index);
-                }
-                else
-                {
-                    con.Call(obj, dat, index);
-                }
+                con.Call(obj, dat, index);
             }
         }
         protected ScrollItem CreateItem(List<ScrollItem> buffer, Constructor con, FakeStruct mod, Transform parent)
@@ -375,18 +381,8 @@ namespace huqiang.UIComposite
             }
             else
             {
-                if (con.hotfix)
-                {
-                    var trans = a.target = HGUIManager.GameBuffer.Clone(mod).transform;
-                    if (con.reflect != null)
-                        a.obj = con.reflect(trans);
-                    else a.obj = trans;
-                }
-                else
-                {
-                    a.obj = con.Create();
-                    a.target = HGUIManager.GameBuffer.Clone(mod, con.initializer).transform;
-                }
+                a.obj = con.Create();
+                a.target = HGUIManager.GameBuffer.Clone(mod, con.initializer).transform;
             }
             a.target.SetParent(parent);
             a.target.localScale = Vector3.one;
@@ -539,7 +535,6 @@ namespace huqiang.UIComposite
         }
         public ScrollYExtand()
         {
-            //UIAnimation.Manage.AddAnimat(this);
         }
         void CalculSizeD()
         {

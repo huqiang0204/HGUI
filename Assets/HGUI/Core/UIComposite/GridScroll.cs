@@ -2,8 +2,6 @@
 using huqiang.Data;
 using huqiang.UIEvent;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace huqiang.UIComposite

@@ -282,6 +282,8 @@ namespace huqiang.UIComposite
         void Order(bool force = false)
         {
             int len = DataLength;
+            if (len <= 0)
+                return;
             float lx = ctSize.x;
             int sr = (int)(m_point / lx);//起始索引
             int er = (int)((m_point + Size.x) / lx) + 1;

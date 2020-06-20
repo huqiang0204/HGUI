@@ -121,6 +121,7 @@ public static class UICompositeMenu
         trans.localPosition = Vector3.zero;
         trans.localScale = Vector3.one;
         trans.localRotation = Quaternion.identity;
+        go.GetComponent<HText>().SizeDelta = new Vector2(160,40);
     }
     [MenuItem("GameObject/HGUI/InputBox", false, 5)]
     static public void AddInputBox(MenuCommand menuCommand)
@@ -567,6 +568,18 @@ public static class UICompositeMenu
         scroll.Sprite = EditorModelManager.FindSprite(icons, background);
         scroll.SprType = SpriteType.Sliced;
         scroll.Pivot = new Vector2(0.5f, 1);
+
+        var bds = UICreator.CreateElement(Vector3.zero, new Vector2(400, 100), "Bodys",  scroll.transform);
+        bds.anchorType = AnchorType.Alignment;
+        bds.anchorPointType = AnchorPointType.Top;
+        bds.marginType = MarginType.MarginX;
+        bds.Pivot = new Vector2(0.5f,1);
+
+        bds = UICreator.CreateElement(Vector3.zero, new Vector2(400, 100), "Titles", scroll.transform);
+        bds.anchorType = AnchorType.Alignment;
+        bds.anchorPointType = AnchorPointType.Top;
+        bds.marginType = MarginType.MarginX;
+        bds.Pivot = new Vector2(0.5f, 1);
 
         CreateItemE(scroll.transform,"Title");
         var item= CreateItemE(scroll.transform, "Item");

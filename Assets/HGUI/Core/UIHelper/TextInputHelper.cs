@@ -35,15 +35,16 @@ public class TextInputHelper:UICompositeHelp
     }
     public override void Refresh()
     {
-        if(InputString==null|InputString=="")
+        var txt = GetComponent<HText>();
+        if (txt == null)
+            return;
+        if (InputString==null|InputString=="")
         {
-            var txt = GetComponent<HText>();
             txt.Text = TipString;
             txt.MainColor = tipColor;
         }
         else
         {
-            var txt = GetComponent<HText>();
             txt.Text = InputString;
             txt.MainColor = inputColor;
         }

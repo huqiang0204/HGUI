@@ -7,7 +7,7 @@ using System.Text;
 
 namespace huqiang
 {
-    public class KcpEnvelope:IDisposable
+    public class KcpEnvelope : IDisposable
     {
         public static long timeout = 5000000;
         public class DataItem
@@ -23,11 +23,13 @@ namespace huqiang
         UInt16[] delays = new UInt16[256];//时延统计
         public static UInt16 MinID = 34000;
         public static UInt16 MaxID = 44000;
+        static UInt16 Fragment = 1472;
+        static int FragmentSize = (1472 - 8 - 14) - 12 * 4;//包头4字节,标志1字节,包尾4字节,数据头14字节,12个节点,每个节点4字节=1402
         public QueueBuffer<EnvelopeData> QueueBuf = new QueueBuffer<EnvelopeData>(64);
         List<DataItem> sendBuffer = new List<DataItem>();
         public List<byte[]> ValidateData = new List<byte[]>();
         protected UInt16 id = 34000;
-        protected UInt16 Fragment = 1472;
+
         protected EnvelopeItem[] pool = new EnvelopeItem[128];
         protected int remain = 0;
         protected byte[] buffer;
@@ -43,11 +45,11 @@ namespace huqiang
         {
             var tmp = Envelope.PackAll(dat, type, id, Fragment);
             long now = DateTime.Now.Ticks;
-            for(int i=0;i<tmp.Length;i++)
+            for (int i = 0; i < tmp.Length; i++)
             {
                 DataItem item = new DataItem();
                 item.msgID = id;
-                item.partID =(UInt16)i;
+                item.partID = (UInt16)i;
                 item.dat = tmp[i];
                 item.time = now;
                 sendBuffer.Add(item);
@@ -77,8 +79,7 @@ namespace huqiang
                 for (; c >= 0; c--)
                 {
                     var item = dats[c];
-                    UInt16 tag = item.head.Type;
-                    byte type = item.type;
+                    byte type = (byte)item.head.Type;
                     if (type == EnvelopeType.Heart)//这是一个心跳包
                     {
                         dats.RemoveAt(c);
@@ -95,7 +96,7 @@ namespace huqiang
                         ValidateData.Add(tmp);
                     }
                 }
-                OrganizeSubVolume(dats, 1403);
+                OrganizeSubVolume(dats, FragmentSize);
             }
             catch
             {
@@ -178,8 +179,8 @@ namespace huqiang
             }
             sendBuffer.Clear();
         }
-        
-        void Success(UInt16 _id,UInt16 part, long now)
+
+        void Success(UInt16 _id, UInt16 part, long now)
         {
             for (int i = 0; i < sendBuffer.Count; i++)
                 if (sendBuffer[i].msgID == _id)
@@ -195,7 +196,10 @@ namespace huqiang
                         break;
                     }
         }
-        public int Delay { get {
+        public int Delay
+        {
+            get
+            {
                 int a = 0;
                 int i = 0;
                 for (; i < 256; i++)
@@ -211,15 +215,15 @@ namespace huqiang
                 if (i == 0)
                     return 0;
                 return a / i;
-            } }
+            }
+        }
         public void Dispose()
         {
             Clear();
             ValidateData.Clear();
         }
-        public bool Send(Socket soc, long now, IPEndPoint ip)
+        public void Send(Socket soc, long now, IPEndPoint ip)
         {
-            int c = 0;
             lock (ValidateData)
             {
                 int len = ValidateData.Count;
@@ -232,33 +236,32 @@ namespace huqiang
                 var dat = sendBuffer[i];
                 if (dat != null)
                 {
-                    if(dat.send)//已经发送过了
+                    if (dat.send)//已经发送过了
                     {
                         if (now - dat.time > timeout)
                         {
                             dat.time += timeout;
-                           c = soc.SendTo(dat.dat, ip);//重新发送超时的数据
+                            soc.SendTo(dat.dat, ip);//重新发送超时的数据
                         }
                     }
                     else
                     {
-                        c = soc.SendTo(dat.dat, ip);//首次发送数据
+                        soc.SendTo(dat.dat, ip);//首次发送数据
                         dat.send = true;
                         dat.time = now;
                     }
                 }
             }
-            return c > 0;
         }
-       
+
         /// <summary>
         /// 添加需要发送的消息
         /// </summary>
-        public void AddMsg(byte[][] dat,long now,UInt16 msgID)
+        public void AddMsg(byte[][] dat, long now, UInt16 msgID)
         {
             lock (sendBuffer)
             {
-                for(UInt16 i=0;i<dat.Length;i++)
+                for (UInt16 i = 0; i < dat.Length; i++)
                 {
                     DataItem item = new DataItem();
                     item.msgID = msgID;

@@ -479,6 +479,7 @@ namespace huqiang.Core.HGUI
             {
                 return;
             }
+            MainCanvas = this;
             point = 1;
             max = 0;
             TxtCollector.Clear();

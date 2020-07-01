@@ -272,6 +272,7 @@ namespace huqiang.UIComposite
             a.target.SetParent(Main);
             a.target.SetAsFirstSibling();
             a.target.localRotation = Quaternion.identity;
+            a.target.localScale = Vector3.one;
             return a;
         }
         Constructor creator;

@@ -1,5 +1,4 @@
 ﻿using huqiang.Data;
-using huqiang.Data2D;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,6 +8,11 @@ using UnityEngine;
 
 namespace huqiang.Core.HGUI
 {
+    public class PrefabAsset
+    {
+        public string name;
+        public FakeStruct models;
+    }
     public class HGUIManager
     {
         public static GameobjectBuffer GameBuffer;

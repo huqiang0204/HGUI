@@ -100,7 +100,7 @@ namespace huqiang.Core.HGUI
                     TxtCollector.Next();
                 var txt = script as HText;
                 if (txt != null)
-                    TxtCollector.AddText(txt,act);
+                    TxtCollector.AddText(txt, act);
             }
             PipeLine[index].script = script;
             int c = trans.childCount;
@@ -152,7 +152,7 @@ namespace huqiang.Core.HGUI
             Collection(transform, -1, 0);
             for (int i = 0; i < max; i++)
                 scripts[i].MainUpdate();
-            TxtCollector.GenerateTexture(true);
+            TxtCollector.GenerateTexture(false);
             Batch();
             ApplyMeshRenderer();
             ApplyToCamera();

@@ -7,10 +7,14 @@ namespace huqiang.Core.HGUI
 {
     public class TextCollector
     {
+        struct TextState
+        {
+            public HText text;
+            public bool active;
+        }
         struct TextInfo
         {
-            public HText[] texts;
-            public bool[] state;
+            public TextState[] texts;
             public int max;
             public bool end;
         }
@@ -24,13 +28,12 @@ namespace huqiang.Core.HGUI
             var buf = buffer[point].texts;
             if (buf == null)
             {
-                buf = new HText[1024];
-                buffer[point].state = new bool[1024];
+                buf = new TextState[1024];
                 buffer[point].texts = buf;
             }
             int top = buffer[point].max;
-            buf[top] = text;
-            buffer[point].state[top] = active;
+            buf[top].text = text;
+            buf[top].active = active;
             buffer[point].max++;
         }
         public void Clear()
@@ -40,7 +43,7 @@ namespace huqiang.Core.HGUI
                 int c = buffer[i].max;
                 var buf = buffer[i];
                 for (int j = 0; j < c; j++)
-                    buf.texts[j] = null;
+                    buf.texts[j].text = null;
                 buffer[i].max = 0;
                 buffer[i].end = false;
             }
@@ -77,13 +80,12 @@ namespace huqiang.Core.HGUI
             {
                 int c = buffer[i].max;
                 var buf = buffer[i].texts;
-                var state = buffer[i].state;
                 bool dirty = force;
                 if (!force)
                 {
                     for (int j = 0; j < c; j++)
                     {
-                        if (buf[j].m_dirty | buf[j].m_colorChanged)
+                        if (buf[j].text.m_dirty | buf[j].text.m_colorChanged)
                         {
                             dirty = true;
                             break;
@@ -95,16 +97,16 @@ namespace huqiang.Core.HGUI
                     for (int j = 0; j < c; j++)
                     {
                         if(force)
-                            buf[j].Populate();
+                            buf[j].text.Populate();
                         else
-                        if (state[j])
-                            buf[j].Populate();
+                        if (buf[j].active)
+                            buf[j].text.Populate();
                     }
                     if(buf!=null)
                     {
                         if (buf.Length > 0)
                         {
-                            var txt = buf[0];
+                            var txt = buf[0].text;
                             if(txt!=null)
                             {
                                 var font = txt.Font;
@@ -114,8 +116,8 @@ namespace huqiang.Core.HGUI
                                     var id = tex.GetInstanceID();
                                     for (int j = 0; j < c; j++)
                                     {
-                                        buf[j].texIds[0] = id;
-                                        buf[j].textures[0] = tex;
+                                        buf[j].text.texIds[0] = id;
+                                        buf[j].text.textures[0] = tex;
                                     }
                                 }
                             }

@@ -32,6 +32,8 @@ namespace huqiang.Core.HGUI
                 }
                 else
                 {
+                    if (f_str == value)
+                        return;
                     f_str = value;
                     emojis.Clear();
                     m_str = EmojiMap.CheckEmoji(f_str, emojis);

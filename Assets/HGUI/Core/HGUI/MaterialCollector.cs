@@ -111,7 +111,7 @@ namespace huqiang.Core.HGUI
             textures[o].fillcolor = fillcolor;
             return false;
         }
-        public void CombinationMaterial(HGraphics graphics, int[] tris, ref int offset, ref Vector4 clip)
+        public void CombinationMaterial(HGraphics graphics, int[] tris, int len, ref int offset, ref Vector4 clip)
         {
             int id = graphics.MatID;
 #if UNITY_EDITOR
@@ -124,25 +124,28 @@ namespace huqiang.Core.HGUI
                 bool mask = graphics.Mask;
                 if (CombinationMaterial(graphics.textures[0], graphics.texIds[0], graphics.fillColors[0], ref offset, ref clip,mask))
                 {
-                    CombinationMesh(tris);
+                    for (int i = 0; i < len; i++)
+                        tmpMesh.Add(tris[i]);
                 }
                 else
                 {
                     if (max > 0)
                         CompeleteSub();
-                    CombinationMesh(tris);
+                    for (int i = 0; i < len; i++)
+                        tmpMesh.Add(tris[i]);
                 }
             }
             else//使用自定义材质球
             {
                 if (max > -1)
                     CompeleteSub();
-                CombinationMesh(tris);
+                for (int i = 0; i < len; i++)
+                    tmpMesh.Add(tris[i]);
                 graphics.Material.SetTexture(tc[0], graphics.textures[0]);
                 CombinationMaterial(graphics.Material, id, ref clip);
             }
         }
-        public void CombinationMaterial(HGraphics graphics, int[][] trisArray, int[] offsets, ref Vector4 clip)
+        public void CombinationMaterial(HGraphics graphics, int[] trisArray,ArrayInfo[] address, int[] offsets, int len, ref Vector4 clip)
         {
             int id = graphics.MatID;
 #if UNITY_EDITOR
@@ -154,19 +157,30 @@ namespace huqiang.Core.HGUI
             {
                 if (trisArray != null)
                 {
-                    int c = trisArray.Length;
                     bool mask = graphics.Mask;
-                    for (int i = 0; i < c; i++)
+                    for (int i = 0; i < len; i++)
                     {
                         if (CombinationMaterial(graphics.textures[i], graphics.texIds[i],graphics.fillColors[i], ref offsets[i], ref clip, mask))
                         {
-                            CombinationMesh(trisArray[i]);
+                            int s = address[i].Start;
+                            int l = address[i].Length;
+                            for (int j = 0; j < l; j++)
+                            { 
+                                tmpMesh.Add(trisArray[s]);
+                                s++;
+                            }
                         }
                         else
                         {
                             if (max > 0)
                                 CompeleteSub();
-                            CombinationMesh(trisArray[i]);
+                            int s = address[i].Start;
+                            int l = address[i].Length;
+                            for (int j = 0; j < l; j++)
+                            {
+                                tmpMesh.Add(trisArray[s]);
+                                s++;
+                            }
                         }
                         mask = false;
                     }
@@ -176,35 +190,25 @@ namespace huqiang.Core.HGUI
             {
                 if (max > -1)
                     CompeleteSub();
-                for (int i = 0; i < trisArray.Length; i++)
-                    CombinationMesh(trisArray[i]);
+                for (int i = 0; i < len; i++)
+                {
+                    int s = address[i].Start;
+                    int l = address[i].Length;
+                    for (int j = 0; j < l; j++)
+                    {
+                        tmpMesh.Add(trisArray[s]);
+                        s++;
+                    }
+                }
                 graphics.Material.SetTexture(tc[0],graphics.textures[0]);
                 CombinationMaterial(graphics.Material, id, ref clip);
             }
         }
-        List<int[]> tmpMesh = new List<int[]>();
-        public void CombinationMesh(int[] sub)
-        {
-            tmpMesh.Add(sub);
-        }
+        List<int> tmpMesh = new List<int>();
+        
         public void CompeleteSub()
         {
-            int c = tmpMesh.Count;
-            int all = 0;
-            for (int i = 0; i < c; i++)
-                all += tmpMesh[i].Length;
-            int[] buf = new int[all];
-            int s = 0;
-            for (int i = 0; i < c; i++)
-            {
-                var t = tmpMesh[i];
-                for (int j = 0; j < t.Length; j++)
-                {
-                    buf[s] = t[j];
-                    s++;
-                }
-            }
-            submesh.Add(buf);
+            submesh.Add(tmpMesh.ToArray());
             tmpMesh.Clear();
         }
         public void End()

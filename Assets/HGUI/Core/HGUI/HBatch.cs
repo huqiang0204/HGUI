@@ -1,11 +1,21 @@
-﻿using System;
+﻿using ILRuntime.Mono.Cecil;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace huqiang.Core.HGUI
 {
+    public struct ArrayInfo
+    {
+        public int Start;
+        public int Length;
+    }
     internal class HBatch
     {
+
+        static int[] TriBuffer = new int[65536];
+        static int[] IDBuffer = new int[32];
+        static ArrayInfo[] Arrays= new ArrayInfo[32];
         public static void Batch(HCanvas canvas, HGUIElement[] pipeLine)
         {
             HGUIElement root = pipeLine[0];
@@ -38,7 +48,7 @@ namespace huqiang.Core.HGUI
             scale.x *= s.x;
             scale.y *= s.y;
             Quaternion q = quate * pipeLine[index].localRotation;
-
+ 
             bool mask = false;
             var script = root.script;
             if (script != null)
@@ -105,16 +115,16 @@ namespace huqiang.Core.HGUI
                         {
                             int tid = 0;
                             var src = graphics.tris;
-                            if (src.Length > 0)
+                            int len = src.Length;
+                            if (len > 0)
                             {
-                                int[] tmp = new int[src.Length];
-                                for (int k = 0; k < tmp.Length; k++)
+                                for (int k = 0; k < len; k++)
                                 {
-                                    tmp[k] = src[k] + vc;
+                                    TriBuffer[k] = src[k] + vc;
                                 }
-                                canvas.MatCollector.CombinationMaterial(graphics, tmp, ref tid, ref clip);
+                                canvas.MatCollector.CombinationMaterial(graphics, TriBuffer, len, ref tid, ref clip);
                             }
-                            AddUV1(canvas,tid,vert.Length);
+                            AddUV1(canvas, tid, vert.Length);
                         }
                         else if (graphics.subTris != null)
                         {
@@ -122,20 +132,23 @@ namespace huqiang.Core.HGUI
                             int l = subs.Length;
                             if (l > 0)
                             {
-                                int[] ids = new int[l];
-                                int[][] buf = new int[l][];
+                                int op = 0;
                                 for (int i = 0; i < l; i++)
                                 {
+                                    Arrays[i].Start = op;
                                     var src = subs[i];
-                                    int[] tmp = new int[src.Length];
-                                    for (int k = 0; k < tmp.Length; k++)
+                                    int len = src.Length;
+                                    Arrays[i].Length = len;
+                                    int e = op;
+                                    for (int k = 0; k < len; k++)
                                     {
-                                        tmp[k] = src[k] + vc;
+                                        TriBuffer[e] = src[k] + vc;
+                                        e++;
                                     }
-                                    buf[i] = tmp;
+                                    op += len;
                                 }
-                                canvas.MatCollector.CombinationMaterial(graphics, buf, ids, ref clip);
-                                AddUV1(canvas,ids,vert);
+                                canvas.MatCollector.CombinationMaterial(graphics, TriBuffer,Arrays, IDBuffer, l,ref clip);
+                                AddUV1(canvas, IDBuffer, vert,l);
                             }
                             else
                             {
@@ -192,14 +205,14 @@ namespace huqiang.Core.HGUI
                 {
                     int tid = 0;
                     var src = graphics.tris;
-                    if (src.Length > 0)
+                    int len = src.Length;
+                    if (len > 0)
                     {
-                        int[] tmp = new int[src.Length];
-                        for (int k = 0; k < tmp.Length; k++)
+                        for (int k = 0; k < len; k++)
                         {
-                            tmp[k] = src[k] + vc;
+                            TriBuffer[k] = src[k] + vc;
                         }
-                        canvas.MatCollector.CombinationMaterial(graphics, tmp, ref tid, ref clip);
+                        canvas.MatCollector.CombinationMaterial(graphics, TriBuffer, len, ref tid, ref clip);
                     }
                     AddUV1(canvas, tid, vert.Length);
                 }
@@ -209,20 +222,23 @@ namespace huqiang.Core.HGUI
                     int l = subs.Length;
                     if (l > 0)
                     {
-                        int[] ids = new int[l];
-                        int[][] buf = new int[l][];
+                        int op = 0;
                         for (int i = 0; i < l; i++)
                         {
+                            Arrays[i].Start = op;
                             var src = subs[i];
-                            int[] tmp = new int[src.Length];
-                            for (int k = 0; k < tmp.Length; k++)
+                            int len = src.Length;
+                            Arrays[i].Length = len;
+                            int e = op;
+                            for (int k = 0; k < len; k++)
                             {
-                                tmp[k] = src[k] + vc;
+                                TriBuffer[e] = src[k] + vc;
+                                e++;
                             }
-                            buf[i] = tmp;
+                            op += len;
                         }
-                        canvas.MatCollector.CombinationMaterial(graphics, buf, ids, ref clip);
-                        AddUV1(canvas, ids, vert);
+                        canvas.MatCollector.CombinationMaterial(graphics, TriBuffer, Arrays, IDBuffer, l, ref clip);
+                        AddUV1(canvas, IDBuffer, vert, l);
                     }
                     else
                     {
@@ -237,33 +253,29 @@ namespace huqiang.Core.HGUI
         }
         static void AddUV1(HCanvas canvas, int tid, int vertCount)
         {
-            Vector2[] uv1 = new Vector2[vertCount];
+
+            Vector2 v = Vector2.zero;
             switch (tid)
             {
                 case 1:
-                    for (int i = 0; i < uv1.Length; i++)
-                        uv1[i].y = 1;
+                    v.y = 1;
                     break;
                 case 2:
-                    for (int i = 0; i < uv1.Length; i++)
-                        uv1[i].x = 1;
+                    v.x = 1;
                     break;
                 case 3:
-                    for (int i = 0; i < uv1.Length; i++)
-                    {
-                        uv1[i].x = 1;
-                        uv1[i].y = 1;
-                    }
+                    v.x = 1;
+                    v.y = 1;
                     break;
             }
-            canvas.uv1.AddRange(uv1);
+            for (int i = 0; i < vertCount; i++)
+                canvas.uv1.Add(v);
         }
         static Vector2[] UV1 = new Vector2[4];
-        static void AddUV1(HCanvas canvas, int[] ids, HVertex[] vertices)
+        static void AddUV1(HCanvas canvas, int[] ids, HVertex[] vertices,int l)
         {
             int len = vertices.Length;
-            Vector2[] uv1 = new Vector2[len];
-            for (int i = 0; i < ids.Length; i++)
+            for (int i = 0; i < l; i++)
             {
                 switch (ids[i])
                 {
@@ -286,8 +298,7 @@ namespace huqiang.Core.HGUI
                 }
             }
             for (int i = 0; i < len; i++)
-                uv1[i] = UV1[vertices[i].picture];
-            canvas.uv1.AddRange(uv1);
+                canvas.uv1.Add(UV1[vertices[i].picture]);
         }
         static Vector4 CutRect(Vector4 v0,Vector4 v1)
         {

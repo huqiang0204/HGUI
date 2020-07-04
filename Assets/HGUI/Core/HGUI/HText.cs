@@ -28,8 +28,17 @@ namespace huqiang.Core.HGUI
                 text.tris = null;
                 return;
             }
-            HVertex[] hv = new HVertex[c];
-            
+
+            HVertex[] hv = text.vertices;
+            if (hv == null)
+            {
+                hv = new HVertex[c];
+            }
+            else if (hv.Length != c)
+            {
+                hv = new HVertex[c];
+            }
+
             int e = c / 4;
             for (int i = 0; i < c; i++)
             {
@@ -108,19 +117,42 @@ namespace huqiang.Core.HGUI
                 {
                     if (text.subTris == null)
                         text.subTris = new int[2][];
-                    text.subTris[0] = bufferA.ToArray();
-                    text.subTris[1] = bufferB.ToArray();
+                    if(text.subTris[0]!=null)
+                    {
+                        if(text.subTris[0].Length==bufferA.Count)
+                        {
+                            bufferA.CopyTo(text.subTris[0]);
+                        }else bufferA.ToArray();
+                    }else text.subTris[0] = bufferA.ToArray();
+                    if(text.subTris[1]!=null)
+                    {
+                        if(text.subTris[1].Length==bufferB.Count)
+                        {
+                            bufferB.CopyTo(text.subTris[1]);
+                        }
+                        else text.subTris[1] = bufferB.ToArray();
+                    }
+                    else text.subTris[1] = bufferB.ToArray();
                     text.tris = null;
                 }
                 else
                 {
+                    if(text.tris!=null)
+                    {
+                        if(text.tris.Length==bufferA.Count)
+                        {
+                            bufferA.CopyTo(text.tris);
+                        }
+                        else text.tris = bufferA.ToArray();
+                    }
+                    else
                     text.tris = bufferA.ToArray();
                     text.subTris = null;
                 }
             }
             else
             {
-                text.tris = CreateTri(c);
+                text.tris = CreateTri(c,text.tris);
                 text.subTris = null;
             }
             text.vertices = hv;
@@ -193,13 +225,17 @@ namespace huqiang.Core.HGUI
                 }
             }
         }
-        static int[] CreateTri(int len)
+        static int[] CreateTri(int len,int[] ori)
         {
             int c = len / 4;
             if (c < 0)
                 return null;
             int max = c * 6;
-            int[] tri = new int[max];
+            int[] tri = ori;
+            if (tri == null)
+                tri = new int[max];
+            else if (tri.Length != max)
+                tri = new int[max];
             for (int i = 0; i < c; i++)
             {
                 int p = i * 4;
@@ -397,9 +433,39 @@ namespace huqiang.Core.HGUI
             GetGenerationSettings(ref m_sizeDelta,ref settings);
             var g = Generator;
             g.Populate(str, settings);
-            verts = g.verts.ToArray();
-            uILines = g.lines.ToArray();
-            uIChars = g.characters.ToArray();
+            var v = g.verts;
+            if (verts != null)
+            {
+                if (v.Count == verts.Length)
+                {
+                    v.CopyTo(verts,0);
+                }
+                else
+                    verts = v.ToArray();
+            }
+            else verts = v.ToArray();
+            var l = g.lines;
+            if(uILines!=null)
+            {
+                if(uILines.Length==l.Count)
+                {
+                    l.CopyTo(uILines,0);
+                }
+                else
+                {
+                    uILines = l.ToArray();
+                }
+            }else uILines = l.ToArray();
+            var c = g.characters;
+            if(uIChars!=null)
+            {
+                if(uIChars.Length==c.Count)
+                {
+                    c.CopyTo(uIChars,0);
+                }else uIChars = c.ToArray();
+            }
+            else
+            uIChars = c.ToArray();
             m_dirty = false;
             m_vertexChange = true;
             fillColors[0] = true;

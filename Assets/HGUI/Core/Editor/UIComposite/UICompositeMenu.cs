@@ -536,7 +536,10 @@ public static class UICompositeMenu
         scroll.Pivot = new Vector2(0.5f,1);
 
         var item =CreateItem(scroll.transform, "Item");
-        item.transform.localPosition = new Vector3(0,-200,0);
+        item.Pivot = new Vector2(0.5f, 1);
+        item.transform.localPosition = new Vector3(0, 0, 0);
+        item.transform.Find("Image").localPosition = new Vector3(0, -50, 0);
+        item.transform.Find("Text").localPosition = new Vector3(0, -50, 0);
 
         var slider = UICreator.CreateHImage(new Vector3(190, -200, 0), new Vector2(20, 400), "Slider", scroll.transform);
         slider.eventType = huqiang.Core.HGUI.EventType.UserEvent;

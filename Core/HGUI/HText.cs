@@ -523,5 +523,4 @@ namespace huqiang.Core.HGUI
        Vertical,
        Both
     }
-
 }

@@ -33,10 +33,11 @@ namespace huqiang.Core.HGUI
         public Vector4 uvrect = new Vector4(0,0,1,1);
         public override Color32 MainColor { get => m_color; set { m_color = value; m_colorChanged = true;} }
         public override Vector2 SizeDelta { get => m_sizeDelta; set { m_sizeDelta = value; m_vertexChange = true; } }
-        //internal HVertex[] vertices;
         internal int[] tris;
         internal int[][] subTris;
         internal BlockInfo vertInfo;
+        internal BlockInfo trisInfo;
+        internal BlockInfo trisInfo2;
         [SerializeField]
         internal Material m_material;
         public Material Material { get => m_material; set {

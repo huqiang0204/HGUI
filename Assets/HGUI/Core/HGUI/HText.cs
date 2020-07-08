@@ -10,6 +10,7 @@ namespace huqiang.Core.HGUI
     public class HText:HGraphics
     {
         static BlockBuffer<HVertex> blockBuffer = new BlockBuffer<HVertex>(32, 1024);
+        static BlockBuffer<int> trisBuffer = new BlockBuffer<int>(48,1024);
         static Font defFont;
         static char[] key_noMesh = new char[] { ' ' ,'\n', '\r' };
         static List<int> bufferA = new List<int>();

@@ -167,7 +167,6 @@ namespace huqiang.Core.HGUI
                 text.tris = CreateTri(c,text.tris);
                 text.subTris = null;
             }
-            //text.vertices = hv;
         }
         static void OutLineVertex(ref BlockInfo buf, int start, ref BlockInfo src, float x,float y,ref Color32 color)
         {

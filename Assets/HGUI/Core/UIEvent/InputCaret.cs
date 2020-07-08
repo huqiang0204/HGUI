@@ -90,29 +90,55 @@ namespace huqiang.UIEvent
         }
         public static void ChangeCaret(float left, float right, float top, float down, Color32 color)
         {
-            HVertex[] hv = new HVertex[4];
-            hv[0].position.x = left;
-            hv[0].position.y = down;
-            hv[0].color = color;
+            if (Caret.vertInfo.Size == 0)
+            {
+                Caret.vertInfo = HGUIMesh.blockBuffer.RegNew(4);
+            }
+            else if (Caret.vertInfo.Size < 4 | Caret.vertInfo.Size > 8)
+            {
+                HGUIMesh.blockBuffer.Release(ref Caret.vertInfo);
+                Caret.vertInfo = HGUIMesh.blockBuffer.RegNew(4);
+            }
+            unsafe
+            {
+                HVertex* hv = (HVertex*)Caret.vertInfo.Addr;
+                hv[0].position.x = left;
+                hv[0].position.y = down;
+                hv[0].color = color;
 
-            hv[1].position.x = right;
-            hv[1].position.y = down;
-            hv[1].color = color;
+                hv[1].position.x = right;
+                hv[1].position.y = down;
+                hv[1].color = color;
 
-            hv[2].position.x = left;
-            hv[2].position.y = top;
-            hv[2].color = color;
+                hv[2].position.x = left;
+                hv[2].position.y = top;
+                hv[2].color = color;
 
-            hv[3].position.x = right;
-            hv[3].position.y = top;
-            hv[3].color = color;
-            Caret.vertices = hv;
+                hv[3].position.x = right;
+                hv[3].position.y = top;
+                hv[3].color = color;
+            }
+          
             Caret.tris = HGUIMesh.Rectangle;
             CaretStyle = 1;
         }
         public static void ChangeCaret(HVertex[] vertices,int[] tris)
         {
-            Caret.vertices = vertices;
+            int c = vertices.Length;
+            if (Caret.vertInfo.Size > 0)
+            {
+                HGUIMesh.blockBuffer.Release(ref Caret.vertInfo);
+            }
+            Caret.vertInfo = HGUIMesh.blockBuffer.RegNew(c);
+            unsafe
+            {
+                HVertex* hv = (HVertex*)Caret.vertInfo.Addr;
+                for (int i = 0; i < c; i++)
+                {
+                    hv[i] = vertices[i];
+                }
+            }
+            Caret.vertInfo.DataCount = c;
             Caret.tris = tris;
             CaretStyle = 2;
         }

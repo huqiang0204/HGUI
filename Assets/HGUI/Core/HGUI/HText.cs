@@ -1,4 +1,5 @@
-﻿using System;
+﻿using huqiang.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,7 @@ namespace huqiang.Core.HGUI
 {
     public class HText:HGraphics
     {
+        static BlockBuffer<HVertex> blockBuffer = new BlockBuffer<HVertex>(32, 1024);
         static Font defFont;
         static char[] key_noMesh = new char[] { ' ' ,'\n', '\r' };
         static List<int> bufferA = new List<int>();
@@ -24,30 +26,35 @@ namespace huqiang.Core.HGUI
             int c = verts.Length;
             if (c == 0)
             {
-                text.vertices = null;
+                text.vertInfo.DataCount = 0;
                 text.tris = null;
                 return;
             }
-
-            HVertex[] hv = text.vertices;
-            if (hv == null)
+            if(text.vertInfo.Size==0)
             {
-                hv = new HVertex[c];
+                text.vertInfo = blockBuffer.RegNew(c);
             }
-            else if (hv.Length != c)
+            else
+            if (text.vertInfo.Size < c| text.vertInfo.Size> c+32)
             {
-                hv = new HVertex[c];
+                blockBuffer.Release(ref text.vertInfo);
+                text.vertInfo = blockBuffer.RegNew(c);
             }
-
+            text.vertInfo.DataCount = c;
             int e = c / 4;
-            for (int i = 0; i < c; i++)
+            unsafe
             {
-                hv[i].position = verts[i].position;
-                hv[i].color = verts[i].color;
-                hv[i].uv = verts[i].uv0;
-                hv[i].uv4.x = 1;
-                hv[i].uv4.y = 1;
+                HVertex* hv= (HVertex*)text.vertInfo.Addr;
+                for (int i = 0; i < c; i++)
+                {
+                    hv[i].position = verts[i].position;
+                    hv[i].color = verts[i].color;
+                    hv[i].uv = verts[i].uv0;
+                    hv[i].uv4.x = 1;
+                    hv[i].uv4.y = 1;
+                }
             }
+  
             if(emojis.Count>0)
             {
                 var info = emojis[0];
@@ -72,21 +79,26 @@ namespace huqiang.Core.HGUI
                         if (i == info.pos)
                         {
                             int o = p * 4;
-                            hv[o].uv = info.uv[0];
-                            hv[o].color = col;
-                            hv[o].picture = 1;
-                            o++;
-                            hv[o].uv = info.uv[1];
-                            hv[o].color = col;
-                            hv[o].picture = 1;
-                            o++;
-                            hv[o].uv = info.uv[2];
-                            hv[o].color = col;
-                            hv[o].picture = 1;
-                            o++;
-                            hv[o].uv = info.uv[3];
-                            hv[o].color = col;
-                            hv[o].picture = 1;
+                            unsafe
+                            {
+                                HVertex* hv = (HVertex*)text.vertInfo.Addr;
+                                hv[o].uv = info.uv[0];
+                                hv[o].color = col;
+                                hv[o].picture = 1;
+                                o++;
+                                hv[o].uv = info.uv[1];
+                                hv[o].color = col;
+                                hv[o].picture = 1;
+                                o++;
+                                hv[o].uv = info.uv[2];
+                                hv[o].color = col;
+                                hv[o].picture = 1;
+                                o++;
+                                hv[o].uv = info.uv[3];
+                                hv[o].color = col;
+                                hv[o].picture = 1;
+                            }
+                         
                             si++;
                             if (si < emojis.Count)
                                 info = emojis[si];
@@ -155,19 +167,25 @@ namespace huqiang.Core.HGUI
                 text.tris = CreateTri(c,text.tris);
                 text.subTris = null;
             }
-            text.vertices = hv;
+            //text.vertices = hv;
         }
-        static void OutLineVertex(HVertex[] buf, int start, HVertex[] src, float x,float y,ref Color32 color)
+        static void OutLineVertex(ref BlockInfo buf, int start, ref BlockInfo src, float x,float y,ref Color32 color)
         {
-            int l = src.Length;
-            for(int i=0;i<l;i++)
+            int l = src.DataCount;
+            unsafe
             {
-                buf[start] = src[i];
-                buf[start].position.x += x;
-                buf[start].position.y += y;
-                buf[start].color = color;
-                start++;
+                HVertex* tar =(HVertex*) buf.Addr;
+                HVertex* ori = (HVertex*)src.Addr;
+                for (int i = 0; i < l; i++)
+                {
+                    tar[start] = ori[i];
+                    tar[start].position.x += x;
+                    tar[start].position.y += y;
+                    tar[start].color = color;
+                    start++;
+                }
             }
+         
         }
         static void OutLineTris(int[] buf, int start, int[] src, int offset)
         {
@@ -179,23 +197,29 @@ namespace huqiang.Core.HGUI
         }
         static void CreateOutLine(HText text)
         {
-            HVertex[] buf = text.vertices;
-            if (buf == null)
+            int c = text.vertInfo.DataCount;
+            if (c == 0)
                 return;
-            int c = buf.Length;
-            HVertex[] tmp = new HVertex[c * 5];
+            BlockInfo tmp = blockBuffer.RegNew(c*5);
             float d = text.OutLine;
-            OutLineVertex(tmp, 0, buf, d, d, ref text.shadowColor);
-            OutLineVertex(tmp, c, buf, d, -d, ref text.shadowColor);
-            OutLineVertex(tmp, c * 2, buf, -d, -d, ref text.shadowColor);
-            OutLineVertex(tmp, c * 3, buf, -d, d, ref text.shadowColor);
-            int s = c * 4;
-            for (int i = 0; i < c; i++)
+            OutLineVertex(ref tmp, 0,ref text.vertInfo, d, d, ref text.shadowColor);
+            OutLineVertex(ref tmp, c, ref text.vertInfo, d, -d, ref text.shadowColor);
+            OutLineVertex(ref tmp, c * 2, ref text.vertInfo, -d, -d, ref text.shadowColor);
+            OutLineVertex(ref tmp, c * 3, ref text.vertInfo, -d, d, ref text.shadowColor);
+            unsafe
             {
-                tmp[s] = buf[i];
-                s++;
+                HVertex* tar = (HVertex*)tmp.Addr;
+                HVertex* ori = (HVertex*)text.vertInfo.Addr;
+                int s = c * 4;
+                for (int i = 0; i < c; i++)
+                {
+                    tar[s] = ori[i];
+                    s++;
+                }
             }
-            text.vertices = tmp;
+
+            blockBuffer.Release(ref text.vertInfo);
+            text.vertInfo = tmp;
             if (text.tris != null)
             {
                 var src = text.tris;
@@ -284,7 +308,6 @@ namespace huqiang.Core.HGUI
                 m_dirty = true;
             } }
         EmojiString emojiString = new EmojiString();
-        UILineInfo[] lines;
         UIVertex[] verts;
         [SerializeField]
         internal Font _font;

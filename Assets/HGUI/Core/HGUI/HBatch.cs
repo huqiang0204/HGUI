@@ -12,7 +12,6 @@ namespace huqiang.Core.HGUI
     }
     internal class HBatch
     {
-
         static int[] TriBuffer = new int[65536];
         static int[] IDBuffer = new int[32];
         static ArrayInfo[] Arrays= new ArrayInfo[32];
@@ -86,31 +85,36 @@ namespace huqiang.Core.HGUI
                         AddShadow(graphics,canvas,ref q,ref scale,ref o,ref clip);
                     var vs = canvas.vertex;
                     var vc = vs.Count;
-                    var vert = graphics.vertices;
-                    if (vert != null)
+                    int dc = graphics.vertInfo.DataCount;
+                    if (dc>0)
                     {
                         float px = (0.5f - script.Pivot.x) * script.SizeDelta.x;
-                        float py = (0.5f - script.Pivot.y) * script.SizeDelta.y;  
+                        float py = (0.5f - script.Pivot.y) * script.SizeDelta.y;
                         Vector2 uv2 = Vector2.zero;
-                        for (int j = 0; j < vert.Length; j++)
+                        unsafe
                         {
-                            var tp = vert[j].position;//局部顶点
-                            tp.x += px;
-                            tp.y += py;
-                            var t = q * tp;
-                            t.x *= scale.x;
-                            t.y *= scale.y;
-                            t += o;
-                            t.z = 0;
-                            uv2.x = (t.x + 10000) / 20000;
-                            uv2.y = (t.y + 10000) / 20000;
-                            vs.Add(t);
-                            canvas.colors.Add(vert[j].color);
-                            canvas.uv.Add(vert[j].uv);
-                            canvas.uv2.Add(uv2);
-                            canvas.uv3.Add(vert[j].uv3);
-                            canvas.uv4.Add(vert[j].uv4);
+                            HVertex* hv = (HVertex*)graphics.vertInfo.Addr;
+                            for (int j = 0; j < dc; j++)
+                            {
+                                var tp = hv[j].position;//局部顶点
+                                tp.x += px;
+                                tp.y += py;
+                                var t = q * tp;
+                                t.x *= scale.x;
+                                t.y *= scale.y;
+                                t += o;
+                                t.z = 0;
+                                uv2.x = (t.x + 10000) / 20000;
+                                uv2.y = (t.y + 10000) / 20000;
+                                vs.Add(t);
+                                canvas.colors.Add(hv[j].color);
+                                canvas.uv.Add(hv[j].uv);
+                                canvas.uv2.Add(uv2);
+                                canvas.uv3.Add(hv[j].uv3);
+                                canvas.uv4.Add(hv[j].uv4);
+                            }
                         }
+                
                         if (graphics.tris != null)
                         {
                             int tid = 0;
@@ -124,7 +128,7 @@ namespace huqiang.Core.HGUI
                                 }
                                 canvas.MatCollector.CombinationMaterial(graphics, TriBuffer, len, ref tid, ref clip);
                             }
-                            AddUV1(canvas, tid, vert.Length);
+                            AddUV1(canvas, tid, dc);
                         }
                         else if (graphics.subTris != null)
                         {
@@ -147,17 +151,21 @@ namespace huqiang.Core.HGUI
                                     }
                                     op += len;
                                 }
-                                canvas.MatCollector.CombinationMaterial(graphics, TriBuffer,Arrays, IDBuffer, l,ref clip);
-                                AddUV1(canvas, IDBuffer, vert,l);
+                                canvas.MatCollector.CombinationMaterial(graphics, TriBuffer, Arrays, IDBuffer, l, ref clip);
+                                unsafe
+                                {
+                                    HVertex* hv = (HVertex*)graphics.vertInfo.Addr;
+                                    AddUV1(canvas, IDBuffer, hv, dc, l);
+                                }
                             }
                             else
                             {
-                                AddUV1(canvas, 0, vert.Length);
+                                AddUV1(canvas, 0, dc);
                             }
                         }
                         else
                         {
-                            AddUV1(canvas, 0, vert.Length);
+                            AddUV1(canvas, 0, dc);
                         }
                     }
                 }
@@ -175,31 +183,35 @@ namespace huqiang.Core.HGUI
         {
             var vs = canvas.vertex;
             var vc = vs.Count;
-            var vert = graphics.vertices;
+            int dc = graphics.vertInfo.DataCount;
             var os = graphics.shadowOffsset;
-            if (vert != null)
+            if (dc>0)
             {
                 float px = (0.5f - graphics.Pivot.x) * graphics.SizeDelta.x+os.x;
                 float py = (0.5f - graphics.Pivot.y) * graphics.SizeDelta.y+os.y;
                 Vector2 uv2 = Vector2.zero;
-                for (int j = 0; j < vert.Length; j++)
+                unsafe
                 {
-                    var tp = vert[j].position;//局部顶点
-                    tp.x += px;
-                    tp.y += py;
-                    var t = q * tp;
-                    t.x *= scale.x;
-                    t.y *= scale.y;
-                    t += o;
-                    t.z = 0;
-                    uv2.x = (t.x + 10000) / 20000;
-                    uv2.y = (t.y + 10000) / 20000;
-                    vs.Add(t);
-                    canvas.colors.Add(graphics.shadowColor);
-                    canvas.uv.Add(vert[j].uv);
-                    canvas.uv2.Add(uv2);
-                    canvas.uv3.Add(vert[j].uv3);
-                    canvas.uv4.Add(vert[j].uv4);
+                    HVertex* vert = (HVertex*)graphics.vertInfo.Addr;
+                    for (int j = 0; j < dc; j++)
+                    {
+                        var tp = vert[j].position;//局部顶点
+                        tp.x += px;
+                        tp.y += py;
+                        var t = q * tp;
+                        t.x *= scale.x;
+                        t.y *= scale.y;
+                        t += o;
+                        t.z = 0;
+                        uv2.x = (t.x + 10000) / 20000;
+                        uv2.y = (t.y + 10000) / 20000;
+                        vs.Add(t);
+                        canvas.colors.Add(graphics.shadowColor);
+                        canvas.uv.Add(vert[j].uv);
+                        canvas.uv2.Add(uv2);
+                        canvas.uv3.Add(vert[j].uv3);
+                        canvas.uv4.Add(vert[j].uv4);
+                    }
                 }
                 if (graphics.tris != null)
                 {
@@ -214,7 +226,7 @@ namespace huqiang.Core.HGUI
                         }
                         canvas.MatCollector.CombinationMaterial(graphics, TriBuffer, len, ref tid, ref clip);
                     }
-                    AddUV1(canvas, tid, vert.Length);
+                    AddUV1(canvas, tid, dc);
                 }
                 else if (graphics.subTris != null)
                 {
@@ -238,16 +250,20 @@ namespace huqiang.Core.HGUI
                             op += len;
                         }
                         canvas.MatCollector.CombinationMaterial(graphics, TriBuffer, Arrays, IDBuffer, l, ref clip);
-                        AddUV1(canvas, IDBuffer, vert, l);
+                        unsafe
+                        {
+                            HVertex* hv = (HVertex*)graphics.vertInfo.Addr;
+                            AddUV1(canvas, IDBuffer, hv, dc, l);
+                        }
                     }
                     else
                     {
-                        AddUV1(canvas, 0, vert.Length);
+                        AddUV1(canvas, 0, dc);
                     }
                 }
                 else
                 {
-                    AddUV1(canvas, 0, vert.Length);
+                    AddUV1(canvas, 0, dc);
                 }
             }
         }
@@ -298,6 +314,33 @@ namespace huqiang.Core.HGUI
                 }
             }
             for (int i = 0; i < len; i++)
+                canvas.uv1.Add(UV1[vertices[i].picture]);
+        }
+        unsafe static void AddUV1(HCanvas canvas, int[] ids, HVertex* vertices,  int vc,int l)
+        {
+            for (int i = 0; i < l; i++)
+            {
+                switch (ids[i])
+                {
+                    case 0:
+                        UV1[i].x = 0;
+                        UV1[i].y = 0;
+                        break;
+                    case 1:
+                        UV1[i].x = 0;
+                        UV1[i].y = 1;
+                        break;
+                    case 2:
+                        UV1[i].x = 1;
+                        UV1[i].y = 0;
+                        break;
+                    case 3:
+                        UV1[i].x = 1;
+                        UV1[i].y = 1;
+                        break;
+                }
+            }
+            for (int i = 0; i < vc; i++)
                 canvas.uv1.Add(UV1[vertices[i].picture]);
         }
         static Vector4 CutRect(Vector4 v0,Vector4 v1)

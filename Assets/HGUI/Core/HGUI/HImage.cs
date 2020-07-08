@@ -179,11 +179,15 @@ namespace huqiang.Core.HGUI
                 m_colorChanged = false;
             }else if(m_colorChanged)
             {
-                var hv =vertices;
-                if (hv != null)
+                var c =vertInfo.DataCount;
+                if (c > 0)
                 {
-                    for (int i = 0; i < hv.Length; i++)
-                        hv[i].color = m_color;
+                    unsafe
+                    {
+                        HVertex* hv = (HVertex*)vertInfo.Addr;
+                        for (int i = 0; i < c; i++)
+                            hv[i].color = m_color;
+                    }
                 }
             }
         }

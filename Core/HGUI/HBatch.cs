@@ -97,6 +97,7 @@ namespace huqiang.Core.HGUI
                             for (int j = 0; j < dc; j++)
                             {
                                 var tp = hv[j].position;//局部顶点
+                                tp.z = 0;
                                 tp.x += px;
                                 tp.y += py;
                                 var t = q * tp;
@@ -130,37 +131,44 @@ namespace huqiang.Core.HGUI
                             }
                             AddUV1(canvas, tid, dc);
                         }
-                        else if (graphics.subTris != null)
+                        else if(graphics.trisInfo.DataCount>0|graphics.trisInfo2.DataCount>0)
                         {
-                            var subs = graphics.subTris;
-                            int l = subs.Length;
-                            if (l > 0)
+                            int l = 0;
+                            int tc = graphics.trisInfo.DataCount;
+                            if (tc>0)
                             {
-                                int op = 0;
-                                for (int i = 0; i < l; i++)
-                                {
-                                    Arrays[i].Start = op;
-                                    var src = subs[i];
-                                    int len = src.Length;
-                                    Arrays[i].Length = len;
-                                    int e = op;
-                                    for (int k = 0; k < len; k++)
+                                unsafe {
+                                    int* ip = (int*)graphics.trisInfo.Addr;
+                                    for (int k = 0; k < tc; k++)
                                     {
-                                        TriBuffer[e] = src[k] + vc;
-                                        e++;
+                                        TriBuffer[k] = ip[k] + vc;
                                     }
-                                    op += len;
                                 }
-                                canvas.MatCollector.CombinationMaterial(graphics, TriBuffer, Arrays, IDBuffer, l, ref clip);
+                                l = 1;
+                            }
+                            Arrays[0].Length = tc;
+                            int tc2 = graphics.trisInfo2.DataCount;
+                            if (tc2 > 0)
+                            {
+                                int ks = tc;
                                 unsafe
                                 {
-                                    HVertex* hv = (HVertex*)graphics.vertInfo.Addr;
-                                    AddUV1(canvas, IDBuffer, hv, dc, l);
+                                    int* ip = (int*)graphics.trisInfo2.Addr;
+                                    for (int k = 0; k < tc2; k++)
+                                    {
+                                        TriBuffer[ks] = ip[k] + vc;
+                                        ks++;
+                                    }
                                 }
+                                Arrays[1].Start = tc;
+                                Arrays[1].Length = tc2;
+                                l = 2;
                             }
-                            else
+                            canvas.MatCollector.CombinationMaterial(graphics, TriBuffer, Arrays, IDBuffer, l, ref clip);
+                            unsafe
                             {
-                                AddUV1(canvas, 0, dc);
+                                HVertex* hv = (HVertex*)graphics.vertInfo.Addr;
+                                AddUV1(canvas, IDBuffer, hv, dc, l);
                             }
                         }
                         else
@@ -228,37 +236,45 @@ namespace huqiang.Core.HGUI
                     }
                     AddUV1(canvas, tid, dc);
                 }
-                else if (graphics.subTris != null)
+                else if (graphics.trisInfo.DataCount > 0 | graphics.trisInfo2.DataCount > 0)
                 {
-                    var subs = graphics.subTris;
-                    int l = subs.Length;
-                    if (l > 0)
+                    int l = 0;
+                    int tc = graphics.trisInfo.DataCount;
+                    if (tc > 0)
                     {
-                        int op = 0;
-                        for (int i = 0; i < l; i++)
-                        {
-                            Arrays[i].Start = op;
-                            var src = subs[i];
-                            int len = src.Length;
-                            Arrays[i].Length = len;
-                            int e = op;
-                            for (int k = 0; k < len; k++)
-                            {
-                                TriBuffer[e] = src[k] + vc;
-                                e++;
-                            }
-                            op += len;
-                        }
-                        canvas.MatCollector.CombinationMaterial(graphics, TriBuffer, Arrays, IDBuffer, l, ref clip);
                         unsafe
                         {
-                            HVertex* hv = (HVertex*)graphics.vertInfo.Addr;
-                            AddUV1(canvas, IDBuffer, hv, dc, l);
+                            int* ip = (int*)graphics.trisInfo.Addr;
+                            for (int k = 0; k < tc; k++)
+                            {
+                                TriBuffer[k] = ip[k] + vc;
+                            }
                         }
+                        l = 1;
                     }
-                    else
+                    Arrays[0].Length = tc;
+                    int tc2 = graphics.trisInfo2.DataCount;
+                    if (tc2 > 0)
                     {
-                        AddUV1(canvas, 0, dc);
+                        int ks = tc;
+                        unsafe
+                        {
+                            int* ip = (int*)graphics.trisInfo2.Addr;
+                            for (int k = 0; k < tc2; k++)
+                            {
+                                TriBuffer[ks] = ip[k] + vc;
+                                ks++;
+                            }
+                        }
+                        Arrays[1].Start = tc;
+                        Arrays[1].Length = tc2;
+                        l = 2;
+                    }
+                    canvas.MatCollector.CombinationMaterial(graphics, TriBuffer, Arrays, IDBuffer, l, ref clip);
+                    unsafe
+                    {
+                        HVertex* hv = (HVertex*)graphics.vertInfo.Addr;
+                        AddUV1(canvas, IDBuffer, hv, dc, l);
                     }
                 }
                 else

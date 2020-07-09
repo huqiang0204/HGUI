@@ -9,6 +9,7 @@ namespace huqiang.Data
     public interface Addressable
     {
         IntPtr Addr { get; }
+        void Release(ref BlockInfo block);
     }
     public unsafe struct BlockInfo
     {
@@ -33,6 +34,13 @@ namespace huqiang.Data
             Length = len;
             areaSize = area;
             DataCount = 0;
+        }
+        public void Release()
+        {
+            if (Length == 0)
+                return;
+            address.Release(ref this);
+            Length = 0;
         }
     }
     public class BlockBuffer<T> : Addressable, IDisposable where T : unmanaged

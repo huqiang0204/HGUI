@@ -1329,28 +1329,31 @@ namespace huqiang.Core.HGUI
                 if (a < 0)
                     a += 1;
                 Vector2 d = MathH.Tan2(360 - a * 360);//方向
-                Vector2[] lines = new Vector2[9];
-                lines[0].x = ocx;
-                lines[2].y = ocy;
-                lines[3].y = y;
-                lines[4].x = ocx;
-                lines[4].y = y;
-                lines[5].x = x;
-                lines[5].y = y;
-                lines[6].x = x;
-                lines[6].y = ocy;
-                lines[7].x = x;
-                lines[8].x = ocx;
-                Vector2 oc = new Vector2(ocx, ocy);
-                Vector2 ot = oc + d * 10000;
-                Vector2 cross = Vector2.zero;
-                for (int i = 0; i < 8; i++)
+                unsafe
                 {
-                    if (huqiang.Physics2D.LineToLine(ref lines[i], ref lines[i + 1], ref oc, ref ot, ref cross))
+                    Vector2* lines =stackalloc Vector2[9];
+                    lines[0].x = ocx;
+                    lines[2].y = ocy;
+                    lines[3].y = y;
+                    lines[4].x = ocx;
+                    lines[4].y = y;
+                    lines[5].x = x;
+                    lines[5].y = y;
+                    lines[6].x = x;
+                    lines[6].y = ocy;
+                    lines[7].x = x;
+                    lines[8].x = ocx;
+                    Vector2 oc = new Vector2(ocx, ocy);
+                    Vector2 ot = oc + d * 10000;
+                    Vector2 cross = Vector2.zero;
+                    for (int i = 0; i < 8; i++)
                     {
-                        float r = (cross - lines[i + 1]).magnitude / (lines[i + 1] - lines[i]).magnitude;
-                        a = (7 - i + r) * 0.125f;
-                        break;
+                        if (huqiang.Physics2D.LineToLine(ref lines[i], ref lines[i + 1], ref oc, ref ot, ref cross))
+                        {
+                            float r = (cross - lines[i + 1]).magnitude / (lines[i + 1] - lines[i]).magnitude;
+                            a = (7 - i + r) * 0.125f;
+                            break;
+                        }
                     }
                 }
             }
@@ -1666,31 +1669,34 @@ namespace huqiang.Core.HGUI
                 if (a < 0)
                     a += 1;
                 Vector2 d = MathH.Tan2(360 - a * 360);//方向
-                Vector2[] lines = new Vector2[9];
-                lines[0].x = x;
-                lines[0].y = ocy;
-                lines[1].x = x;
-                lines[2].x = ocx;
-                lines[4].y = ocy;
-                lines[5].y = y;
-                lines[6].x = ocx;
-                lines[6].y = y;
-                lines[7].x = x;
-                lines[7].y = y;
-                lines[8].x = x;
-                lines[8].y = ocy;
-                Vector2 oc = new Vector2(ocx, ocy);
-                Vector2 ot = oc + d * 10000;
-                Vector2 cross = Vector2.zero;
-                for (int i = 0; i < 8; i++)
+                unsafe
                 {
-                    if (huqiang.Physics2D.LineToLine(ref lines[i], ref lines[i + 1], ref oc, ref ot, ref cross))
+                    Vector2* lines = stackalloc Vector2[9];
+                    lines[0].x = x;
+                    lines[0].y = ocy;
+                    lines[1].x = x;
+                    lines[2].x = ocx;
+                    lines[4].y = ocy;
+                    lines[5].y = y;
+                    lines[6].x = ocx;
+                    lines[6].y = y;
+                    lines[7].x = x;
+                    lines[7].y = y;
+                    lines[8].x = x;
+                    lines[8].y = ocy;
+                    Vector2 oc = new Vector2(ocx, ocy);
+                    Vector2 ot = oc + d * 10000;
+                    Vector2 cross = Vector2.zero;
+                    for (int i = 0; i < 8; i++)
                     {
-                        float r = (cross - lines[i + 1]).magnitude / (lines[i + 1] - lines[i]).magnitude;
-                        a = (7 - i + r) * 0.125f;
-                        break;
+                        if (huqiang.Physics2D.LineToLine(ref lines[i], ref lines[i + 1], ref oc, ref ot, ref cross))
+                        {
+                            float r = (cross - lines[i + 1]).magnitude / (lines[i + 1] - lines[i]).magnitude;
+                            a = (7 - i + r) * 0.125f;
+                            break;
+                        }
                     }
-                }
+                }       
             }
             float px = image.m_pivot.x / image.m_rect.width;
             float py = image.m_pivot.y / image.m_rect.height;
@@ -1999,29 +2005,32 @@ namespace huqiang.Core.HGUI
                 float ocx = x * 0.5f;
                 float ocy = y * 0.5f;
                 Vector2 d = MathH.Tan2(360 - a * 360);//方向
-                Vector2[] lines = new Vector2[9];
-                lines[0].x = ocx;
-                lines[0].y = y;
-                lines[1].x = x;
-                lines[1].y = y;
-                lines[2].x = x;
-                lines[2].y = ocy;
-                lines[3].x = x;
-                lines[4].x = ocx;
-                lines[6].y = ocy;
-                lines[7].y = y;
-                lines[8].x = ocx;
-                lines[8].y = y;
-                Vector2 oc = new Vector2(ocx, ocy);
-                Vector2 ot = oc + d * 10000;
-                Vector2 cross = Vector2.zero;
-                for (int i = 0; i < 8; i++)
+                unsafe
                 {
-                    if (huqiang.Physics2D.LineToLine(ref lines[i], ref lines[i + 1], ref oc, ref ot, ref cross))
+                    Vector2* lines = stackalloc Vector2[9];
+                    lines[0].x = ocx;
+                    lines[0].y = y;
+                    lines[1].x = x;
+                    lines[1].y = y;
+                    lines[2].x = x;
+                    lines[2].y = ocy;
+                    lines[3].x = x;
+                    lines[4].x = ocx;
+                    lines[6].y = ocy;
+                    lines[7].y = y;
+                    lines[8].x = ocx;
+                    lines[8].y = y;
+                    Vector2 oc = new Vector2(ocx, ocy);
+                    Vector2 ot = oc + d * 10000;
+                    Vector2 cross = Vector2.zero;
+                    for (int i = 0; i < 8; i++)
                     {
-                        float r = (cross - lines[i + 1]).magnitude / (lines[i + 1] - lines[i]).magnitude;
-                        a = (7 - i+r) * 0.125f ;
-                        break;
+                        if (huqiang.Physics2D.LineToLine(ref lines[i], ref lines[i + 1], ref oc, ref ot, ref cross))
+                        {
+                            float r = (cross - lines[i + 1]).magnitude / (lines[i + 1] - lines[i]).magnitude;
+                            a = (7 - i + r) * 0.125f;
+                            break;
+                        }
                     }
                 }
             }
@@ -2336,28 +2345,31 @@ namespace huqiang.Core.HGUI
                 if (a < 0)
                     a += 1;
                 Vector2 d = MathH.Tan2(360 - a * 360);//方向
-                Vector2[] lines = new Vector2[9];
-                lines[0].y = ocy;
-                lines[1].y = y;
-                lines[2].x = ocx;
-                lines[2].y = y;
-                lines[3].x = x;
-                lines[3].y = y;
-                lines[4].x = x;
-                lines[4].y = ocy;
-                lines[5].x = x;
-                lines[6].x = ocx;
-                lines[8].y = ocy;
-                Vector2 oc = new Vector2(ocx, ocy);
-                Vector2 ot = oc + d * 10000;
-                Vector2 cross = Vector2.zero;
-                for (int i = 0; i < 8; i++)
+                unsafe
                 {
-                    if (huqiang.Physics2D.LineToLine(ref lines[i], ref lines[i + 1], ref oc, ref ot, ref cross))
+                    Vector2* lines = stackalloc Vector2[9];
+                    lines[0].y = ocy;
+                    lines[1].y = y;
+                    lines[2].x = ocx;
+                    lines[2].y = y;
+                    lines[3].x = x;
+                    lines[3].y = y;
+                    lines[4].x = x;
+                    lines[4].y = ocy;
+                    lines[5].x = x;
+                    lines[6].x = ocx;
+                    lines[8].y = ocy;
+                    Vector2 oc = new Vector2(ocx, ocy);
+                    Vector2 ot = oc + d * 10000;
+                    Vector2 cross = Vector2.zero;
+                    for (int i = 0; i < 8; i++)
                     {
-                        float r = (cross - lines[i + 1]).magnitude / (lines[i + 1] - lines[i]).magnitude;
-                        a = (7 - i + r) * 0.125f;
-                        break;
+                        if (huqiang.Physics2D.LineToLine(ref lines[i], ref lines[i + 1], ref oc, ref ot, ref cross))
+                        {
+                            float r = (cross - lines[i + 1]).magnitude / (lines[i + 1] - lines[i]).magnitude;
+                            a = (7 - i + r) * 0.125f;
+                            break;
+                        }
                     }
                 }
             }

@@ -194,7 +194,7 @@ namespace huqiang.Core.HGUI
             if (renderer == null)
                 renderer = GetComponent<MeshRenderer>();
             if (renderer != null)
-                renderer.materials = MatCollector.GenerateMaterial();
+                renderer.materials = MatCollector.GenerateMaterial();   //这里会产生一次GC
         }
         void ApplyToCamera()
         {
@@ -535,7 +535,11 @@ namespace huqiang.Core.HGUI
             }
             var mr = GetComponent<MeshRenderer>();
             if (mr != null)
+            {
+                //这里会产生一次GC
                 mr.sharedMaterials = MatCollector.GenerateMaterial();
+            }
+               
         }
 #endif
 #endregion

@@ -118,7 +118,7 @@ namespace huqiang.Core.HGUI
                 TxtCollector.Back();
         }
   
-        protected override void Update()
+        protected virtual void Update()
         {
             MainCanvas = this;
             UserAction.Update();

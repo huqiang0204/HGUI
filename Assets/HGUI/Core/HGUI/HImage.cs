@@ -164,6 +164,7 @@ namespace huqiang.Core.HGUI
         }
         public override void MainUpdate()
         {
+            base.MainUpdate();
             if(m_dirty)
             {
                 ApplySpriteInfo();

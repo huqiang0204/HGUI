@@ -47,11 +47,14 @@ namespace huqiang
         {
             Frames++;
             float timeslice = UserAction.TimeSlice;
-            var tmp = Actions.ToArray();
-            for (int i = 0; i < tmp.Length; i++)
+            if(Actions.Count>0)
             {
-                if (tmp[i] != null)
-                    tmp[i].Update(timeslice);
+                var tmp = Actions.ToArray();
+                for (int i = 0; i < tmp.Length; i++)
+                {
+                    if (tmp[i] != null)
+                        tmp[i].Update(timeslice);
+                }
             }
             DoEvent(timeslice);
             DoFrameEvent();

@@ -84,6 +84,7 @@ public class TestPageHelperEditor : Editor
                     {
                         var trans = go.transform;
                         trans.SetParent(root);
+                        trans.localScale = Vector3.one;
                     }
                 }
         }
@@ -104,6 +105,7 @@ public class TestPageHelperEditor : Editor
                     {
                         var trans = go.transform;
                         trans.SetParent(root);
+                        trans.localScale = Vector3.one;
                     }
                 }
             }

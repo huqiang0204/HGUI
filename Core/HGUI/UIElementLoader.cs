@@ -70,7 +70,12 @@ namespace huqiang.Core.HGUI
             ui.userEvent = null;
             ui.mod = fake;
             LoadScript(fake.ip, ui);
+#if UNITY_EDITOR
+            if (Application.isPlaying)
+                ui.Initial(main);
+#else
             ui.Initial(main);
+#endif
         }
         public override unsafe FakeStruct LoadFromObject(Component com, DataBuffer buffer)
         {

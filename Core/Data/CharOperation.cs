@@ -24,6 +24,8 @@ namespace huqiang.Data
         {
             if (validat == CharacterValidation.None)
                 return ch;
+            if (pos > text.Length)
+                pos = text.Length;
             if (validat == CharacterValidation.Integer)
             {
                 if (ch == '-')

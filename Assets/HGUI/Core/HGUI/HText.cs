@@ -210,6 +210,7 @@ namespace huqiang.Core.HGUI
             if (c == 0)
                 return;
             BlockInfo tmp = blockBuffer.RegNew(c*5);
+            tmp.DataCount = c * 5;
             float d = text.OutLine;
             OutLineVertex(ref tmp, 0,ref text.vertInfo, d, d, ref text.shadowColor);
             OutLineVertex(ref tmp, c, ref text.vertInfo, d, -d, ref text.shadowColor);
@@ -233,6 +234,7 @@ namespace huqiang.Core.HGUI
             {
                 int l = text.trisInfo.DataCount;
                 var tris = trisBuffer.RegNew(l*5);
+                tris.DataCount = l * 5;
                 OutLineTris(ref tris, 0,ref text.trisInfo, 0);
                 OutLineTris(ref tris, l, ref text.trisInfo, c);
                 OutLineTris(ref tris, l * 2, ref text.trisInfo, c * 2);
@@ -245,6 +247,7 @@ namespace huqiang.Core.HGUI
             {
                 int l = text.trisInfo2.DataCount;
                 var tris = trisBuffer.RegNew(l * 5);
+                tris.DataCount = l * 5;
                 OutLineTris(ref tris, 0, ref text.trisInfo2, 0);
                 OutLineTris(ref tris, l, ref text.trisInfo2, c);
                 OutLineTris(ref tris, l * 2, ref text.trisInfo2, c * 2);

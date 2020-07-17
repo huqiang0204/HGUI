@@ -1,4 +1,5 @@
 ﻿using huqiang.Core.HGUI;
+using huqiang.Data;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,10 +13,10 @@ namespace huqiang.UIModel
     {
         public static Transform Root { get; set; }
         public static UIMenu Instance { get; set; }
-        public static void UpdateData(string cmd, object obj)
+        public static void UpdateData(Msg msg, object obj)
         {
             if (Instance != null)
-                Instance.Cmd(cmd, obj);
+                Instance.Cmd(msg, obj);
         }
         public static void Refresh(float time)
         {

@@ -1,4 +1,5 @@
 ﻿using huqiang.Core.HGUI;
+using huqiang.Data;
 using huqiang.UIEvent;
 using System;
 using System.Collections.Generic;
@@ -85,10 +86,10 @@ namespace huqiang.UIModel
                 }
             }
         }
-        public static void UpdateData(string cmd, object obj)
+        public static void UpdateData(Msg msg, object obj)
         {
             if (CurrentPage != null)
-                CurrentPage.Cmd(cmd, obj);
+                CurrentPage.Cmd(msg, obj);
         }
         public static void Refresh(float time)
         {

@@ -26,9 +26,11 @@ namespace huqiang.Core.HGUI
             8, 12, 13, 8, 13, 9, 9, 13, 14, 9, 14, 10, 10, 14, 15, 10, 15, 11 };
         public static void CreateMesh(HImage image)
         {
-            if (image.s_id ==0)
+            if (image.s_id == 0)
             {
-                CreateSimpleVertex(image);
+                if (image.SprType == SpriteType.Filled)
+                    CreateFilledMesh(image);
+                else CreateSimpleVertex(image);
                 goto label;
             }
             switch (image.SprType)

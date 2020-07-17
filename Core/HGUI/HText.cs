@@ -248,6 +248,7 @@ namespace huqiang.Core.HGUI
                 int l = text.trisInfo2.DataCount;
                 var tris = trisBuffer.RegNew(l * 5);
                 tris.DataCount = l * 5;
+                tris.DataCount = l * 5;
                 OutLineTris(ref tris, 0, ref text.trisInfo2, 0);
                 OutLineTris(ref tris, l, ref text.trisInfo2, c);
                 OutLineTris(ref tris, l * 2, ref text.trisInfo2, c * 2);

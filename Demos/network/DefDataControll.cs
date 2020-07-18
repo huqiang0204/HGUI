@@ -23,6 +23,16 @@ namespace Assets.Net
                     break;
             }
         }
+        public static void Dispatch(Msg msg)
+        {
+            switch (msg.Cmd)
+            {
+                case Update:
+                    break;
+                default:
+                    break;
+            }
+        }
         static void UpdateUI(DataBuffer buffer)
         {
             var fake = buffer.fakeStruct;

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -191,8 +192,20 @@ namespace Assets.Net
         }
         void DispatchJson(string json)
         {
-            //var j = JsonUtility.FromJson<reqs>(json);
+            var j = JsonUtility.FromJson<Msg>(json);
+            if(j.Error>0)
+            {
 
+            }
+            else
+            {
+                switch (j.Type)
+                {
+                    case MessageType.Def:
+                        DefDataControll.Dispatch(j);
+                        break;
+                }
+            }
         }
         void DispatchStream(DataBuffer buffer)
         {
@@ -235,9 +248,37 @@ namespace Assets.Net
                 }
             }
         }
-        void SendAesJson(byte[] dat)
+        public void SendJson(int cmd, int type, string json)
         {
-            link.Send(dat, EnvelopeType.AesJson);
+            Msg msg = new Msg();
+            msg.Cmd = cmd;
+            msg.Type = type;
+            msg.Args = json;
+            string str = JsonUtility.ToJson(msg);
+            var dat = Encoding.UTF8.GetBytes(str);
+            link.Send(dat, EnvelopeType.Json);
+        }
+        public void SendAesJson(int cmd,int type,string json)
+        {
+            Msg msg = new Msg();
+            msg.Cmd = cmd;
+            msg.Type = type;
+            msg.Args = json;
+            string str = JsonUtility.ToJson(msg);
+            var dat = Encoding.UTF8.GetBytes(str);
+            
+            //link.Send(dat, EnvelopeType.AesJson);
+        }
+        public void SendLz4AesJson(int cmd, int type, string json)
+        {
+            Msg msg = new Msg();
+            msg.Cmd = cmd;
+            msg.Type = type;
+            msg.Args = json;
+            string str = JsonUtility.ToJson(msg);
+            var dat = Encoding.UTF8.GetBytes(str);
+
+            //link.Send(dat, EnvelopeType.AesJson);
         }
         public void SendStream(DataBuffer db)
         {

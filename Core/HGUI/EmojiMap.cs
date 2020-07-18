@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using huqiang.Data;
+using System.Reflection.Emit;
 
 namespace huqiang.Core.HGUI
 {
@@ -44,10 +45,13 @@ namespace huqiang.Core.HGUI
                         t++;
                         s++;
                     }
-                    uv[0] = uVs[i].uv0;
-                    uv[1] = uVs[i].uv1;
-                    uv[2] = uVs[i].uv2;
-                    uv[3] = uVs[i].uv3;
+                    if(uv!=null)
+                    {
+                        uv[0] = uVs[i].uv0;
+                        uv[1] = uVs[i].uv1;
+                        uv[2] = uVs[i].uv2;
+                        uv[3] = uVs[i].uv3;
+                    }
                     return true;
                 label:;
                 }
@@ -94,7 +98,26 @@ namespace huqiang.Core.HGUI
             }
             return 0;
         }
-
+        public static int FindEmoji(char[] buff, int index, int end, Vector2[] uv)
+        {
+            if (index >= end)
+                return 0;
+            int max = end - index;
+            if (max > 15)
+                max = 15;
+            for (int i = max; i >= 0; i--)
+            {
+                var ci = charInfos[i];
+                if (ci != null)
+                {
+                    if (ci.Find(buff, index, uv))
+                    {
+                        return i + 1;
+                    }
+                }
+            }
+            return 0;
+        }
         public const char emSpace = '@';//'\u2001';☀@
         public static string CheckEmoji(string str, List<EmojiInfo> list)
         {
@@ -167,6 +190,61 @@ namespace huqiang.Core.HGUI
                 }
             }
             return sb.ToString();
+        }
+        /// <summary>
+        /// 移除表情符
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="builder"></param>
+        public static int RemoveEmoji(char[] str, int charLen, char[] buf, int max)
+        {
+            int i = 0;
+            int pos = 0;
+            while (i < charLen)
+            {
+                char c = str[i];
+                UInt16 v = (UInt16)c;
+                if (v < 0x8cff)
+                {
+                    if (v >= 0x2600 & v <= 0x27bf)
+                    {
+                    }
+                    else
+                    {
+                        for (int j = 0; j < max; j++)
+                        {
+                            if (buf[j] == c)
+                                goto label1;
+                        }
+                        buf[max] = c;
+                        max++;
+                    label1:;
+                    }
+                    i++;
+                }
+                else
+                {
+                    int a = FindEmoji(str, i, charLen, null);
+                    if (a > 0)
+                    {
+                        i += a;
+                    }
+                    else
+                    {
+                        i++;
+                        for (int j = 0; j < max; j++)
+                        {
+                            if (buf[j] == c)
+                                goto label1;
+                        }
+                        buf[max] = c;
+                        max++;
+                    label1:;
+                    }
+                }
+                pos++;
+            }
+            return max;
         }
     }
 }

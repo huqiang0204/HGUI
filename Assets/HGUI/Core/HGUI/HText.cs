@@ -1,4 +1,5 @@
-﻿using System;
+﻿using huqiang.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,8 @@ namespace huqiang.Core.HGUI
 {
     public class HText:HGraphics
     {
+        static BlockBuffer<HVertex> blockBuffer = new BlockBuffer<HVertex>(32, 1024);
+        static BlockBuffer<int> trisBuffer = new BlockBuffer<int>(48,1024);
         static Font defFont;
         static char[] key_noMesh = new char[] { ' ' ,'\n', '\r' };
         static List<int> bufferA = new List<int>();
@@ -22,32 +25,40 @@ namespace huqiang.Core.HGUI
             var str = text.emojiString.FilterString;
             var verts = text.verts;
             int c = verts.Length;
+            text.tris = null;
             if (c == 0)
             {
-                text.vertices = null;
-                text.tris = null;
+                text.vertInfo.DataCount = 0;
+                text.trisInfo.DataCount = 0;
+                text.trisInfo2.DataCount = 0;
                 return;
             }
-
-            HVertex[] hv = text.vertices;
-            if (hv == null)
+            if(text.vertInfo.Size==0)
             {
-                hv = new HVertex[c];
+                text.vertInfo = blockBuffer.RegNew(c);
             }
-            else if (hv.Length != c)
+            else
+            if (text.vertInfo.Size < c| text.vertInfo.Size> c+32)
             {
-                hv = new HVertex[c];
+                blockBuffer.Release(ref text.vertInfo);
+                text.vertInfo = blockBuffer.RegNew(c);
             }
-
+            text.vertInfo.DataCount = c;
             int e = c / 4;
-            for (int i = 0; i < c; i++)
+            unsafe
             {
-                hv[i].position = verts[i].position;
-                hv[i].color = verts[i].color;
-                hv[i].uv = verts[i].uv0;
-                hv[i].uv4.x = 1;
-                hv[i].uv4.y = 1;
+                HVertex* hv= (HVertex*)text.vertInfo.Addr;
+                for (int i = 0; i < c; i++)
+                {
+                    hv[i].position = verts[i].position;
+                    hv[i].color = verts[i].color;
+                    hv[i].uv = verts[i].uv0;
+                    hv[i].uv4.x = 1;
+                    hv[i].uv4.y = 1;
+                    hv[i].picture = 0;
+                }
             }
+  
             if(emojis.Count>0)
             {
                 var info = emojis[0];
@@ -58,7 +69,6 @@ namespace huqiang.Core.HGUI
                 for (int i = 0; i < len; i++)
                 {
                     bool yes = true;
-                    
                     for(int j=0;j<key_noMesh.Length;j++)
                     {
                         if(key_noMesh[j]==str[i])
@@ -72,21 +82,26 @@ namespace huqiang.Core.HGUI
                         if (i == info.pos)
                         {
                             int o = p * 4;
-                            hv[o].uv = info.uv[0];
-                            hv[o].color = col;
-                            hv[o].picture = 1;
-                            o++;
-                            hv[o].uv = info.uv[1];
-                            hv[o].color = col;
-                            hv[o].picture = 1;
-                            o++;
-                            hv[o].uv = info.uv[2];
-                            hv[o].color = col;
-                            hv[o].picture = 1;
-                            o++;
-                            hv[o].uv = info.uv[3];
-                            hv[o].color = col;
-                            hv[o].picture = 1;
+                            unsafe
+                            {
+                                HVertex* hv = (HVertex*)text.vertInfo.Addr;
+                                hv[o].uv = info.uv[0];
+                                hv[o].color = col;
+                                hv[o].picture = 1;
+                                o++;
+                                hv[o].uv = info.uv[1];
+                                hv[o].color = col;
+                                hv[o].picture = 1;
+                                o++;
+                                hv[o].uv = info.uv[2];
+                                hv[o].color = col;
+                                hv[o].picture = 1;
+                                o++;
+                                hv[o].uv = info.uv[3];
+                                hv[o].color = col;
+                                hv[o].picture = 1;
+                            }
+                         
                             si++;
                             if (si < emojis.Count)
                                 info = emojis[si];
@@ -113,146 +128,176 @@ namespace huqiang.Core.HGUI
                             break;
                     }
                 }
-                if(bufferB.Count>0)
+                if (text.trisInfo.Size > 0)
+                    trisBuffer.Release(ref text.trisInfo);
+                int ic = bufferA.Count;
+                if(ic>0)
                 {
-                    if (text.subTris == null)
-                        text.subTris = new int[2][];
-                    if(text.subTris[0]!=null)
+                    text.trisInfo = trisBuffer.RegNew(ic);
+                    text.trisInfo.DataCount = ic;
+                    unsafe
                     {
-                        if(text.subTris[0].Length==bufferA.Count)
-                        {
-                            bufferA.CopyTo(text.subTris[0]);
-                        }else bufferA.ToArray();
-                    }else text.subTris[0] = bufferA.ToArray();
-                    if(text.subTris[1]!=null)
-                    {
-                        if(text.subTris[1].Length==bufferB.Count)
-                        {
-                            bufferB.CopyTo(text.subTris[1]);
-                        }
-                        else text.subTris[1] = bufferB.ToArray();
+                        int* ip = (int*)text.trisInfo.Addr;
+                        for (int i = 0; i < ic; i++)
+                            ip[i] = bufferA[i];
                     }
-                    else text.subTris[1] = bufferB.ToArray();
-                    text.tris = null;
                 }
                 else
                 {
-                    if(text.tris!=null)
+                    text.trisInfo.DataCount = 0;
+                }
+
+                ic = bufferB.Count;
+                if (ic > 0)
+                {
+                    if (text.trisInfo2.Size > 0)
+                        trisBuffer.Release(ref text.trisInfo2);
+                    text.trisInfo2 = trisBuffer.RegNew(ic);
+                    text.trisInfo2.DataCount = ic;
+                    unsafe
                     {
-                        if(text.tris.Length==bufferA.Count)
-                        {
-                            bufferA.CopyTo(text.tris);
-                        }
-                        else text.tris = bufferA.ToArray();
+                        int* ip = (int*)text.trisInfo2.Addr;
+                        for (int i = 0; i < ic; i++)
+                            ip[i] = bufferB[i];
                     }
-                    else
-                    text.tris = bufferA.ToArray();
-                    text.subTris = null;
+                }
+                else
+                { 
+                    text.trisInfo2.DataCount = 0; 
                 }
             }
             else
             {
-                text.tris = CreateTri(c,text.tris);
-                text.subTris = null;
-            }
-            text.vertices = hv;
-        }
-        static void OutLineVertex(HVertex[] buf, int start, HVertex[] src, float x,float y,ref Color32 color)
-        {
-            int l = src.Length;
-            for(int i=0;i<l;i++)
-            {
-                buf[start] = src[i];
-                buf[start].position.x += x;
-                buf[start].position.y += y;
-                buf[start].color = color;
-                start++;
+                CreateTri(c,ref text.trisInfo);
+                text.trisInfo2.DataCount = 0;
             }
         }
-        static void OutLineTris(int[] buf, int start, int[] src, int offset)
+        static void OutLineVertex(ref BlockInfo buf, int start, ref BlockInfo src, float x,float y,ref Color32 color)
         {
-            for(int i=0;i<src.Length;i++)
+            int l = src.DataCount;
+            unsafe
             {
-                buf[start] = src[i] + offset;
-                start++;
+                HVertex* tar =(HVertex*) buf.Addr;
+                HVertex* ori = (HVertex*)src.Addr;
+                for (int i = 0; i < l; i++)
+                {
+                    tar[start] = ori[i];
+                    tar[start].position.x += x;
+                    tar[start].position.y += y;
+                    tar[start].color = color;
+                    start++;
+                }
             }
+         
+        }
+        static void OutLineTris(ref BlockInfo buf, int start, ref BlockInfo src, int offset)
+        {
+            unsafe
+            {
+                int* tar = (int*)buf.Addr;
+                int* ori = (int*)src.Addr;
+                for (int i = 0; i < src.DataCount; i++)
+                {
+                    tar[start] = ori[i] + offset;
+                    start++;
+                }
+            }
+       
         }
         static void CreateOutLine(HText text)
         {
-            HVertex[] buf = text.vertices;
-            if (buf == null)
+            int c = text.vertInfo.DataCount;
+            if (c == 0)
                 return;
-            int c = buf.Length;
-            HVertex[] tmp = new HVertex[c * 5];
+            BlockInfo tmp = blockBuffer.RegNew(c*5);
+            tmp.DataCount = c * 5;
             float d = text.OutLine;
-            OutLineVertex(tmp, 0, buf, d, d, ref text.shadowColor);
-            OutLineVertex(tmp, c, buf, d, -d, ref text.shadowColor);
-            OutLineVertex(tmp, c * 2, buf, -d, -d, ref text.shadowColor);
-            OutLineVertex(tmp, c * 3, buf, -d, d, ref text.shadowColor);
-            int s = c * 4;
-            for (int i = 0; i < c; i++)
+            OutLineVertex(ref tmp, 0,ref text.vertInfo, d, d, ref text.shadowColor);
+            OutLineVertex(ref tmp, c, ref text.vertInfo, d, -d, ref text.shadowColor);
+            OutLineVertex(ref tmp, c * 2, ref text.vertInfo, -d, -d, ref text.shadowColor);
+            OutLineVertex(ref tmp, c * 3, ref text.vertInfo, -d, d, ref text.shadowColor);
+            unsafe
             {
-                tmp[s] = buf[i];
-                s++;
-            }
-            text.vertices = tmp;
-            if (text.tris != null)
-            {
-                var src = text.tris;
-                int l = src.Length;
-                int[] tris = new int[l * 5];
-                OutLineTris(tris, 0, src, 0);
-                OutLineTris(tris, l, src, c);
-                OutLineTris(tris, l * 2, src, c * 2);
-                OutLineTris(tris, l * 3, src, c * 3);
-                OutLineTris(tris, l * 4, src, c * 4);
-                text.tris = tris;
-            }
-            else if (text.subTris != null)
-            {
-                var o = text.subTris;
-                for (int j = 0; j < o.Length; j++)
+                HVertex* tar = (HVertex*)tmp.Addr;
+                HVertex* ori = (HVertex*)text.vertInfo.Addr;
+                int s = c * 4;
+                for (int i = 0; i < c; i++)
                 {
-                    var src = o[j];
-                    int l = src.Length;
-                    int[] tris = new int[l * 5];
-                    OutLineTris(tris, 0, src, 0);
-                    OutLineTris(tris, l, src, c);
-                    OutLineTris(tris, l * 2, src, c * 2);
-                    OutLineTris(tris, l * 3, src, c * 3);
-                    OutLineTris(tris, l * 4, src, c * 4);
-                    o[j] = tris;
+                    tar[s] = ori[i];
+                    s++;
                 }
             }
+
+            blockBuffer.Release(ref text.vertInfo);
+            text.vertInfo = tmp;
+            if (text.trisInfo.DataCount>0)
+            {
+                int l = text.trisInfo.DataCount;
+                var tris = trisBuffer.RegNew(l*5);
+                tris.DataCount = l * 5;
+                OutLineTris(ref tris, 0,ref text.trisInfo, 0);
+                OutLineTris(ref tris, l, ref text.trisInfo, c);
+                OutLineTris(ref tris, l * 2, ref text.trisInfo, c * 2);
+                OutLineTris(ref tris, l * 3, ref text.trisInfo, c * 3);
+                OutLineTris(ref tris, l * 4, ref text.trisInfo, c * 4);
+                trisBuffer.Release(ref text.trisInfo);
+                text.trisInfo = tris;
+            }
+            if (text.trisInfo2.DataCount>0)
+            {
+                int l = text.trisInfo2.DataCount;
+                var tris = trisBuffer.RegNew(l * 5);
+                tris.DataCount = l * 5;
+                tris.DataCount = l * 5;
+                OutLineTris(ref tris, 0, ref text.trisInfo2, 0);
+                OutLineTris(ref tris, l, ref text.trisInfo2, c);
+                OutLineTris(ref tris, l * 2, ref text.trisInfo2, c * 2);
+                OutLineTris(ref tris, l * 3, ref text.trisInfo2, c * 3);
+                OutLineTris(ref tris, l * 4, ref text.trisInfo2, c * 4);
+                trisBuffer.Release(ref text.trisInfo2);
+                text.trisInfo2 = tris;
+            }
         }
-        static int[] CreateTri(int len,int[] ori)
+        static void CreateTri(int len,ref BlockInfo block)
         {
             int c = len / 4;
             if (c < 0)
-                return null;
-            int max = c * 6;
-            int[] tri = ori;
-            if (tri == null)
-                tri = new int[max];
-            else if (tri.Length != max)
-                tri = new int[max];
-            for (int i = 0; i < c; i++)
             {
-                int p = i * 4;
-                int s = i * 6;
-                tri[s] = p;
-                s++;
-                tri[s] = p + 1;
-                s++;
-                tri[s] = p + 2;
-                s++;
-                tri[s] = p + 2;
-                s++;
-                tri[s] = p + 3;
-                s++;
-                tri[s] = p;
+                block.DataCount = 0;
+                return;
             }
-            return tri;
+            int max = c * 6;
+            if(block.Size==0)
+            {
+                block = trisBuffer.RegNew(max);
+            }
+            else if(block.Size<max|block.Size>max+48)
+            {
+                trisBuffer.Release(ref block);
+                block= trisBuffer.RegNew(max);
+            }
+            block.DataCount = max;
+            unsafe
+            {
+                int* tri =(int*) block.Addr;
+                for (int i = 0; i < c; i++)
+                {
+                    int p = i * 4;
+                    int s = i * 6;
+                    tri[s] = p;
+                    s++;
+                    tri[s] = p + 1;
+                    s++;
+                    tri[s] = p + 2;
+                    s++;
+                    tri[s] = p + 2;
+                    s++;
+                    tri[s] = p + 3;
+                    s++;
+                    tri[s] = p;
+                }
+            }
+           
         }
         public static Font DefaultFont
         {
@@ -284,7 +329,6 @@ namespace huqiang.Core.HGUI
                 m_dirty = true;
             } }
         EmojiString emojiString = new EmojiString();
-        UILineInfo[] lines;
         UIVertex[] verts;
         [SerializeField]
         internal Font _font;
@@ -523,5 +567,4 @@ namespace huqiang.Core.HGUI
        Vertical,
        Both
     }
-
 }

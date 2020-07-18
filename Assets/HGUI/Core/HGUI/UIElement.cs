@@ -41,9 +41,9 @@ namespace huqiang.Core.HGUI
     public class UIElement:MonoBehaviour
     {
         #region static method
+        static Transform[] buff = new Transform[32];
         public static Coordinates GetGlobaInfo(Transform trans, bool Includeroot = true)
         {
-            Transform[] buff = new Transform[32];
             buff[0] = trans;
             var parent = trans.parent;
             int max = 1;
@@ -496,6 +496,10 @@ namespace huqiang.Core.HGUI
         public CompositeType compositeType;
         public virtual void MainUpdate()
         {
+            if (userEvent != null)
+                userEvent.Update();
+            if (composite != null)
+                composite.Update(UserAction.TimeSlice);
         }
         public virtual void SubUpdate()
         {
@@ -601,12 +605,12 @@ namespace huqiang.Core.HGUI
                     break;
             }
         }
-        protected virtual void Update()
-        {
-            if (userEvent != null)
-                userEvent.Update();
-            if (composite != null)
-                composite.Update(UserAction.TimeSlice);
-        }
+        //protected virtual void Update()
+        //{
+        //    if (userEvent != null)
+        //        userEvent.Update();
+        //    if (composite != null)
+        //        composite.Update(UserAction.TimeSlice);
+        //}
     }
 }

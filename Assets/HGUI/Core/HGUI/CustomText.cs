@@ -160,7 +160,7 @@ namespace huqiang.Core.HGUI
             var col = image.m_color;
             for (int i = 0; i < v.Length; i++)
                 v[i].color = col;
-            image.vertices = v;
+            //image.vertices = v;
             image.tris = tri.ToArray();
         }
         float GetLineStart(char[] tmp, int index, float w)

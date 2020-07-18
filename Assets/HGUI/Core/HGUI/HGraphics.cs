@@ -1,4 +1,5 @@
-﻿using System;
+﻿using huqiang.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -32,9 +33,10 @@ namespace huqiang.Core.HGUI
         public Vector4 uvrect = new Vector4(0,0,1,1);
         public override Color32 MainColor { get => m_color; set { m_color = value; m_colorChanged = true;} }
         public override Vector2 SizeDelta { get => m_sizeDelta; set { m_sizeDelta = value; m_vertexChange = true; } }
-        internal HVertex[] vertices;
         internal int[] tris;
-        internal int[][] subTris;
+        internal BlockInfo vertInfo;
+        internal BlockInfo trisInfo;
+        internal BlockInfo trisInfo2;
         [SerializeField]
         internal Material m_material;
         public Material Material { get => m_material; set {
@@ -115,10 +117,14 @@ namespace huqiang.Core.HGUI
         {
             if(m_colorChanged)
             {
-                if (vertices != null)
+                if (vertInfo.DataCount>0)
                 {
-                    for (int i = 0; i < vertices.Length; i++)
-                        vertices[i].color = m_color;
+                    unsafe
+                    {
+                        HVertex* hv = (HVertex*) vertInfo.Addr;
+                        for (int i = 0; i < vertInfo.DataCount; i++)
+                            hv[i].color = m_color;
+                    }
                 }
                 m_colorChanged = false;
             }
@@ -126,6 +132,12 @@ namespace huqiang.Core.HGUI
         private void Start()
         {
             m_dirty = true;
+        }
+        private void OnDestroy()
+        {
+            vertInfo.Release();
+            trisInfo.Release();
+            trisInfo2.Release();
         }
     }
 }

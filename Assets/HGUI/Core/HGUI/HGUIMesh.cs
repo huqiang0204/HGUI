@@ -1,4 +1,5 @@
 ﻿using huqiang;
+using huqiang.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,7 @@ namespace huqiang.Core.HGUI
 {
     public class HGUIMesh
     {
+        public static BlockBuffer<HVertex> blockBuffer = new BlockBuffer<HVertex>(4, 2048);
         public static int[] Triangle = new int[] { 0,1,2};
         public static int[] Rectangle = new int[] { 0, 2, 3, 0, 3, 1 };
         public static int[] TowRectangle = new int[] { 0, 3, 4, 0, 4, 1, 1, 4, 5, 1, 5, 2 };
@@ -24,9 +26,11 @@ namespace huqiang.Core.HGUI
             8, 12, 13, 8, 13, 9, 9, 13, 14, 9, 14, 10, 10, 14, 15, 10, 15, 11 };
         public static void CreateMesh(HImage image)
         {
-            if (image.s_id ==0)
+            if (image.s_id == 0)
             {
-                CreateSimpleVertex(image);
+                if (image.SprType == SpriteType.Filled)
+                    CreateFilledMesh(image);
+                else CreateSimpleVertex(image);
                 goto label;
             }
             switch (image.SprType)
@@ -45,93 +49,113 @@ namespace huqiang.Core.HGUI
                     break;
             }
         label:;
-            var hv = image.vertices;
-            var col = image.m_color;
-            Vector4 tang = image.uvrect;
-            if(hv!=null)
+            var c = image.vertInfo.DataCount;
+            if(c>0)
             {
-                for (int i = 0; i < hv.Length; i++)
+                var col = image.m_color;
+                Vector4 tang = image.uvrect;
+                unsafe
                 {
-                    hv[i].color = col;
-                    hv[i].uv3.x = tang.x;
-                    hv[i].uv3.y = tang.y;
-                    hv[i].uv4.x = tang.z;
-                    hv[i].uv4.y = tang.w;
+                    HVertex* hv = (HVertex*)image.vertInfo.Addr;
+                    for (int i = 0; i < c; i++)
+                    {
+                        hv[i].color = col;
+                        hv[i].uv3.x = tang.x;
+                        hv[i].uv3.y = tang.y;
+                        hv[i].uv4.x = tang.z;
+                        hv[i].uv4.y = tang.w;
+                    }
                 }
             }
         }
         static void CreateSimpleVertex(HImage image)
         {
-            HVertex[] hv = image.vertices;
-            if (hv == null)
-                hv = new HVertex[4];
-            else if (hv.Length != 4)
-                hv = new HVertex[4];
+            if (image.vertInfo.Size == 0)
+            {
+                image.vertInfo = blockBuffer.RegNew(4);
+            }
+            else if (image.vertInfo.Size < 4 | image.vertInfo.Size > 8)
+            {
+                blockBuffer.Release(ref image.vertInfo);
+                image.vertInfo = blockBuffer.RegNew(4);
+            }
+            image.vertInfo.DataCount = 4;
             float x = image.SizeDelta.x;
             float lx = -0.5f * x;
             float rx = 0.5f * x;
             float y = image.SizeDelta.y;
             float dy = -0.5f * y;
             float ty = 0.5f * y;
-            hv[0].position.x = lx;
-            hv[0].position.y = dy;
-            hv[0].uv.x = 0;
-            hv[0].uv.y = 0;
-            hv[1].position.x = rx;
-            hv[1].position.y = dy;
-            hv[1].uv.x = 1;
-            hv[1].uv.y = 0;
-            hv[2].position.x = lx;
-            hv[2].position.y = ty;
-            hv[2].uv.x = 0;
-            hv[2].uv.y =1;
-            hv[3].position.x = rx;
-            hv[3].position.y = ty;
-            hv[3].uv.x = 1;
-            hv[3].uv.y = 1;
-            image.vertices = hv;
+            unsafe
+            {
+                HVertex* hv = (HVertex*)image.vertInfo.Addr;
+                hv[0].position.x = lx;
+                hv[0].position.y = dy;
+                hv[0].uv.x = 0;
+                hv[0].uv.y = 0;
+                hv[1].position.x = rx;
+                hv[1].position.y = dy;
+                hv[1].uv.x = 1;
+                hv[1].uv.y = 0;
+                hv[2].position.x = lx;
+                hv[2].position.y = ty;
+                hv[2].uv.x = 0;
+                hv[2].uv.y = 1;
+                hv[3].position.x = rx;
+                hv[3].position.y = ty;
+                hv[3].uv.x = 1;
+                hv[3].uv.y = 1;
+            }
+           
             image.tris = Rectangle;
         }
         static void CreateSimpleMesh(HImage image)
         {
             float px = image.m_pivot.x / image.m_rect.width;
             float py = image.m_pivot.y / image.m_rect.height;
-            HVertex[] hv = image.vertices;
-            if (hv == null)
-                hv = new HVertex[4];
-            else if (hv.Length != 4)
-                hv = new HVertex[4];
+            if (image.vertInfo.Size == 0)
+            {
+                image.vertInfo = blockBuffer.RegNew(4);
+            }
+            else if (image.vertInfo.Size < 4 | image.vertInfo.Size > 8)
+            {
+                blockBuffer.Release(ref image.vertInfo);
+                image.vertInfo = blockBuffer.RegNew(4);
+            }
+            image.vertInfo.DataCount = 4;
             float x = image.SizeDelta.x;
             float lx = -px * x;
             float rx = (1 - px) * x;
             float y = image.SizeDelta.y;
             float dy = -py * y;
             float ty = (1 - py) * y;
-            hv[0].position.x = lx;
-            hv[0].position.y = dy;
-            hv[1].position.x = rx;
-            hv[1].position.y = dy;
-            hv[2].position.x = lx;
-            hv[2].position.y = ty;
-            hv[3].position.x = rx;
-            hv[3].position.y = ty;
-        
-            image.vertices = hv;
+            unsafe
+            {
+                HVertex* hv = (HVertex*)image.vertInfo.Addr;
+                hv[0].position.x = lx;
+                hv[0].position.y = dy;
+                hv[1].position.x = rx;
+                hv[1].position.y = dy;
+                hv[2].position.x = lx;
+                hv[2].position.y = ty;
+                hv[3].position.x = rx;
+                hv[3].position.y = ty;
 
-            float w = image.m_textureSize.x;
-            float h = image.m_textureSize.y;
-            lx = image.m_rect.x / w;
-            rx = lx + image.m_rect.width / w;
-            dy = image.m_rect.y / h;
-            ty = dy + image.m_rect.height / h;
-            hv[0].uv.x = lx;
-            hv[0].uv.y = dy;
-            hv[1].uv.x = rx;
-            hv[1].uv.y = dy;
-            hv[2].uv.x = lx;
-            hv[2].uv.y = ty;
-            hv[3].uv.x = rx;
-            hv[3].uv.y = ty;
+                float w = image.m_textureSize.x;
+                float h = image.m_textureSize.y;
+                lx = image.m_rect.x / w;
+                rx = lx + image.m_rect.width / w;
+                dy = image.m_rect.y / h;
+                ty = dy + image.m_rect.height / h;
+                hv[0].uv.x = lx;
+                hv[0].uv.y = dy;
+                hv[1].uv.x = rx;
+                hv[1].uv.y = dy;
+                hv[2].uv.x = lx;
+                hv[2].uv.y = ty;
+                hv[3].uv.x = rx;
+                hv[3].uv.y = ty;
+            }
     
             image.tris = Rectangle;
         }
@@ -164,43 +188,55 @@ namespace huqiang.Core.HGUI
                 sdy = cy;
                 sty = cy;
             }
-            var hv = new HVertex[16];
-            hv[0].position.x = lx;
-            hv[0].position.y = dy;
-            hv[1].position.x = slx;
-            hv[1].position.y = dy;
-            hv[2].position.x = srx;
-            hv[2].position.y = dy;
-            hv[3].position.x = rx;
-            hv[3].position.y = dy;
+            if (image.vertInfo.Size == 0)
+            {
+                image.vertInfo = blockBuffer.RegNew(16);
+            }
+            else if (image.vertInfo.Size < 16 | image.vertInfo.Size > 20)
+            {
+                blockBuffer.Release(ref image.vertInfo);
+                image.vertInfo = blockBuffer.RegNew(16);
+            }
+            image.vertInfo.DataCount = 16;
+            unsafe
+            {
+                HVertex* hv = (HVertex*)image.vertInfo.Addr;
+                hv[0].position.x = lx;
+                hv[0].position.y = dy;
+                hv[1].position.x = slx;
+                hv[1].position.y = dy;
+                hv[2].position.x = srx;
+                hv[2].position.y = dy;
+                hv[3].position.x = rx;
+                hv[3].position.y = dy;
 
-            hv[4].position.x = lx;
-            hv[4].position.y = sdy;
-            hv[5].position.x = slx;
-            hv[5].position.y = sdy;
-            hv[6].position.x = srx;
-            hv[6].position.y = sdy;
-            hv[7].position.x = rx;
-            hv[7].position.y = sdy;
+                hv[4].position.x = lx;
+                hv[4].position.y = sdy;
+                hv[5].position.x = slx;
+                hv[5].position.y = sdy;
+                hv[6].position.x = srx;
+                hv[6].position.y = sdy;
+                hv[7].position.x = rx;
+                hv[7].position.y = sdy;
 
-            hv[8].position.x = lx;
-            hv[8].position.y = sty;
-            hv[9].position.x = slx;
-            hv[9].position.y = sty;
-            hv[10].position.x = srx;
-            hv[10].position.y = sty;
-            hv[11].position.x = rx;
-            hv[11].position.y = sty;
+                hv[8].position.x = lx;
+                hv[8].position.y = sty;
+                hv[9].position.x = slx;
+                hv[9].position.y = sty;
+                hv[10].position.x = srx;
+                hv[10].position.y = sty;
+                hv[11].position.x = rx;
+                hv[11].position.y = sty;
 
-            hv[12].position.x = lx;
-            hv[12].position.y = ty;
-            hv[13].position.x = slx;
-            hv[13].position.y = ty;
-            hv[14].position.x = srx;
-            hv[14].position.y = ty;
-            hv[15].position.x = rx;
-            hv[15].position.y = ty;
-            image.vertices= hv;
+                hv[12].position.x = lx;
+                hv[12].position.y = ty;
+                hv[13].position.x = slx;
+                hv[13].position.y = ty;
+                hv[14].position.x = srx;
+                hv[14].position.y = ty;
+                hv[15].position.x = rx;
+                hv[15].position.y = ty;
+            }
 
             float w = image.m_textureSize.x;
             float h = image.m_textureSize.y;
@@ -214,41 +250,45 @@ namespace huqiang.Core.HGUI
             srx = rx - image.m_border.z / w;
             sty = ty - image.m_border.w / h;
 
-            hv[0].uv.x = lx;
-            hv[0].uv.y = dy;
-            hv[1].uv.x = slx;
-            hv[1].uv.y = dy;
-            hv[2].uv.x = srx;
-            hv[2].uv.y = dy;
-            hv[3].uv.x = rx;
-            hv[3].uv.y = dy;
+            unsafe
+            {
+                HVertex* hv = (HVertex*)image.vertInfo.Addr;
+                hv[0].uv.x = lx;
+                hv[0].uv.y = dy;
+                hv[1].uv.x = slx;
+                hv[1].uv.y = dy;
+                hv[2].uv.x = srx;
+                hv[2].uv.y = dy;
+                hv[3].uv.x = rx;
+                hv[3].uv.y = dy;
 
-            hv[4].uv.x = lx;
-            hv[4].uv.y = sdy;
-            hv[5].uv.x = slx;
-            hv[5].uv.y = sdy;
-            hv[6].uv.x = srx;
-            hv[6].uv.y = sdy;
-            hv[7].uv.x = rx;
-            hv[7].uv.y = sdy;
+                hv[4].uv.x = lx;
+                hv[4].uv.y = sdy;
+                hv[5].uv.x = slx;
+                hv[5].uv.y = sdy;
+                hv[6].uv.x = srx;
+                hv[6].uv.y = sdy;
+                hv[7].uv.x = rx;
+                hv[7].uv.y = sdy;
 
-            hv[8].uv.x = lx;
-            hv[8].uv.y = sty;
-            hv[9].uv.x = slx;
-            hv[9].uv.y = sty;
-            hv[10].uv.x = srx;
-            hv[10].uv.y = sty;
-            hv[11].uv.x = rx;
-            hv[11].uv.y = sty;
+                hv[8].uv.x = lx;
+                hv[8].uv.y = sty;
+                hv[9].uv.x = slx;
+                hv[9].uv.y = sty;
+                hv[10].uv.x = srx;
+                hv[10].uv.y = sty;
+                hv[11].uv.x = rx;
+                hv[11].uv.y = sty;
 
-            hv[12].uv.x = lx;
-            hv[12].uv.y = ty;
-            hv[13].uv.x = slx;
-            hv[13].uv.y = ty;
-            hv[14].uv.x = srx;
-            hv[14].uv.y = ty;
-            hv[15].uv.x = rx;
-            hv[15].uv.y = ty;
+                hv[12].uv.x = lx;
+                hv[12].uv.y = ty;
+                hv[13].uv.x = slx;
+                hv[13].uv.y = ty;
+                hv[14].uv.x = srx;
+                hv[14].uv.y = ty;
+                hv[15].uv.x = rx;
+                hv[15].uv.y = ty;
+            }
 
             if (image.m_fillCenter)
                 image.tris = TwelveRectangle;
@@ -452,25 +492,37 @@ namespace huqiang.Core.HGUI
                 ulx = image.m_rect.x / w;
                 urx = ulx + image.m_fillAmount * image.m_rect.width / w;
             }
-            var hv = new HVertex[4];
-            hv[0].position.x = lx;
-            hv[0].position.y = dy;
-            hv[1].position.x = rx;
-            hv[1].position.y = dy;
-            hv[2].position.x = lx;
-            hv[2].position.y = ty;
-            hv[3].position.x = rx;
-            hv[3].position.y = ty;
-            hv[0].uv.x = ulx;
-            hv[0].uv.y = udy;
-            hv[1].uv.x = urx;
-            hv[1].uv.y = udy;
-            hv[2].uv.x = ulx;
-            hv[2].uv.y = uty;
-            hv[3].uv.x = urx;
-            hv[3].uv.y = uty;
+            if (image.vertInfo.Size == 0)
+            {
+                image.vertInfo = blockBuffer.RegNew(4);
+            }
+            else if (image.vertInfo.Size < 4 | image.vertInfo.Size > 8)
+            {
+                blockBuffer.Release(ref image.vertInfo);
+                image.vertInfo = blockBuffer.RegNew(4);
+            }
+            image.vertInfo.DataCount = 4;
+            unsafe
+            {
+                HVertex* hv = (HVertex*)image.vertInfo.Addr;
+                hv[0].position.x = lx;
+                hv[0].position.y = dy;
+                hv[1].position.x = rx;
+                hv[1].position.y = dy;
+                hv[2].position.x = lx;
+                hv[2].position.y = ty;
+                hv[3].position.x = rx;
+                hv[3].position.y = ty;
+                hv[0].uv.x = ulx;
+                hv[0].uv.y = udy;
+                hv[1].uv.x = urx;
+                hv[1].uv.y = udy;
+                hv[2].uv.x = ulx;
+                hv[2].uv.y = uty;
+                hv[3].uv.x = urx;
+                hv[3].uv.y = uty;
+            }
 
-            image.vertices = hv;
             image.tris = Rectangle;
         }
         static void FillVertical(HImage image)
@@ -503,26 +555,37 @@ namespace huqiang.Core.HGUI
                 udy = image.m_rect.y / h;
                 uty = udy + image.m_fillAmount * image.m_rect.height / h;
             }
-            var hv = new HVertex[4];
-            hv[0].position.x = lx;
-            hv[0].position.y = dy;
-            hv[1].position.x = rx;
-            hv[1].position.y = dy;
-            hv[2].position.x = lx;
-            hv[2].position.y = ty;
-            hv[3].position.x = rx;
-            hv[3].position.y = ty;
+            if (image.vertInfo.Size == 0)
+            {
+                image.vertInfo = blockBuffer.RegNew(4);
+            }
+            else if (image.vertInfo.Size < 4 | image.vertInfo.Size > 8)
+            {
+                blockBuffer.Release(ref image.vertInfo);
+                image.vertInfo = blockBuffer.RegNew(4);
+            }
+            image.vertInfo.DataCount = 4;
+            unsafe
+            {
+                HVertex* hv = (HVertex*)image.vertInfo.Addr;
+                hv[0].position.x = lx;
+                hv[0].position.y = dy;
+                hv[1].position.x = rx;
+                hv[1].position.y = dy;
+                hv[2].position.x = lx;
+                hv[2].position.y = ty;
+                hv[3].position.x = rx;
+                hv[3].position.y = ty;
 
-            hv[0].uv.x = ulx;
-            hv[0].uv.y = udy;
-            hv[1].uv.x = urx;
-            hv[1].uv.y = udy;
-            hv[2].uv.x = ulx;
-            hv[2].uv.y = uty;
-            hv[3].uv.x = urx;
-            hv[3].uv.y = uty;
-
-            image.vertices = hv;
+                hv[0].uv.x = ulx;
+                hv[0].uv.y = udy;
+                hv[1].uv.x = urx;
+                hv[1].uv.y = udy;
+                hv[2].uv.x = ulx;
+                hv[2].uv.y = uty;
+                hv[3].uv.x = urx;
+                hv[3].uv.y = uty;
+            }
             image.tris = Rectangle;
         }
         static void FillRadial90(HImage image)
@@ -542,116 +605,128 @@ namespace huqiang.Core.HGUI
             float udy = image.m_rect.y / h;
             float uty = udy + image.m_rect.height / h;
             float a = image.m_fillAmount;
-            if(a>0.5f)
+            if (image.vertInfo.Size == 0)
             {
-                var hv = new HVertex[4];
-                hv[0].position.x = lx;
-                hv[0].position.y = dy;
-                hv[1].position.x = rx;
-                hv[1].position.y = dy;
-                hv[2].position.x = lx;
-                hv[2].position.y = ty;
-                hv[3].position.x = rx;
-                hv[3].position.y = ty;
-                hv[0].uv.x = ulx;
-                hv[0].uv.y = udy;
-                hv[1].uv.x = urx;
-                hv[1].uv.y = udy;
-                hv[2].uv.x = ulx;
-                hv[2].uv.y = uty;
-                hv[3].uv.x = urx;
-                hv[3].uv.y = uty;
-               
-                a -= 0.5f;
-                a *= 2;
-                switch(image.m_fillOrigin)
-                {
-                    case 0:
-                        hv[1].position.y = ty - (ty - dy) * a;
-                        hv[1].uv.y = uty - (uty - udy) * a;
-                        break;
-                    case 1:
-                        hv[0].position.x = rx - (rx - lx) * a;
-                        hv[0].uv.x = urx - (urx - ulx) * a;
-                        break;
-                    case 2:
-                        hv[2].position.y = dy + (ty - dy) * a;
-                        hv[2].uv.y = udy + (uty - udy) * a;
-                        break;
-                    default:
-                        hv[3].position.x = lx + (rx - lx) * a;
-                        hv[3].uv.x = ulx + (urx - ulx) * a;
-                        break;
-                }
-                image.vertices= hv;
-                image.tris = Rectangle;
+                image.vertInfo = blockBuffer.RegNew(4);
             }
-            else
+            else if (image.vertInfo.Size < 4 | image.vertInfo.Size > 8)
             {
-                var hv = new HVertex[3];
-                a *= 2;
-                switch (image.m_fillOrigin)
-                {
-                    case 0:
-                        hv[0].position.x = lx;
-                        hv[0].position.y = dy;
-                        hv[1].position.x = lx;
-                        hv[1].position.y = ty;
-                        hv[2].position.y = ty;
-                        hv[2].position.x = lx + (rx - lx) * a;
-                        hv[0].uv.x = ulx;
-                        hv[0].uv.y = udy;
-                        hv[1].uv.x = ulx;
-                        hv[1].uv.y = uty;
-                        hv[2].uv.y = uty;
-                        hv[2].uv.x = ulx + (urx - ulx) * a;
-                        break;
-                    case 1:
-                        hv[0].position.x = lx;
-                        hv[0].position.y = ty;
-                        hv[1].position.x = rx;
-                        hv[1].position.y = ty;
-                        hv[2].position.x = rx;
-                        hv[2].position.y = ty - (ty - dy) * a;
-                        hv[0].uv.x = ulx;
-                        hv[0].uv.y = uty;
-                        hv[1].uv.x = urx;
-                        hv[1].uv.y = uty;
-                        hv[2].uv.x = urx;
-                        hv[2].uv.y = uty - (uty - udy) * a;
-                        break;
-                    case 2:
-                        hv[0].position.x = rx - (rx - lx) * a;
-                        hv[0].position.y = dy;
-                        hv[1].position.x = rx;
-                        hv[1].position.y = ty;
-                        hv[2].position.x = rx;
-                        hv[2].position.y = dy;
-                        hv[0].uv.x = urx - (urx - ulx) * a;
-                        hv[0].uv.y = udy;
-                        hv[1].uv.x = urx;
-                        hv[1].uv.y = uty;
-                        hv[2].uv.x = urx;
-                        hv[2].uv.y = udy;
-                        break;
-                    default:
-                        hv[0].position.x = lx;
-                        hv[0].position.y = dy;
-                        hv[1].position.x = lx;
-                        hv[1].position.y = dy + (ty - dy) * a;
-                        hv[2].position.x = rx;
-                        hv[2].position.y = dy;
-                        hv[0].uv.x = ulx;
-                        hv[0].uv.y = udy;
-                        hv[1].uv.x = ulx;
-                        hv[1].uv.y = udy + (uty - udy) * a;
-                        hv[2].uv.x = urx;
-                        hv[2].uv.y = udy;
-                        break;
-                }
-                image.vertices = hv;
-                image.tris = Triangle;
+                blockBuffer.Release(ref image.vertInfo);
+                image.vertInfo = blockBuffer.RegNew(4);
             }
+            unsafe
+            {
+                HVertex* hv = (HVertex*)image.vertInfo.Addr;
+                if (a > 0.5f)
+                {
+                    hv[0].position.x = lx;
+                    hv[0].position.y = dy;
+                    hv[1].position.x = rx;
+                    hv[1].position.y = dy;
+                    hv[2].position.x = lx;
+                    hv[2].position.y = ty;
+                    hv[3].position.x = rx;
+                    hv[3].position.y = ty;
+                    hv[0].uv.x = ulx;
+                    hv[0].uv.y = udy;
+                    hv[1].uv.x = urx;
+                    hv[1].uv.y = udy;
+                    hv[2].uv.x = ulx;
+                    hv[2].uv.y = uty;
+                    hv[3].uv.x = urx;
+                    hv[3].uv.y = uty;
+
+                    a -= 0.5f;
+                    a *= 2;
+                    switch (image.m_fillOrigin)
+                    {
+                        case 0:
+                            hv[1].position.y = ty - (ty - dy) * a;
+                            hv[1].uv.y = uty - (uty - udy) * a;
+                            break;
+                        case 1:
+                            hv[0].position.x = rx - (rx - lx) * a;
+                            hv[0].uv.x = urx - (urx - ulx) * a;
+                            break;
+                        case 2:
+                            hv[2].position.y = dy + (ty - dy) * a;
+                            hv[2].uv.y = udy + (uty - udy) * a;
+                            break;
+                        default:
+                            hv[3].position.x = lx + (rx - lx) * a;
+                            hv[3].uv.x = ulx + (urx - ulx) * a;
+                            break;
+                    }
+                    image.vertInfo.DataCount = 4;
+                    image.tris = Rectangle;
+                }
+                else
+                {
+                    a *= 2;
+                    switch (image.m_fillOrigin)
+                    {
+                        case 0:
+                            hv[0].position.x = lx;
+                            hv[0].position.y = dy;
+                            hv[1].position.x = lx;
+                            hv[1].position.y = ty;
+                            hv[2].position.y = ty;
+                            hv[2].position.x = lx + (rx - lx) * a;
+                            hv[0].uv.x = ulx;
+                            hv[0].uv.y = udy;
+                            hv[1].uv.x = ulx;
+                            hv[1].uv.y = uty;
+                            hv[2].uv.y = uty;
+                            hv[2].uv.x = ulx + (urx - ulx) * a;
+                            break;
+                        case 1:
+                            hv[0].position.x = lx;
+                            hv[0].position.y = ty;
+                            hv[1].position.x = rx;
+                            hv[1].position.y = ty;
+                            hv[2].position.x = rx;
+                            hv[2].position.y = ty - (ty - dy) * a;
+                            hv[0].uv.x = ulx;
+                            hv[0].uv.y = uty;
+                            hv[1].uv.x = urx;
+                            hv[1].uv.y = uty;
+                            hv[2].uv.x = urx;
+                            hv[2].uv.y = uty - (uty - udy) * a;
+                            break;
+                        case 2:
+                            hv[0].position.x = rx - (rx - lx) * a;
+                            hv[0].position.y = dy;
+                            hv[1].position.x = rx;
+                            hv[1].position.y = ty;
+                            hv[2].position.x = rx;
+                            hv[2].position.y = dy;
+                            hv[0].uv.x = urx - (urx - ulx) * a;
+                            hv[0].uv.y = udy;
+                            hv[1].uv.x = urx;
+                            hv[1].uv.y = uty;
+                            hv[2].uv.x = urx;
+                            hv[2].uv.y = udy;
+                            break;
+                        default:
+                            hv[0].position.x = lx;
+                            hv[0].position.y = dy;
+                            hv[1].position.x = lx;
+                            hv[1].position.y = dy + (ty - dy) * a;
+                            hv[2].position.x = rx;
+                            hv[2].position.y = dy;
+                            hv[0].uv.x = ulx;
+                            hv[0].uv.y = udy;
+                            hv[1].uv.x = ulx;
+                            hv[1].uv.y = udy + (uty - udy) * a;
+                            hv[2].uv.x = urx;
+                            hv[2].uv.y = udy;
+                            break;
+                    }
+                    image.vertInfo.DataCount = 3;
+                    image.tris = Triangle;
+                }
+            }
+         
         }
         static void FillRadial180(HImage image)
         {
@@ -696,109 +771,119 @@ namespace huqiang.Core.HGUI
             float cx = lx + x * 0.5f;
             float ucx = ulx + (urx - ulx) * 0.5f;
             float a = image.m_fillAmount;
-            if (a > 0.75f)
+            if (image.vertInfo.Size == 0)
             {
-                a -= 0.75f;
-                a *= 4;
-                HVertex[] hv = new HVertex[6];
-                hv[0].position.x = lx;
-                hv[0].position.y = dy;
-                hv[1].position.x = cx;
-                hv[1].position.y = dy;
-                hv[2].position.x = rx;
-                hv[2].position.y = ty - y * a;
-                hv[3].position.x = lx;
-                hv[3].position.y = ty;
-                hv[4].position.x = cx;
-                hv[4].position.y = ty;
-                hv[5].position.x = rx;
-                hv[5].position.y = ty;
-                hv[0].uv.x = ulx;
-                hv[0].uv.y = udy;
-                hv[1].uv.x = ucx;
-                hv[1].uv.y = udy;
-                hv[2].uv.x = urx;
-                hv[2].uv.y = uty - (uty - udy) * a;
-                hv[3].uv.x = ulx;
-                hv[3].uv.y = uty;
-                hv[4].uv.x = ucx;
-                hv[4].uv.y = uty;
-                hv[5].uv.x = urx;
-                hv[5].uv.y = uty;
-                image.vertices = hv;
-                image.tris = TowRectangle;
+                image.vertInfo = blockBuffer.RegNew(8);
             }
-            else if (a > 0.5f)
+            else if (image.vertInfo.Size < 8 | image.vertInfo.Size > 12)
             {
-                a -= 0.5f;
-                a *= 4;
-                HVertex[] hv = new HVertex[5];
-                hv[0].position.x = lx;
-                hv[0].position.y = dy;
-                hv[1].position.x = cx;
-                hv[1].position.y = dy;
-                hv[2].position.x = lx;
-                hv[2].position.y = ty;
-                hv[3].position.x = cx;
-                hv[3].position.y = ty;
-                hv[4].position.x = cx + (rx - cx) * a;
-                hv[4].position.y = ty;
-                hv[0].uv.x = ulx;
-                hv[0].uv.y = udy;
-                hv[1].uv.x = ucx;
-                hv[1].uv.y = udy;
-                hv[2].uv.x = ulx;
-                hv[2].uv.y = uty;
-                hv[3].uv.x = ucx;
-                hv[3].uv.y = uty;
-                hv[4].uv.x = ucx + (urx - ucx) * a;
-                hv[4].uv.y = uty;
-                image.vertices = hv;
-                image.tris = ThreeTriangleB;
+                blockBuffer.Release(ref image.vertInfo);
+                image.vertInfo = blockBuffer.RegNew(8);
             }
-            else if (a > 0.25f)
+            unsafe
             {
-                a -= 0.25f;
-                a *= 4;
-                HVertex[] hv = new HVertex[4];
-                hv[0].position.x = lx;
-                hv[0].position.y = dy;
-                hv[1].position.x = cx;
-                hv[1].position.y = dy;
-                hv[2].position.x = lx;
-                hv[2].position.y = ty;
-                hv[3].position.x = lx + (cx - lx) * a;
-                hv[3].position.y = ty;
-                hv[0].uv.x = ulx;
-                hv[0].uv.y = udy;
-                hv[1].uv.x = ucx;
-                hv[1].uv.y = udy;
-                hv[2].uv.x = ulx;
-                hv[2].uv.y = uty;
-                hv[3].uv.x = ulx + (ucx - ulx) * a;
-                hv[3].uv.y = uty;
-                image.vertices = hv;
-                image.tris = Rectangle;
+                HVertex* hv = (HVertex*)image.vertInfo.Addr;
+                if (a > 0.75f)
+                {
+                    a -= 0.75f;
+                    a *= 4;
+                    hv[0].position.x = lx;
+                    hv[0].position.y = dy;
+                    hv[1].position.x = cx;
+                    hv[1].position.y = dy;
+                    hv[2].position.x = rx;
+                    hv[2].position.y = ty - y * a;
+                    hv[3].position.x = lx;
+                    hv[3].position.y = ty;
+                    hv[4].position.x = cx;
+                    hv[4].position.y = ty;
+                    hv[5].position.x = rx;
+                    hv[5].position.y = ty;
+                    hv[0].uv.x = ulx;
+                    hv[0].uv.y = udy;
+                    hv[1].uv.x = ucx;
+                    hv[1].uv.y = udy;
+                    hv[2].uv.x = urx;
+                    hv[2].uv.y = uty - (uty - udy) * a;
+                    hv[3].uv.x = ulx;
+                    hv[3].uv.y = uty;
+                    hv[4].uv.x = ucx;
+                    hv[4].uv.y = uty;
+                    hv[5].uv.x = urx;
+                    hv[5].uv.y = uty;
+                    image.vertInfo.DataCount = 6;
+                    image.tris = TowRectangle;
+                }
+                else if (a > 0.5f)
+                {
+                    a -= 0.5f;
+                    a *= 4;
+                    hv[0].position.x = lx;
+                    hv[0].position.y = dy;
+                    hv[1].position.x = cx;
+                    hv[1].position.y = dy;
+                    hv[2].position.x = lx;
+                    hv[2].position.y = ty;
+                    hv[3].position.x = cx;
+                    hv[3].position.y = ty;
+                    hv[4].position.x = cx + (rx - cx) * a;
+                    hv[4].position.y = ty;
+                    hv[0].uv.x = ulx;
+                    hv[0].uv.y = udy;
+                    hv[1].uv.x = ucx;
+                    hv[1].uv.y = udy;
+                    hv[2].uv.x = ulx;
+                    hv[2].uv.y = uty;
+                    hv[3].uv.x = ucx;
+                    hv[3].uv.y = uty;
+                    hv[4].uv.x = ucx + (urx - ucx) * a;
+                    hv[4].uv.y = uty;
+                    image.vertInfo.DataCount = 5;
+                    image.tris = ThreeTriangleB;
+                }
+                else if (a > 0.25f)
+                {
+                    a -= 0.25f;
+                    a *= 4;
+                    hv[0].position.x = lx;
+                    hv[0].position.y = dy;
+                    hv[1].position.x = cx;
+                    hv[1].position.y = dy;
+                    hv[2].position.x = lx;
+                    hv[2].position.y = ty;
+                    hv[3].position.x = lx + (cx - lx) * a;
+                    hv[3].position.y = ty;
+                    hv[0].uv.x = ulx;
+                    hv[0].uv.y = udy;
+                    hv[1].uv.x = ucx;
+                    hv[1].uv.y = udy;
+                    hv[2].uv.x = ulx;
+                    hv[2].uv.y = uty;
+                    hv[3].uv.x = ulx + (ucx - ulx) * a;
+                    hv[3].uv.y = uty;
+                    image.vertInfo.DataCount = 4;
+                    image.tris = Rectangle;
+                }
+                else
+                {
+                    a *= 4;
+                    hv[0].position.x = lx;
+                    hv[0].position.y = dy;
+                    hv[1].position.x = cx;
+                    hv[1].position.y = dy;
+                    hv[2].position.x = lx;
+                    hv[2].position.y = dy + y * a;
+                    hv[0].uv.x = ulx;
+                    hv[0].uv.y = udy;
+                    hv[1].uv.x = ucx;
+                    hv[1].uv.y = udy;
+                    hv[2].uv.x = ulx;
+                    hv[2].uv.y = udy + (uty - udy) * a;
+                    image.vertInfo.DataCount = 3;
+                    image.tris = Triangle;
+                }
             }
-            else
-            {
-                a *= 4;
-                HVertex[] hv = new HVertex[3];
-                hv[0].position.x = lx;
-                hv[0].position.y = dy;
-                hv[1].position.x = cx;
-                hv[1].position.y = dy;
-                hv[2].position.x = lx;
-                hv[2].position.y = dy + y * a;
-                hv[0].uv.x = ulx;
-                hv[0].uv.y = udy;
-                hv[1].uv.x = ucx;
-                hv[1].uv.y = udy;
-                hv[2].uv.x = ulx;
-                hv[2].uv.y = udy + (uty - udy) * a;
-                image.vertices = hv;
-                image.tris = Triangle;
-            }
+        
         }
         static int[] TriangleL4 = new int[] { 0, 2, 3, 0, 3, 1, 2, 4, 5, 2, 5, 3 };
         static int[] TriangleL3 = new int[] { 0, 1, 2, 1, 3, 4, 1, 4, 2 };
@@ -821,110 +906,120 @@ namespace huqiang.Core.HGUI
             float cy = dy + y * 0.5f;
             float ucy = udy + (uty - udy) * 0.5f;
             float a = image.m_fillAmount;
-            if (a > 0.75f)
+            if (image.vertInfo.Size == 0)
             {
-                a -= 0.75f;
-                a *= 4;
-                HVertex[] hv = new HVertex[6];
-                hv[0].position.x = rx - x * a;
-                hv[0].position.y = dy;
-                hv[1].position.x = rx;
-                hv[1].position.y = dy;
-                hv[2].position.x = lx;
-                hv[2].position.y = cy;
-                hv[3].position.x = rx;
-                hv[3].position.y = cy;
-                hv[4].position.x = lx;
-                hv[4].position.y = ty;
-                hv[5].position.x = rx;
-                hv[5].position.y = ty;
-                hv[0].uv.x = urx - (urx - ulx) * a;
-                hv[0].uv.y = udy;
-                hv[1].uv.x = urx;
-                hv[1].uv.y = udy;
-                hv[2].uv.x = ulx;
-                hv[2].uv.y = ucy;
-                hv[3].uv.x = urx;
-                hv[3].uv.y = ucy;
-                hv[4].uv.x = ulx;
-                hv[4].uv.y = uty;
-                hv[5].uv.x = urx;
-                hv[5].uv.y = uty;
-                image.vertices = hv;
-                image.tris = TriangleL4;
+                image.vertInfo = blockBuffer.RegNew(8);
             }
-            else if (a > 0.5f)
+            else if (image.vertInfo.Size < 8 | image.vertInfo.Size > 12)
             {
-                a -= 0.5f;
-                a *= 4;
-                HVertex[] hv = new HVertex[5];
-                hv[0].position.x = rx;
-                hv[0].position.y = cy - (cy - dy) * a;
-                hv[1].position.x = lx;
-                hv[1].position.y = cy;
-                hv[2].position.x = rx;
-                hv[2].position.y = cy;
-                hv[3].position.x = lx;
-                hv[3].position.y = ty;
-                hv[4].position.x = rx;
-                hv[4].position.y = ty;
-                hv[0].uv.x = urx;
-                hv[0].uv.y = ucy - (ucy - udy) * a;
-                hv[1].uv.x = ulx;
-                hv[1].uv.y = ucy;
-                hv[2].uv.x = urx;
-                hv[2].uv.y = ucy;
-                hv[3].uv.x = ulx;
-                hv[3].uv.y = uty;
-                hv[4].uv.x = urx;
-                hv[4].uv.y = uty;
-                image.vertices = hv;
-                image.tris = TriangleL3;
+                blockBuffer.Release(ref image.vertInfo);
+                image.vertInfo = blockBuffer.RegNew(8);
             }
-            else if (a > 0.25f)
+            unsafe
             {
-                a -= 0.25f;
-                a *= 4;
-                HVertex[] hv = new HVertex[4];
-                hv[0].position.x = lx;
-                hv[0].position.y = cy;
-                hv[1].position.x = rx;
-                hv[1].position.y = ty - (ty - cy) * a;
-                hv[2].position.x = lx;
-                hv[2].position.y = ty;
-                hv[3].position.x = rx;
-                hv[3].position.y = ty;
-                hv[0].uv.x = ulx;
-                hv[0].uv.y = ucy;
-                hv[1].uv.x = urx;
-                hv[1].uv.y = uty - (uty - ucy) * a;
-                hv[2].uv.x = ulx;
-                hv[2].uv.y = uty;
-                hv[3].uv.x = urx;
-                hv[3].uv.y = uty;
-               
-                image.vertices = hv;
-                image.tris = Rectangle;
+                HVertex* hv = (HVertex*)image.vertInfo.Addr;
+                if (a > 0.75f)
+                {
+                    a -= 0.75f;
+                    a *= 4;
+                    hv[0].position.x = rx - x * a;
+                    hv[0].position.y = dy;
+                    hv[1].position.x = rx;
+                    hv[1].position.y = dy;
+                    hv[2].position.x = lx;
+                    hv[2].position.y = cy;
+                    hv[3].position.x = rx;
+                    hv[3].position.y = cy;
+                    hv[4].position.x = lx;
+                    hv[4].position.y = ty;
+                    hv[5].position.x = rx;
+                    hv[5].position.y = ty;
+                    hv[0].uv.x = urx - (urx - ulx) * a;
+                    hv[0].uv.y = udy;
+                    hv[1].uv.x = urx;
+                    hv[1].uv.y = udy;
+                    hv[2].uv.x = ulx;
+                    hv[2].uv.y = ucy;
+                    hv[3].uv.x = urx;
+                    hv[3].uv.y = ucy;
+                    hv[4].uv.x = ulx;
+                    hv[4].uv.y = uty;
+                    hv[5].uv.x = urx;
+                    hv[5].uv.y = uty;
+                    image.vertInfo.DataCount = 6;
+                    image.tris = TriangleL4;
+                }
+                else if (a > 0.5f)
+                {
+                    a -= 0.5f;
+                    a *= 4;
+                    hv[0].position.x = rx;
+                    hv[0].position.y = cy - (cy - dy) * a;
+                    hv[1].position.x = lx;
+                    hv[1].position.y = cy;
+                    hv[2].position.x = rx;
+                    hv[2].position.y = cy;
+                    hv[3].position.x = lx;
+                    hv[3].position.y = ty;
+                    hv[4].position.x = rx;
+                    hv[4].position.y = ty;
+                    hv[0].uv.x = urx;
+                    hv[0].uv.y = ucy - (ucy - udy) * a;
+                    hv[1].uv.x = ulx;
+                    hv[1].uv.y = ucy;
+                    hv[2].uv.x = urx;
+                    hv[2].uv.y = ucy;
+                    hv[3].uv.x = ulx;
+                    hv[3].uv.y = uty;
+                    hv[4].uv.x = urx;
+                    hv[4].uv.y = uty;
+                    image.vertInfo.DataCount = 5;
+                    image.tris = TriangleL3;
+                }
+                else if (a > 0.25f)
+                {
+                    a -= 0.25f;
+                    a *= 4;
+                    hv[0].position.x = lx;
+                    hv[0].position.y = cy;
+                    hv[1].position.x = rx;
+                    hv[1].position.y = ty - (ty - cy) * a;
+                    hv[2].position.x = lx;
+                    hv[2].position.y = ty;
+                    hv[3].position.x = rx;
+                    hv[3].position.y = ty;
+                    hv[0].uv.x = ulx;
+                    hv[0].uv.y = ucy;
+                    hv[1].uv.x = urx;
+                    hv[1].uv.y = uty - (uty - ucy) * a;
+                    hv[2].uv.x = ulx;
+                    hv[2].uv.y = uty;
+                    hv[3].uv.x = urx;
+                    hv[3].uv.y = uty;
+
+                    image.vertInfo.DataCount = 4;
+                    image.tris = Rectangle;
+                }
+                else
+                {
+                    a *= 4;
+                    hv[0].position.x = lx;
+                    hv[0].position.y = cy;
+                    hv[1].position.x = lx;
+                    hv[1].position.y = ty;
+                    hv[2].position.x = lx + (rx - lx) * a;
+                    hv[2].position.y = ty;
+                    hv[0].uv.x = ulx;
+                    hv[0].uv.y = ucy;
+                    hv[1].uv.x = ulx;
+                    hv[1].uv.y = uty;
+                    hv[2].uv.x = ulx + (urx - ulx) * a;
+                    hv[2].uv.y = uty;
+                    image.vertInfo.DataCount = 3;
+                    image.tris = Triangle;
+                }
             }
-            else
-            {
-                a *= 4;
-                HVertex[] hv = new HVertex[3];
-                hv[0].position.x = lx;
-                hv[0].position.y = cy;
-                hv[1].position.x = lx;
-                hv[1].position.y = ty;
-                hv[2].position.x = lx + (rx - lx) * a;
-                hv[2].position.y = ty;
-                hv[0].uv.x = ulx;
-                hv[0].uv.y = ucy;
-                hv[1].uv.x = ulx;
-                hv[1].uv.y = uty;
-                hv[2].uv.x = ulx + (urx - ulx) * a;
-                hv[2].uv.y = uty;
-                image.vertices = hv;
-                image.tris = Triangle;
-            }
+        
         }
         static int[] TriangleT4 = new int[] { 0, 3, 4, 0, 4, 1, 1, 4, 5,1,5,2};
         static int[] TriangleT3 = new int[] { 0, 3, 1, 1, 3, 4, 1, 4, 2 };
@@ -947,109 +1042,119 @@ namespace huqiang.Core.HGUI
             float cx = lx + x * 0.5f;
             float ucx = ulx + (urx - ulx) * 0.5f;
             float a = image.m_fillAmount;
-            if (a > 0.75f)
+            if (image.vertInfo.Size == 0)
             {
-                a -= 0.75f;
-                a *= 4;
-                HVertex[] hv = new HVertex[6];
-                hv[0].position.x = lx;
-                hv[0].position.y = dy;
-                hv[1].position.x = cx;
-                hv[1].position.y = dy;
-                hv[2].position.x = rx;
-                hv[2].position.y = dy;
-                hv[3].position.x = lx;
-                hv[3].position.y = dy + y * a;
-                hv[4].position.x = cx;
-                hv[4].position.y = ty;
-                hv[5].position.x = rx;
-                hv[5].position.y = ty;
-                hv[0].uv.x = ulx;
-                hv[0].uv.y = udy;
-                hv[1].uv.x = ucx;
-                hv[1].uv.y = udy;
-                hv[2].uv.x = urx;
-                hv[2].uv.y = udy;
-                hv[3].uv.x = ulx;
-                hv[3].uv.y = udy + (uty - udy) * a;
-                hv[4].uv.x = ucx;
-                hv[4].uv.y = uty;
-                hv[5].uv.x = urx;
-                hv[5].uv.y = uty;
-                image.vertices = hv;
-                image.tris = TriangleT4;
+                image.vertInfo = blockBuffer.RegNew(8);
             }
-            else if (a > 0.5f)
+            else if (image.vertInfo.Size < 8 | image.vertInfo.Size > 12)
             {
-                a -= 0.5f;
-                a *= 4;
-                HVertex[] hv = new HVertex[5];
-                hv[0].position.x = cx - (cx - lx) * a;
-                hv[0].position.y = dy;
-                hv[1].position.x = cx;
-                hv[1].position.y = dy;
-                hv[2].position.x = rx;
-                hv[2].position.y = dy;
-                hv[3].position.x = cx;
-                hv[3].position.y = ty;
-                hv[4].position.x = rx;
-                hv[4].position.y = ty;
-                hv[0].uv.x = ucx - (ucx - ulx) * a;
-                hv[0].uv.y = udy;
-                hv[1].uv.x = ucx;
-                hv[1].uv.y = udy;
-                hv[2].uv.x = urx;
-                hv[2].uv.y = udy;
-                hv[3].uv.x = ucx;
-                hv[3].uv.y = uty;
-                hv[4].uv.x = urx;
-                hv[4].uv.y = uty;
-                image.vertices = hv;
-                image.tris = TriangleT3;
+                blockBuffer.Release(ref image.vertInfo);
+                image.vertInfo = blockBuffer.RegNew(8);
             }
-            else if (a > 0.25f)
+            unsafe
             {
-                a -= 0.25f;
-                a *= 4;
-                HVertex[] hv = new HVertex[4];
-                hv[0].position.x = rx - (rx - cx) * a;
-                hv[0].position.y = dy;
-                hv[1].position.x = rx;
-                hv[1].position.y = dy;
-                hv[2].position.x = cx;
-                hv[2].position.y = ty;
-                hv[3].position.x = rx;
-                hv[3].position.y = ty;
-                hv[0].uv.x = urx - (urx - ucx) * a;
-                hv[0].uv.y = udy;
-                hv[1].uv.x = urx;
-                hv[1].uv.y = udy;
-                hv[2].uv.x = ucx;
-                hv[2].uv.y = uty;
-                hv[3].uv.x = urx;
-                hv[3].uv.y = uty;
-                image.vertices = hv;
-                image.tris = Rectangle;
+                HVertex* hv = (HVertex*)image.vertInfo.Addr;
+                if (a > 0.75f)
+                {
+                    a -= 0.75f;
+                    a *= 4;
+                    hv[0].position.x = lx;
+                    hv[0].position.y = dy;
+                    hv[1].position.x = cx;
+                    hv[1].position.y = dy;
+                    hv[2].position.x = rx;
+                    hv[2].position.y = dy;
+                    hv[3].position.x = lx;
+                    hv[3].position.y = dy + y * a;
+                    hv[4].position.x = cx;
+                    hv[4].position.y = ty;
+                    hv[5].position.x = rx;
+                    hv[5].position.y = ty;
+                    hv[0].uv.x = ulx;
+                    hv[0].uv.y = udy;
+                    hv[1].uv.x = ucx;
+                    hv[1].uv.y = udy;
+                    hv[2].uv.x = urx;
+                    hv[2].uv.y = udy;
+                    hv[3].uv.x = ulx;
+                    hv[3].uv.y = udy + (uty - udy) * a;
+                    hv[4].uv.x = ucx;
+                    hv[4].uv.y = uty;
+                    hv[5].uv.x = urx;
+                    hv[5].uv.y = uty;
+                    image.vertInfo.DataCount = 6;
+                    image.tris = TriangleT4;
+                }
+                else if (a > 0.5f)
+                {
+                    a -= 0.5f;
+                    a *= 4;
+                    hv[0].position.x = cx - (cx - lx) * a;
+                    hv[0].position.y = dy;
+                    hv[1].position.x = cx;
+                    hv[1].position.y = dy;
+                    hv[2].position.x = rx;
+                    hv[2].position.y = dy;
+                    hv[3].position.x = cx;
+                    hv[3].position.y = ty;
+                    hv[4].position.x = rx;
+                    hv[4].position.y = ty;
+                    hv[0].uv.x = ucx - (ucx - ulx) * a;
+                    hv[0].uv.y = udy;
+                    hv[1].uv.x = ucx;
+                    hv[1].uv.y = udy;
+                    hv[2].uv.x = urx;
+                    hv[2].uv.y = udy;
+                    hv[3].uv.x = ucx;
+                    hv[3].uv.y = uty;
+                    hv[4].uv.x = urx;
+                    hv[4].uv.y = uty;
+                    image.vertInfo.DataCount = 5;
+                    image.tris = TriangleT3;
+                }
+                else if (a > 0.25f)
+                {
+                    a -= 0.25f;
+                    a *= 4;
+                    hv[0].position.x = rx - (rx - cx) * a;
+                    hv[0].position.y = dy;
+                    hv[1].position.x = rx;
+                    hv[1].position.y = dy;
+                    hv[2].position.x = cx;
+                    hv[2].position.y = ty;
+                    hv[3].position.x = rx;
+                    hv[3].position.y = ty;
+                    hv[0].uv.x = urx - (urx - ucx) * a;
+                    hv[0].uv.y = udy;
+                    hv[1].uv.x = urx;
+                    hv[1].uv.y = udy;
+                    hv[2].uv.x = ucx;
+                    hv[2].uv.y = uty;
+                    hv[3].uv.x = urx;
+                    hv[3].uv.y = uty;
+                    image.vertInfo.DataCount = 4;
+                    image.tris = Rectangle;
+                }
+                else
+                {
+                    a *= 4;
+                    hv[0].position.x = rx;
+                    hv[0].position.y = ty - (ty - dy) * a;
+                    hv[1].position.x = cx;
+                    hv[1].position.y = ty;
+                    hv[2].position.x = rx;
+                    hv[2].position.y = ty;
+                    hv[0].uv.x = urx;
+                    hv[0].uv.y = uty - (uty - udy) * a;
+                    hv[1].uv.x = ucx;
+                    hv[1].uv.y = uty;
+                    hv[2].uv.x = urx;
+                    hv[2].uv.y = uty;
+                    image.vertInfo.DataCount = 3;
+                    image.tris = Triangle;
+                }
             }
-            else
-            {
-                a *= 4;
-                HVertex[] hv = new HVertex[3];
-                hv[0].position.x = rx;
-                hv[0].position.y = ty - (ty - dy) * a;
-                hv[1].position.x = cx;
-                hv[1].position.y = ty;
-                hv[2].position.x = rx;
-                hv[2].position.y = ty;
-                hv[0].uv.x = urx;
-                hv[0].uv.y = uty - (uty - udy) * a;
-                hv[1].uv.x = ucx;
-                hv[1].uv.y = uty;
-                hv[2].uv.x = urx;
-                hv[2].uv.y = uty;
-                image.vertices = hv;
-                image.tris = Triangle;
-            }
+           
         }
         static int[] TriangleR3 = new int[] { 0, 2, 3, 0, 3, 1, 2, 4, 3 };
         static void FillRadial180Right(HImage image)
@@ -1071,109 +1176,118 @@ namespace huqiang.Core.HGUI
             float cy = dy + y * 0.5f;
             float ucy = udy + (uty - udy) * 0.5f;
             float a = image.m_fillAmount;
-            if (a > 0.75f)
+            if (image.vertInfo.Size == 0)
             {
-                a -= 0.75f;
-                a *= 4;
-                HVertex[] hv = new HVertex[6];
-                hv[0].position.x = lx;
-                hv[0].position.y = dy;
-                hv[1].position.x = rx;
-                hv[1].position.y = dy;
-                hv[2].position.x = lx;
-                hv[2].position.y = cy;
-                hv[3].position.x = rx;
-                hv[3].position.y = cy;
-                hv[4].position.x = lx;
-                hv[4].position.y = ty;
-                hv[5].position.x = lx + x * a;
-                hv[5].position.y = ty;
-                hv[0].uv.x = ulx;
-                hv[0].uv.y = udy;
-                hv[1].uv.x = urx;
-                hv[1].uv.y = udy;
-                hv[2].uv.x = ulx;
-                hv[2].uv.y = ucy;
-                hv[3].uv.x = urx;
-                hv[3].uv.y = ucy;
-                hv[4].uv.x = ulx;
-                hv[4].uv.y = uty;
-                hv[5].uv.x = ulx +(urx-ulx)* a;
-                hv[5].uv.y = uty;
-                image.vertices = hv;
-                image.tris = TriangleL4;
+                image.vertInfo = blockBuffer.RegNew(8);
             }
-            else if (a > 0.5f)
+            else if (image.vertInfo.Size < 8 | image.vertInfo.Size > 12)
             {
-                a -= 0.5f;
-                a *= 4;
-                HVertex[] hv = new HVertex[5];
-                hv[0].position.x = lx;
-                hv[0].position.y = dy;
-                hv[1].position.x = rx;
-                hv[1].position.y = dy;
-                hv[2].position.x = lx;
-                hv[2].position.y = cy;
-                hv[3].position.x = rx;
-                hv[3].position.y = cy;
-                hv[4].position.x = lx;
-                hv[4].position.y = cy + (ty - cy) * a;
-                hv[0].uv.x = ulx;
-                hv[0].uv.y = udy;
-                hv[1].uv.x = urx;
-                hv[1].uv.y = udy;
-                hv[2].uv.x = ulx;
-                hv[2].uv.y = ucy;
-                hv[3].uv.x = urx;
-                hv[3].uv.y = ucy;
-                hv[4].uv.x = ulx;
-                hv[4].uv.y = ucy + (uty - ucy) * a;
-                image.vertices = hv;
-                image.tris = TriangleR3;
+                blockBuffer.Release(ref image.vertInfo);
+                image.vertInfo = blockBuffer.RegNew(8);
             }
-            else if (a > 0.25f)
+            unsafe
             {
-                a -= 0.25f;
-                a *= 4;
-                HVertex[] hv = new HVertex[4];
-                hv[0].position.x = lx;
-                hv[0].position.y = dy;
-                hv[1].position.x = rx;
-                hv[1].position.y = dy;
-                hv[2].position.x = lx;
-                hv[2].position.y = dy + (cy - dy) * a;
-                hv[3].position.x = rx;
-                hv[3].position.y = cy;
-                hv[0].uv.x = ulx;
-                hv[0].uv.y = udy;
-                hv[1].uv.x = urx;
-                hv[1].uv.y = udy;
-                hv[2].uv.x = ulx;
-                hv[2].uv.y = udy + (ucy - udy) * a;
-                hv[3].uv.x = urx;
-                hv[3].uv.y = ucy;
+                HVertex* hv = (HVertex*)image.vertInfo.Addr;
+                if (a > 0.75f)
+                {
+                    a -= 0.75f;
+                    a *= 4;
+                    hv[0].position.x = lx;
+                    hv[0].position.y = dy;
+                    hv[1].position.x = rx;
+                    hv[1].position.y = dy;
+                    hv[2].position.x = lx;
+                    hv[2].position.y = cy;
+                    hv[3].position.x = rx;
+                    hv[3].position.y = cy;
+                    hv[4].position.x = lx;
+                    hv[4].position.y = ty;
+                    hv[5].position.x = lx + x * a;
+                    hv[5].position.y = ty;
+                    hv[0].uv.x = ulx;
+                    hv[0].uv.y = udy;
+                    hv[1].uv.x = urx;
+                    hv[1].uv.y = udy;
+                    hv[2].uv.x = ulx;
+                    hv[2].uv.y = ucy;
+                    hv[3].uv.x = urx;
+                    hv[3].uv.y = ucy;
+                    hv[4].uv.x = ulx;
+                    hv[4].uv.y = uty;
+                    hv[5].uv.x = ulx + (urx - ulx) * a;
+                    hv[5].uv.y = uty;
+                    image.vertInfo.DataCount = 6;
+                    image.tris = TriangleL4;
+                }
+                else if (a > 0.5f)
+                {
+                    a -= 0.5f;
+                    a *= 4;
+                    hv[0].position.x = lx;
+                    hv[0].position.y = dy;
+                    hv[1].position.x = rx;
+                    hv[1].position.y = dy;
+                    hv[2].position.x = lx;
+                    hv[2].position.y = cy;
+                    hv[3].position.x = rx;
+                    hv[3].position.y = cy;
+                    hv[4].position.x = lx;
+                    hv[4].position.y = cy + (ty - cy) * a;
+                    hv[0].uv.x = ulx;
+                    hv[0].uv.y = udy;
+                    hv[1].uv.x = urx;
+                    hv[1].uv.y = udy;
+                    hv[2].uv.x = ulx;
+                    hv[2].uv.y = ucy;
+                    hv[3].uv.x = urx;
+                    hv[3].uv.y = ucy;
+                    hv[4].uv.x = ulx;
+                    hv[4].uv.y = ucy + (uty - ucy) * a;
+                    image.vertInfo.DataCount = 5;
+                    image.tris = TriangleR3;
+                }
+                else if (a > 0.25f)
+                {
+                    a -= 0.25f;
+                    a *= 4;
+                    hv[0].position.x = lx;
+                    hv[0].position.y = dy;
+                    hv[1].position.x = rx;
+                    hv[1].position.y = dy;
+                    hv[2].position.x = lx;
+                    hv[2].position.y = dy + (cy - dy) * a;
+                    hv[3].position.x = rx;
+                    hv[3].position.y = cy;
+                    hv[0].uv.x = ulx;
+                    hv[0].uv.y = udy;
+                    hv[1].uv.x = urx;
+                    hv[1].uv.y = udy;
+                    hv[2].uv.x = ulx;
+                    hv[2].uv.y = udy + (ucy - udy) * a;
+                    hv[3].uv.x = urx;
+                    hv[3].uv.y = ucy;
 
-                image.vertices = hv;
-                image.tris = Rectangle;
-            }
-            else
-            {
-                a *= 4;
-                HVertex[] hv = new HVertex[3];
-                hv[0].position.x = rx - (rx - lx) * a;
-                hv[0].position.y = dy;
-                hv[1].position.x = rx;
-                hv[1].position.y = cy;
-                hv[2].position.x = rx;
-                hv[2].position.y = dy;
-                hv[0].uv.x = urx - (urx - ulx) * a;
-                hv[0].uv.y = udy;
-                hv[1].uv.x = urx;
-                hv[1].uv.y = ucy;
-                hv[2].uv.x = urx;
-                hv[2].uv.y = udy;
-                image.vertices = hv;
-                image.tris = Triangle;
+                    image.vertInfo.DataCount = 4;
+                    image.tris = Rectangle;
+                }
+                else
+                {
+                    a *= 4;
+                    hv[0].position.x = rx - (rx - lx) * a;
+                    hv[0].position.y = dy;
+                    hv[1].position.x = rx;
+                    hv[1].position.y = cy;
+                    hv[2].position.x = rx;
+                    hv[2].position.y = dy;
+                    hv[0].uv.x = urx - (urx - ulx) * a;
+                    hv[0].uv.y = udy;
+                    hv[1].uv.x = urx;
+                    hv[1].uv.y = ucy;
+                    hv[2].uv.x = urx;
+                    hv[2].uv.y = udy;
+                    image.vertInfo.DataCount = 3;
+                    image.tris = Triangle;
+                }
             }
         }
         static void FillRadial360(HImage image)
@@ -1216,28 +1330,31 @@ namespace huqiang.Core.HGUI
                 if (a < 0)
                     a += 1;
                 Vector2 d = MathH.Tan2(360 - a * 360);//方向
-                Vector2[] lines = new Vector2[9];
-                lines[0].x = ocx;
-                lines[2].y = ocy;
-                lines[3].y = y;
-                lines[4].x = ocx;
-                lines[4].y = y;
-                lines[5].x = x;
-                lines[5].y = y;
-                lines[6].x = x;
-                lines[6].y = ocy;
-                lines[7].x = x;
-                lines[8].x = ocx;
-                Vector2 oc = new Vector2(ocx, ocy);
-                Vector2 ot = oc + d * 10000;
-                Vector2 cross = Vector2.zero;
-                for (int i = 0; i < 8; i++)
+                unsafe
                 {
-                    if (huqiang.Physics2D.LineToLine(ref lines[i], ref lines[i + 1], ref oc, ref ot, ref cross))
+                    Vector2* lines =stackalloc Vector2[9];
+                    lines[0].x = ocx;
+                    lines[2].y = ocy;
+                    lines[3].y = y;
+                    lines[4].x = ocx;
+                    lines[4].y = y;
+                    lines[5].x = x;
+                    lines[5].y = y;
+                    lines[6].x = x;
+                    lines[6].y = ocy;
+                    lines[7].x = x;
+                    lines[8].x = ocx;
+                    Vector2 oc = new Vector2(ocx, ocy);
+                    Vector2 ot = oc + d * 10000;
+                    Vector2 cross = Vector2.zero;
+                    for (int i = 0; i < 8; i++)
                     {
-                        float r = (cross - lines[i + 1]).magnitude / (lines[i + 1] - lines[i]).magnitude;
-                        a = (7 - i + r) * 0.125f;
-                        break;
+                        if (huqiang.Physics2D.LineToLine(ref lines[i], ref lines[i + 1], ref oc, ref ot, ref cross))
+                        {
+                            float r = (cross - lines[i + 1]).magnitude / (lines[i + 1] - lines[i]).magnitude;
+                            a = (7 - i + r) * 0.125f;
+                            break;
+                        }
                     }
                 }
             }
@@ -1257,276 +1374,281 @@ namespace huqiang.Core.HGUI
             float ucx = ulx + (urx - ulx) * 0.5f;
             float cy = dy + y * 0.5f;
             float ucy = udy + (uty - udy) * 0.5f;
-            if(a>0.875f)
+            if (image.vertInfo.Size == 0)
             {
-                a -= 0.875f;
-                a *= 8;
-                HVertex[] hv = new HVertex[10];
-                hv[0].position.x = lx;
-                hv[0].position.y = dy;
-                hv[1].position.x = lx + (cx - lx) * a;
-                hv[1].position.y = dy;
-                hv[2].position.x = cx;
-                hv[2].position.y = dy;
-                hv[3].position.x = rx;
-                hv[3].position.y = dy;
-                hv[4].position.x = lx;
-                hv[4].position.y = cy;
-                hv[5].position.x = cx;
-                hv[5].position.y = cy;
-                hv[6].position.x = rx;
-                hv[6].position.y = cy;
-                hv[7].position.x = lx;
-                hv[7].position.y = ty;
-                hv[8].position.x = cx;
-                hv[8].position.y = ty;
-                hv[9].position.x = rx;
-                hv[9].position.y = ty;
-                hv[0].uv.x = ulx;
-                hv[0].uv.y = udy;
-                hv[1].uv.x = ulx + (ucx - ulx) * a;
-                hv[1].uv.y = udy;
-                hv[2].uv.x = ucx;
-                hv[2].uv.y = udy;
-                hv[3].uv.x = urx;
-                hv[3].uv.y = udy;
-                hv[4].uv.x = ulx;
-                hv[4].uv.y = ucy;
-                hv[5].uv.x = ucx;
-                hv[5].uv.y = ucy;
-                hv[6].uv.x = urx;
-                hv[6].uv.y = ucy;
-                hv[7].uv.x = ulx;
-                hv[7].uv.y = uty;
-                hv[8].uv.x = ucx;
-                hv[8].uv.y = uty;
-                hv[9].uv.x = urx;
-                hv[9].uv.y = uty;
-                image.vertices = hv;
-                image.tris = Triangle360B8;
+                image.vertInfo = blockBuffer.RegNew(12);
             }
-            else if(a>0.75f)
+            else if (image.vertInfo.Size < 12 | image.vertInfo.Size > 16)
             {
-                a -= 0.75f;
-                a *= 8;
-                HVertex[] hv = new HVertex[9];
-                hv[0].position.x = lx;
-                hv[0].position.y = cy - (cy - dy) * a;
-                hv[1].position.x = cx;
-                hv[1].position.y = dy;
-                hv[2].position.x = rx;
-                hv[2].position.y = dy;
-                hv[3].position.x = lx;
-                hv[3].position.y = cy;
-                hv[4].position.x = cx;
-                hv[4].position.y = cy;
-                hv[5].position.x = rx;
-                hv[5].position.y = cy;
-                hv[6].position.x = lx;
-                hv[6].position.y = ty;
-                hv[7].position.x = cx;
-                hv[7].position.y = ty;
-                hv[8].position.x = rx;
-                hv[8].position.y = ty;
-                hv[0].uv.x = ulx;
-                hv[0].uv.y = ucy - (ucy - udy) * a;
-                hv[1].uv.x = ucx;
-                hv[1].uv.y = udy;
-                hv[2].uv.x = urx;
-                hv[2].uv.y = udy;
-                hv[3].uv.x = ulx;
-                hv[3].uv.y = ucy;
-                hv[4].uv.x = ucx;
-                hv[4].uv.y = ucy;
-                hv[5].uv.x = urx;
-                hv[5].uv.y = ucy;
-                hv[6].uv.x = ulx;
-                hv[6].uv.y = uty;
-                hv[7].uv.x = ucx;
-                hv[7].uv.y = uty;
-                hv[8].uv.x = urx;
-                hv[8].uv.y = uty;
-                image.vertices = hv;
-                image.tris = Triangle360B7;
+                blockBuffer.Release(ref image.vertInfo);
+                image.vertInfo = blockBuffer.RegNew(12);
             }
-            else if(a>0.625f)
+            unsafe
             {
-                a -= 0.625f;
-                a *= 8;
-                HVertex[] hv = new HVertex[8];
-                hv[0].position.x = cx;
-                hv[0].position.y = dy;
-                hv[1].position.x = rx;
-                hv[1].position.y = dy;
-                hv[2].position.x = lx;
-                hv[2].position.y = ty - (ty - cy) * a;
-                hv[3].position.x = cx;
-                hv[3].position.y = cy;
-                hv[4].position.x = rx;
-                hv[4].position.y = cy;
-                hv[5].position.x = lx;
-                hv[5].position.y = ty;
-                hv[6].position.x = cx;
-                hv[6].position.y = ty;
-                hv[7].position.x = rx;
-                hv[7].position.y = ty;
-                hv[0].uv.x = ucx;
-                hv[0].uv.y = udy;
-                hv[1].uv.x = urx;
-                hv[1].uv.y = udy;
-                hv[2].uv.x = ulx;
-                hv[2].uv.y = uty - (uty - ucy) * a;
-                hv[3].uv.x = ucx;
-                hv[3].uv.y = ucy;
-                hv[4].uv.x = urx;
-                hv[4].uv.y = ucy;
-                hv[5].uv.x = ulx;
-                hv[5].uv.y = uty;
-                hv[6].uv.x = ucx;
-                hv[6].uv.y = uty;
-                hv[7].uv.x = urx;
-                hv[7].uv.y = uty;
-                image.vertices = hv;
-                image.tris = Triangle360B6;
-            }
-            else if(a>0.5f)
-            {
-                a -= 0.5f;
-                a *= 8;
-                HVertex[] hv = new HVertex[7];
-                hv[0].position.x = cx;
-                hv[0].position.y = dy;
-                hv[1].position.x = rx;
-                hv[1].position.y = dy;
-                hv[2].position.x = cx;
-                hv[2].position.y = cy;
-                hv[3].position.x = rx;
-                hv[3].position.y = cy;
-                hv[4].position.x = cx - (cx - lx) * a;
-                hv[4].position.y = ty;
-                hv[5].position.x = cx;
-                hv[5].position.y = ty;
-                hv[6].position.x = rx;
-                hv[6].position.y = ty;
-                hv[0].uv.x = ucx;
-                hv[0].uv.y = udy;
-                hv[1].uv.x = urx;
-                hv[1].uv.y = udy;
-                hv[2].uv.x = ucx;
-                hv[2].uv.y = ucy;
-                hv[3].uv.x = urx;
-                hv[3].uv.y = ucy;
-                hv[4].uv.x = ucx - (ucx - ulx) * a;
-                hv[4].uv.y = uty;
-                hv[5].uv.x = ucx;
-                hv[5].uv.y = uty;
-                hv[6].uv.x = urx;
-                hv[6].uv.y = uty;
-                image.vertices = hv;
-                image.tris = Triangle360B5;
-            }
-            else if(a>0.375f)
-            {
-                a -= 0.375f;
-                a *= 8;
-                HVertex[] hv = new HVertex[6];
-                hv[0].position.x = cx;
-                hv[0].position.y = dy;
-                hv[1].position.x = rx;
-                hv[1].position.y = dy;
-                hv[2].position.x = cx;
-                hv[2].position.y = cy;
-                hv[3].position.x = rx;
-                hv[3].position.y = cy;
-                hv[4].position.x = rx - (rx - cx) * a;
-                hv[4].position.y = ty;
-                hv[5].position.x = rx;
-                hv[5].position.y = ty;
-                hv[0].uv.x = ucx;
-                hv[0].uv.y = udy;
-                hv[1].uv.x = urx;
-                hv[1].uv.y = udy;
-                hv[2].uv.x = ucx;
-                hv[2].uv.y = ucy;
-                hv[3].uv.x = urx;
-                hv[3].uv.y = ucy;
-                hv[4].uv.x = urx - (urx - ucx) * a;
-                hv[4].uv.y = uty;
-                hv[5].uv.x = urx;
-                hv[5].uv.y = uty;
-                image.vertices = hv;
-                image.tris = TriangleL4;
-            }
-            else if(a>0.25f)
-            {
-                a -= 0.25f;
-                a *= 8;
-               HVertex[] hv = new HVertex[5];
-                hv[0].position.x = cx;
-                hv[0].position.y = dy;
-                hv[1].position.x = rx;
-                hv[1].position.y = dy;
-                hv[2].position.x = cx;
-                hv[2].position.y = cy;
-                hv[3].position.x = rx;
-                hv[3].position.y = cy;
-                hv[4].position.x = rx;
-                hv[4].position.y = cy + (ty - cy) * a;
-                hv[0].uv.x = ucx;
-                hv[0].uv.y = udy;
-                hv[1].uv.x = urx;
-                hv[1].uv.y = udy;
-                hv[2].uv.x = ucx;
-                hv[2].uv.y = ucy;
-                hv[3].uv.x = urx;
-                hv[3].uv.y = ucy;
-                hv[4].uv.x = urx;
-                hv[4].uv.y = ucy + (uty - ucy) * a;
-                image.vertices = hv;
-                image.tris = TriangleL3;
-            }
-            else if(a>0.125f)
-            {
-                a -= 0.125f;
-                a *= 8;
-                HVertex[] hv = new HVertex[4];
-                hv[0].position.x = cx;
-                hv[0].position.y = dy;
-                hv[1].position.x = rx;
-                hv[1].position.y = dy;
-                hv[2].position.x = cx;
-                hv[2].position.y = cy;
-                hv[3].position.x = rx;
-                hv[3].position.y = dy+(cy-dy)*a;
-                hv[0].uv.x = ucx;
-                hv[0].uv.y = udy;
-                hv[1].uv.x = urx;
-                hv[1].uv.y = udy;
-                hv[2].uv.x = ucx;
-                hv[2].uv.y = ucy;
-                hv[3].uv.x = urx;
-                hv[3].uv.y = udy + (ucy - udy) * a;
-                image.vertices = hv;
-                image.tris = Rectangle;
-            }
-            else
-            {
-                a *= 8;
-                HVertex[] hv = new HVertex[4];
-                hv[0].position.x = cx;
-                hv[0].position.y = dy;
-                hv[1].position.x = cx;
-                hv[1].position.y = cy;
-                hv[2].position.x = cx + (rx - cx) * a;
-                hv[2].position.y = dy;
-                hv[0].uv.x = ucx;
-                hv[0].uv.y = udy;
-                hv[1].uv.x = ucx;
-                hv[1].uv.y = ucy;
-                hv[2].uv.x = ucx + (urx - ucx) * a;
-                hv[2].uv.y = udy;
-                image.vertices = hv;
-                image.tris = Triangle;
+                HVertex* hv = (HVertex*)image.vertInfo.Addr;
+                if (a > 0.875f)
+                {
+                    a -= 0.875f;
+                    a *= 8;
+                    hv[0].position.x = lx;
+                    hv[0].position.y = dy;
+                    hv[1].position.x = lx + (cx - lx) * a;
+                    hv[1].position.y = dy;
+                    hv[2].position.x = cx;
+                    hv[2].position.y = dy;
+                    hv[3].position.x = rx;
+                    hv[3].position.y = dy;
+                    hv[4].position.x = lx;
+                    hv[4].position.y = cy;
+                    hv[5].position.x = cx;
+                    hv[5].position.y = cy;
+                    hv[6].position.x = rx;
+                    hv[6].position.y = cy;
+                    hv[7].position.x = lx;
+                    hv[7].position.y = ty;
+                    hv[8].position.x = cx;
+                    hv[8].position.y = ty;
+                    hv[9].position.x = rx;
+                    hv[9].position.y = ty;
+                    hv[0].uv.x = ulx;
+                    hv[0].uv.y = udy;
+                    hv[1].uv.x = ulx + (ucx - ulx) * a;
+                    hv[1].uv.y = udy;
+                    hv[2].uv.x = ucx;
+                    hv[2].uv.y = udy;
+                    hv[3].uv.x = urx;
+                    hv[3].uv.y = udy;
+                    hv[4].uv.x = ulx;
+                    hv[4].uv.y = ucy;
+                    hv[5].uv.x = ucx;
+                    hv[5].uv.y = ucy;
+                    hv[6].uv.x = urx;
+                    hv[6].uv.y = ucy;
+                    hv[7].uv.x = ulx;
+                    hv[7].uv.y = uty;
+                    hv[8].uv.x = ucx;
+                    hv[8].uv.y = uty;
+                    hv[9].uv.x = urx;
+                    hv[9].uv.y = uty;
+                    image.vertInfo.DataCount = 10;
+                    image.tris = Triangle360B8;
+                }
+                else if (a > 0.75f)
+                {
+                    a -= 0.75f;
+                    a *= 8;
+                    hv[0].position.x = lx;
+                    hv[0].position.y = cy - (cy - dy) * a;
+                    hv[1].position.x = cx;
+                    hv[1].position.y = dy;
+                    hv[2].position.x = rx;
+                    hv[2].position.y = dy;
+                    hv[3].position.x = lx;
+                    hv[3].position.y = cy;
+                    hv[4].position.x = cx;
+                    hv[4].position.y = cy;
+                    hv[5].position.x = rx;
+                    hv[5].position.y = cy;
+                    hv[6].position.x = lx;
+                    hv[6].position.y = ty;
+                    hv[7].position.x = cx;
+                    hv[7].position.y = ty;
+                    hv[8].position.x = rx;
+                    hv[8].position.y = ty;
+                    hv[0].uv.x = ulx;
+                    hv[0].uv.y = ucy - (ucy - udy) * a;
+                    hv[1].uv.x = ucx;
+                    hv[1].uv.y = udy;
+                    hv[2].uv.x = urx;
+                    hv[2].uv.y = udy;
+                    hv[3].uv.x = ulx;
+                    hv[3].uv.y = ucy;
+                    hv[4].uv.x = ucx;
+                    hv[4].uv.y = ucy;
+                    hv[5].uv.x = urx;
+                    hv[5].uv.y = ucy;
+                    hv[6].uv.x = ulx;
+                    hv[6].uv.y = uty;
+                    hv[7].uv.x = ucx;
+                    hv[7].uv.y = uty;
+                    hv[8].uv.x = urx;
+                    hv[8].uv.y = uty;
+                    image.vertInfo.DataCount = 9;
+                    image.tris = Triangle360B7;
+                }
+                else if (a > 0.625f)
+                {
+                    a -= 0.625f;
+                    a *= 8;
+                    hv[0].position.x = cx;
+                    hv[0].position.y = dy;
+                    hv[1].position.x = rx;
+                    hv[1].position.y = dy;
+                    hv[2].position.x = lx;
+                    hv[2].position.y = ty - (ty - cy) * a;
+                    hv[3].position.x = cx;
+                    hv[3].position.y = cy;
+                    hv[4].position.x = rx;
+                    hv[4].position.y = cy;
+                    hv[5].position.x = lx;
+                    hv[5].position.y = ty;
+                    hv[6].position.x = cx;
+                    hv[6].position.y = ty;
+                    hv[7].position.x = rx;
+                    hv[7].position.y = ty;
+                    hv[0].uv.x = ucx;
+                    hv[0].uv.y = udy;
+                    hv[1].uv.x = urx;
+                    hv[1].uv.y = udy;
+                    hv[2].uv.x = ulx;
+                    hv[2].uv.y = uty - (uty - ucy) * a;
+                    hv[3].uv.x = ucx;
+                    hv[3].uv.y = ucy;
+                    hv[4].uv.x = urx;
+                    hv[4].uv.y = ucy;
+                    hv[5].uv.x = ulx;
+                    hv[5].uv.y = uty;
+                    hv[6].uv.x = ucx;
+                    hv[6].uv.y = uty;
+                    hv[7].uv.x = urx;
+                    hv[7].uv.y = uty;
+                    image.vertInfo.DataCount = 8;
+                    image.tris = Triangle360B6;
+                }
+                else if (a > 0.5f)
+                {
+                    a -= 0.5f;
+                    a *= 8;
+                    hv[0].position.x = cx;
+                    hv[0].position.y = dy;
+                    hv[1].position.x = rx;
+                    hv[1].position.y = dy;
+                    hv[2].position.x = cx;
+                    hv[2].position.y = cy;
+                    hv[3].position.x = rx;
+                    hv[3].position.y = cy;
+                    hv[4].position.x = cx - (cx - lx) * a;
+                    hv[4].position.y = ty;
+                    hv[5].position.x = cx;
+                    hv[5].position.y = ty;
+                    hv[6].position.x = rx;
+                    hv[6].position.y = ty;
+                    hv[0].uv.x = ucx;
+                    hv[0].uv.y = udy;
+                    hv[1].uv.x = urx;
+                    hv[1].uv.y = udy;
+                    hv[2].uv.x = ucx;
+                    hv[2].uv.y = ucy;
+                    hv[3].uv.x = urx;
+                    hv[3].uv.y = ucy;
+                    hv[4].uv.x = ucx - (ucx - ulx) * a;
+                    hv[4].uv.y = uty;
+                    hv[5].uv.x = ucx;
+                    hv[5].uv.y = uty;
+                    hv[6].uv.x = urx;
+                    hv[6].uv.y = uty;
+                    image.vertInfo.DataCount = 7;
+                    image.tris = Triangle360B5;
+                }
+                else if (a > 0.375f)
+                {
+                    a -= 0.375f;
+                    a *= 8;
+                    hv[0].position.x = cx;
+                    hv[0].position.y = dy;
+                    hv[1].position.x = rx;
+                    hv[1].position.y = dy;
+                    hv[2].position.x = cx;
+                    hv[2].position.y = cy;
+                    hv[3].position.x = rx;
+                    hv[3].position.y = cy;
+                    hv[4].position.x = rx - (rx - cx) * a;
+                    hv[4].position.y = ty;
+                    hv[5].position.x = rx;
+                    hv[5].position.y = ty;
+                    hv[0].uv.x = ucx;
+                    hv[0].uv.y = udy;
+                    hv[1].uv.x = urx;
+                    hv[1].uv.y = udy;
+                    hv[2].uv.x = ucx;
+                    hv[2].uv.y = ucy;
+                    hv[3].uv.x = urx;
+                    hv[3].uv.y = ucy;
+                    hv[4].uv.x = urx - (urx - ucx) * a;
+                    hv[4].uv.y = uty;
+                    hv[5].uv.x = urx;
+                    hv[5].uv.y = uty;
+                    image.vertInfo.DataCount = 6;
+                    image.tris = TriangleL4;
+                }
+                else if (a > 0.25f)
+                {
+                    a -= 0.25f;
+                    a *= 8;
+                    hv[0].position.x = cx;
+                    hv[0].position.y = dy;
+                    hv[1].position.x = rx;
+                    hv[1].position.y = dy;
+                    hv[2].position.x = cx;
+                    hv[2].position.y = cy;
+                    hv[3].position.x = rx;
+                    hv[3].position.y = cy;
+                    hv[4].position.x = rx;
+                    hv[4].position.y = cy + (ty - cy) * a;
+                    hv[0].uv.x = ucx;
+                    hv[0].uv.y = udy;
+                    hv[1].uv.x = urx;
+                    hv[1].uv.y = udy;
+                    hv[2].uv.x = ucx;
+                    hv[2].uv.y = ucy;
+                    hv[3].uv.x = urx;
+                    hv[3].uv.y = ucy;
+                    hv[4].uv.x = urx;
+                    hv[4].uv.y = ucy + (uty - ucy) * a;
+                    image.vertInfo.DataCount = 5;
+                    image.tris = TriangleL3;
+                }
+                else if (a > 0.125f)
+                {
+                    a -= 0.125f;
+                    a *= 8;
+                    hv[0].position.x = cx;
+                    hv[0].position.y = dy;
+                    hv[1].position.x = rx;
+                    hv[1].position.y = dy;
+                    hv[2].position.x = cx;
+                    hv[2].position.y = cy;
+                    hv[3].position.x = rx;
+                    hv[3].position.y = dy + (cy - dy) * a;
+                    hv[0].uv.x = ucx;
+                    hv[0].uv.y = udy;
+                    hv[1].uv.x = urx;
+                    hv[1].uv.y = udy;
+                    hv[2].uv.x = ucx;
+                    hv[2].uv.y = ucy;
+                    hv[3].uv.x = urx;
+                    hv[3].uv.y = udy + (ucy - udy) * a;
+                    image.vertInfo.DataCount = 4;
+                    image.tris = Rectangle;
+                }
+                else
+                {
+                    a *= 8;
+                    hv[0].position.x = cx;
+                    hv[0].position.y = dy;
+                    hv[1].position.x = cx;
+                    hv[1].position.y = cy;
+                    hv[2].position.x = cx + (rx - cx) * a;
+                    hv[2].position.y = dy;
+                    hv[0].uv.x = ucx;
+                    hv[0].uv.y = udy;
+                    hv[1].uv.x = ucx;
+                    hv[1].uv.y = ucy;
+                    hv[2].uv.x = ucx + (urx - ucx) * a;
+                    hv[2].uv.y = udy;
+                    image.vertInfo.DataCount = 3;
+                    image.tris = Triangle;
+                }
             }
         }
         static int[] Triangle360R8 = new int[] { 0, 4, 5, 0, 5, 1, 1, 5, 3, 1, 3, 2, 4, 7, 8, 4, 8, 5, 5, 8, 9, 5, 9, 6 };
@@ -1548,31 +1670,34 @@ namespace huqiang.Core.HGUI
                 if (a < 0)
                     a += 1;
                 Vector2 d = MathH.Tan2(360 - a * 360);//方向
-                Vector2[] lines = new Vector2[9];
-                lines[0].x = x;
-                lines[0].y = ocy;
-                lines[1].x = x;
-                lines[2].x = ocx;
-                lines[4].y = ocy;
-                lines[5].y = y;
-                lines[6].x = ocx;
-                lines[6].y = y;
-                lines[7].x = x;
-                lines[7].y = y;
-                lines[8].x = x;
-                lines[8].y = ocy;
-                Vector2 oc = new Vector2(ocx, ocy);
-                Vector2 ot = oc + d * 10000;
-                Vector2 cross = Vector2.zero;
-                for (int i = 0; i < 8; i++)
+                unsafe
                 {
-                    if (huqiang.Physics2D.LineToLine(ref lines[i], ref lines[i + 1], ref oc, ref ot, ref cross))
+                    Vector2* lines = stackalloc Vector2[9];
+                    lines[0].x = x;
+                    lines[0].y = ocy;
+                    lines[1].x = x;
+                    lines[2].x = ocx;
+                    lines[4].y = ocy;
+                    lines[5].y = y;
+                    lines[6].x = ocx;
+                    lines[6].y = y;
+                    lines[7].x = x;
+                    lines[7].y = y;
+                    lines[8].x = x;
+                    lines[8].y = ocy;
+                    Vector2 oc = new Vector2(ocx, ocy);
+                    Vector2 ot = oc + d * 10000;
+                    Vector2 cross = Vector2.zero;
+                    for (int i = 0; i < 8; i++)
                     {
-                        float r = (cross - lines[i + 1]).magnitude / (lines[i + 1] - lines[i]).magnitude;
-                        a = (7 - i + r) * 0.125f;
-                        break;
+                        if (huqiang.Physics2D.LineToLine(ref lines[i], ref lines[i + 1], ref oc, ref ot, ref cross))
+                        {
+                            float r = (cross - lines[i + 1]).magnitude / (lines[i + 1] - lines[i]).magnitude;
+                            a = (7 - i + r) * 0.125f;
+                            break;
+                        }
                     }
-                }
+                }       
             }
             float px = image.m_pivot.x / image.m_rect.width;
             float py = image.m_pivot.y / image.m_rect.height;
@@ -1590,276 +1715,281 @@ namespace huqiang.Core.HGUI
             float ucx = ulx + (urx - ulx) * 0.5f;
             float cy = dy + y * 0.5f;
             float ucy = udy + (uty - udy) * 0.5f;
-            if (a > 0.875f)
+            if (image.vertInfo.Size == 0)
             {
-                a -= 0.875f;
-                a *= 8;
-                HVertex[] hv = new HVertex[10];
-                hv[0].position.x = lx;
-                hv[0].position.y = dy;
-                hv[1].position.x = cx;
-                hv[1].position.y = dy;
-                hv[2].position.x = rx;
-                hv[2].position.y = dy;
-                hv[3].position.x = rx;
-                hv[3].position.y = dy + (cy - dy) * a;
-                hv[4].position.x = lx;
-                hv[4].position.y = cy;
-                hv[5].position.x = cx;
-                hv[5].position.y = cy;
-                hv[6].position.x = rx;
-                hv[6].position.y = cy;
-                hv[7].position.x = lx;
-                hv[7].position.y = ty;
-                hv[8].position.x = cx;
-                hv[8].position.y = ty;
-                hv[9].position.x = rx;
-                hv[9].position.y = ty;
-                hv[0].uv.x = ulx;
-                hv[0].uv.y = udy;
-                hv[1].uv.x = ucx;
-                hv[1].uv.y = udy;
-                hv[2].uv.x = urx;
-                hv[2].uv.y = udy;
-                hv[3].uv.x = urx;
-                hv[3].uv.y = udy + (ucy - udy) * a;
-                hv[4].uv.x = ulx;
-                hv[4].uv.y = ucy;
-                hv[5].uv.x = ucx;
-                hv[5].uv.y = ucy;
-                hv[6].uv.x = urx;
-                hv[6].uv.y = ucy;
-                hv[7].uv.x = ulx;
-                hv[7].uv.y = uty;
-                hv[8].uv.x = ucx;
-                hv[8].uv.y = uty;
-                hv[9].uv.x = urx;
-                hv[9].uv.y = uty;
-                image.vertices = hv;
-                image.tris = Triangle360R8;
+                image.vertInfo = blockBuffer.RegNew(12);
             }
-            else if (a > 0.75f)
+            else if (image.vertInfo.Size < 12 | image.vertInfo.Size > 16)
             {
-                a -= 0.75f;
-                a *= 8;
-                HVertex[] hv = new HVertex[9];
-                hv[0].position.x = lx;
-                hv[0].position.y = dy;
-                hv[1].position.x = cx;
-                hv[1].position.y = dy;
-                hv[2].position.x = cx + (rx - cx) * a;
-                hv[2].position.y = dy;
-                hv[3].position.x = lx;
-                hv[3].position.y = cy;
-                hv[4].position.x = cx;
-                hv[4].position.y = cy;
-                hv[5].position.x = rx;
-                hv[5].position.y = cy;
-                hv[6].position.x = lx;
-                hv[6].position.y = ty;
-                hv[7].position.x = cx;
-                hv[7].position.y = ty;
-                hv[8].position.x = rx;
-                hv[8].position.y = ty;
-                hv[0].uv.x = ulx;
-                hv[0].uv.y = udy;
-                hv[1].uv.x = ucx;
-                hv[1].uv.y = udy;
-                hv[2].uv.x = ucx + (urx - ucx) * a;
-                hv[2].uv.y = udy;
-                hv[3].uv.x = ulx;
-                hv[3].uv.y = ucy;
-                hv[4].uv.x = ucx;
-                hv[4].uv.y = ucy;
-                hv[5].uv.x = urx;
-                hv[5].uv.y = ucy;
-                hv[6].uv.x = ulx;
-                hv[6].uv.y = uty;
-                hv[7].uv.x = ucx;
-                hv[7].uv.y = uty;
-                hv[8].uv.x = urx;
-                hv[8].uv.y = uty;
-                image.vertices = hv;
-                image.tris = Triangle360R7;
+                blockBuffer.Release(ref image.vertInfo);
+                image.vertInfo = blockBuffer.RegNew(12);
             }
-            else if(a>0.625f)
+            unsafe
             {
-                a -= 0.625f;
-                a *= 8;
-                HVertex[] hv = new HVertex[8];
-                hv[0].position.x = lx;
-                hv[0].position.y = dy;
-                hv[1].position.x = lx + (cx - lx) * a;
-                hv[1].position.y = dy;
-                hv[2].position.x = lx;
-                hv[2].position.y = cy;
-                hv[3].position.x = cx;
-                hv[3].position.y = cy;
-                hv[4].position.x = rx;
-                hv[4].position.y = cy;
-                hv[5].position.x = lx;
-                hv[5].position.y = ty;
-                hv[6].position.x = cx;
-                hv[6].position.y = ty;
-                hv[7].position.x = rx;
-                hv[7].position.y = ty;
-                hv[0].uv.x = ulx;
-                hv[0].uv.y = udy;
-                hv[1].uv.x = ulx + (ucx - ulx) * a;
-                hv[1].uv.y = udy;
-                hv[2].uv.x = ulx;
-                hv[2].uv.y = ucy;
-                hv[3].uv.x = ucx;
-                hv[3].uv.y = ucy;
-                hv[4].uv.x = urx;
-                hv[4].uv.y = ucy;
-                hv[5].uv.x = ulx;
-                hv[5].uv.y = uty;
-                hv[6].uv.x = ucx;
-                hv[6].uv.y = uty;
-                hv[7].uv.x = urx;
-                hv[7].uv.y = uty;
-                image.vertices = hv;
-                image.tris = Triangle360R6;
-            }
-            else if (a > 0.5f)
-            {
-                a -= 0.5f;
-                a *= 8;
-                HVertex[] uv = new HVertex[7];
-                uv[0].position.x = lx;
-                uv[0].position.y = cy - (cy - dy) * a;
-                uv[1].position.x = lx;
-                uv[1].position.y = cy;
-                uv[2].position.x = cx;
-                uv[2].position.y = cy;
-                uv[3].position.x = rx;
-                uv[3].position.y = cy;
-                uv[4].position.x = lx;
-                uv[4].position.y = ty;
-                uv[5].position.x = cx;
-                uv[5].position.y = ty;
-                uv[6].position.x = rx;
-                uv[6].position.y = ty;
-                uv[0].uv.x = ulx;
-                uv[0].uv.y = ucy - (ucy - udy) * a;
-                uv[1].uv.x = ulx;
-                uv[1].uv.y = ucy;
-                uv[2].uv.x = ucx;
-                uv[2].uv.y = ucy;
-                uv[3].uv.x = urx;
-                uv[3].uv.y = ucy;
-                uv[4].uv.x = ulx;
-                uv[4].uv.y = uty;
-                uv[5].uv.x = ucx;
-                uv[5].uv.y = uty;
-                uv[6].uv.x = urx;
-                uv[6].uv.y = uty;
-                image.vertices = uv;
-                image.tris = Triangle360R5;
-            }
-            else if (a > 0.375f)
-            {
-                a -= 0.375f;
-                a *= 8;
-                HVertex[] hv = new HVertex[6];
-                hv[0].position.x = lx;
-                hv[0].position.y = ty - (ty - cy) * a;
-                hv[1].position.x = cx;
-                hv[1].position.y = cy;
-                hv[2].position.x = rx;
-                hv[2].position.y = cy;
-                hv[3].position.x = lx;
-                hv[3].position.y = ty;
-                hv[4].position.x = cx;
-                hv[4].position.y = ty;
-                hv[5].position.x = rx;
-                hv[5].position.y = ty;
-                hv[0].uv.x = ulx;
-                hv[0].uv.y = uty - (uty - ucy) * a;
-                hv[1].uv.x = ucx;
-                hv[1].uv.y = ucy;
-                hv[2].uv.x = urx;
-                hv[2].uv.y = ucy;
-                hv[3].uv.x = ulx;
-                hv[3].uv.y = uty;
-                hv[4].uv.x = ucx;
-                hv[4].uv.y = uty;
-                hv[5].uv.x = urx;
-                hv[5].uv.y = uty;
-                image.vertices = hv;
-                image.tris = Triangle360R4;
-            }
-            else if (a > 0.25f)
-            {
-                a -= 0.25f;
-                a *= 8;
-                HVertex[] hv = new HVertex[5];
-                hv[0].position.x = cx;
-                hv[0].position.y = cy;
-                hv[1].position.x = rx;
-                hv[1].position.y = cy;
-                hv[2].position.x = cx - (cx - lx) * a;
-                hv[2].position.y = ty;
-                hv[3].position.x = cx;
-                hv[3].position.y = ty;
-                hv[4].position.x = rx;
-                hv[4].position.y = ty;
-                hv[0].uv.x = ucx;
-                hv[0].uv.y = ucy;
-                hv[1].uv.x = urx;
-                hv[1].uv.y = ucy;
-                hv[2].uv.x = ucx - (ucx - ulx) * a;
-                hv[2].uv.y = uty;
-                hv[3].uv.x = ucx;
-                hv[3].uv.y = uty;
-                hv[4].uv.x = urx;
-                hv[4].uv.y = uty;
-                image.vertices = hv;
-                image.tris = Triangle360R3;
-            }
-            else if (a > 0.125f)
-            {
-                a -= 0.125f;
-                a *= 8;
-                HVertex[] hv = new HVertex[4];
-                hv[0].position.x = cx;
-                hv[0].position.y = cy;
-                hv[1].position.x = rx;
-                hv[1].position.y = cy;
-                hv[2].position.x = rx - (rx - cx) * a;
-                hv[2].position.y = ty;
-                hv[3].position.x = rx;
-                hv[3].position.y = ty;
-                hv[0].uv.x = ucx;
-                hv[0].uv.y = ucy;
-                hv[1].uv.x = urx;
-                hv[1].uv.y = ucy;
-                hv[2].uv.x = urx - (urx - ucx) * a;
-                hv[2].uv.y = uty;
-                hv[3].uv.x = urx;
-                hv[3].uv.y = uty;
-                image.vertices = hv;
-                image.tris = Rectangle;
-            }
-            else
-            {
-                a *= 8;
-                HVertex[] hv = new HVertex[3];
-                hv[0].position.x = cx;
-                hv[0].position.y = cy;
-                hv[1].position.x = rx;
-                hv[1].position.y = cy + (ty - cy) * a;
-                hv[2].position.x = rx;
-                hv[2].position.y = cy;
-                hv[0].uv.x = ucx;
-                hv[0].uv.y = ucy;
-                hv[1].uv.x = urx;
-                hv[1].uv.y = ucy + (uty - ucy) * a;
-                hv[2].uv.x = urx;
-                hv[2].uv.y = ucy;
-                image.vertices = hv;
-                image.tris = Triangle;
+                HVertex* hv = (HVertex*)image.vertInfo.Addr;
+                if (a > 0.875f)
+                {
+                    a -= 0.875f;
+                    a *= 8;
+                    hv[0].position.x = lx;
+                    hv[0].position.y = dy;
+                    hv[1].position.x = cx;
+                    hv[1].position.y = dy;
+                    hv[2].position.x = rx;
+                    hv[2].position.y = dy;
+                    hv[3].position.x = rx;
+                    hv[3].position.y = dy + (cy - dy) * a;
+                    hv[4].position.x = lx;
+                    hv[4].position.y = cy;
+                    hv[5].position.x = cx;
+                    hv[5].position.y = cy;
+                    hv[6].position.x = rx;
+                    hv[6].position.y = cy;
+                    hv[7].position.x = lx;
+                    hv[7].position.y = ty;
+                    hv[8].position.x = cx;
+                    hv[8].position.y = ty;
+                    hv[9].position.x = rx;
+                    hv[9].position.y = ty;
+                    hv[0].uv.x = ulx;
+                    hv[0].uv.y = udy;
+                    hv[1].uv.x = ucx;
+                    hv[1].uv.y = udy;
+                    hv[2].uv.x = urx;
+                    hv[2].uv.y = udy;
+                    hv[3].uv.x = urx;
+                    hv[3].uv.y = udy + (ucy - udy) * a;
+                    hv[4].uv.x = ulx;
+                    hv[4].uv.y = ucy;
+                    hv[5].uv.x = ucx;
+                    hv[5].uv.y = ucy;
+                    hv[6].uv.x = urx;
+                    hv[6].uv.y = ucy;
+                    hv[7].uv.x = ulx;
+                    hv[7].uv.y = uty;
+                    hv[8].uv.x = ucx;
+                    hv[8].uv.y = uty;
+                    hv[9].uv.x = urx;
+                    hv[9].uv.y = uty;
+                    image.vertInfo.DataCount = 10;
+                    image.tris = Triangle360R8;
+                }
+                else if (a > 0.75f)
+                {
+                    a -= 0.75f;
+                    a *= 8;
+                    hv[0].position.x = lx;
+                    hv[0].position.y = dy;
+                    hv[1].position.x = cx;
+                    hv[1].position.y = dy;
+                    hv[2].position.x = cx + (rx - cx) * a;
+                    hv[2].position.y = dy;
+                    hv[3].position.x = lx;
+                    hv[3].position.y = cy;
+                    hv[4].position.x = cx;
+                    hv[4].position.y = cy;
+                    hv[5].position.x = rx;
+                    hv[5].position.y = cy;
+                    hv[6].position.x = lx;
+                    hv[6].position.y = ty;
+                    hv[7].position.x = cx;
+                    hv[7].position.y = ty;
+                    hv[8].position.x = rx;
+                    hv[8].position.y = ty;
+                    hv[0].uv.x = ulx;
+                    hv[0].uv.y = udy;
+                    hv[1].uv.x = ucx;
+                    hv[1].uv.y = udy;
+                    hv[2].uv.x = ucx + (urx - ucx) * a;
+                    hv[2].uv.y = udy;
+                    hv[3].uv.x = ulx;
+                    hv[3].uv.y = ucy;
+                    hv[4].uv.x = ucx;
+                    hv[4].uv.y = ucy;
+                    hv[5].uv.x = urx;
+                    hv[5].uv.y = ucy;
+                    hv[6].uv.x = ulx;
+                    hv[6].uv.y = uty;
+                    hv[7].uv.x = ucx;
+                    hv[7].uv.y = uty;
+                    hv[8].uv.x = urx;
+                    hv[8].uv.y = uty;
+                    image.vertInfo.DataCount = 9;
+                    image.tris = Triangle360R7;
+                }
+                else if (a > 0.625f)
+                {
+                    a -= 0.625f;
+                    a *= 8;
+                    hv[0].position.x = lx;
+                    hv[0].position.y = dy;
+                    hv[1].position.x = lx + (cx - lx) * a;
+                    hv[1].position.y = dy;
+                    hv[2].position.x = lx;
+                    hv[2].position.y = cy;
+                    hv[3].position.x = cx;
+                    hv[3].position.y = cy;
+                    hv[4].position.x = rx;
+                    hv[4].position.y = cy;
+                    hv[5].position.x = lx;
+                    hv[5].position.y = ty;
+                    hv[6].position.x = cx;
+                    hv[6].position.y = ty;
+                    hv[7].position.x = rx;
+                    hv[7].position.y = ty;
+                    hv[0].uv.x = ulx;
+                    hv[0].uv.y = udy;
+                    hv[1].uv.x = ulx + (ucx - ulx) * a;
+                    hv[1].uv.y = udy;
+                    hv[2].uv.x = ulx;
+                    hv[2].uv.y = ucy;
+                    hv[3].uv.x = ucx;
+                    hv[3].uv.y = ucy;
+                    hv[4].uv.x = urx;
+                    hv[4].uv.y = ucy;
+                    hv[5].uv.x = ulx;
+                    hv[5].uv.y = uty;
+                    hv[6].uv.x = ucx;
+                    hv[6].uv.y = uty;
+                    hv[7].uv.x = urx;
+                    hv[7].uv.y = uty;
+                    image.vertInfo.DataCount = 8;
+                    image.tris = Triangle360R6;
+                }
+                else if (a > 0.5f)
+                {
+                    a -= 0.5f;
+                    a *= 8;
+                    hv[0].position.x = lx;
+                    hv[0].position.y = cy - (cy - dy) * a;
+                    hv[1].position.x = lx;
+                    hv[1].position.y = cy;
+                    hv[2].position.x = cx;
+                    hv[2].position.y = cy;
+                    hv[3].position.x = rx;
+                    hv[3].position.y = cy;
+                    hv[4].position.x = lx;
+                    hv[4].position.y = ty;
+                    hv[5].position.x = cx;
+                    hv[5].position.y = ty;
+                    hv[6].position.x = rx;
+                    hv[6].position.y = ty;
+                    hv[0].uv.x = ulx;
+                    hv[0].uv.y = ucy - (ucy - udy) * a;
+                    hv[1].uv.x = ulx;
+                    hv[1].uv.y = ucy;
+                    hv[2].uv.x = ucx;
+                    hv[2].uv.y = ucy;
+                    hv[3].uv.x = urx;
+                    hv[3].uv.y = ucy;
+                    hv[4].uv.x = ulx;
+                    hv[4].uv.y = uty;
+                    hv[5].uv.x = ucx;
+                    hv[5].uv.y = uty;
+                    hv[6].uv.x = urx;
+                    hv[6].uv.y = uty;
+                    image.vertInfo.DataCount = 7;
+                    image.tris = Triangle360R5;
+                }
+                else if (a > 0.375f)
+                {
+                    a -= 0.375f;
+                    a *= 8;
+                    hv[0].position.x = lx;
+                    hv[0].position.y = ty - (ty - cy) * a;
+                    hv[1].position.x = cx;
+                    hv[1].position.y = cy;
+                    hv[2].position.x = rx;
+                    hv[2].position.y = cy;
+                    hv[3].position.x = lx;
+                    hv[3].position.y = ty;
+                    hv[4].position.x = cx;
+                    hv[4].position.y = ty;
+                    hv[5].position.x = rx;
+                    hv[5].position.y = ty;
+                    hv[0].uv.x = ulx;
+                    hv[0].uv.y = uty - (uty - ucy) * a;
+                    hv[1].uv.x = ucx;
+                    hv[1].uv.y = ucy;
+                    hv[2].uv.x = urx;
+                    hv[2].uv.y = ucy;
+                    hv[3].uv.x = ulx;
+                    hv[3].uv.y = uty;
+                    hv[4].uv.x = ucx;
+                    hv[4].uv.y = uty;
+                    hv[5].uv.x = urx;
+                    hv[5].uv.y = uty;
+                    image.vertInfo.DataCount = 6;
+                    image.tris = Triangle360R4;
+                }
+                else if (a > 0.25f)
+                {
+                    a -= 0.25f;
+                    a *= 8;
+                    hv[0].position.x = cx;
+                    hv[0].position.y = cy;
+                    hv[1].position.x = rx;
+                    hv[1].position.y = cy;
+                    hv[2].position.x = cx - (cx - lx) * a;
+                    hv[2].position.y = ty;
+                    hv[3].position.x = cx;
+                    hv[3].position.y = ty;
+                    hv[4].position.x = rx;
+                    hv[4].position.y = ty;
+                    hv[0].uv.x = ucx;
+                    hv[0].uv.y = ucy;
+                    hv[1].uv.x = urx;
+                    hv[1].uv.y = ucy;
+                    hv[2].uv.x = ucx - (ucx - ulx) * a;
+                    hv[2].uv.y = uty;
+                    hv[3].uv.x = ucx;
+                    hv[3].uv.y = uty;
+                    hv[4].uv.x = urx;
+                    hv[4].uv.y = uty;
+                    image.vertInfo.DataCount = 5;
+                    image.tris = Triangle360R3;
+                }
+                else if (a > 0.125f)
+                {
+                    a -= 0.125f;
+                    a *= 8;
+                    hv[0].position.x = cx;
+                    hv[0].position.y = cy;
+                    hv[1].position.x = rx;
+                    hv[1].position.y = cy;
+                    hv[2].position.x = rx - (rx - cx) * a;
+                    hv[2].position.y = ty;
+                    hv[3].position.x = rx;
+                    hv[3].position.y = ty;
+                    hv[0].uv.x = ucx;
+                    hv[0].uv.y = ucy;
+                    hv[1].uv.x = urx;
+                    hv[1].uv.y = ucy;
+                    hv[2].uv.x = urx - (urx - ucx) * a;
+                    hv[2].uv.y = uty;
+                    hv[3].uv.x = urx;
+                    hv[3].uv.y = uty;
+                    image.vertInfo.DataCount = 4;
+                    image.tris = Rectangle;
+                }
+                else
+                {
+                    a *= 8;
+                    hv[0].position.x = cx;
+                    hv[0].position.y = cy;
+                    hv[1].position.x = rx;
+                    hv[1].position.y = cy + (ty - cy) * a;
+                    hv[2].position.x = rx;
+                    hv[2].position.y = cy;
+                    hv[0].uv.x = ucx;
+                    hv[0].uv.y = ucy;
+                    hv[1].uv.x = urx;
+                    hv[1].uv.y = ucy + (uty - ucy) * a;
+                    hv[2].uv.x = urx;
+                    hv[2].uv.y = ucy;
+                    image.vertInfo.DataCount = 3;
+                    image.tris = Triangle;
+                }
             }
         }
         static int[] Triangle360T8 = new int[] { 0, 3, 4, 0, 4, 1, 1, 4, 5, 1, 5, 2, 3, 6, 7, 3, 7, 4, 4, 8, 9, 4, 9, 5 };
@@ -1876,29 +2006,32 @@ namespace huqiang.Core.HGUI
                 float ocx = x * 0.5f;
                 float ocy = y * 0.5f;
                 Vector2 d = MathH.Tan2(360 - a * 360);//方向
-                Vector2[] lines = new Vector2[9];
-                lines[0].x = ocx;
-                lines[0].y = y;
-                lines[1].x = x;
-                lines[1].y = y;
-                lines[2].x = x;
-                lines[2].y = ocy;
-                lines[3].x = x;
-                lines[4].x = ocx;
-                lines[6].y = ocy;
-                lines[7].y = y;
-                lines[8].x = ocx;
-                lines[8].y = y;
-                Vector2 oc = new Vector2(ocx, ocy);
-                Vector2 ot = oc + d * 10000;
-                Vector2 cross = Vector2.zero;
-                for (int i = 0; i < 8; i++)
+                unsafe
                 {
-                    if (huqiang.Physics2D.LineToLine(ref lines[i], ref lines[i + 1], ref oc, ref ot, ref cross))
+                    Vector2* lines = stackalloc Vector2[9];
+                    lines[0].x = ocx;
+                    lines[0].y = y;
+                    lines[1].x = x;
+                    lines[1].y = y;
+                    lines[2].x = x;
+                    lines[2].y = ocy;
+                    lines[3].x = x;
+                    lines[4].x = ocx;
+                    lines[6].y = ocy;
+                    lines[7].y = y;
+                    lines[8].x = ocx;
+                    lines[8].y = y;
+                    Vector2 oc = new Vector2(ocx, ocy);
+                    Vector2 ot = oc + d * 10000;
+                    Vector2 cross = Vector2.zero;
+                    for (int i = 0; i < 8; i++)
                     {
-                        float r = (cross - lines[i + 1]).magnitude / (lines[i + 1] - lines[i]).magnitude;
-                        a = (7 - i+r) * 0.125f ;
-                        break;
+                        if (huqiang.Physics2D.LineToLine(ref lines[i], ref lines[i + 1], ref oc, ref ot, ref cross))
+                        {
+                            float r = (cross - lines[i + 1]).magnitude / (lines[i + 1] - lines[i]).magnitude;
+                            a = (7 - i + r) * 0.125f;
+                            break;
+                        }
                     }
                 }
             }
@@ -1918,276 +2051,281 @@ namespace huqiang.Core.HGUI
             float ucx = ulx + (urx - ulx) * 0.5f;
             float cy = dy + y * 0.5f;
             float ucy = udy + (uty - udy) * 0.5f;
-            if(a>0.875f)
+            if (image.vertInfo.Size == 0)
             {
-                a -= 0.875f;
-                a *= 8;
-                HVertex[] hv = new HVertex[10];
-                hv[0].position.x = lx;
-                hv[0].position.y = dy;
-                hv[1].position.x = cx;
-                hv[1].position.y = dy;
-                hv[2].position.x = rx;
-                hv[2].position.y = dy;
-                hv[3].position.x = lx;
-                hv[3].position.y = cy;
-                hv[4].position.x = cx;
-                hv[4].position.y = cy;
-                hv[5].position.x = rx;
-                hv[5].position.y = cy;
-                hv[6].position.x = lx;
-                hv[6].position.y = ty;
-                hv[7].position.x = cx;
-                hv[7].position.y = ty;
-                hv[8].position.x = rx - (rx - cx) * a;
-                hv[8].position.y = ty;
-                hv[9].position.x = rx;
-                hv[9].position.y = ty;
-                hv[0].uv.x = ulx;
-                hv[0].uv.y = udy;
-                hv[1].uv.x = ucx;
-                hv[1].uv.y = udy;
-                hv[2].uv.x = urx;
-                hv[2].uv.y = udy;
-                hv[3].uv.x = ulx;
-                hv[3].uv.y = ucy;
-                hv[4].uv.x = ucx;
-                hv[4].uv.y = ucy;
-                hv[5].uv.x = urx;
-                hv[5].uv.y = ucy;
-                hv[6].uv.x = ulx;
-                hv[6].uv.y = uty;
-                hv[7].uv.x = ucx;
-                hv[7].uv.y = uty;
-                hv[8].uv.x = urx - (urx - ucx) * a;
-                hv[8].uv.y = uty;
-                hv[9].uv.x = urx;
-                hv[9].uv.y = uty;
-                image.vertices= hv;
-                image.tris = Triangle360T8;
+                image.vertInfo = blockBuffer.RegNew(12);
             }
-            else if(a>0.75f)
+            else if (image.vertInfo.Size < 12 | image.vertInfo.Size > 16)
             {
-                a -= 0.75f;
-                a *= 8;
-                HVertex[] hv = new HVertex[9];
-                hv[0].position.x = lx;
-                hv[0].position.y = dy;
-                hv[1].position.x = cx;
-                hv[1].position.y = dy;
-                hv[2].position.x = rx;
-                hv[2].position.y = dy;
-                hv[3].position.x = lx;
-                hv[3].position.y = cy;
-                hv[4].position.x = cx;
-                hv[4].position.y = cy;
-                hv[5].position.x = rx;
-                hv[5].position.y = cy;
-                hv[6].position.x = lx;
-                hv[6].position.y = ty;
-                hv[7].position.x = cx;
-                hv[7].position.y = ty;
-                hv[8].position.x = rx;
-                hv[8].position.y = cy + (ty - cy) * a;
-                hv[0].uv.x = ulx;
-                hv[0].uv.y = udy;
-                hv[1].uv.x = ucx;
-                hv[1].uv.y = udy;
-                hv[2].uv.x = urx;
-                hv[2].uv.y = udy;
-                hv[3].uv.x = ulx;
-                hv[3].uv.y = ucy;
-                hv[4].uv.x = ucx;
-                hv[4].uv.y = ucy;
-                hv[5].uv.x = urx;
-                hv[5].uv.y = ucy;
-                hv[6].uv.x = ulx;
-                hv[6].uv.y = uty;
-                hv[7].uv.x = ucx;
-                hv[7].uv.y = uty;
-                hv[8].uv.x = urx;
-                hv[8].uv.y = ucy + (uty - ucy) * a;
-                image.vertices = hv;
-                image.tris = Triangle360T7;
+                blockBuffer.Release(ref image.vertInfo);
+                image.vertInfo = blockBuffer.RegNew(12);
             }
-            else if(a>0.625f)
+            unsafe
             {
-                a -= 0.625f;
-                a *= 8;
-                HVertex[] hv = new HVertex[8];
-                hv[0].position.x = lx;
-                hv[0].position.y = dy;
-                hv[1].position.x = cx;
-                hv[1].position.y = dy;
-                hv[2].position.x = rx;
-                hv[2].position.y = dy;
-                hv[3].position.x = lx;
-                hv[3].position.y = cy;
-                hv[4].position.x = cx;
-                hv[4].position.y = cy;
-                hv[5].position.x = rx;
-                hv[5].position.y = dy + (cy - dy) * a;
-                hv[6].position.x = lx;
-                hv[6].position.y = ty;
-                hv[7].position.x = cx;
-                hv[7].position.y = ty;
-                hv[0].uv.x = ulx;
-                hv[0].uv.y = udy;
-                hv[1].uv.x = ucx;
-                hv[1].uv.y = udy;
-                hv[2].uv.x = urx;
-                hv[2].uv.y = udy;
-                hv[3].uv.x = ulx;
-                hv[3].uv.y = ucy;
-                hv[4].uv.x = ucx;
-                hv[4].uv.y = ucy;
-                hv[5].uv.x = urx;
-                hv[5].uv.y = udy + (ucy - udy) * a;
-                hv[6].uv.x = ulx;
-                hv[6].uv.y = uty;
-                hv[7].uv.x = ucx;
-                hv[7].uv.y = uty;
-                image.vertices = hv;
-                image.tris = Triangle360T6;
-            }
-            else if(a>0.5f)
-            {
-                a -= 0.5f;
-                a *= 8;
-                HVertex[] hv = new HVertex[7];
-                hv[0].position.x = lx;
-                hv[0].position.y = dy;
-                hv[1].position.x = cx;
-                hv[1].position.y = dy;
-                hv[2].position.x = cx + (rx - cx) * a;
-                hv[2].position.y = dy;
-                hv[3].position.x = lx;
-                hv[3].position.y = cy;
-                hv[4].position.x = cx;
-                hv[4].position.y = cy;
-                hv[5].position.x = lx;
-                hv[5].position.y = ty;
-                hv[6].position.x = cx;
-                hv[6].position.y = ty;
-                hv[0].uv.x = ulx;
-                hv[0].uv.y = udy;
-                hv[1].uv.x = ucx;
-                hv[1].uv.y = udy;
-                hv[2].uv.x = ucx + (urx - ucx) * a;
-                hv[2].uv.y = udy;
-                hv[3].uv.x = ulx;
-                hv[3].uv.y = ucy;
-                hv[4].uv.x = ucx;
-                hv[4].uv.y = ucy;
-                hv[5].uv.x = ulx;
-                hv[5].uv.y = uty;
-                hv[6].uv.x = ucx;
-                hv[6].uv.y = uty;
-                image.vertices = hv;
-                image.tris = Triangle360T5;
-            }
-            else if(a>0.375f)
-            {
-                a -= 0.375f;
-                a *= 8;
-                HVertex[] hv = new HVertex[6];
-                hv[0].position.x = lx;
-                hv[0].position.y = dy;
-                hv[1].position.x = lx + (cx - lx) * a;
-                hv[1].position.y = dy;
-                hv[2].position.x = lx;
-                hv[2].position.y = cy;
-                hv[3].position.x = cx;
-                hv[3].position.y = cy;
-                hv[4].position.x = lx;
-                hv[4].position.y = ty;
-                hv[5].position.x = cx;
-                hv[5].position.y = ty;
-                hv[0].uv.x = ulx;
-                hv[0].uv.y = udy;
-                hv[1].uv.x = ulx + (ucx - ulx) * a;
-                hv[1].uv.y = udy;
-                hv[2].uv.x = ulx;
-                hv[2].uv.y = ucy;
-                hv[3].uv.x = ucx;
-                hv[3].uv.y = ucy;
-                hv[4].uv.x = ulx;
-                hv[4].uv.y = uty;
-                hv[5].uv.x = ucx;
-                hv[5].uv.y = uty;
-                image.vertices = hv;
-                image.tris = TriangleL4;
-            }
-            else if(a>0.25f)
-            {
-                a -= 0.25f;
-                a *= 8;
-                HVertex[] hv = new HVertex[5];
-                hv[0].position.x = lx;
-                hv[0].position.y = cy - (cy - dy) * a;
-                hv[1].position.x = lx;
-                hv[1].position.y = cy;
-                hv[2].position.x = cx;
-                hv[2].position.y = cy;
-                hv[3].position.x = lx;
-                hv[3].position.y = ty;
-                hv[4].position.x = cx;
-                hv[4].position.y = ty;
-                hv[0].uv.x = ulx;
-                hv[0].uv.y = ucy - (ucy - udy) * a;
-                hv[1].uv.x = ulx;
-                hv[1].uv.y = ucy;
-                hv[2].uv.x = ucx;
-                hv[2].uv.y = ucy;
-                hv[3].uv.x = ulx;
-                hv[3].uv.y = uty;
-                hv[4].uv.x = ucx;
-                hv[4].uv.y = uty;
-                image.vertices = hv;
-                image.tris = TriangleL3;
-            }
-            else if(a>0.125f)
-            {
-                a -= 0.125f;
-                a *= 8;
-                HVertex[] hv = new HVertex[4];
-                hv[0].position.x = lx;
-                hv[0].position.y = ty - (ty - cy) * a;
-                hv[1].position.x = cx;
-                hv[1].position.y = cy;
-                hv[2].position.x = lx;
-                hv[2].position.y = ty;
-                hv[3].position.x = cx;
-                hv[3].position.y = ty;
-                hv[0].uv.x = ulx;
-                hv[0].uv.y = uty - (uty - ucy) * a;
-                hv[1].uv.x = ucx;
-                hv[1].uv.y = ucy;
-                hv[2].uv.x = ulx;
-                hv[2].uv.y = uty;
-                hv[3].uv.x = ucx;
-                hv[3].uv.y = uty;
-                image.vertices = hv;
-                image.tris = Rectangle;
-            }
-            else
-            {
-                a *= 8;
-                HVertex[] uv = new HVertex[3];
-                uv[0].position.x = cx;
-                uv[0].position.y = cy;
-                uv[1].position.x = cx - (cx - lx) * a;
-                uv[1].position.y = ty;
-                uv[2].position.x = cx;
-                uv[2].position.y = ty;
-                uv[0].uv.x = ucx;
-                uv[0].uv.y = ucy;
-                uv[1].uv.x = ucx - (ucx - ulx) * a;
-                uv[1].uv.y = uty;
-                uv[2].uv.x = ucx;
-                uv[2].uv.y = uty;
-                image.vertices = uv;
-                image.tris = Triangle;
+                HVertex* hv = (HVertex*)image.vertInfo.Addr;
+                if (a > 0.875f)
+                {
+                    a -= 0.875f;
+                    a *= 8;
+                    hv[0].position.x = lx;
+                    hv[0].position.y = dy;
+                    hv[1].position.x = cx;
+                    hv[1].position.y = dy;
+                    hv[2].position.x = rx;
+                    hv[2].position.y = dy;
+                    hv[3].position.x = lx;
+                    hv[3].position.y = cy;
+                    hv[4].position.x = cx;
+                    hv[4].position.y = cy;
+                    hv[5].position.x = rx;
+                    hv[5].position.y = cy;
+                    hv[6].position.x = lx;
+                    hv[6].position.y = ty;
+                    hv[7].position.x = cx;
+                    hv[7].position.y = ty;
+                    hv[8].position.x = rx - (rx - cx) * a;
+                    hv[8].position.y = ty;
+                    hv[9].position.x = rx;
+                    hv[9].position.y = ty;
+                    hv[0].uv.x = ulx;
+                    hv[0].uv.y = udy;
+                    hv[1].uv.x = ucx;
+                    hv[1].uv.y = udy;
+                    hv[2].uv.x = urx;
+                    hv[2].uv.y = udy;
+                    hv[3].uv.x = ulx;
+                    hv[3].uv.y = ucy;
+                    hv[4].uv.x = ucx;
+                    hv[4].uv.y = ucy;
+                    hv[5].uv.x = urx;
+                    hv[5].uv.y = ucy;
+                    hv[6].uv.x = ulx;
+                    hv[6].uv.y = uty;
+                    hv[7].uv.x = ucx;
+                    hv[7].uv.y = uty;
+                    hv[8].uv.x = urx - (urx - ucx) * a;
+                    hv[8].uv.y = uty;
+                    hv[9].uv.x = urx;
+                    hv[9].uv.y = uty;
+                    image.vertInfo.DataCount = 10;
+                    image.tris = Triangle360T8;
+                }
+                else if (a > 0.75f)
+                {
+                    a -= 0.75f;
+                    a *= 8;
+                    hv[0].position.x = lx;
+                    hv[0].position.y = dy;
+                    hv[1].position.x = cx;
+                    hv[1].position.y = dy;
+                    hv[2].position.x = rx;
+                    hv[2].position.y = dy;
+                    hv[3].position.x = lx;
+                    hv[3].position.y = cy;
+                    hv[4].position.x = cx;
+                    hv[4].position.y = cy;
+                    hv[5].position.x = rx;
+                    hv[5].position.y = cy;
+                    hv[6].position.x = lx;
+                    hv[6].position.y = ty;
+                    hv[7].position.x = cx;
+                    hv[7].position.y = ty;
+                    hv[8].position.x = rx;
+                    hv[8].position.y = cy + (ty - cy) * a;
+                    hv[0].uv.x = ulx;
+                    hv[0].uv.y = udy;
+                    hv[1].uv.x = ucx;
+                    hv[1].uv.y = udy;
+                    hv[2].uv.x = urx;
+                    hv[2].uv.y = udy;
+                    hv[3].uv.x = ulx;
+                    hv[3].uv.y = ucy;
+                    hv[4].uv.x = ucx;
+                    hv[4].uv.y = ucy;
+                    hv[5].uv.x = urx;
+                    hv[5].uv.y = ucy;
+                    hv[6].uv.x = ulx;
+                    hv[6].uv.y = uty;
+                    hv[7].uv.x = ucx;
+                    hv[7].uv.y = uty;
+                    hv[8].uv.x = urx;
+                    hv[8].uv.y = ucy + (uty - ucy) * a;
+                    image.vertInfo.DataCount = 9;
+                    image.tris = Triangle360T7;
+                }
+                else if (a > 0.625f)
+                {
+                    a -= 0.625f;
+                    a *= 8;
+                    hv[0].position.x = lx;
+                    hv[0].position.y = dy;
+                    hv[1].position.x = cx;
+                    hv[1].position.y = dy;
+                    hv[2].position.x = rx;
+                    hv[2].position.y = dy;
+                    hv[3].position.x = lx;
+                    hv[3].position.y = cy;
+                    hv[4].position.x = cx;
+                    hv[4].position.y = cy;
+                    hv[5].position.x = rx;
+                    hv[5].position.y = dy + (cy - dy) * a;
+                    hv[6].position.x = lx;
+                    hv[6].position.y = ty;
+                    hv[7].position.x = cx;
+                    hv[7].position.y = ty;
+                    hv[0].uv.x = ulx;
+                    hv[0].uv.y = udy;
+                    hv[1].uv.x = ucx;
+                    hv[1].uv.y = udy;
+                    hv[2].uv.x = urx;
+                    hv[2].uv.y = udy;
+                    hv[3].uv.x = ulx;
+                    hv[3].uv.y = ucy;
+                    hv[4].uv.x = ucx;
+                    hv[4].uv.y = ucy;
+                    hv[5].uv.x = urx;
+                    hv[5].uv.y = udy + (ucy - udy) * a;
+                    hv[6].uv.x = ulx;
+                    hv[6].uv.y = uty;
+                    hv[7].uv.x = ucx;
+                    hv[7].uv.y = uty;
+                    image.vertInfo.DataCount = 8;
+                    image.tris = Triangle360T6;
+                }
+                else if (a > 0.5f)
+                {
+                    a -= 0.5f;
+                    a *= 8;
+                    hv[0].position.x = lx;
+                    hv[0].position.y = dy;
+                    hv[1].position.x = cx;
+                    hv[1].position.y = dy;
+                    hv[2].position.x = cx + (rx - cx) * a;
+                    hv[2].position.y = dy;
+                    hv[3].position.x = lx;
+                    hv[3].position.y = cy;
+                    hv[4].position.x = cx;
+                    hv[4].position.y = cy;
+                    hv[5].position.x = lx;
+                    hv[5].position.y = ty;
+                    hv[6].position.x = cx;
+                    hv[6].position.y = ty;
+                    hv[0].uv.x = ulx;
+                    hv[0].uv.y = udy;
+                    hv[1].uv.x = ucx;
+                    hv[1].uv.y = udy;
+                    hv[2].uv.x = ucx + (urx - ucx) * a;
+                    hv[2].uv.y = udy;
+                    hv[3].uv.x = ulx;
+                    hv[3].uv.y = ucy;
+                    hv[4].uv.x = ucx;
+                    hv[4].uv.y = ucy;
+                    hv[5].uv.x = ulx;
+                    hv[5].uv.y = uty;
+                    hv[6].uv.x = ucx;
+                    hv[6].uv.y = uty;
+                    image.vertInfo.DataCount = 7;
+                    image.tris = Triangle360T5;
+                }
+                else if (a > 0.375f)
+                {
+                    a -= 0.375f;
+                    a *= 8;
+                    hv[0].position.x = lx;
+                    hv[0].position.y = dy;
+                    hv[1].position.x = lx + (cx - lx) * a;
+                    hv[1].position.y = dy;
+                    hv[2].position.x = lx;
+                    hv[2].position.y = cy;
+                    hv[3].position.x = cx;
+                    hv[3].position.y = cy;
+                    hv[4].position.x = lx;
+                    hv[4].position.y = ty;
+                    hv[5].position.x = cx;
+                    hv[5].position.y = ty;
+                    hv[0].uv.x = ulx;
+                    hv[0].uv.y = udy;
+                    hv[1].uv.x = ulx + (ucx - ulx) * a;
+                    hv[1].uv.y = udy;
+                    hv[2].uv.x = ulx;
+                    hv[2].uv.y = ucy;
+                    hv[3].uv.x = ucx;
+                    hv[3].uv.y = ucy;
+                    hv[4].uv.x = ulx;
+                    hv[4].uv.y = uty;
+                    hv[5].uv.x = ucx;
+                    hv[5].uv.y = uty;
+                    image.vertInfo.DataCount = 6;
+                    image.tris = TriangleL4;
+                }
+                else if (a > 0.25f)
+                {
+                    a -= 0.25f;
+                    a *= 8;
+                    hv[0].position.x = lx;
+                    hv[0].position.y = cy - (cy - dy) * a;
+                    hv[1].position.x = lx;
+                    hv[1].position.y = cy;
+                    hv[2].position.x = cx;
+                    hv[2].position.y = cy;
+                    hv[3].position.x = lx;
+                    hv[3].position.y = ty;
+                    hv[4].position.x = cx;
+                    hv[4].position.y = ty;
+                    hv[0].uv.x = ulx;
+                    hv[0].uv.y = ucy - (ucy - udy) * a;
+                    hv[1].uv.x = ulx;
+                    hv[1].uv.y = ucy;
+                    hv[2].uv.x = ucx;
+                    hv[2].uv.y = ucy;
+                    hv[3].uv.x = ulx;
+                    hv[3].uv.y = uty;
+                    hv[4].uv.x = ucx;
+                    hv[4].uv.y = uty;
+                    image.vertInfo.DataCount = 5;
+                    image.tris = TriangleL3;
+                }
+                else if (a > 0.125f)
+                {
+                    a -= 0.125f;
+                    a *= 8;
+                    hv[0].position.x = lx;
+                    hv[0].position.y = ty - (ty - cy) * a;
+                    hv[1].position.x = cx;
+                    hv[1].position.y = cy;
+                    hv[2].position.x = lx;
+                    hv[2].position.y = ty;
+                    hv[3].position.x = cx;
+                    hv[3].position.y = ty;
+                    hv[0].uv.x = ulx;
+                    hv[0].uv.y = uty - (uty - ucy) * a;
+                    hv[1].uv.x = ucx;
+                    hv[1].uv.y = ucy;
+                    hv[2].uv.x = ulx;
+                    hv[2].uv.y = uty;
+                    hv[3].uv.x = ucx;
+                    hv[3].uv.y = uty;
+                    image.vertInfo.DataCount = 4;
+                    image.tris = Rectangle;
+                }
+                else
+                {
+                    a *= 8;
+                    hv[0].position.x = cx;
+                    hv[0].position.y = cy;
+                    hv[1].position.x = cx - (cx - lx) * a;
+                    hv[1].position.y = ty;
+                    hv[2].position.x = cx;
+                    hv[2].position.y = ty;
+                    hv[0].uv.x = ucx;
+                    hv[0].uv.y = ucy;
+                    hv[1].uv.x = ucx - (ucx - ulx) * a;
+                    hv[1].uv.y = uty;
+                    hv[2].uv.x = ucx;
+                    hv[2].uv.y = uty;
+                    image.vertInfo.DataCount = 3;
+                    image.tris = Triangle;
+                }
             }
         }
         static int[] Triangle360L8 = new int[] { 0, 3, 4, 0, 4, 1, 1, 4, 5, 1, 5, 2, 6, 7, 4, 4, 7, 8, 4, 8, 9, 4, 9, 5 };
@@ -2208,28 +2346,31 @@ namespace huqiang.Core.HGUI
                 if (a < 0)
                     a += 1;
                 Vector2 d = MathH.Tan2(360 - a * 360);//方向
-                Vector2[] lines = new Vector2[9];
-                lines[0].y = ocy;
-                lines[1].y = y;
-                lines[2].x = ocx;
-                lines[2].y = y;
-                lines[3].x = x;
-                lines[3].y = y;
-                lines[4].x = x;
-                lines[4].y = ocy;
-                lines[5].x = x;
-                lines[6].x = ocx;
-                lines[8].y = ocy;
-                Vector2 oc = new Vector2(ocx, ocy);
-                Vector2 ot = oc + d * 10000;
-                Vector2 cross = Vector2.zero;
-                for (int i = 0; i < 8; i++)
+                unsafe
                 {
-                    if (huqiang.Physics2D.LineToLine(ref lines[i], ref lines[i + 1], ref oc, ref ot, ref cross))
+                    Vector2* lines = stackalloc Vector2[9];
+                    lines[0].y = ocy;
+                    lines[1].y = y;
+                    lines[2].x = ocx;
+                    lines[2].y = y;
+                    lines[3].x = x;
+                    lines[3].y = y;
+                    lines[4].x = x;
+                    lines[4].y = ocy;
+                    lines[5].x = x;
+                    lines[6].x = ocx;
+                    lines[8].y = ocy;
+                    Vector2 oc = new Vector2(ocx, ocy);
+                    Vector2 ot = oc + d * 10000;
+                    Vector2 cross = Vector2.zero;
+                    for (int i = 0; i < 8; i++)
                     {
-                        float r = (cross - lines[i + 1]).magnitude / (lines[i + 1] - lines[i]).magnitude;
-                        a = (7 - i + r) * 0.125f;
-                        break;
+                        if (huqiang.Physics2D.LineToLine(ref lines[i], ref lines[i + 1], ref oc, ref ot, ref cross))
+                        {
+                            float r = (cross - lines[i + 1]).magnitude / (lines[i + 1] - lines[i]).magnitude;
+                            a = (7 - i + r) * 0.125f;
+                            break;
+                        }
                     }
                 }
             }
@@ -2249,276 +2390,281 @@ namespace huqiang.Core.HGUI
             float ucx = ulx + (urx - ulx) * 0.5f;
             float cy = dy + y * 0.5f;
             float ucy = udy + (uty - udy) * 0.5f;
-            if(a>0.875f)
+            if (image.vertInfo.Size == 0)
             {
-                a -= 0.875f;
-                a *= 8;
-                HVertex[] hv = new HVertex[10];
-                hv[0].position.x = lx;
-                hv[0].position.y = dy;
-                hv[1].position.x = cx;
-                hv[1].position.y = dy;
-                hv[2].position.x = rx;
-                hv[2].position.y = dy;
-                hv[3].position.x = lx;
-                hv[3].position.y = cy;
-                hv[4].position.x = cx;
-                hv[4].position.y = cy;
-                hv[5].position.x = rx;
-                hv[5].position.y = cy;
-                hv[6].position.x = lx;
-                hv[6].position.y = ty - (ty - cy) * a;
-                hv[7].position.x = lx;
-                hv[7].position.y = ty;
-                hv[8].position.x = cx;
-                hv[8].position.y = ty;
-                hv[9].position.x = rx;
-                hv[9].position.y = ty;
-                hv[0].uv.x = ulx;
-                hv[0].uv.y = udy;
-                hv[1].uv.x = ucx;
-                hv[1].uv.y = udy;
-                hv[2].uv.x = urx;
-                hv[2].uv.y = udy;
-                hv[3].uv.x = ulx;
-                hv[3].uv.y = ucy;
-                hv[4].uv.x = ucx;
-                hv[4].uv.y = ucy;
-                hv[5].uv.x = urx;
-                hv[5].uv.y = ucy;
-                hv[6].uv.x = ulx;
-                hv[6].uv.y = uty - (uty - ucy) * a;
-                hv[7].uv.x = ulx;
-                hv[7].uv.y = uty;
-                hv[8].uv.x = ucx;
-                hv[8].uv.y = uty;
-                hv[9].uv.x = urx;
-                hv[9].uv.y = uty;
-                image.vertices = hv;
-                image.tris = Triangle360L8;
+                image.vertInfo = blockBuffer.RegNew(12);
             }
-            else if(a>0.75f)
+            else if (image.vertInfo.Size < 12 | image.vertInfo.Size > 16)
             {
-                a -= 0.75f;
-                a *= 8;
-                HVertex[] hv = new HVertex[9];
-                hv[0].position.x = lx;
-                hv[0].position.y = dy;
-                hv[1].position.x = cx;
-                hv[1].position.y = dy;
-                hv[2].position.x = rx;
-                hv[2].position.y = dy;
-                hv[3].position.x = lx;
-                hv[3].position.y = cy;
-                hv[4].position.x = cx;
-                hv[4].position.y = cy;
-                hv[5].position.x = rx;
-                hv[5].position.y = cy;
-                hv[6].position.x = cx - (cx - lx) * a;
-                hv[6].position.y = ty;
-                hv[7].position.x = cx;
-                hv[7].position.y = ty;
-                hv[8].position.x = rx;
-                hv[8].position.y = ty;
-                hv[0].uv.x = ulx;
-                hv[0].uv.y = udy;
-                hv[1].uv.x = ucx;
-                hv[1].uv.y = udy;
-                hv[2].uv.x = urx;
-                hv[2].uv.y = udy;
-                hv[3].uv.x = ulx;
-                hv[3].uv.y = ucy;
-                hv[4].uv.x = ucx;
-                hv[4].uv.y = ucy;
-                hv[5].uv.x = urx;
-                hv[5].uv.y = ucy;
-                hv[6].uv.x = ucx - (ucx - ulx) * a;
-                hv[6].uv.y = uty;
-                hv[7].uv.x = ucx;
-                hv[7].uv.y = uty;
-                hv[8].uv.x = urx;
-                hv[8].uv.y = uty;
-                image.vertices = hv;
-                image.tris = Triangle360L7;
+                blockBuffer.Release(ref image.vertInfo);
+                image.vertInfo = blockBuffer.RegNew(12);
             }
-            else if(a>0.625f)
+            unsafe
             {
-                a -= 0.625f;
-                a *= 8;
-                HVertex[] hv = new HVertex[8];
-                hv[0].position.x = lx;
-                hv[0].position.y = dy;
-                hv[1].position.x = cx;
-                hv[1].position.y = dy;
-                hv[2].position.x = rx;
-                hv[2].position.y = dy;
-                hv[3].position.x = lx;
-                hv[3].position.y = cy;
-                hv[4].position.x = cx;
-                hv[4].position.y = cy;
-                hv[5].position.x = rx;
-                hv[5].position.y = cy;
-                hv[6].position.x = rx - (rx - cx) * a;
-                hv[6].position.y = ty;
-                hv[7].position.x = rx;
-                hv[7].position.y = ty;
-                hv[0].uv.x = ulx;
-                hv[0].uv.y = udy;
-                hv[1].uv.x = ucx;
-                hv[1].uv.y = udy;
-                hv[2].uv.x = urx;
-                hv[2].uv.y = udy;
-                hv[3].uv.x = ulx;
-                hv[3].uv.y = ucy;
-                hv[4].uv.x = ucx;
-                hv[4].uv.y = ucy;
-                hv[5].uv.x = urx;
-                hv[5].uv.y = ucy;
-                hv[6].uv.x = urx - (urx - ucx) * a;
-                hv[6].uv.y = uty;
-                hv[7].uv.x = urx;
-                hv[7].uv.y = uty;
-                image.vertices = hv;
-                image.tris = Triangle360L6;
-            }
-            else if(a>0.5f)
-            {
-                a -= 0.5f;
-                a *= 8;
-                HVertex[] hv = new HVertex[7];
-                hv[0].position.x = lx;
-                hv[0].position.y = dy;
-                hv[1].position.x = cx;
-                hv[1].position.y = dy;
-                hv[2].position.x = rx;
-                hv[2].position.y = dy;
-                hv[3].position.x = lx;
-                hv[3].position.y = cy;
-                hv[4].position.x = cx;
-                hv[4].position.y = cy;
-                hv[5].position.x = rx;
-                hv[5].position.y = cy;
-                hv[6].position.x = rx;
-                hv[6].position.y = cy + (ty - cy) * a;
-                hv[0].uv.x = ulx;
-                hv[0].uv.y = udy;
-                hv[1].uv.x = ucx;
-                hv[1].uv.y = udy;
-                hv[2].uv.x = urx;
-                hv[2].uv.y = udy;
-                hv[3].uv.x = ulx;
-                hv[3].uv.y = ucy;
-                hv[4].uv.x = ucx;
-                hv[4].uv.y = ucy;
-                hv[5].uv.x = urx;
-                hv[5].uv.y = ucy;
-                hv[6].uv.x = urx;
-                hv[6].uv.y = ucy + (uty - ucy) * a;
-                image.vertices = hv;
-                image.tris = Triangle360L5;
-            }
-            else if(a>0.375f)
-            {
-                a -= 0.375f;
-                a *= 8;
-                HVertex[] hv = new HVertex[6];
-                hv[0].position.x = lx;
-                hv[0].position.y = dy;
-                hv[1].position.x = cx;
-                hv[1].position.y = dy;
-                hv[2].position.x = rx;
-                hv[2].position.y = dy;
-                hv[3].position.x = lx;
-                hv[3].position.y = cy;
-                hv[4].position.x = cx;
-                hv[4].position.y = cy;
-                hv[5].position.x = rx;
-                hv[5].position.y = dy + (cy - dy) * a;
-                hv[0].uv.x = ulx;
-                hv[0].uv.y = udy;
-                hv[1].uv.x = ucx;
-                hv[1].uv.y = udy;
-                hv[2].uv.x = urx;
-                hv[2].uv.y = udy;
-                hv[3].uv.x = ulx;
-                hv[3].uv.y = ucy;
-                hv[4].uv.x = ucx;
-                hv[4].uv.y = ucy;
-                hv[5].uv.x = urx;
-                hv[5].uv.y = udy + (ucy - udy) * a;
-                image.vertices = hv;
-                image.tris = TriangleT4;
-            }
-            else if(a>0.25f)
-            {
-                a -= 0.25f;
-                a *= 8;
-                HVertex[] hv = new HVertex[5];
-                hv[0].position.x = lx;
-                hv[0].position.y = dy;
-                hv[1].position.x = cx;
-                hv[1].position.y = dy;
-                hv[2].position.x = cx + (rx - cx) * a;
-                hv[2].position.y = dy;
-                hv[3].position.x = lx;
-                hv[3].position.y = cy;
-                hv[4].position.x = cx;
-                hv[4].position.y = cy;
-                hv[0].uv.x = ulx;
-                hv[0].uv.y = udy;
-                hv[1].uv.x = ucx;
-                hv[1].uv.y = udy;
-                hv[2].uv.x = ucx + (urx - ucx) * a;
-                hv[2].uv.y = udy;
-                hv[3].uv.x = ulx;
-                hv[3].uv.y = ucy;
-                hv[4].uv.x = ucx;
-                hv[4].uv.y = ucy;
-                image.vertices = hv;
-                image.tris = Triangle360L3;
-            }
-            else if(a>0.125f)
-            {
-                a -= 0.125f;
-                a *= 8;
-                HVertex[] hv = new HVertex[4];
-                hv[0].position.x = lx;
-                hv[0].position.y = dy;
-                hv[1].position.x = lx + (cx - lx) * a;
-                hv[1].position.y = dy;
-                hv[2].position.x = lx;
-                hv[2].position.y = cy;
-                hv[3].position.x = cx;
-                hv[3].position.y = cy;
-                hv[0].uv.x = ulx;
-                hv[0].uv.y = udy;
-                hv[1].uv.x = ulx + (ucx - ulx) * a;
-                hv[1].uv.y = udy;
-                hv[2].uv.x = ulx;
-                hv[2].uv.y = ucy;
-                hv[3].uv.x = ucx;
-                hv[3].uv.y = ucy;
-                image.vertices = hv;
-                image.tris = Rectangle;
-            }
-            else
-            {
-                a *= 8;
-                HVertex[] hv = new HVertex[3];
-                hv[0].position.x = lx;
-                hv[0].position.y = cy - (cy - dy) * a;
-                hv[1].position.x = lx;
-                hv[1].position.y = cy;
-                hv[2].position.x = cx;
-                hv[2].position.y = cy;
-                hv[0].uv.x = ulx;
-                hv[0].uv.y = ucy - (ucy - udy) * a;
-                hv[1].uv.x = ulx;
-                hv[1].uv.y = ucy;
-                hv[2].uv.x = ucx;
-                hv[2].uv.y = ucy;
-                image.vertices = hv;
-                image.tris = Triangle;
+                HVertex* hv = (HVertex*)image.vertInfo.Addr;
+                if (a > 0.875f)
+                {
+                    a -= 0.875f;
+                    a *= 8;
+                    hv[0].position.x = lx;
+                    hv[0].position.y = dy;
+                    hv[1].position.x = cx;
+                    hv[1].position.y = dy;
+                    hv[2].position.x = rx;
+                    hv[2].position.y = dy;
+                    hv[3].position.x = lx;
+                    hv[3].position.y = cy;
+                    hv[4].position.x = cx;
+                    hv[4].position.y = cy;
+                    hv[5].position.x = rx;
+                    hv[5].position.y = cy;
+                    hv[6].position.x = lx;
+                    hv[6].position.y = ty - (ty - cy) * a;
+                    hv[7].position.x = lx;
+                    hv[7].position.y = ty;
+                    hv[8].position.x = cx;
+                    hv[8].position.y = ty;
+                    hv[9].position.x = rx;
+                    hv[9].position.y = ty;
+                    hv[0].uv.x = ulx;
+                    hv[0].uv.y = udy;
+                    hv[1].uv.x = ucx;
+                    hv[1].uv.y = udy;
+                    hv[2].uv.x = urx;
+                    hv[2].uv.y = udy;
+                    hv[3].uv.x = ulx;
+                    hv[3].uv.y = ucy;
+                    hv[4].uv.x = ucx;
+                    hv[4].uv.y = ucy;
+                    hv[5].uv.x = urx;
+                    hv[5].uv.y = ucy;
+                    hv[6].uv.x = ulx;
+                    hv[6].uv.y = uty - (uty - ucy) * a;
+                    hv[7].uv.x = ulx;
+                    hv[7].uv.y = uty;
+                    hv[8].uv.x = ucx;
+                    hv[8].uv.y = uty;
+                    hv[9].uv.x = urx;
+                    hv[9].uv.y = uty;
+                    image.vertInfo.DataCount = 10;
+                    image.tris = Triangle360L8;
+                }
+                else if (a > 0.75f)
+                {
+                    a -= 0.75f;
+                    a *= 8;
+                    hv[0].position.x = lx;
+                    hv[0].position.y = dy;
+                    hv[1].position.x = cx;
+                    hv[1].position.y = dy;
+                    hv[2].position.x = rx;
+                    hv[2].position.y = dy;
+                    hv[3].position.x = lx;
+                    hv[3].position.y = cy;
+                    hv[4].position.x = cx;
+                    hv[4].position.y = cy;
+                    hv[5].position.x = rx;
+                    hv[5].position.y = cy;
+                    hv[6].position.x = cx - (cx - lx) * a;
+                    hv[6].position.y = ty;
+                    hv[7].position.x = cx;
+                    hv[7].position.y = ty;
+                    hv[8].position.x = rx;
+                    hv[8].position.y = ty;
+                    hv[0].uv.x = ulx;
+                    hv[0].uv.y = udy;
+                    hv[1].uv.x = ucx;
+                    hv[1].uv.y = udy;
+                    hv[2].uv.x = urx;
+                    hv[2].uv.y = udy;
+                    hv[3].uv.x = ulx;
+                    hv[3].uv.y = ucy;
+                    hv[4].uv.x = ucx;
+                    hv[4].uv.y = ucy;
+                    hv[5].uv.x = urx;
+                    hv[5].uv.y = ucy;
+                    hv[6].uv.x = ucx - (ucx - ulx) * a;
+                    hv[6].uv.y = uty;
+                    hv[7].uv.x = ucx;
+                    hv[7].uv.y = uty;
+                    hv[8].uv.x = urx;
+                    hv[8].uv.y = uty;
+                    image.vertInfo.DataCount = 9;
+                    image.tris = Triangle360L7;
+                }
+                else if (a > 0.625f)
+                {
+                    a -= 0.625f;
+                    a *= 8;
+                    hv[0].position.x = lx;
+                    hv[0].position.y = dy;
+                    hv[1].position.x = cx;
+                    hv[1].position.y = dy;
+                    hv[2].position.x = rx;
+                    hv[2].position.y = dy;
+                    hv[3].position.x = lx;
+                    hv[3].position.y = cy;
+                    hv[4].position.x = cx;
+                    hv[4].position.y = cy;
+                    hv[5].position.x = rx;
+                    hv[5].position.y = cy;
+                    hv[6].position.x = rx - (rx - cx) * a;
+                    hv[6].position.y = ty;
+                    hv[7].position.x = rx;
+                    hv[7].position.y = ty;
+                    hv[0].uv.x = ulx;
+                    hv[0].uv.y = udy;
+                    hv[1].uv.x = ucx;
+                    hv[1].uv.y = udy;
+                    hv[2].uv.x = urx;
+                    hv[2].uv.y = udy;
+                    hv[3].uv.x = ulx;
+                    hv[3].uv.y = ucy;
+                    hv[4].uv.x = ucx;
+                    hv[4].uv.y = ucy;
+                    hv[5].uv.x = urx;
+                    hv[5].uv.y = ucy;
+                    hv[6].uv.x = urx - (urx - ucx) * a;
+                    hv[6].uv.y = uty;
+                    hv[7].uv.x = urx;
+                    hv[7].uv.y = uty;
+                    image.vertInfo.DataCount = 8;
+                    image.tris = Triangle360L6;
+                }
+                else if (a > 0.5f)
+                {
+                    a -= 0.5f;
+                    a *= 8;
+                    hv[0].position.x = lx;
+                    hv[0].position.y = dy;
+                    hv[1].position.x = cx;
+                    hv[1].position.y = dy;
+                    hv[2].position.x = rx;
+                    hv[2].position.y = dy;
+                    hv[3].position.x = lx;
+                    hv[3].position.y = cy;
+                    hv[4].position.x = cx;
+                    hv[4].position.y = cy;
+                    hv[5].position.x = rx;
+                    hv[5].position.y = cy;
+                    hv[6].position.x = rx;
+                    hv[6].position.y = cy + (ty - cy) * a;
+                    hv[0].uv.x = ulx;
+                    hv[0].uv.y = udy;
+                    hv[1].uv.x = ucx;
+                    hv[1].uv.y = udy;
+                    hv[2].uv.x = urx;
+                    hv[2].uv.y = udy;
+                    hv[3].uv.x = ulx;
+                    hv[3].uv.y = ucy;
+                    hv[4].uv.x = ucx;
+                    hv[4].uv.y = ucy;
+                    hv[5].uv.x = urx;
+                    hv[5].uv.y = ucy;
+                    hv[6].uv.x = urx;
+                    hv[6].uv.y = ucy + (uty - ucy) * a;
+                    image.vertInfo.DataCount = 7;
+                    image.tris = Triangle360L5;
+                }
+                else if (a > 0.375f)
+                {
+                    a -= 0.375f;
+                    a *= 8;
+                    hv[0].position.x = lx;
+                    hv[0].position.y = dy;
+                    hv[1].position.x = cx;
+                    hv[1].position.y = dy;
+                    hv[2].position.x = rx;
+                    hv[2].position.y = dy;
+                    hv[3].position.x = lx;
+                    hv[3].position.y = cy;
+                    hv[4].position.x = cx;
+                    hv[4].position.y = cy;
+                    hv[5].position.x = rx;
+                    hv[5].position.y = dy + (cy - dy) * a;
+                    hv[0].uv.x = ulx;
+                    hv[0].uv.y = udy;
+                    hv[1].uv.x = ucx;
+                    hv[1].uv.y = udy;
+                    hv[2].uv.x = urx;
+                    hv[2].uv.y = udy;
+                    hv[3].uv.x = ulx;
+                    hv[3].uv.y = ucy;
+                    hv[4].uv.x = ucx;
+                    hv[4].uv.y = ucy;
+                    hv[5].uv.x = urx;
+                    hv[5].uv.y = udy + (ucy - udy) * a;
+                    image.vertInfo.DataCount = 6;
+                    image.tris = TriangleT4;
+                }
+                else if (a > 0.25f)
+                {
+                    a -= 0.25f;
+                    a *= 8;
+                    hv[0].position.x = lx;
+                    hv[0].position.y = dy;
+                    hv[1].position.x = cx;
+                    hv[1].position.y = dy;
+                    hv[2].position.x = cx + (rx - cx) * a;
+                    hv[2].position.y = dy;
+                    hv[3].position.x = lx;
+                    hv[3].position.y = cy;
+                    hv[4].position.x = cx;
+                    hv[4].position.y = cy;
+                    hv[0].uv.x = ulx;
+                    hv[0].uv.y = udy;
+                    hv[1].uv.x = ucx;
+                    hv[1].uv.y = udy;
+                    hv[2].uv.x = ucx + (urx - ucx) * a;
+                    hv[2].uv.y = udy;
+                    hv[3].uv.x = ulx;
+                    hv[3].uv.y = ucy;
+                    hv[4].uv.x = ucx;
+                    hv[4].uv.y = ucy;
+                    image.vertInfo.DataCount = 5;
+                    image.tris = Triangle360L3;
+                }
+                else if (a > 0.125f)
+                {
+                    a -= 0.125f;
+                    a *= 8;
+                    hv[0].position.x = lx;
+                    hv[0].position.y = dy;
+                    hv[1].position.x = lx + (cx - lx) * a;
+                    hv[1].position.y = dy;
+                    hv[2].position.x = lx;
+                    hv[2].position.y = cy;
+                    hv[3].position.x = cx;
+                    hv[3].position.y = cy;
+                    hv[0].uv.x = ulx;
+                    hv[0].uv.y = udy;
+                    hv[1].uv.x = ulx + (ucx - ulx) * a;
+                    hv[1].uv.y = udy;
+                    hv[2].uv.x = ulx;
+                    hv[2].uv.y = ucy;
+                    hv[3].uv.x = ucx;
+                    hv[3].uv.y = ucy;
+                    image.vertInfo.DataCount = 4;
+                    image.tris = Rectangle;
+                }
+                else
+                {
+                    a *= 8;
+                    hv[0].position.x = lx;
+                    hv[0].position.y = cy - (cy - dy) * a;
+                    hv[1].position.x = lx;
+                    hv[1].position.y = cy;
+                    hv[2].position.x = cx;
+                    hv[2].position.y = cy;
+                    hv[0].uv.x = ulx;
+                    hv[0].uv.y = ucy - (ucy - udy) * a;
+                    hv[1].uv.x = ulx;
+                    hv[1].uv.y = ucy;
+                    hv[2].uv.x = ucx;
+                    hv[2].uv.y = ucy;
+                    image.vertInfo.DataCount = 3;
+                    image.tris = Triangle;
+                }
             }
         }
     }

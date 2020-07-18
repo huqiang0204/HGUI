@@ -345,13 +345,16 @@ namespace huqiang.Data
                     var ss = path.Split('/');
                     var str = ss[ss.Length - 1];
                     ss = str.Split('.');
-                    var sp = UnityEditor.AssetDatabase.LoadAllAssetsAtPath(path);
-                    if (sp != null)
-                        if (sp.Length > 0)
-                        {
-                            objects.Add(sp);
-                            return sp;
-                        }
+                    if (ss[0] == name)
+                    {
+                        var sp = UnityEditor.AssetDatabase.LoadAllAssetsAtPath(path);
+                        if (sp != null)
+                            if (sp.Length > 0)
+                            {
+                                objects.Add(sp);
+                                return sp;
+                            }
+                    }
                 }
             }
             return null;

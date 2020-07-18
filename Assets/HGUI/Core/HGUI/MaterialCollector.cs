@@ -219,6 +219,11 @@ namespace huqiang.Core.HGUI
             }
         }
         static string[] tc = new string[] { "_MainTex" , "_STex","_TTex" , "_FTex" };
+        public int Length { get => max + 1; }
+        /// <summary>
+        /// 这里会产生一次GC
+        /// </summary>
+        /// <returns></returns>
         public Material[] GenerateMaterial()
         {
             MaterialManager.Reset();

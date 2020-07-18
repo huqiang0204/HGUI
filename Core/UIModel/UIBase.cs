@@ -108,7 +108,7 @@ namespace huqiang.UIModel
         {
             return null;
         }
-        public virtual void Cmd(string cmd, object dat)
+        public virtual void Cmd(Msg msg, object dat)
         {
         }
         public virtual void Cmd(int cmd, object dat)

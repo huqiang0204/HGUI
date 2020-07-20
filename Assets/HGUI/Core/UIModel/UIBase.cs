@@ -11,6 +11,7 @@ namespace huqiang.UIModel
 {
     public class UIBase
     {
+        public static INIReader Lan = new INIReader();
         static int point;
         static UIBase[] buff = new UIBase[1024];
         public static T GetUI<T>() where T : UIBase
@@ -63,13 +64,16 @@ namespace huqiang.UIModel
             temp.All = reflections;
             return temp;
         }
+        string uiName;
+        protected UIInitializer uiInitializer;
         public T LoadUI<T>(string asset, string name) where T : class, new()
         {
+            uiName = name;
             model = HGUIManager.FindModel(asset, name);
             T t = new T();
-            UIInitializer iInitializer = new UIInitializer(ObjectFields(typeof(T)));
-            iInitializer.Reset(t);
-            Main = HGUIManager.GameBuffer.Clone(model, iInitializer);
+            uiInitializer = new UIInitializer(ObjectFields(typeof(T)));
+            uiInitializer.Reset(t);
+            Main = HGUIManager.GameBuffer.Clone(model, uiInitializer);
             var trans = Main.transform;
             trans.SetParent(Parent);
             trans.localPosition = Vector3.zero;
@@ -131,7 +135,19 @@ namespace huqiang.UIModel
         }
         public virtual void ChangeLanguage()
         {
-
+            if (Lan == null)
+                return;
+            if (uiName != null)
+            {
+                var sec = Lan.FindSection(uiName);
+                if (sec != null)
+                {
+                    if (uiInitializer != null)
+                    {
+                        uiInitializer.ChangeLanguage(sec);
+                    }
+                }
+            }
         }
     }
 }

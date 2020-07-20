@@ -133,5 +133,19 @@ namespace huqiang.Core.HGUI
             for (int i = 0; i < c; i++)
                 ReflectionEnity(com.GetChild(i));
         }
+        public void ChangeLanguage(INISection section)
+        {
+            if (reflections == null)
+                return;
+            var all = reflections.All;
+            for (int i = 0; i < all.Length; i++)
+            {
+                HText txt = all[i].Value as HText;
+                if (txt != null)
+                {
+                    txt.Text = section.GetValue(all[i].name);
+                }
+            }
+        }
     }
 }

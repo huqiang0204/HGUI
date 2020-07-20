@@ -353,6 +353,7 @@ namespace huqiang.UIEvent
             entry = true;
             FocusAction = action;
             mVelocity = Vector2.zero;
+            UIAudioManager.PointerDown();
         }
         protected virtual void OnMouseUp(UserAction action)
         {
@@ -366,6 +367,7 @@ namespace huqiang.UIEvent
             Pressed = false;
             if (PointerUp != null)
                 PointerUp(this, action);
+            UIAudioManager.PointerUp();
             if (press)
             {
                 long r = DateTime.Now.Ticks - PressTime;
@@ -378,6 +380,7 @@ namespace huqiang.UIEvent
                     x += y;
                     if (x < ClickArea)
                         OnClick(action);
+                    UIAudioManager.OnClick();
                 }
             }
         }
@@ -391,6 +394,7 @@ namespace huqiang.UIEvent
                 if (PointerEntry != null)
                     PointerEntry(this, action);
                 LastPosition = action.CanPosition;
+                UIAudioManager.PointerEntry();
             }
             else
             {
@@ -421,6 +425,7 @@ namespace huqiang.UIEvent
             }
             if (PointerLeave != null)
                 PointerLeave(this, action);
+            UIAudioManager.PointerLeave();
         }
         internal virtual void OnFocusMove(UserAction action)
         {

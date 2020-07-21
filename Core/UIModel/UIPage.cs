@@ -47,6 +47,7 @@ namespace huqiang.UIModel
             var t = new T();
             CurrentPage = t;
             t.Initial(Root, dat);
+            t.ChangeLanguage();
             t.ReSize();
         }
         public static void LoadPage(Type type, object dat = null)
@@ -67,6 +68,7 @@ namespace huqiang.UIModel
                 var t = Activator.CreateInstance(type) as UIPage;
                 CurrentPage = t;
                 t.Initial(Root, dat);
+                t.ChangeLanguage();
                 t.ReSize();
                 t.Recovery();
             }
@@ -171,6 +173,7 @@ namespace huqiang.UIModel
             if (parent == null)
                 t.Initial(Parent, this, obj);
             else t.Initial(parent, this, obj);
+            t.ChangeLanguage();
             t.ReSize();
             return t;
         }
@@ -191,6 +194,7 @@ namespace huqiang.UIModel
             if (parent == null)
                 t.Initial(Parent, this, obj);
             else t.Initial(parent, this, obj);
+            t.ChangeLanguage();
             t.ReSize();
             return t;
         }

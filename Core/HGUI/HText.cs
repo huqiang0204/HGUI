@@ -234,7 +234,7 @@ namespace huqiang.Core.HGUI
             {
                 int l = text.trisInfo.DataCount;
                 var tris = trisBuffer.RegNew(l*5);
-                tris.DataCount = l * 5;
+                tris.DataCount = l*5;
                 OutLineTris(ref tris, 0,ref text.trisInfo, 0);
                 OutLineTris(ref tris, l, ref text.trisInfo, c);
                 OutLineTris(ref tris, l * 2, ref text.trisInfo, c * 2);
@@ -247,7 +247,6 @@ namespace huqiang.Core.HGUI
             {
                 int l = text.trisInfo2.DataCount;
                 var tris = trisBuffer.RegNew(l * 5);
-                tris.DataCount = l * 5;
                 tris.DataCount = l * 5;
                 OutLineTris(ref tris, 0, ref text.trisInfo2, 0);
                 OutLineTris(ref tris, l, ref text.trisInfo2, c);
@@ -450,6 +449,8 @@ namespace huqiang.Core.HGUI
         internal UICharInfo[] uIChars;
         public void Populate()
         {
+            if (!m_dirty)
+                return;
             emojiString.FullString = m_text;
             var str = emojiString.FilterString;
             if(sizeFitter!=ContentSizeFitter.None)
@@ -514,6 +515,7 @@ namespace huqiang.Core.HGUI
             m_vertexChange = true;
             fillColors[0] = true;
             m_colorChanged = false;
+            MainTexture = Font.material.mainTexture;
         }
         public override void UpdateMesh()
         {

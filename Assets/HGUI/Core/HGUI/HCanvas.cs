@@ -45,8 +45,10 @@ namespace huqiang.Core.HGUI
         QueueBuffer<TempBuffer> Main,Sub;
         HGUIElement[] PipeLine = new HGUIElement[4096];
         UIElement[] scripts = new UIElement[4096];
+        HText[] texts = new HText[2048];
         int point = 0;
         int max;
+        int top_txt=0;
         public UserAction[] inputs;
         public bool PauseEvent;
         protected virtual void Start()
@@ -55,21 +57,10 @@ namespace huqiang.Core.HGUI
             Main = new QueueBuffer<TempBuffer>();
             Sub = new QueueBuffer<TempBuffer>();
         }
-        int Late;
+        bool ftr;
         void FontTextureRebuilt(Font font)
         {
-            Late = 2;
-            point = 1;
-            max = 0;
-            TxtCollector.Clear();
-            Collection(transform, -1, 0);
-            try
-            {
-                TxtCollector.GenerateTexture(true);
-            }
-            catch
-            {
-            }
+            ftr = true;
         }
         protected virtual void OnDestroy()
         {
@@ -96,11 +87,12 @@ namespace huqiang.Core.HGUI
                 script.PipelineIndex = index;
                 scripts[max] = script;
                 max++;
-                if (mask)
-                    TxtCollector.Next();
                 var txt = script as HText;
                 if (txt != null)
-                    TxtCollector.AddText(txt, act);
+                {
+                    texts[top_txt] = txt;
+                    top_txt++;
+                }
             }
             PipeLine[index].script = script;
             int c = trans.childCount;
@@ -114,8 +106,6 @@ namespace huqiang.Core.HGUI
                     Collection(trans.GetChild(i), index, s);
                     s++;
                 }
-            if (mask)
-                TxtCollector.Back();
         }
   
         protected virtual void Update()
@@ -148,11 +138,21 @@ namespace huqiang.Core.HGUI
         {
             point = 1;
             max = 0;
-            TxtCollector.Clear();
+            top_txt = 0;
             Collection(transform, -1, 0);
             for (int i = 0; i < max; i++)
                 scripts[i].MainUpdate();
-            TxtCollector.GenerateTexture(false);
+            for (int i = 0; i < top_txt; i++)
+                texts[i].Populate();
+            if(ftr)//纹理被改变了,需要重新计算
+            {
+                ftr = false;
+                for (int i = 0; i < top_txt; i++)
+                {
+                    texts[i].m_dirty = true;
+                    texts[i].Populate();
+                }
+            }
             Batch();
             ApplyMeshRenderer();
             ApplyToCamera();
@@ -450,7 +450,6 @@ namespace huqiang.Core.HGUI
                 Main.Enqueue(m);
             }
         }
-        internal TextCollector TxtCollector = new TextCollector();
         internal List<Vector3> vertex = new List<Vector3>();
         internal List<Vector2> uv = new List<Vector2>();
         internal List<Vector2> uv1 = new List<Vector2>();
@@ -482,7 +481,7 @@ namespace huqiang.Core.HGUI
             MainCanvas = this;
             point = 1;
             max = 0;
-            TxtCollector.Clear();
+            top_txt = 0;
             Collection(transform, -1, 0);
             int len = max;
             for (int i = 0; i < len; i++)
@@ -498,7 +497,8 @@ namespace huqiang.Core.HGUI
                 Resize(scripts[i], false);
             for (int i = 0; i < max; i++)
                 scripts[i].MainUpdate();
-            TxtCollector.GenerateTexture();
+            for (int i = 0; i < top_txt; i++)
+                texts[i].Populate();
             Batch();
             ApplyToCamera();
             ApplyShareMesh();

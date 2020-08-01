@@ -34,6 +34,7 @@ namespace huqiang.Core.HGUI
         public Vector2 DesignSize = new Vector2(1920, 1080);
         [Range(0.1f, 3)]
         public float PhysicalScale = 1;
+        public float NearPlane = 0.01f;
         public Vector2 A = new Vector2(4,0.9f);//贝塞尔曲线起点
         public Vector2 B = new Vector2(6,1f);
         public Vector2 C = new Vector2(8,1.2f);
@@ -254,7 +255,8 @@ namespace huqiang.Core.HGUI
 #endif
                 m_sizeDelta.x = w / ps;
                 m_sizeDelta.y = h / ps;
-                if(cam.orthographic)
+                float near = cam.nearClipPlane + NearPlane;
+                if (cam.orthographic)
                 {
                     float os = cam.orthographicSize * 2;
                     float s = os / (float)h;
@@ -262,12 +264,11 @@ namespace huqiang.Core.HGUI
                     transform.localScale = new Vector3(s, s, s);
                     Vector3 pos = cam.transform.position;
                     Vector3 forward = cam.transform.forward;
-                    transform.position = pos + forward;
+                    transform.position = pos + forward * near;
                     transform.forward = forward;
                 }
                 else
                 {
-                    float near = cam.nearClipPlane + 0.01f;
                     float s = 2 / (float)h;
                     float o = MathH.Tan(cam.fieldOfView) / near;
                     s /= o;

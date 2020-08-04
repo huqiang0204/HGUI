@@ -27,7 +27,7 @@ namespace huqiang.Unit
                 Vector2 s = size;
                 s.x *= Target.localScale.x;
                 s.y *= Target.localScale.y;
-                var q = Target.localRoate;
+                var q = Target.localRotate;
                 var p = Target.localPosition;
                 p.x += offset.x;
                 p.y += offset.y;

@@ -18,7 +18,7 @@ namespace huqiang.Unit
                 buf = new Vector2[points.Length];
             var ls = Target.localScale;
             var pos = Target.localPosition;
-            var q = Target.localRoate;
+            var q = Target.localRotate;
             for(int i=0;i<buf.Length;i++)
             {
                 var v = points[i];

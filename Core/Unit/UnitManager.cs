@@ -14,7 +14,7 @@ namespace huqiang.Unit
         public Vector2 pivot=new Vector2(0.5f,0.5f);
         public Vector3 localPosition;
         public Vector3 localScale = Vector3.one;
-        public Quaternion localRoate = Quaternion.identity;
+        public Quaternion localRotate = Quaternion.identity;
         public float time;
         public bool active = true;
         public bool show = true;
@@ -38,19 +38,19 @@ namespace huqiang.Unit
             Vector3 v = Vector3.zero;
             v.x = lx;
             v.y = dy;
-            v = localRoate * v + localPosition;
+            v = localRotate * v + localPosition;
             vertex.Add(v);
             v.x = lx;
             v.y = ty;
-            v = localRoate * v + localPosition;
+            v = localRotate * v + localPosition;
             vertex.Add(v);
             v.x = rx;
             v.y = ty;
-            v = localRoate * v + localPosition;
+            v = localRotate * v + localPosition;
             vertex.Add(v);
             v.x = rx;
             v.y = dy;
-            v = localRoate * v + localPosition;
+            v = localRotate * v + localPosition;
             vertex.Add(v);
             carrier.uv.AddRange(uv);
             for (int i = 0; i < 4; i++)

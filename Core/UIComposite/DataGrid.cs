@@ -219,6 +219,14 @@ namespace huqiang.UIComposite
             pos.y = -pos.y;
             item.Row = row;
             item.Column = col;
+            float w = columns[col].width;
+            var size = item.Item.SizeDelta;
+            if(size.x!=w)
+            {
+                size.x = w;
+                item.Item.SizeDelta = size;
+                UIElement.ResizeChild(item.Item);
+            }
             item.target.transform.localPosition = pos;
             itemCreator.Update(item, data);
         }

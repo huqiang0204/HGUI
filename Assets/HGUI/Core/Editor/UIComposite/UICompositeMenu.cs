@@ -90,38 +90,19 @@ public static class UICompositeMenu
     static public void AddEmpty(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;
-        var go = new GameObject("Empty", typeof(UIElement));
-        var trans = go.transform;
-        if (parent != null)
-            trans.SetParent(parent.transform);
-        trans.localPosition = Vector3.zero;
-        trans.localScale = Vector3.one;
-        trans.localRotation = Quaternion.identity;
+        UICreator.CreateElement(Vector3.zero, new Vector2(100,100),"Empty", parent.transform);
     }
     [MenuItem("GameObject/HGUI/Image", false, 3)]
     static public void AddImage(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;
-        var go = new GameObject("Image", typeof(HImage));
-        var trans = go.transform;
-        if (parent != null)
-            trans.SetParent(parent.transform);
-        trans.localPosition = Vector3.zero;
-        trans.localScale = Vector3.one;
-        trans.localRotation = Quaternion.identity;
+        UICreator.CreateHImage(Vector3.zero, new Vector2(100, 100), "Image", parent.transform);
     }
     [MenuItem("GameObject/HGUI/Text", false, 4)]
     static public void AddText(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;
-        var go = new GameObject("Text", typeof(HText));
-        var trans = go.transform;
-        if (parent != null)
-            trans.SetParent(parent.transform);
-        trans.localPosition = Vector3.zero;
-        trans.localScale = Vector3.one;
-        trans.localRotation = Quaternion.identity;
-        go.GetComponent<HText>().SizeDelta = new Vector2(160,40);
+        UICreator.CreateHText(Vector3.zero, new Vector2(160, 40), "Text", parent.transform);
     }
     [MenuItem("GameObject/HGUI/InputBox", false, 5)]
     static public void AddInputBox(MenuCommand menuCommand)
@@ -885,5 +866,53 @@ public static class UICompositeMenu
         var down = UICreator.CreateHImage(new Vector3(0, -80, 0), new Vector2(100, 50), "Down", Docker.transform);
         down.Sprite = bk;
         down.MainColor = 0x69DCF8d0.ToColor();
+    }
+    [MenuItem("GameObject/HGUI/DataGrid", false, 20)]
+    static public void AddDataGrid(MenuCommand menuCommand)
+    {
+        GameObject parent = menuCommand.context as GameObject;
+        var dg =  UICreator.CreateElement(Vector3.zero,new Vector2(1280,720),"DataGrid",parent.transform);
+        dg.Pivot = new Vector2(0f,1);
+        dg.compositeType = CompositeType.DataGrid;
+        var grid = UICreator.CreateElement(Vector3.zero,new Vector2(100,100),"Grid",dg.transform);
+        grid.Pivot = new Vector2(0f,1f);
+        grid.marginType = MarginType.Margin;
+        grid.Mask = true;
+        grid.margin.top = 60;
+        var items = UICreator.CreateElement(Vector3.zero,new Vector2(100,100),"Items",grid.transform);
+        items.Pivot = new Vector2(0f,1);
+        var heads = new GameObject("Heads");
+        heads.transform.SetParent(dg.transform);
+        heads.transform.localScale = Vector3.one;
+        heads.transform.localPosition = Vector3.zero;
+        heads.transform.localRotation = Quaternion.identity;
+        var drags = new GameObject("Drags");
+        drags.transform.SetParent(dg.transform);
+        drags.transform.localScale = Vector3.one;
+        drags.transform.localPosition = Vector3.zero;
+        drags.transform.localRotation = Quaternion.identity;
+
+        var head = UICreator.CreateElement(Vector3.zero,new Vector2(200,60),"Head",dg.transform);
+        head.Pivot = new Vector2(0f,1);
+        var img = UICreator.CreateHImage(Vector3.zero, new Vector2(200, 60), "Image", head.transform);
+        img.marginType = MarginType.Margin;
+        var txt = UICreator.CreateHText(Vector3.zero, new Vector2(200, 60), "Text", head.transform);
+        txt.marginType = MarginType.Margin;
+        txt.TextAnchor = TextAnchor.MiddleLeft;
+        txt.FontSize = 32;
+        txt.Text = "字段名";
+        txt.MainColor = Color.black;
+        var item= UICreator.CreateElement(Vector3.zero, new Vector2(200, 60), "Item", dg.transform);
+        item.Pivot = new Vector2(0f,1);
+        txt = UICreator.CreateHText(Vector3.zero, new Vector2(200, 60), "Text", item.transform);
+        txt.marginType = MarginType.Margin;
+        txt.TextAnchor = TextAnchor.MiddleLeft;
+        txt.FontSize =28;
+        txt.Text = "数据";
+
+        var drag = UICreator.CreateElement(Vector3.zero, new Vector2(40, 60), "Drag", dg.transform);
+        drag.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        var line = UICreator.CreateHImage(Vector3.zero, new Vector2(200, 60), "Line", dg.transform);
+        line.MainColor = new Color32(85,85,85,255);
     }
 }

@@ -11,7 +11,6 @@ namespace huqiang.Core.HGUI
     {
         static List<HText> TextBuffer = new List<HText>();
         static BlockBuffer<HVertex> blockBuffer = new BlockBuffer<HVertex>(32, 1024);
-        static BlockBuffer<int> trisBuffer = new BlockBuffer<int>(48,1024);
         static Font defFont;
         static char[] key_noMesh = new char[] { ' ' ,'\n', '\r' };
         static List<int> bufferA = new List<int>();
@@ -27,7 +26,6 @@ namespace huqiang.Core.HGUI
                 else ht.m_dirty = true;
             }
         }
-
         static void CreateEmojiMesh(HText text)
         {
             if (text.verts == null)
@@ -578,9 +576,15 @@ namespace huqiang.Core.HGUI
         {
             TextBuffer.Add(this);
         }
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
             TextBuffer.Remove(this);
+        }
+        public override void ReSized()
+        {
+            base.ReSized();
+            m_dirty = true;
         }
     }
     public enum ContentSizeFitter

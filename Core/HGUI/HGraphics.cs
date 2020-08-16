@@ -22,6 +22,7 @@ namespace huqiang.Core.HGUI
     }
     public class HGraphics:UIElement
     {
+        protected static BlockBuffer<int> trisBuffer = new BlockBuffer<int>(48, 1024);
         internal static Shader DefShader { get {
                 if(shader==null)
                     shader = Shader.Find("Custom/UIDef");//Custom/UIDef
@@ -133,7 +134,7 @@ namespace huqiang.Core.HGUI
         {
             m_dirty = true;
         }
-        private void OnDestroy()
+        protected virtual void OnDestroy()
         {
             vertInfo.Release();
             trisInfo.Release();

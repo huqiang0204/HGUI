@@ -27,7 +27,17 @@ namespace huqiang.Data
             }
         }
         public int Offset { get => Index; }
+        /// <summary>
+        /// 可以存放的元素尺寸
+        /// </summary>
         public int Size { get => Length; }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="addr"></param>
+        /// <param name="index"></param>
+        /// <param name="len"></param>
+        /// <param name="area">每区域的大小,即块的尺寸x元素的尺寸</param>
         public BlockInfo(Addressable addr, int index, int len,int area)
         {
             address = addr;
@@ -76,14 +86,18 @@ namespace huqiang.Data
     public class BlockBuffer<T> : Addressable, IDisposable where T : unmanaged
     {
         IntPtr ptr;
-        int blockSize;
-        int pe;
-        int dataLength;
-        int allLength;
-        int eSize;
+        int blockSize;//块大小
+        int pe;//pe头尺寸
+        int dataLength;//数据总体尺寸
+        int allLength;//总计申请的内存尺寸
+        int eSize;//每个元素的大小
 
         public IntPtr Addr => ptr + pe;
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="block">块大小,32则为一个块可以包含32个元素</param>
+        /// <param name="len">32,32 则为32*32*sizeof(T)总缓存大小</param>
         public unsafe BlockBuffer(int block = 32, int len = 32)
         {
             eSize = sizeof(T);
@@ -123,13 +137,25 @@ namespace huqiang.Data
                 bp[o] = 1;
                 o++;
             }
-            int os = index * blockSize * eSize+pe;
             len = block * blockSize;
-            return new BlockInfo(this, index, len, blockSize*eSize);
+            int all = len * eSize;
+            int area = blockSize * eSize;
+            IntPtr p = ptr + pe;
+            p += index * area;
+            unsafe
+            {
+                bp = (byte*)p;
+                for (int i = 0; i < all; i++)
+                {
+                    *bp = 0;
+                    bp++;
+                }
+            }
+            return new BlockInfo(this, index, len, area);
         }
         public unsafe void Release(ref BlockInfo blockInfo)
         {
-            int block = blockInfo.Size / blockSize;
+            int block = blockInfo.Size / blockSize;//计算有多少个块
             byte* bp = (byte*)ptr;
             int o = blockInfo.Offset;
             for (int i=0;i<block;i++)

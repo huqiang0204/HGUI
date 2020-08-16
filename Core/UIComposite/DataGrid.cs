@@ -1,4 +1,5 @@
 ﻿using huqiang.Core.HGUI;
+using huqiang.Core.Line;
 using huqiang.Data;
 using huqiang.UIEvent;
 using System;
@@ -97,11 +98,11 @@ namespace huqiang.UIComposite
         FakeStruct ItemMod;
         FakeStruct HeadMod;
         FakeStruct DragMod;
-        FakeStruct LineMod;
         Transform Heads;
         Transform Grid;
         Transform Items;
         Transform Drags;
+        HLine lines;
         Vector2 contentSize;
         Vector2 headSize;
         float itemY;
@@ -116,7 +117,7 @@ namespace huqiang.UIComposite
         public SwapBuffer<DataGridItem, DataGridItemContext> ItemSwap;
         QueueBuffer<DataGridItem> itemQueue;
         SwapBuffer<UserEvent, DataGridHead> dragSwap;
-        List<HImage> lines;
+        //List<HImage> lines;
         List<HImage> temp;
         public UserEvent eventCall;
         public Action<DataGrid,DataGridColumn> ColumnResized;
@@ -129,7 +130,6 @@ namespace huqiang.UIComposite
             SetHeadUpdate<DataGridHead, DataGridColumn>(DefHeadUpdate);
             SetItemUpdate<DataGridItem, DataGridItemContext>(DefItemUpdate);
             dragSwap = new SwapBuffer<UserEvent, DataGridHead>(128);
-            lines = new List<HImage>();
             temp = new List<HImage>();
         }
         public override void Initial(FakeStruct mod, UIElement element)
@@ -138,12 +138,12 @@ namespace huqiang.UIComposite
             HeadMod = HGUIManager.FindChild(mod, "Head");
             ItemMod = HGUIManager.FindChild(mod, "Item");
             DragMod = HGUIManager.FindChild(mod, "Drag");
-            LineMod = HGUIManager.FindChild(mod, "Line");
             var trans = element.transform;
             Heads = trans.Find("Heads");
             Grid = trans.Find("Grid");
             Items = Grid.Find("Items");
             Drags = trans.Find("Drags");
+            lines = Grid.Find("Line").GetComponent<HLine>();
             unsafe
             {
                 headSize = ((TransfromData*)HeadMod.ip)->size;
@@ -152,7 +152,6 @@ namespace huqiang.UIComposite
             HGUIManager.GameBuffer.RecycleGameObject(trans.Find("Head").gameObject);
             HGUIManager.GameBuffer.RecycleGameObject(trans.Find("Item").gameObject);
             HGUIManager.GameBuffer.RecycleGameObject(trans.Find("Drag").gameObject);
-            HGUIManager.GameBuffer.RecycleGameObject(trans.Find("Line").gameObject);
             eventCall = element.RegEvent<UserEvent>();
             eventCall.CutRect = true;
             eventCall.Drag = (o, e, s) => { Scrolling(o, s); };
@@ -247,8 +246,7 @@ namespace huqiang.UIComposite
             item.target.transform.localPosition = pos;
             pos.x += col.width;
             UpdateDrag(pos,item);
-            pos.y = -0.5f*lineHigh ;
-            UpdateLine(pos,new Vector2(2,lineHigh));
+            UpdateVerticalLine(pos.x);
             if (item.Head != null)
                 if (item.Head.m_sizeDelta.x != col.width)
                 {
@@ -351,28 +349,34 @@ namespace huqiang.UIComposite
             if (ColumnResized != null)
                 ColumnResized(this, col);
         }
-        void UpdateLine(Vector3 pos,Vector2 size)
+        void UpdateVerticalLine(float x)
         {
-            HImage item = null;
-            if (temp.Count > 0)
-            {
-                item = temp[0];
-                item.gameObject.SetActive(true);
-                temp.RemoveAt(0);
-            }else
-            {
-                item = HGUIManager.GameBuffer.Clone(LineMod).GetComponent<HImage>();
-                item.transform.SetParent(Grid);
-                item.transform.localScale = Vector3.one;
-                item.transform.localRotation = Quaternion.identity;
-            }
-            lines.Add(item);
-            item.transform.localPosition = pos;
-            item.SizeDelta = size;
+            float ox =x - Enity.m_sizeDelta.x * 0.5f;
+            float oy = Enity.m_sizeDelta.y *0.5f;
+            Beeline beeline = new Beeline();
+            beeline.lineBase.Width = 2;
+            beeline.lineBase.Color = lines.MainColor;
+            beeline.Start.x = ox;
+            beeline.Start.y = oy;
+            beeline.End.x = ox;
+            beeline.End.y = oy - lineHigh;
+            lines.AddLine(ref beeline);
+        }
+        void UpdateHorizontalLine(float y)
+        {
+            float ox = Enity.m_sizeDelta.x * -0.5f;
+            float oy = Enity.m_sizeDelta.y * 0.5f - y ;
+            Beeline beeline = new Beeline();
+            beeline.lineBase.Width = 2;
+            beeline.lineBase.Color = lines.MainColor;
+            beeline.Start.x = ox;
+            beeline.Start.y = oy;
+            beeline.End.x = ox+lineWidth;
+            beeline.End.y = oy;
+            lines.AddLine(ref beeline);
         }
         void Order()
         {
-            temp.AddRange(lines);
             lines.Clear();
             float x = m_pointX;
             float os  = -x;
@@ -426,11 +430,12 @@ namespace huqiang.UIComposite
             {
                 var data = columns[0].datas;
                 float end = Enity.m_sizeDelta.y;
-                float oy = s * itemY-m_pointY;
+                float oy = s * itemY- m_pointY;
+                oy -= itemY * 0.5f;
                 for (int i = s; i < data.Count; i++)
                 {
                     oy += itemY;
-                    UpdateLine(new Vector3(lineWidth*0.5f,-oy,0),new Vector2(lineWidth,2));
+                    UpdateHorizontalLine(oy);
                     if (oy > end)
                         break;
                 }

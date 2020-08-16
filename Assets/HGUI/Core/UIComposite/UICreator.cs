@@ -54,5 +54,17 @@ namespace huqiang.UIComposite
             trans.localRotation = Quaternion.identity;
             return img;
         }
+        public static HLine CreateHLine(Vector3 pos, Vector2 size, string name, Transform parent)
+        {
+            var go = new GameObject(name);
+            var img = go.AddComponent<HLine>();
+            img.SizeDelta = size;
+            var trans = go.transform;
+            trans.SetParent(parent);
+            trans.localPosition = pos;
+            trans.localScale = Vector3.one;
+            trans.localRotation = Quaternion.identity;
+            return img;
+        }
     }
 }

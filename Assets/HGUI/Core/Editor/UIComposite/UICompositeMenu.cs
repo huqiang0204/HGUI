@@ -888,8 +888,13 @@ public static class UICompositeMenu
         grid.marginType = MarginType.Margin;
         grid.Mask = true;
         grid.margin.top = 60;
+
         var items = UICreator.CreateElement(Vector3.zero,new Vector2(100,100),"Items",grid.transform);
         items.Pivot = new Vector2(0f,1);
+
+        var line = UICreator.CreateHLine(Vector3.zero, new Vector2(200, 60), "Line", grid.transform);
+        line.MainColor = new Color32(85, 85, 85, 255);
+
         var heads = new GameObject("Heads");
         heads.transform.SetParent(dg.transform);
         heads.transform.localScale = Vector3.one;
@@ -921,7 +926,6 @@ public static class UICompositeMenu
 
         var drag = UICreator.CreateElement(Vector3.zero, new Vector2(40, 60), "Drag", dg.transform);
         drag.eventType = huqiang.Core.HGUI.EventType.UserEvent;
-        var line = UICreator.CreateHImage(Vector3.zero, new Vector2(200, 60), "Line", dg.transform);
-        line.MainColor = new Color32(85,85,85,255);
+      
     }
 }

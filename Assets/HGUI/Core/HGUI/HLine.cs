@@ -57,10 +57,12 @@ namespace huqiang.Core.HGUI
                 beelines.Clear();
             if (arcLines != null)
                 arcLines.Clear();
-            if (beelines != null)
-                beelines.Clear();
+            if (bzierLines != null)
+               bzierLines.Clear();
             if (bzierLines2 != null)
                 bzierLines2.Clear();
+            vertInfo.DataCount = 0;
+            trisInfo.DataCount = 0;
         }
         int GetSize()
         {
@@ -161,21 +163,25 @@ namespace huqiang.Core.HGUI
                 p[index].position.y = start.y - nx;
                 p[index].position.z = 0;
                 p[index].color = color;
+                p[index].picture = 0;
                 index++;
                 p[index].position.x = start.x - ny;
                 p[index].position.y = start.y + nx;
                 p[index].position.z = 0;
                 p[index].color = color;
+                p[index].picture = 0;
                 index++;
                 p[index].position.x = end.x - ny;
                 p[index].position.y = end.y + nx;
                 p[index].position.z = 0;
                 p[index].color = color;
+                p[index].picture = 0;
                 index++;
                 p[index].position.x = end.x + ny;
                 p[index].position.y = end.y - nx;
                 p[index].position.z = 0;
                 p[index].color = color;
+                p[index].picture = 0;
             }
             index = vert.DataCount;
             int t = tris.DataCount;

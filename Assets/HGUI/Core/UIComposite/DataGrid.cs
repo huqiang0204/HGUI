@@ -352,7 +352,7 @@ namespace huqiang.UIComposite
         void UpdateVerticalLine(float x)
         {
             float ox =x - Enity.m_sizeDelta.x * 0.5f;
-            float oy = Enity.m_sizeDelta.y *0.5f;
+            float oy = Enity.m_sizeDelta.y *0.5f-itemY*0.5f;
             Beeline beeline = new Beeline();
             beeline.lineBase.Width = 2;
             beeline.lineBase.Color = lines.MainColor;
@@ -431,12 +431,12 @@ namespace huqiang.UIComposite
                 var data = columns[0].datas;
                 float end = Enity.m_sizeDelta.y;
                 float oy = s * itemY- m_pointY;
-                oy -= itemY * 0.5f;
+                oy += itemY * 0.5f;
                 for (int i = s; i < data.Count; i++)
                 {
                     oy += itemY;
                     UpdateHorizontalLine(oy);
-                    if (oy > end)
+                    if (oy > end + itemY)
                         break;
                 }
             }

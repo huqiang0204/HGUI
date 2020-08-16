@@ -324,16 +324,21 @@ namespace huqiang.Data
             {
                 len /= 8;
                 Int64[] buf = new long[len];
+                Int64* sp = (Int64*)p;
                 for (int i = 0; i < len; i++)
-                { buf[i] = *p; p++; }
+                { 
+                    buf[i] = *sp; 
+                    sp++; 
+                }
                 return buf;
             }
             else if (type == DataType.DoubleArray)
             {
                 len /= 8;
                 Double[] buf = new Double[len];
+                double* sp = (double*)p;
                 for (int i = 0; i < len; i++)
-                { buf[i] = *p; p++; }
+                { buf[i] = *sp; sp++; }
                 return buf;
             }
             else if (type == DataType.FakeStringArray)
@@ -368,7 +373,16 @@ namespace huqiang.Data
                 int len = array.Length;
                 byte[] buf = new byte[len * size];
                 var src = Marshal.UnsafeAddrOfPinnedArrayElement(array, 0);
-                Marshal.Copy(src, buf, 0, buf.Length);
+                unsafe
+                {
+                    byte* sp = (byte*)src;
+                    for (int i = 0; i < buf.Length; i++)
+                    {
+                        buf[i] = *sp;
+                        sp++;
+                    }
+                }
+                //Marshal.Copy(src, buf, 0, buf.Length);
                 return buf;
             }
             else

@@ -54,6 +54,7 @@ namespace huqiang.Core.HGUI
         public bool PauseEvent;
         protected virtual void Start()
         {
+            MainCanvas = this;
             Font.textureRebuilt += FontTextureRebuilt;
             Main = new QueueBuffer<TempBuffer>();
             Sub = new QueueBuffer<TempBuffer>();
@@ -118,6 +119,7 @@ namespace huqiang.Core.HGUI
             AnimationManage.Manage.Update();
             if (UIPage.CurrentPage != null)
                 UIPage.CurrentPage.Update(UserAction.TimeSlice);
+            UINotify.UpdateAll(UserAction.TimeSlice);
             TextInput.Dispatch();
             InputCaret.UpdateCaret();
             CheckSize();
@@ -133,6 +135,8 @@ namespace huqiang.Core.HGUI
                 Scale.ScreenHeight = h;
                 if (UIPage.CurrentPage != null)
                     UIPage.CurrentPage.ReSize();
+                if (UIMenu.CurrentMenu != null)
+                    UIMenu.CurrentMenu.ReSize();
             }
         }
         private void LateUpdate()
@@ -143,17 +147,13 @@ namespace huqiang.Core.HGUI
             Collection(transform, -1, 0);
             for (int i = 0; i < max; i++)
                 scripts[i].MainUpdate();
-            for (int i = 0; i < top_txt; i++)
-                texts[i].Populate();
-            if(ftr)//纹理被改变了,需要重新计算
+            if (ftr)//纹理被改变了,需要重新计算
             {
                 ftr = false;
-                for (int i = 0; i < top_txt; i++)
-                {
-                    texts[i].m_dirty = true;
-                    texts[i].Populate();
-                }
+                HText.DirtyAll();
             }
+            for (int i = 0; i < top_txt; i++)
+                texts[i].Populate();
             Batch();
             ApplyMeshRenderer();
             ApplyToCamera();

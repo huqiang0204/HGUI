@@ -642,7 +642,7 @@ namespace huqiang.UIComposite
             MainArea = area;
             area.SizeChanged();
         }
-        void SizeChanged(UIElement mod)
+        public void SizeChanged(UIElement mod)
         {
             Vector2 size = Enity.SizeDelta;
             float rx = size.x * 0.5f;

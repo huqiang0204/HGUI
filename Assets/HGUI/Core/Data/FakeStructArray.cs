@@ -221,5 +221,11 @@ namespace huqiang.Data
                 return null;
             return buffer.GetData(*addr) as T;
         }
+        public unsafe T GetData<T>(int index, int offset) where T : class
+        {
+            int o = (index * m_size + offset) * 4;
+            int os = *(Int32*)(ip + o);
+            return buffer.GetData(os) as T;
+        }
     }
 }

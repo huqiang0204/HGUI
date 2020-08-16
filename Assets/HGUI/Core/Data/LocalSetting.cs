@@ -46,7 +46,7 @@ namespace huqiang.Data
             if (sec == null)
             {
                 sec = new INISection();
-                sec.name = block;
+                sec.Name = block;
                 Setting.AddSection(sec);
             }
             Changed = true;
@@ -58,7 +58,7 @@ namespace huqiang.Data
             if (sec == null)
             {
                 sec = new INISection();
-                sec.name = block;
+                sec.Name = block;
                 Setting.AddSection(sec);
             }
             Changed = true;

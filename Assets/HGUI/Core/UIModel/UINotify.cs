@@ -1,5 +1,6 @@
 ﻿using huqiang.Core.HGUI;
 using huqiang.Data;
+using huqiang.UIEvent;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,95 +13,72 @@ namespace huqiang.UIModel
     public class UINotify : UIBase
     {
         public static Transform Root { get; set; }
+        public static UIElement UIRoot { get; private set; }
         public static UINotify Instance { get; private set; }
-        public static void UpdateData(Msg msg, object obj)
+        public static void Initial(Transform Canvas)
         {
-            if (Instance != null)
-                Instance.Cmd(msg, obj);
+            var menu = new GameObject("Notify");
+            var ele = UIRoot = menu.AddComponent<UIElement>();
+            ele.marginType = MarginType.Margin;
+            Root = menu.transform;
+            menu.transform.SetParent(Canvas);
+            Root.localPosition = Vector3.zero;
+            Root.localScale = Vector3.one;
+            Root.localRotation = Quaternion.identity;
         }
-        public static void Refresh(float time)
+        public static void UpdateAll(float time)
         {
-            if (Instance != null)
-                Instance.Update(time);
-        }
-        List<PopWindow> pops;
-        public UINotify()
-        {
-            pops = new List<PopWindow>();
-            Instance = this;
-        }
-        public virtual void Show(object dat = null)
-        {
-        }
-        public override void ReSize()
-        {
-            for (int i = 0; i < pops.Count; i++)
+            for (int i = 0; i < notifys.Count; i++)
             {
-                var p = pops[i];
-                if (p.model != null)
-                    p.ReSize();
-            }
-        }
-        public override void Dispose()
-        {
-            if (pops != null)
-                for (int i = 0; i < pops.Count; i++)
-                    pops[i].Dispose();
-            pops.Clear();
-            HGUIManager.GameBuffer.RecycleGameObject(Main);
-            ClearUI();
-        }
-        public void HidePopWindow()
-        {
-            for (int i = 0; i < pops.Count; i++)
-                pops[i].Hide();
-        }
-        /// <summary>
-        /// 释放掉当前未激活的弹窗
-        /// </summary>
-        public void ReleasePopWindow()
-        {
-            int c = pops.Count - 1;
-            for (; c >= 0; c--)
-            {
-                var p = pops[c];
-                if (p.model != null)
-                { p.Dispose(); pops.RemoveAt(c); }
-                else if (!p.Main.gameObject.activeSelf)
-                { p.Dispose(); pops.RemoveAt(c); }
-            }
-        }
-        protected T ShowPopWindow<T>(object obj = null) where T : PopWindow, new()
-        {
-            for (int i = 0; i < pops.Count; i++)
-                if (pops[i] is T)
+                if (notifys[i].Main != null)
                 {
-                    pops[i].Show(obj);
-                    return pops[i] as T;
+                    if (notifys[i].Main.activeSelf)
+                        notifys[i].Update(time);
+                }
+            }
+        }
+        static List<UINotify> notifys = new List<UINotify>();
+        public static UINotify CurrentNotify { get; private set; }
+        public static T ShowNotify<T>(UIBase context, object obj = null) where T : UINotify, new()
+        {
+            UIRoot.gameObject.SetActive(true);
+            for (int i = 0; i < notifys.Count; i++)
+                if (notifys[i] is T)
+                {
+                    CurrentNotify = notifys[i];
+                    notifys[i].Show(context, obj);
+                    return notifys[i] as T;
                 }
             var t = new T();
-            pops.Add(t);
-            t.Initial(Root, this, obj);
+            notifys.Add(t);
+            CurrentNotify = t;
+            t.Initial(Root, context, obj);
+            t.Show(context, obj);
             t.ReSize();
             return t;
         }
-        public T GetPopWindow<T>() where T : PopWindow
+        public UINotify()
         {
-            for (int i = 0; i < pops.Count; i++)
-                if (pops[i] is T)
-                    return pops[i] as T;
-            return null;
+            Instance = this;
         }
-        public override void Update(float time)
+        public virtual void Show(UIBase context, object dat = null)
         {
-            for (int i = 0; i < pops.Count; i++)
-            {
-                var p = pops[i];
-                if (p.model != null)
-                    if (p.Main.gameObject.activeSelf)
-                        p.Update(time);
-            }
+            if (Main != null)
+                Main.SetActive(true);
         }
+        public override void ReSize()
+        {
+            if (UIRoot != null)
+                if (HCanvas.MainCanvas != null)
+                    UIRoot.SizeDelta = HCanvas.MainCanvas.SizeDelta;
+            base.ReSize();
+        }
+        public virtual void Hide()
+        {
+            if (Main != null)
+                Main.SetActive(false);
+        }
+
     }
 }
 

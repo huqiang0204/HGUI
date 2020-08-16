@@ -24,7 +24,7 @@ namespace huqiang.UIComposite
             script.SizeChanged = (o) => Order();
         }
         public Direction direction = Direction.Horizontal;
-        void Order()
+        public void Order()
         {
             switch (direction)
             {

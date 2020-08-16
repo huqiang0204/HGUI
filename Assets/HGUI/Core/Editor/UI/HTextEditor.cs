@@ -45,6 +45,10 @@ public class HTextEditor:UIElementEditor
                 if (can != null)
                     can.Refresh();
             }
+           if (GUI.changed)
+            {
+                txt.Text = txt.Text;
+            }
         }
 
     }

@@ -7,12 +7,12 @@ namespace huqiang.Data
 {
     public class INIReader
     {
-        List<INISection> sections = new List<INISection>();
+        public List<INISection> sections = new List<INISection>();
         public string Name;
         public INISection FindSection(string sec)
         {
             for (int i = 0; i < sections.Count; i++)
-                if (sections[i].name == sec)
+                if (sections[i].Name == sec)
                     return sections[i];
             return null;
         }
@@ -85,7 +85,7 @@ namespace huqiang.Data
                 LoadData(ss);
             }
         }
-        public void LoadFromFile(byte[] bytes)
+        public void LoadData(byte[] bytes)
         {
             sections.Clear();
             if (bytes!=null&&bytes.Length>0)
@@ -109,7 +109,7 @@ namespace huqiang.Data
                         var last = str.LastIndexOf(']');
                         var name = str.Substring(1, last - 1);
                         sec = new INISection();
-                        sec.name = name;
+                        sec.Name = name;
                         sections.Add(sec);
                     }
                     else if (str[0] != '#' & sec != null)
@@ -139,7 +139,7 @@ namespace huqiang.Data
         public bool RemoveSection(string name)
         {
             for(int i=0;i<sections.Count;i++)
-                if(sections[i].name==name)
+                if(sections[i].Name==name)
                 {
                     sections.RemoveAt(i);
                     return true;
@@ -150,21 +150,19 @@ namespace huqiang.Data
         {
             sections.Add(section);
         }
-        public void WriteToFile(string path)
+        public string GetString()
         {
-            if (File.Exists(path))
-                File.Delete(path);
             StringBuilder sb = new StringBuilder();
             bool muti = false;
-            for(int i=0;i<sections.Count;i++)
+            for (int i = 0; i < sections.Count; i++)
             {
                 if (muti)
                     sb.Append("\r[");
                 else sb.Append("[");
-                sb.Append(sections[i].name);
+                sb.Append(sections[i].Name);
                 sb.Append("]");
-                var v = sections[i].values;
-                for(int j=0;j<v.Count;j++)
+                var v = sections[i].Values;
+                for (int j = 0; j < v.Count; j++)
                 {
                     var kv = v[j];
                     if (kv.value != null & kv.value != "")
@@ -175,15 +173,15 @@ namespace huqiang.Data
                         sb.Append(kv.value);
                     }
                 }
-                var m = sections[i].mates;
+                var m = sections[i].Mates;
                 for (int j = 0; j < m.Count; j++)
                 {
                     var u = m[j];
                     v = u.values;
-                    for(int k=0;k<v.Count;k++)
+                    for (int k = 0; k < v.Count; k++)
                     {
                         var kv = v[k];
-                        if(kv.value!=null&kv.value!="")
+                        if (kv.value != null & kv.value != "")
                         {
                             sb.Append('\r');
                             sb.Append(u.index);
@@ -196,7 +194,13 @@ namespace huqiang.Data
                 }
                 muti = true;
             }
-            byte[] dat = Encoding.UTF8.GetBytes(sb.ToString());
+            return sb.ToString();
+        }
+        public void WriteToFile(string path)
+        {
+            if (File.Exists(path))
+                File.Delete(path);
+            byte[] dat = Encoding.UTF8.GetBytes(GetString());
             File.WriteAllBytes(path, dat);
         }
     }

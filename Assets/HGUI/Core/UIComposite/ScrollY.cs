@@ -182,7 +182,7 @@ namespace huqiang.UIComposite
         }
         public void Calcul()
         {
-            float w = Size.x - ItemOffset.x;
+            float w = Enity.m_sizeDelta.x - ItemOffset.x;
             float dw = w / ItemSize.x;
             Column = (int)dw;
             if (Column < 1)
@@ -190,7 +190,7 @@ namespace huqiang.UIComposite
             if (DynamicSize)
             {
                 float dx = w / Column;
-                ctScale =dx / ItemSize.x;
+                ctScale = dx / ItemSize.x;
                 ctSize.x = dx;
                 ctSize.y = ItemSize.y * ctScale;
             }

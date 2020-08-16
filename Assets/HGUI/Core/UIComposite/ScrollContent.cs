@@ -273,6 +273,12 @@ namespace huqiang.UIComposite
             a.target.SetAsFirstSibling();
             a.target.localRotation = Quaternion.identity;
             a.target.localScale = Vector3.one;
+            var ui = a.target.GetComponent<UIElement>();
+            if (ui != null)
+            {
+                UIElement.Resize(ui);
+                ItemSize = ui.m_sizeDelta;
+            }
             return a;
         }
         Constructor creator;

@@ -13,7 +13,7 @@ namespace huqiang.UIComposite
         /// 展开
         /// </summary>
         public bool expand;
-        public string content;
+        public virtual string content { get; set; }
         /// <summary>
         /// 绑定的数据,联系上下文
         /// </summary>
@@ -22,18 +22,25 @@ namespace huqiang.UIComposite
         public List<TreeViewNode> child = new List<TreeViewNode>();
         public void Add(TreeViewNode node)
         {
+            if (node.parent == this)
+                return;
             if (node != null)
             {
+                if (node.parent != null)
+                    node.parent.child.Remove(this);
                 child.Add(node);
                 node.parent = this;
             }
         }
         public void SetParent(TreeViewNode node)
         {
-            if (parent != node)
+            if (parent == node)
+                return;
+            if (parent != null)
                 parent.child.Remove(this);
             if (node != null)
                 node.child.Add(this);
+            parent = node;
         }
         public TreeViewNode parent { get; private set; }
         public int[] Level
@@ -133,7 +140,7 @@ namespace huqiang.UIComposite
         public Vector2 Size;//scrollView的尺寸
         Vector2 contentSize;
         public Vector2 ItemSize;
-        public TreeViewNode nodes;
+        public TreeViewNode Root;
         public float ItemHigh = 30;
         public UserEvent eventCall;//scrollY自己的按钮
         public FakeStruct ItemMod;
@@ -188,13 +195,13 @@ namespace huqiang.UIComposite
         float hx;
         public void Refresh()
         {
-            if (nodes == null)
+            if (Root == null)
                 return;
             Size = Enity.SizeDelta;
             hy = Size.y * 0.5f;
             hx = Size.x * 0.5f;
             contentSize.x = ItemSize.x;
-            contentSize.y = CalculHigh(nodes, 0, 0);
+            contentSize.y = CalculHigh(Root, 0, 0);
             RecycleItem();
             if (m_pointX + ItemSize.x > contentSize.x)
                 m_pointX = contentSize.x - ItemSize.x;
@@ -412,6 +419,12 @@ namespace huqiang.UIComposite
             var m = new TVMiddleware<T, U>();
             m.Invoke = action;
             creator = m;
+        }
+        public void Clear()
+        {
+            swap.Clear();
+            queue.Clear();
+            HGUIManager.GameBuffer.RecycleChild(Enity.gameObject);
         }
     }
 }

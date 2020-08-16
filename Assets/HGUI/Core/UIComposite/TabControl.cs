@@ -29,7 +29,8 @@ namespace huqiang.UIComposite
         public Transform Items;
         public UIElement Content;
         public FakeStruct Item;
-        public TableContent curContent;
+        public TableContent CurContent;
+        public Action<TabControl> SelectChanged;
         StackPanel stackPanel;
         HeadDock dock;
         /// <summary>
@@ -103,18 +104,18 @@ namespace huqiang.UIComposite
             eve.PointerLeave = ItemPointLeave;
             content.eventCall = eve;
             content.eventCall.DataContext = content;
-            if (curContent != null)
+            if (CurContent != null)
             {
-                curContent.Content.gameObject.SetActive(false);
-                if (curContent.Back != null)
-                    curContent.Back.gameObject.SetActive(false);
+                CurContent.Content.gameObject.SetActive(false);
+                if (CurContent.Back != null)
+                    CurContent.Back.gameObject.SetActive(false);
             }
             model.transform.SetParent(Content.transform);
             model.transform.localScale = Vector3.one;
             UIElement.Resize(model);
-            curContent = content;
-            curContent.Back.MainColor = SelectColor;
-            contents.Add(curContent);
+            CurContent = content;
+            CurContent.Back.MainColor = SelectColor;
+            contents.Add(CurContent);
             mod.SetParent(Items);
         }
         /// <summary>
@@ -126,21 +127,21 @@ namespace huqiang.UIComposite
         /// <param name="callback"></param>
         public void AddContent(TableContent table)
         {
-            if (curContent != null)
+            if (CurContent != null)
             {
-                curContent.Content.gameObject.SetActive(false);
-                if (curContent.Back != null)
-                    curContent.Back.gameObject.SetActive(false);
+                CurContent.Content.gameObject.SetActive(false);
+                if (CurContent.Back != null)
+                    CurContent.Back.gameObject.SetActive(false);
             }
             table.Item.transform.SetParent(Items);
             table.Item.userEvent.Click = ItemClick;
             table.Item.userEvent.PointerEntry = ItemPointEntry;
             table.Item.userEvent.PointerLeave = ItemPointLeave;
             table.Content.transform.SetParent(Content.transform);
-            curContent = table;
-            curContent.Content.gameObject.SetActive(true);
-            if (curContent.Back != null)
-                curContent.Back.gameObject.SetActive(true);
+            CurContent = table;
+            CurContent.Content.gameObject.SetActive(true);
+            if (CurContent.Back != null)
+                CurContent.Back.gameObject.SetActive(true);
             contents.Add(table);
         }
         /// <summary>
@@ -152,11 +153,11 @@ namespace huqiang.UIComposite
             contents.Remove(table);
             if(contents.Count>0)
             {
-                curContent = contents[0];
-                if (curContent.Content != null)
-                    curContent.Content.gameObject.SetActive(true);
-                if (curContent.Back != null)
-                    curContent.Back.gameObject.SetActive(true);
+                CurContent = contents[0];
+                if (CurContent.Content != null)
+                    CurContent.Content.gameObject.SetActive(true);
+                if (CurContent.Back != null)
+                    CurContent.Back.gameObject.SetActive(true);
             }
         }
         /// <summary>
@@ -166,8 +167,8 @@ namespace huqiang.UIComposite
         public void ReleseContent(TableContent table)
         {
             contents.Remove(table);
-            if (table == curContent)
-                curContent = null;
+            if (table == CurContent)
+                CurContent = null;
             HGUIManager.GameBuffer.RecycleGameObject(table.Content.gameObject);
             HGUIManager.GameBuffer.RecycleGameObject(table.Item.gameObject);
         }
@@ -181,19 +182,19 @@ namespace huqiang.UIComposite
         }
         public void ShowContent(TableContent content)
         {
-            if (curContent != null)
+            if (CurContent != null)
             {
-                if (curContent.Content != null)
-                    curContent.Content.gameObject.SetActive(false);
-                if (curContent.Back != null)
-                    curContent.Back.gameObject.SetActive(false);
+                if (CurContent.Content != null)
+                    CurContent.Content.gameObject.SetActive(false);
+                if (CurContent.Back != null)
+                    CurContent.Back.gameObject.SetActive(false);
             }
-            curContent = content;
-            curContent.Content.gameObject.SetActive(true);
-            if (curContent.Back != null)
+            CurContent = content;
+            CurContent.Content.gameObject.SetActive(true);
+            if (CurContent.Back != null)
             {
-                curContent.Back.MainColor = SelectColor;
-                curContent.Back.gameObject.SetActive(true);
+                CurContent.Back.MainColor = SelectColor;
+                CurContent.Back.gameObject.SetActive(true);
             }
         }
         public bool ExistContent(TableContent content)
@@ -202,12 +203,17 @@ namespace huqiang.UIComposite
         }
         public void ItemClick(UserEvent callBack,UserAction action)
         {
-            ShowContent(callBack.DataContext as TableContent);
+            var con = callBack.DataContext as TableContent;
+            var cur = CurContent;
+            ShowContent(con);
+            if (con != cur)
+                if (SelectChanged != null)
+                    SelectChanged(this);
         }
         public void ItemPointEntry(UserEvent callBack,UserAction action)
         {
             var c = callBack.DataContext as TableContent;
-            if (c == curContent)
+            if (c == CurContent)
                 return;
             if (c != null)
             {
@@ -221,11 +227,11 @@ namespace huqiang.UIComposite
         public void ItemPointLeave(UserEvent callBack,UserAction action)
         {
             var c = callBack.DataContext as TableContent;
-            if (c == curContent)
+            if (c == CurContent)
                 return;
             if (c != null)
             {
-                if (c != curContent)
+                if (c != CurContent)
                     if (c.Back != null)
                     {
                         c.Back.gameObject.SetActive(false);

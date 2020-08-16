@@ -10,6 +10,10 @@ namespace huqiang.Unit
     {
         public Vector2[] points;
         public Vector2[] buf;
+        public UPolygonCollider()
+        {
+            type = CollisionType.Pollygon;
+        }
         public override void Update()
         {
             if (Target == null)

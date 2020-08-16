@@ -894,6 +894,7 @@ public static class UICompositeMenu
 
         var line = UICreator.CreateHLine(Vector3.zero, new Vector2(200, 60), "Line", grid.transform);
         line.MainColor = new Color32(85, 85, 85, 255);
+        line.marginType = MarginType.Margin;
 
         var heads = new GameObject("Heads");
         heads.transform.SetParent(dg.transform);

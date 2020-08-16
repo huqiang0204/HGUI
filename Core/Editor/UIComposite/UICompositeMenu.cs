@@ -299,15 +299,24 @@ public static class UICompositeMenu
             rect.SetParent(parent.transform);
         rect.localPosition = Vector3.zero;
         rect.localScale = Vector3.one;
+
         var Item = new GameObject("Item");
         var fr = Item.transform;
         fr.SetParent(rect);
         fr.localPosition = Vector3.zero;
         fr.localScale = Vector3.one;
-        var txt = Item.AddComponent<HText>();
-        txt.SizeDelta = new Vector2(200,40);
-        txt.TextAnchor = TextAnchor.MiddleLeft;
-        txt.FontSize = 24;
+        var e = Item.AddComponent<UIElement>();
+        e.SizeDelta = new Vector2(200, 40);
+
+        var txt = new GameObject("Text");
+        var t = txt.transform;
+        t.SetParent(fr);
+        t.localPosition = Vector3.zero;
+        t.localScale = Vector3.one;
+        var ht = txt.AddComponent<HText>();
+        ht.SizeDelta = new Vector2(200, 40);
+        ht.TextAnchor = TextAnchor.MiddleLeft;
+        ht.FontSize = 24;
     }
     [MenuItem("GameObject/HGUI/UIDate", false, 11)]
     static public void AddDate(MenuCommand menuCommand)

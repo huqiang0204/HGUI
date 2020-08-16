@@ -9,6 +9,11 @@ namespace huqiang.Unit
     {
         public float radius;
         public float rad;
+        public UCircleCollider()
+        {
+            type = CollisionType.Cricle;
+        }
+
         public override void Update()
         {
             rad = Target.localScale.x * radius;

@@ -2,6 +2,7 @@
 using UnityEngine;
 using huqiang.Core.HGUI;
 using huqiang.UIModel;
+using huqiang.UIEvent;
 
 namespace huqiang
 {
@@ -15,15 +16,11 @@ namespace huqiang
         }
         static void CreateUI() 
         {
-            var page = new GameObject("page");
-            UIPage.UIRoot = page.AddComponent<UIElement>();
-            UIPage.Root = page.transform;
-            page.transform.SetParent(UIRoot);
-            UIPage.Root.localPosition = Vector3.zero;
-            UIPage.Root.localScale = Vector3.one;
-            UIPage.Root.localRotation = Quaternion.identity;
+            UIPage.Initial(UIRoot);
+            UIMenu.Initial(UIRoot);
+            UINotify.Initial(UIRoot);
 
-            var buff = new GameObject("buffer");
+            var buff = new GameObject("Buffer");
             buff.transform.SetParent(UIRoot);
             buff.SetActive(false);
             buff.transform.localScale = Vector3.one;

@@ -20,6 +20,7 @@ namespace huqiang.Data
     {
         static readonly char[] Separators = { ' ', '.', ',', '\t', '\r', '\n' };
         const string EmailCharacters = "!#$%&'*+-/=?^_`{|}~";
+        const string Num = "0123456789";
         public static char Validate(CharacterValidation validat, string text, int pos, char ch)
         {
             if (validat == CharacterValidation.None)
@@ -175,6 +176,9 @@ namespace huqiang.Data
             {
                 if (str[i] < '0' | str[i] > '9')
                 {
+                    if (i == 0)
+                        if (str[0] == '-')
+                            continue;
                     len = i;
                     break;
                 }
@@ -193,7 +197,7 @@ namespace huqiang.Data
             {
                 if (str[i] < '0' | str[i] > '9')
                 {
-                    if (!point)
+                    if (!point)  
                         if (str[i] == '.')
                         {
                             point = true;
@@ -277,6 +281,206 @@ namespace huqiang.Data
             if (len == 0)
                 return "";
             return str.Substring(0, len);
+        }
+        public static string GetInt(string str, int len)
+        {
+            if (str == "" | str == null)
+                return "0";
+            char[] buf = new char[len + 1];
+            int num = 0;
+            bool frist = false;
+            bool real = false;
+            int rc = 0;
+            for (int i = 0;i < str.Length;i++)
+            {
+                var c = str[i];
+                if (c == '-')
+                {
+                    if (!frist)
+                    {
+                        frist = true;
+                        buf[num] = '-';
+                        num++;
+                    }
+                    else break;
+                }else if(c==' ')
+                {
+
+                }else if(c<'0'| c>'9')
+                {
+                    break;
+                }
+                else if (c == '0')
+                {
+                    if (real)
+                    {
+                        buf[num] = '0';
+                        num++;
+                        rc++;
+                        if (rc >= len)
+                            break;
+                    }
+                }
+                else
+                {
+                    real = true;
+                    buf[num] = c;
+                    num++;
+                    rc++;
+                    if (rc >= len)
+                        break;
+                }
+            }
+            return new string(buf, 0, num);
+        }
+        public static string GetInt(string str)
+        {
+            return GetInt(str,11);
+        }
+        public static string GetUInt(string str)
+        {
+            str = GetInt(str,11);
+            return str.Replace("-","");
+        }
+        public static string Getlong(string str)
+        {
+            return GetInt(str,22);
+        }
+        public static string GetUlong(string str)
+        {
+            str = GetInt(str, 22);
+            return str.Replace("-", "");
+        }
+        public static string GetFloat(string str, int len)
+        {
+            if (str == "" | str == null)
+                return "0";
+            char[] buf = new char[len + 2];
+            int num = 0;
+            bool frist = false;
+            bool real = false;
+            bool dot = false;
+            int rc = 0;
+            for (int i = 0; i < str.Length; i++)
+            {
+                var c = str[i];
+                if (c == '-')
+                {
+                    if (!frist)
+                    {
+                        frist = true;
+                        buf[num] = '-';
+                        num++;
+                    }
+                    else break;
+                }
+                else if (c == ' ')
+                {
+                }
+                else if (c < '0' | c > '9')
+                {
+                    if (c == '.')
+                    {
+                        if (dot)
+                            break;
+                        dot = true;
+                        if (real)
+                        {
+                            buf[num] = '.';
+                            num++;
+                        }
+                        else
+                        {
+                            buf[num] = '0';
+                            num++;
+                            buf[num] = '.';
+                            num++;
+                            rc++;
+                            if (rc >= len)
+                                break;
+                        }
+                    }
+                    else break;
+                }
+                else if (c == '0')
+                {
+                    if (real | dot)
+                    {
+                        buf[num] = '0';
+                        num++;
+                        rc++;
+                        if (rc >= len)
+                            break;
+                    }
+                }
+                else
+                {
+                    real = true;
+                    buf[num] = c;
+                    num++;
+                    rc++;
+                    if (rc >= len)
+                        break;
+                }
+            }
+            if (!real)
+                return "0";
+            if (num > 0)
+                if (buf[num - 1] == '.')
+                    num--;
+            return new string(buf, 0, num);
+        }
+        public static string GetFloat(string str)
+        {
+            return GetFloat(str,8);
+        }
+        public static string GetDouble(string str)
+        {
+            return GetFloat(str,17);
+        }
+        public static string GetIntArray(string str,int len)
+        {
+            StringBuilder sb = new StringBuilder();
+             var ss =str.Split(',');
+            bool next = false;
+            for(int i=0;i<ss.Length;i++)
+            {
+                if (next)
+                    sb.Append(',');
+                sb.Append(GetInt(ss[i], len));
+                next = true;
+            }
+            return sb.ToString();
+        }
+        public static string GetIntArray(string str)
+        {
+            return GetIntArray(str,11);
+        }
+        public static string GetLongArray(string str)
+        {
+            return GetIntArray(str,22);
+        }
+        public static string GetFloatArray(string str,int len)
+        {
+            StringBuilder sb = new StringBuilder();
+            var ss = str.Split(',');
+            bool next = false;
+            for (int i = 0; i < ss.Length; i++)
+            {
+                if (next)
+                    sb.Append(',');
+                sb.Append(GetFloat(ss[i], len));
+                next = true;
+            }
+            return sb.ToString();
+        }
+        public static string GetFloatArray(string str)
+        {
+            return GetFloatArray(str,8);
+        }
+        public static string GetDoubleArray(string str)
+        {
+            return GetFloatArray(str, 17);
         }
     }
 }

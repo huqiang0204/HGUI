@@ -266,7 +266,12 @@ namespace huqiang.UIEvent
                         }
                         else if (state == EditState.NewLine)
                         {
-                            InputEvent.OnInputChanged("\n");
+                            if (InputEvent.lineType == LineType.SingleLine)
+                            {
+                                if (InputEvent.OnSubmit != null)
+                                    InputEvent.OnSubmit(InputEvent);
+                            }
+                            else InputEvent.OnInputChanged("\n");
                         }
 #else
                         InputEvent.TouchInputChanged(Keyboard.TouchString);
@@ -305,21 +310,22 @@ namespace huqiang.UIEvent
         }
         void SetShowText()
         {
-            string str = GetShowString();
-            if (str == ""&! Editing)
+            var str = InputString;
+            if (Editing | (str != "" & str != null))
+            {
+                if (TextCom == null)
+                    return;
+                str = GetShowString();
+                TextCom.MainColor = textColor;
+                if (contentType == ContentType.Password)
+                    TextCom.Text = new string('*', str.Length);
+                else TextCom.Text = str;
+            }
+            else
             {
                 TextCom.MainColor = TipColor;
                 TextCom.Text = m_TipString;
                 InputCaret.CaretStyle = 0;
-            }
-            else
-            {
-                if (TextCom == null)
-                    return;
-                TextCom.MainColor = textColor;
-                if (contentType == ContentType.Password)
-                    TextCom.Text = new string('*',str.Length);
-                else TextCom.Text = str;
             }
         }
         public bool ReadOnly;
@@ -450,6 +456,10 @@ namespace huqiang.UIEvent
                     m_tipColor = tp->tipColor;
                     PointColor = tp->pointColor;
                     SelectionColor = tp->selectColor;
+                    CharacterLimit = tp->CharacterLimit;
+                    ReadOnly = tp->ReadyOnly;
+                    contentType = tp->contentType;
+                    lineType = tp->lineType;
                     m_TipString = mod.buffer.GetData(tp->tipString) as string;
                     var str = mod.buffer.GetData(tp->inputString) as string;
                     str = ValidateString(str);
@@ -489,6 +499,8 @@ namespace huqiang.UIEvent
                 Keyboard.OnInput(Text.FullString, InputEvent.touchType, InputEvent.multiLine, pass, CharacterLimit);
             }
             Style = 1;
+            if (Click != null)
+                Click(this,action);
         }
         internal override void OnLostFocus(UserAction action)
         {

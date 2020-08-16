@@ -16,9 +16,9 @@ namespace huqiang.Data
     }
     public class INISection
     {
-        public string name;
-        public List<KeyValue> values = new List<KeyValue>();
-        public List<IniMate> mates = new List<IniMate>();
+        public string Name;
+        public List<KeyValue> Values = new List<KeyValue>();
+        public List<IniMate> Mates = new List<IniMate>();
         public void Add(string key, string value)
         {
             var ss = key.Split('\\');
@@ -28,26 +28,26 @@ namespace huqiang.Data
             }
             else
             {
-                for (int i = 0; i < values.Count; i++)
-                    if (values[i].key == key)
+                for (int i = 0; i < Values.Count; i++)
+                    if (Values[i].key == key)
                     {
-                        values[i].value = value;
+                        Values[i].value = value;
                         return;
                     }
                 var kv = new KeyValue();
                 kv.key = key;
                 kv.value = value;
-                values.Add(kv);
+                Values.Add(kv);
             }
         }
         //添加数组的值
         public void Add(string index,string key, string value)
         {
             IniMate mate = null;
-            for (int i = 0; i < mates.Count; i++)
-                if (mates[i].index == index)
+            for (int i = 0; i < Mates.Count; i++)
+                if (Mates[i].index == index)
                 {
-                    mate = mates[i];
+                    mate = Mates[i];
                     break;
                 }
             if (mate == null)
@@ -59,7 +59,7 @@ namespace huqiang.Data
                 kv.value = value;
 
                 mate.values.Add(kv);
-                mates.Add(mate);
+                Mates.Add(mate);
             }
             else
             {
@@ -78,9 +78,9 @@ namespace huqiang.Data
         }
         public string GetValue(string key)
         {
-            for (int i = 0; i < values.Count; i++)
-                if (key == values[i].key)
-                    return values[i].value;
+            for (int i = 0; i < Values.Count; i++)
+                if (key == Values[i].key)
+                    return Values[i].value;
             return null;
         }
     }

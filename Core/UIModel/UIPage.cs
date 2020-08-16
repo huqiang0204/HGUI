@@ -26,8 +26,18 @@ namespace huqiang.UIModel
         {
             pages.Clear();
         }
-        public static Transform Root { get; set; }
+        public static Transform Root { get;private set; }
         public static UIElement UIRoot;
+        public static void Initial(Transform Canvas)
+        {
+            var page = new GameObject("Page");
+            UIRoot = page.AddComponent<UIElement>();
+            Root = page.transform;
+            page.transform.SetParent(Canvas);
+            Root.localPosition = Vector3.zero;
+            Root.localScale = Vector3.one;
+            Root.localRotation = Quaternion.identity;
+        }
         public static UIPage CurrentPage { get; private set; }
         public static void LoadPage<T>(object dat = null) where T : UIPage, new()
         {
@@ -88,16 +98,6 @@ namespace huqiang.UIModel
                 }
             }
         }
-        public static void UpdateData(Msg msg, object obj)
-        {
-            if (CurrentPage != null)
-                CurrentPage.Cmd(msg, obj);
-        }
-        public static void Refresh(float time)
-        {
-            if (CurrentPage != null)
-                CurrentPage.Update(time);
-        }
         public UIPage()
         {
             pops = new List<PopWindow>();
@@ -137,12 +137,7 @@ namespace huqiang.UIModel
                     pops[i].Dispose();
             pops.Clear();
             currentPop = null;
-            if (Main != null)
-            {
-                Main.transform.SetParent(null);
-                HGUIManager.GameBuffer.RecycleGameObject(Main);
-            }
-            ClearUI();
+            base.Dispose();
         }
         public void HidePopWindow()
         {

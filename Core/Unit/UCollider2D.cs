@@ -6,8 +6,18 @@ using System.Threading.Tasks;
 
 namespace huqiang.Unit
 {
+    public enum CollisionType
+    {
+        None,
+        Cricle,
+        Pollygon,
+        Line,
+        Dot,
+        Capsules
+    }
     public class UCollider2D
     {
+        public CollisionType type { get; protected set; }
         public Unit Target;
         public virtual void Update()
         {

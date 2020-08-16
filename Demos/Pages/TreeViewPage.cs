@@ -45,7 +45,7 @@ public class TreeViewPage:UIPage
         var trans = TreeModel.transform;
         var root = trans.GetChild(0);
         root.gameObject.SetActive(true);
-        view.tree.nodes = CreateNodeChild(root);
+        view.tree.Root = CreateNodeChild(root);
         view.tree.SetItemUpdate<TreeViewItemEx, TreeViewNodeEx>(TreeItemUpdate);
         view.tree.SelectChanged = SelectChanged;
         view.tree.Refresh();
@@ -137,7 +137,7 @@ public class TreeViewPage:UIPage
             int[] buf = new int[l];
             for (int i = 0; i < l; i++)
                 buf[i] = level[i + 1];
-            var nod = view.tree.nodes.Find(buf);
+            var nod = view.tree.Root.Find(buf);
             if (nod != null)
             {
                 nod.Expand();

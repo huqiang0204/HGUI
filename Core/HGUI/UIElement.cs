@@ -324,8 +324,19 @@ namespace huqiang.Core.HGUI
                     MarginY(script, mar, pp, psize);
                     break;
                 case MarginType.MarginRatioX:
+                    mar = new Margin();
+                    mar.left = script.margin.left * psize.x;
+                    mar.right = script.margin.right * psize.x;
+                    MarginX(script, mar, pp, psize);
                     break;
                 case MarginType.MarginRatioY:
+                    mar = new Margin();
+                    mar.top = script.margin.top * psize.y;
+                    if (script.parentType == ParentType.BangsScreen)
+                        if (Scale.ScreenHeight / Scale.ScreenWidth > 2f)
+                            mar.top += 88;
+                    mar.down = script.margin.down * psize.y;
+                    MarginY(script, mar, pp, psize);
                     break;
             }
             //Scaling(script, script.scaleType, psize, script.DesignSize);
@@ -344,7 +355,7 @@ namespace huqiang.Core.HGUI
                 Scaling(script, script.scaleType, psize, script.m_sizeDelta);
             if (child)
                 ResizeChild(rect, child);
-            else if (script.scaleType != ScaleType.None | script.anchorType != AnchorType.None | script.marginType != MarginType.None)
+            if (script.scaleType != ScaleType.None | script.anchorType != AnchorType.None | script.marginType != MarginType.None)
             {
                 ResizeChild(rect, false);
                 if (v != script.m_sizeDelta)

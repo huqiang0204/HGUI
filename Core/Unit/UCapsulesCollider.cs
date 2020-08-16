@@ -15,6 +15,10 @@ namespace huqiang.Unit
         public Vector2 offset;
         public float radius;
         public bool circle = false;
+        public UCapsulesCollider()
+        {
+            type = CollisionType.Capsules;
+        }
         public override void Update()
         {
             radius = Target.localScale.x * size.x;

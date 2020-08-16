@@ -133,6 +133,8 @@ namespace huqiang.UIEvent
         {
             Style = 0;
             InputCaret.Hide();
+            if (Click != null)
+                Click(this, action);
         }
         internal override void OnLostFocus(UserAction eventCall)
         {

@@ -23,6 +23,7 @@ namespace huqiang.UIComposite
         public UIElement Item;
         public HText Text;
         public DataGridItemContext Context;
+        public DataGridColumn GridColumn;
         public int Row;
         public int Column;
     }
@@ -37,7 +38,29 @@ namespace huqiang.UIComposite
         /// </summary>
         public float width = 80;
         public string Head;
+        public FakeStruct mod;
         public List<DataGridItemContext> datas = new List<DataGridItemContext>();
+        public ModelConstructor itemCreator;
+        public QueueBuffer<DataGridItem> buf=new QueueBuffer<DataGridItem>(128);
+        public void SetItemUpdate<T, U>(Action<T, U> action)
+            where T : DataGridItem, new() where U : DataGridItemContext, new()
+        {
+            var m = new ModelMiddleware<T, U>();
+            m.Invoke = action;
+            itemCreator = m;
+        }
+        public DataGridItem CreateEnity()
+        {
+            DataGridItem it = buf.Dequeue();
+            if (it != null)
+            {
+                it.target.SetActive(true);
+                return it;
+            }
+            var t = itemCreator.Create() as DataGridItem;
+            t.target = HGUIManager.GameBuffer.Clone(mod, itemCreator.initializer);
+            return t;
+        }
     }
     public class ModelConstructor
     {
@@ -96,6 +119,7 @@ namespace huqiang.UIComposite
         List<HImage> lines;
         List<HImage> temp;
         public UserEvent eventCall;
+        public Action<DataGrid,DataGridColumn> ColumnResized;
         public DataGrid()
         {
             HeadSwap = new SwapBuffer<DataGridHead, DataGridColumn>(128);
@@ -130,11 +154,15 @@ namespace huqiang.UIComposite
             HGUIManager.GameBuffer.RecycleGameObject(trans.Find("Drag").gameObject);
             HGUIManager.GameBuffer.RecycleGameObject(trans.Find("Line").gameObject);
             eventCall = element.RegEvent<UserEvent>();
+            eventCall.CutRect = true;
             eventCall.Drag = (o, e, s) => { Scrolling(o, s); };
             eventCall.DragEnd = (o, e, s) => { Scrolling(o, s); };
             eventCall.Scrolling = Scrolling;
             eventCall.ForceEvent = true;
             eventCall.AutoColor = false;
+            var ue = Grid.GetComponent<UIElement>().RegEvent<UserEvent>();
+            ue.CutRect = true;
+            ue.Penetrate = true;
         }
         void Scrolling(UserEvent back, Vector2 v)
         {
@@ -163,7 +191,7 @@ namespace huqiang.UIComposite
             else lineHigh = contentSize.y;
             Order();
         }
-        T CreateEnity<T>(QueueBuffer<T> buf,FakeStruct mod, ModelConstructor creator,Transform parent)
+        T CreateEnity<T>(QueueBuffer<T> buf, FakeStruct mod, ModelConstructor creator,Transform parent)
             where T:DataBaseItem,new()
         {
             T it = buf.Dequeue();
@@ -191,6 +219,22 @@ namespace huqiang.UIComposite
             }
             swap.Done();
         }
+        void RecycleItemEnity()
+        {
+            int len = ItemSwap.Length;
+            for(int i=0;i<len;i++)
+            {
+                var it = ItemSwap.Pop();
+                var col = it.GridColumn;
+                it.target.SetActive(false);
+                if (col == null)
+                {
+                    HGUIManager.GameBuffer.RecycleGameObject(it.target);
+                }
+                else col.buf.Enqueue(it);
+            }
+            ItemSwap.Done();
+        }
         void UpdateHead(Vector3 pos, DataGridColumn col)
         {
             var item = HeadSwap.Exchange((o, e) => { return o.Context == e; }, col);
@@ -205,20 +249,41 @@ namespace huqiang.UIComposite
             UpdateDrag(pos,item);
             pos.y = -0.5f*lineHigh ;
             UpdateLine(pos,new Vector2(2,lineHigh));
+            if (item.Head != null)
+                if (item.Head.m_sizeDelta.x != col.width)
+                {
+                    item.Head.m_sizeDelta.x = col.width;
+                    UIElement.ResizeChild(item.Head);
+                }
             headCreator.Update(item, col);
         }
-        void UpdateItem(Vector3 pos, DataGridItemContext data,int row,int col)
+        void UpdateItem(Vector3 pos, DataGridItemContext data,int row, int col)
         {
             var item = ItemSwap.Exchange((o, e) => { return o.Context == e; }, data);
+            var colunn = columns[col];
             if (item == null)
             {
-                item = CreateEnity<DataGridItem>(itemQueue, ItemMod, itemCreator, Items);
-                item.Context = data;
-                ItemSwap.Push(item);
+                if(colunn.itemCreator!=null)
+                {
+                    item = colunn.CreateEnity();
+                    if (item.Item == null)
+                        item.Item = item.target.GetComponent<UIElement>();
+                    var trans = item.target.transform;
+                    trans.SetParent(Items);
+                    trans.localScale = Vector3.one;
+                    trans.localRotation = Quaternion.identity;
+                    ItemSwap.Push(item);
+                }
+                else
+                {
+                    item = CreateEnity<DataGridItem>(itemQueue, ItemMod, itemCreator, Items);
+                    ItemSwap.Push(item);
+                }
             }
             pos.y = -pos.y;
             item.Row = row;
             item.Column = col;
+            item.GridColumn = colunn;
             float w = columns[col].width;
             var size = item.Item.SizeDelta;
             if(size.x!=w)
@@ -228,7 +293,13 @@ namespace huqiang.UIComposite
                 UIElement.ResizeChild(item.Item);
             }
             item.target.transform.localPosition = pos;
-            itemCreator.Update(item, data);
+            if(item.Context!=data)
+            {
+                item.Context = data;
+                if (colunn.itemCreator != null)
+                    colunn.itemCreator.Update(item, data);
+                else itemCreator.Update(item, data);
+            }
         }
         void UpdateDrag(Vector3 pos,DataGridHead col)
         {
@@ -241,6 +312,7 @@ namespace huqiang.UIComposite
                 item.DataContext = col;
                 dragSwap.Push(item);
                 item.Drag = Draging;
+                item.DragEnd = DragEnd;
                 var trans = go.transform;
                 trans.SetParent(Drags);
                 trans.localScale = Vector3.one;
@@ -262,6 +334,22 @@ namespace huqiang.UIComposite
             UIElement.ResizeChild(head.Head);
             eventCall.RemoveFocus();
             Refresh();
+
+        }
+        void DragEnd(UserEvent back, UserAction action, Vector2 v)
+        {
+            var head = back.DataContext as DataGridHead;
+            var col = head.Context;
+            var trans = back.Context.transform;
+            v.x /= trans.localScale.x;
+            col.width += v.x;
+            if (col.width < 80)
+                col.width = 80;
+            head.Head.m_sizeDelta.x = col.width;
+            UIElement.ResizeChild(head.Head);
+            Refresh();
+            if (ColumnResized != null)
+                ColumnResized(this, col);
         }
         void UpdateLine(Vector3 pos,Vector2 size)
         {
@@ -301,7 +389,7 @@ namespace huqiang.UIComposite
                     break;
             }
             RecycleEnity(HeadSwap,headQueue);
-            RecycleEnity(ItemSwap,itemQueue);
+            RecycleItemEnity();
             int len = dragSwap.Length;
             for (int i = 0; i < len; i++)
             {
@@ -348,7 +436,6 @@ namespace huqiang.UIComposite
                 }
             }
         }
-
         public void AddColumn(DataGridColumn column)
         {
             int c = 0;
@@ -374,6 +461,10 @@ namespace huqiang.UIComposite
                         col.datas.Add(null);
                 }
             }
+            if (column.itemCreator == null)
+                column.itemCreator = itemCreator;
+            if (column.mod == null)
+                column.mod = ItemMod;
             columns.Add(column);
         }
         public void RemoveColumn(int index)
@@ -382,6 +473,25 @@ namespace huqiang.UIComposite
                 return;
             if (index < columns.Count)
                 columns.RemoveAt(index);
+        }
+        public void ClearData()
+        {
+            for (int i = 0; i < columns.Count; i++)
+            {
+                columns[i].datas.Clear();
+            }
+        }
+        public void ClearColumn()
+        {
+            columns.Clear();
+            HeadSwap.Clear();
+            ItemSwap.Clear();
+            dragSwap.Clear();
+            headQueue.Clear();
+            itemQueue.Clear();
+            HGUIManager.GameBuffer.RecycleChild(Items.gameObject);
+            HGUIManager.GameBuffer.RecycleChild(Heads.gameObject);
+            HGUIManager.GameBuffer.RecycleChild(Drags.gameObject);
         }
         public void AddRow(params DataGridItemContext[] content )
         {

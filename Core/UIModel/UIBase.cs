@@ -21,6 +21,24 @@ namespace huqiang.UIModel
                     return buff[i] as T;
             return null;
         }
+        public static void PostMsg<T>(string cmd, object dat) where T : UIBase
+        {
+            for (int i = 0; i < point; i++)
+                if (buff[i] is T)
+                {
+                    buff[i].Cmd(cmd, dat);
+                    return;
+                }
+        }
+        public static void PostMsg<T>(int cmd, object dat) where T : UIBase
+        {
+            for (int i = 0; i < point; i++)
+                if (buff[i] is T)
+                {
+                    buff[i].Cmd(cmd, dat);
+                    return;
+                }
+        }
         public static List<T> GetUIs<T>() where T : UIBase
         {
             List<T> tmp = new List<T>();
@@ -116,6 +134,9 @@ namespace huqiang.UIModel
         {
         }
         public virtual void Cmd(int cmd, object dat)
+        {
+        }
+        public virtual void Cmd(string cmd, object dat)
         {
         }
         public virtual void Cmd(DataBuffer dat)

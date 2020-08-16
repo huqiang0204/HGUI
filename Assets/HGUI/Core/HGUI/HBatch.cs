@@ -356,7 +356,13 @@ namespace huqiang.Core.HGUI
                 }
             }
             for (int i = 0; i < vc; i++)
-                canvas.uv1.Add(UV1[vertices[i].picture]);
+            {
+                int p = vertices[i].picture;
+                if (p < 0 | p > 3)
+                    Debug.LogError("out of index");
+                else canvas.uv1.Add(UV1[p]);
+            }
+                
         }
         static Vector4 CutRect(Vector4 v0,Vector4 v1)
         {

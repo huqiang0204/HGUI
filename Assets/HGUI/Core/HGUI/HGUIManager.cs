@@ -22,7 +22,9 @@ namespace huqiang.Core.HGUI
             GameBuffer.RegComponent(new ComponentInfo<Transform>() { loader = new TransfromLoader() });
             GameBuffer.RegComponent(new ComponentInfo<HImage>() { loader = new HImageLoader() });
             GameBuffer.RegComponent(new ComponentInfo<HText>() { loader = new HTextLoader() });
+            GameBuffer.RegComponent(new ComponentInfo<HLine>() { loader = new HGraphicsLoader() });
             GameBuffer.RegComponent(new ComponentInfo<UIElement>() { loader = new UIElementLoader() });
+          
         }
         /// <summary>
         /// 将场景内的对象保存到文件

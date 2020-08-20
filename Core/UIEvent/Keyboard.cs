@@ -20,8 +20,9 @@ namespace huqiang.UIEvent
         public static List<KeyCode> KeyDowns;
         public static List<KeyCode> KeyUps;
         public static string InputString;
+        public static string TempString;
         public static string CorrectionInput;
-        public static string TouchString="";
+        public static string TouchString = "";
         public static string CorrectionTouch;
         public static bool InputChanged;
         static TouchScreenKeyboard m_touch;
@@ -30,6 +31,10 @@ namespace huqiang.UIEvent
         public static string systemCopyBuffer;
         public static void InfoCollection()
         {
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR
+            IME.Update();
+            TempString = IME.CompString;
+#endif     
             systemCopyBuffer = GUIUtility.systemCopyBuffer;
             if (keys == null)
             {
@@ -81,15 +86,33 @@ namespace huqiang.UIEvent
             }
             else
             {
-                if (InputString != Input.inputString)
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR
+                if (IME.Inputing)
+                {
+                    if(IME.CompStringChanged)
+                    {
+                        InputChanged = true;
+                    }
+                }else if(IME.InputDone)
+                {
+                    InputString = IME.ResultString;
+                }
+                else
+                {
+                    if (InputString != Input.inputString)
+                        InputChanged = true;
+                    else InputChanged = false;
+                    InputString = Input.inputString;
+                }
+#else
+        if (InputString != Input.inputString)
                     InputChanged = true;
                 else InputChanged = false;
                 InputString = Input.inputString;
+#endif
+
             }
             iME = Input.imeCompositionMode;
-#if UNITY_STANDALONE_WIN || UNITY_EDITOR
-            IME.Update();
-#endif     
         }
         public static void OnInput(string str, TouchScreenKeyboardType type,bool multiLine,bool passward,int limit)
         {

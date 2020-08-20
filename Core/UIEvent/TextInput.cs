@@ -251,12 +251,8 @@ namespace huqiang.UIEvent
                         {
                             if (Keyboard.InputChanged)
                             {
-                                if (Keyboard.InputString == "")
-                                    return;
-                                if (Keyboard.Nokey())
-                                    InputEvent.OnInputChanged(IME.ResultString);
-                                else
-                                    InputEvent.OnInputChanged(Keyboard.InputString);
+                                InputEvent.OnInputChanged(Keyboard.InputString);
+                                InputEvent.SetShowText();
                             }
                         }
                         else if (state == EditState.Finish)
@@ -310,7 +306,7 @@ namespace huqiang.UIEvent
         }
         void SetShowText()
         {
-            var str = InputString;
+            var str = InputString + Keyboard.TempString;
             if (Editing | (str != "" & str != null))
             {
                 if (TextCom == null)
@@ -533,7 +529,7 @@ namespace huqiang.UIEvent
         }
         string OnInputChanged(string input)
         {
-            if (input == "")
+            if (input == null | input == "")
                 return "";
             EmojiString es = new EmojiString(input);
             string str = Text.FullString;
@@ -638,8 +634,9 @@ namespace huqiang.UIEvent
             int line = StartPress.Row - ShowStart;
             if(line>=0)
             {
-                var ul = TextCom.uILines;
-                int c = ul.Length;
+
+                var ul = TextCom.LinesInfo;
+                int c = ul.DataCount;
                 if (line < c)
                 {
                     bool right = false;
@@ -649,16 +646,21 @@ namespace huqiang.UIEvent
                         right = true;
                         os--;
                     }
-                    int index = ul[line].startCharIdx + os;
-                    float h = TextCom.uILines[line].height;
-                    var ch = TextCom.uIChars[index];
-                    float rx = ch.cursorPos.x - 0.5f;
-                    if (right)
-                        rx += ch.charWidth + 1;
-                    float lx = rx - 2f;
-                    float ty = ch.cursorPos.y;
-                    float dy = ty - h;
-                    InputCaret.ChangeCaret(lx, rx, ty, dy, PointColor);
+                    unsafe
+                    {
+                        UILineInfo* lp = (UILineInfo*)ul.Addr;
+                        UICharInfo* cp = (UICharInfo*)TextCom.LinesInfo.Addr;
+                        int index = lp[line].startCharIdx + os;
+                        float h = lp[line].height;
+                        var ch = cp[index];
+                        float rx = ch.cursorPos.x - 0.5f;
+                        if (right)
+                            rx += ch.charWidth + 1;
+                        float lx = rx - 2f;
+                        float ty = ch.cursorPos.y;
+                        float dy = ty - h;
+                        InputCaret.ChangeCaret(lx, rx, ty, dy, PointColor);
+                    }
                 }
             }
         }

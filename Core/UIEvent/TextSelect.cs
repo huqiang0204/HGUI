@@ -476,55 +476,61 @@ namespace huqiang.UIEvent
                 return;
             tri.Clear();
             vert.Clear();
-            var tl = TextCom.uILines;
-            int len = tl.Length;
-            var tc = TextCom.uIChars;
-            for (int i = 0; i < ShowRow; i++)
+            var tl = TextCom.LinesInfo;
+            int len = tl.DataCount;
+            var tc = TextCom.CharsInfo;
+            unsafe
             {
-                int l = i + ShowStart;
-                if(IsSelectLine(l))
+                UILineInfo* lp = (UILineInfo*)tl.Addr;
+                UICharInfo* cp = (UICharInfo*)tc.Addr;
+                for (int i = 0; i < ShowRow; i++)
                 {
-                    var range = GetSelectLineRange(l);
-                    bool t = false;
-                    if (range.y == lines[l].Count)
+                    int l = i + ShowStart;
+                    if (IsSelectLine(l))
                     {
-                        t = true;
-                        range.y--;
+                        var range = GetSelectLineRange(l);
+                        bool t = false;
+                        if (range.y == lines[l].Count)
+                        {
+                            t = true;
+                            range.y--;
+                        }
+                        int s = lp[i].startCharIdx;
+                        float lx = cp[range.x + s].cursorPos.x;
+                        float rx = cp[range.y + s].cursorPos.x;
+                        if (t)
+                            rx += cp[range.y + s].charWidth;
+                        float h = lp[i].height;
+                        float top = lp[i].topY;
+                        float down = top - h;
+                        int st = vert.Count;
+                        var v = new HVertex();
+                        v.position.x = lx;
+                        v.position.y = down;
+                        v.color = color;
+                        vert.Add(v);
+                        v.position.x = rx;
+                        v.position.y = down;
+                        v.color = color;
+                        vert.Add(v);
+                        v.position.x = lx;
+                        v.position.y = top;
+                        v.color = color;
+                        vert.Add(v);
+                        v.position.x = rx;
+                        v.position.y = top;
+                        v.color = color;
+                        vert.Add(v);
+                        tri.Add(st);
+                        tri.Add(st + 2);
+                        tri.Add(st + 3);
+                        tri.Add(st);
+                        tri.Add(st + 3);
+                        tri.Add(st + 1);
                     }
-                    int s = tl[i].startCharIdx;
-                    float lx = tc[range.x + s].cursorPos.x;
-                    float rx = tc[range.y + s].cursorPos.x;
-                    if (t)
-                        rx += tc[range.y + s].charWidth;
-                    float h = tl[i].height;
-                    float top = tl[i].topY;
-                    float down = top - h;
-                    int st = vert.Count;
-                    var v = new HVertex();
-                    v.position.x = lx;
-                    v.position.y = down;
-                    v.color = color;
-                    vert.Add(v);
-                    v.position.x = rx;
-                    v.position.y = down;
-                    v.color = color;
-                    vert.Add(v);
-                    v.position.x = lx;
-                    v.position.y = top;
-                    v.color = color;
-                    vert.Add(v);
-                    v.position.x = rx;
-                    v.position.y = top;
-                    v.color = color;
-                    vert.Add(v);
-                    tri.Add(st);
-                    tri.Add(st + 2);
-                    tri.Add(st + 3);
-                    tri.Add(st);
-                    tri.Add(st + 3);
-                    tri.Add(st + 1);
                 }
             }
+          
         }
         public void SelectAll()
         {

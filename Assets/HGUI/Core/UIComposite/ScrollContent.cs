@@ -90,6 +90,7 @@ namespace huqiang.UIComposite
         public Vector2 Size;//scrollView的尺寸
         public Vector2 ActualSize { get; protected set; }//相当于Content的尺寸
         public Vector2 ItemSize = new Vector2(1,1);
+        public int SelectIndex = -1;
         FakeStruct modData;
         public FakeStruct ItemMod
         {

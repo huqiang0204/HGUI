@@ -18,12 +18,29 @@ namespace huqiang.UIComposite
     public class StackPanel:Composite
     {
         int c = 0;
+        public Direction direction = Direction.Horizontal;
+        public float spacing = 0;
+        public bool FixedSize;
+        public float FixedSizeRatio = 1;
+        public float ItemOffset = 0;
         public override void Initial(FakeStruct mod, UIElement script)
         {
             base.Initial(mod, script);
             script.SizeChanged = (o) => Order();
+            unsafe
+            {
+                var ex = mod.buffer.GetData(((TransfromData*)mod.ip)->ex) as FakeStruct;
+                if (ex != null)
+                {
+                    direction = (Direction) ex[0];
+                    spacing = ex.GetFloat(1);
+                    FixedSize = ex[2]==1;
+                    FixedSizeRatio = ex.GetFloat(3);
+                    ItemOffset = ex.GetFloat(4);
+                }
+            }
         }
-        public Direction direction = Direction.Horizontal;
+       
         public void Order()
         {
             switch (direction)
@@ -40,23 +57,36 @@ namespace huqiang.UIComposite
         {
             if (Enity != null)
             {
-                var sx =Enity.SizeDelta.x * -0.5f;
-                var y = Enity.SizeDelta.y;
+                float ps = Enity.SizeDelta.x;
+                float sx = ps * -0.5f;
+                if (FixedSizeRatio > 0)
+                    ps *= FixedSizeRatio;
                 var trans = Enity.transform;
                 var c = trans.childCount;
+                float ox = ItemOffset;
                 for (int i = 0; i < c; i++)
                 {
                     var son = trans.GetChild(i);
                     var ss = son.GetComponent<UIElement>();
                     float w = 0;
+                    float p = 0.5f;
                     if (ss != null)
                     {
-                        w = ss.SizeDelta.x;
+                        if (FixedSize)
+                        {
+                            w = ps;
+                            ox = ItemOffset * w;
+                        }
+                        else
+                        {
+                            w = ss.SizeDelta.x;
+                        }
+                        p = ss.Pivot.x;
                     }
-                    float os = sx + w * 0.5f;
+                    float os = sx - w * -p + ox;
                     son.localPosition = new Vector3(os, 0, 0);
                     son.localScale = Vector3.one;
-                    sx += w;
+                    sx += w + spacing;
                 }
             }
         }
@@ -64,23 +94,36 @@ namespace huqiang.UIComposite
         {
             if (Enity != null)
             {
-                var sy = Enity.SizeDelta.y * 0.5f;
-                var x = Enity.SizeDelta.x;
+                float ps =Enity.SizeDelta.y;
+                float sy = ps * (1 - Enity.Pivot.y);
+                if (FixedSizeRatio > 0)
+                    ps *= FixedSizeRatio;
                 var trans = Enity.transform;
                 var c = trans.childCount;
+                float oy = ItemOffset;
                 for (int i = 0; i < c; i++)
                 {
                     var son = trans.GetChild(i);
                     var ss = son.GetComponent<UIElement>();
                     float h = 0;
+                    float p = 0.5f;
                     if (ss != null)
                     {
-                        h = ss.SizeDelta.y;
+                        if (FixedSize)
+                        {
+                            h = ps;
+                            oy = h * ItemOffset;
+                        }
+                        else
+                        {
+                            h = ss.SizeDelta.y;
+                        }
+                        p = ss.Pivot.y;
                     }
-                    float os = sy - h * 0.5f;
+                    float os = sy + h * (p - 1) - oy;
                     son.localPosition = new Vector3(0, os, 0);
                     son.localScale = Vector3.one;
-                    sy -= h;
+                    sy -= h + spacing;
                 }
             }
         }

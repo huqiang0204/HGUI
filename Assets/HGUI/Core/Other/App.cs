@@ -8,12 +8,6 @@ namespace huqiang
 {
     public class App
     {
-        static void InitialInput()
-        {
-#if UNITY_STANDALONE_WIN || UNITY_EDITOR
-            IME.Initial();
-#endif     
-        }
         static void CreateUI() 
         {
             UIPage.Initial(UIRoot);
@@ -31,7 +25,9 @@ namespace huqiang
         {
             ThreadMission.SetMianId();
             Scale.Initial();
-            InitialInput();
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR
+            IME.Initial();
+#endif     
             UIRoot = uiRoot;
             CreateUI();
         }
@@ -41,6 +37,9 @@ namespace huqiang
             RecordManager.ReleaseAll();
             ElementAsset.bundles.Clear();
             AssetBundle.UnloadAllAssetBundles(true);
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR
+            IME.Dispose();
+#endif     
         }
         public static void Hide()
         {

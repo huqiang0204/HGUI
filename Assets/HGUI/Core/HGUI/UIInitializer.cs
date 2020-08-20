@@ -143,7 +143,9 @@ namespace huqiang.Core.HGUI
                 HText txt = all[i].Value as HText;
                 if (txt != null)
                 {
-                    txt.Text = section.GetValue(all[i].name);
+                    var str = section.GetValue(all[i].name);
+                    if (str != null)
+                        txt.Text = str;
                 }
             }
         }

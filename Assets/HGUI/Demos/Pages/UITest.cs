@@ -23,4 +23,11 @@ public class UITest : TestPageHelper
         //ElementAsset.LoadAssetsAsync("base.unity3d",(o,e)=> { UIPage.LoadPage<ChatPage>(); });
 #endif
     }
+    public override void OnUpdate()
+    {
+        //if (IME.CompStringChanged)
+        //    Debug.Log(IME.CompString);
+        //if (IME.InputDone)
+        //    Debug.Log(IME.ResultString);
+    }
 }

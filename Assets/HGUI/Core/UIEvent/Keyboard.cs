@@ -87,6 +87,9 @@ namespace huqiang.UIEvent
                 InputString = Input.inputString;
             }
             iME = Input.imeCompositionMode;
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR
+            IME.Update();
+#endif     
         }
         public static void OnInput(string str, TouchScreenKeyboardType type,bool multiLine,bool passward,int limit)
         {
@@ -104,7 +107,6 @@ namespace huqiang.UIEvent
                     m_touch.active = false;
             }
         }
-
         public static int targetDisplay { get; set; }
         public  static TouchScreenKeyboardType type { get; private set; }
         public static RangeInt selection { get; set; }

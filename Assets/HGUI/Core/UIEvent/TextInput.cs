@@ -254,7 +254,7 @@ namespace huqiang.UIEvent
                                 if (Keyboard.InputString == "")
                                     return;
                                 if (Keyboard.Nokey())
-                                    InputEvent.OnInputChanged(IME.CurrentCompStr());
+                                    InputEvent.OnInputChanged(IME.ResultString);
                                 else
                                     InputEvent.OnInputChanged(Keyboard.InputString);
                             }

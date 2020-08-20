@@ -64,7 +64,7 @@ public class GridTestWindow : PopWindow
         public HText Text;
     }
     View view;
-    public override void Initial(Transform parent, UIPage ui, object obj = null)
+    public override void Initial(Transform parent, UIBase ui, object obj = null)
     {
         base.Initial(parent, ui, obj);
         view = LoadUI<View>("baseUI", "gridScroll");
@@ -88,7 +88,7 @@ public class GridTestWindow2 : PopWindow
         public HText Text;
     }
     View view;
-    public override void Initial(Transform parent, UIPage ui, object obj = null)
+    public override void Initial(Transform parent, UIBase ui, object obj = null)
     {
         base.Initial(parent, ui, obj);
         view = LoadUI<View>("baseUI", "gridScroll");

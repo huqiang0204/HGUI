@@ -105,7 +105,7 @@ namespace huqiang.UIModel
         protected Type BackPage;
         protected Type BackPop;
         protected object BackData;
-        public PopWindow currentPop { get; private set; }
+        public PopWindow currentPop { get; set; }
         public virtual void Initial(Transform parent, object dat = null)
         {
             Parent = parent;
@@ -175,7 +175,10 @@ namespace huqiang.UIModel
         protected object ShowPopWindow(Type type, object obj = null, Transform parent = null)
         {
             if (currentPop != null)
-            { currentPop.Hide(); currentPop = null; }
+            { 
+                currentPop.Hide(); 
+                currentPop = null; 
+            }
             for (int i = 0; i < pops.Count; i++)
                 if (pops[i].GetType() == type)
                 {

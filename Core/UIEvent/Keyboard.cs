@@ -1,4 +1,5 @@
-﻿using System;
+﻿using huqiang.Core.HGUI;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,6 +8,13 @@ using UnityEngine;
 
 namespace huqiang.UIEvent
 {
+    public enum EditState
+    {
+        Done,
+        Continue,
+        NewLine,
+        Finish
+    }
     public class Keyboard
     {
         public enum TouchOpertaion
@@ -164,6 +172,233 @@ namespace huqiang.UIEvent
             if (KeyUps.Contains(key))
                 return true;
             return false;
+        }
+
+        /// <summary>
+        /// 每秒5次
+        /// </summary>
+        static float KeySpeed = 220;
+        static float MaxSpeed = 30;
+        static float KeyPressTime;
+        public static TextInput InputEvent { get;  set; }
+        public static void Dispatch()
+        {
+            if (InputEvent != null)
+            {
+                if (!InputEvent.ReadOnly)
+                {
+                    if (!InputEvent.Pressed)
+                    {
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR
+                        var state = KeyPressed();
+                        if (state == EditState.Continue)
+                        {
+                            if (Keyboard.InputChanged)
+                            {
+                                InputEvent.OnInputChanged(Keyboard.InputString);
+                                //InputEvent.SetShowText();
+                            }
+                        }
+                        else if (state == EditState.Finish)
+                        {
+                            if (InputEvent.OnSubmit != null)
+                                InputEvent.OnSubmit(InputEvent);
+                        }
+                        else if (state == EditState.NewLine)
+                        {
+                            if (InputEvent.lineType == LineType.SingleLine)
+                            {
+                                if (InputEvent.OnSubmit != null)
+                                    InputEvent.OnSubmit(InputEvent);
+                            }
+                            else InputEvent.OnInputChanged("\n");
+                        }
+#else
+                        InputEvent.TouchInputChanged(Keyboard.TouchString);
+                        if (Keyboard.status == TouchScreenKeyboard.Status.Done)
+                        {
+                            if (InputEvent.OnSubmit != null)
+                                InputEvent.OnSubmit(InputEvent);
+                            InputEvent.Refresh();
+                            InputEvent = null;
+                            return;
+                        }
+#endif
+                    }
+                }
+                //InputEvent.Refresh();
+            }
+        }
+        static EditState KeyPressed()
+        {
+            KeyPressTime -= UserAction.TimeSlice;
+            if (GetKey(KeyCode.Backspace))
+            {
+                if (KeyPressTime <= 0)
+                {
+                    if (InputEvent != null)
+                    {
+                        InputEvent.DeleteLast();
+                        //InputEvent.SetShowText();
+                    }
+                    KeySpeed *= 0.8f;
+                    if (KeySpeed < MaxSpeed)
+                        KeySpeed = MaxSpeed;
+                    KeyPressTime = KeySpeed;
+                }
+                return EditState.Done;
+            }
+            if (GetKey(KeyCode.Delete))
+            {
+                if (KeyPressTime <= 0)
+                {
+                    if (InputEvent != null)
+                    {
+                        InputEvent.DeleteNext();
+                        //InputEvent.SetShowText();
+                    }
+                    KeySpeed *= 0.7f;
+                    if (KeySpeed < MaxSpeed)
+                        KeySpeed = MaxSpeed;
+                    KeyPressTime = KeySpeed;
+                }
+                return EditState.Done;
+            }
+            if (GetKey(KeyCode.LeftArrow))
+            {
+                if (KeyPressTime <= 0)
+                {
+                    if (InputEvent != null)
+                    {
+                        InputEvent.PointerMoveLeft();
+                    }
+                    KeySpeed *= 0.7f;
+                    if (KeySpeed < MaxSpeed)
+                        KeySpeed = MaxSpeed;
+                    KeyPressTime = KeySpeed;
+                }
+                return EditState.Done;
+            }
+            if (GetKey(KeyCode.RightArrow))
+            {
+                if (KeyPressTime <= 0)
+                {
+                    if (InputEvent != null)
+                    {
+                        InputEvent.PointerMoveRight();
+                    }
+                    KeySpeed *= 0.7f;
+                    if (KeySpeed < MaxSpeed)
+                        KeySpeed = MaxSpeed;
+                    KeyPressTime = KeySpeed;
+                }
+                return EditState.Done;
+            }
+            if (GetKey(KeyCode.UpArrow))
+            {
+                if (KeyPressTime <= 0)
+                {
+                    if (InputEvent != null)
+                    {
+                        InputEvent.PointerMoveUp();
+                    }
+                    KeySpeed *= 0.7f;
+                    if (KeySpeed < MaxSpeed)
+                        KeySpeed = MaxSpeed;
+                    KeyPressTime = KeySpeed;
+                }
+                return EditState.Done;
+            }
+            if (GetKey(KeyCode.DownArrow))
+            {
+                if (KeyPressTime <= 0)
+                {
+                    if (InputEvent != null)
+                    {
+                        InputEvent.PointerMoveDown();
+                    }
+                    KeySpeed *= 0.7f;
+                    if (KeySpeed < MaxSpeed)
+                        KeySpeed = MaxSpeed;
+                    KeyPressTime = KeySpeed;
+                }
+                return EditState.Done;
+            }
+            KeySpeed = 220f;
+            if (GetKeyDown(KeyCode.Home))
+            {
+                InputEvent.PointerMoveStart();
+                return EditState.Done;
+            }
+            if (GetKeyDown(KeyCode.End))
+            {
+                InputEvent.PointerMoveEnd();
+                return EditState.Done;
+            }
+            if (GetKeyDown(KeyCode.A))
+            {
+                if (GetKey(KeyCode.LeftControl) | GetKey(KeyCode.RightControl))
+                {
+                    if (InputEvent != null)
+                    {
+                        //InputEvent.SelectAll();
+                        TextOperation.SelectAll();
+                    }
+                    return EditState.Done;
+                }
+            }
+            if (GetKeyDown(KeyCode.X))//剪切
+            {
+                if (GetKey(KeyCode.LeftControl) | GetKey(KeyCode.RightControl))
+                {
+                    if (InputEvent != null)
+                    {
+                        string str = TextOperation.GetSelectString();//InputEvent.GetSelectString();
+                        InputEvent.DeleteSelectString();
+                        GUIUtility.systemCopyBuffer = str;
+                        //InputEvent.SetShowText();
+                    }
+                    return EditState.Done;
+                }
+            }
+            if (GetKeyDown(KeyCode.C))//复制
+            {
+                if (GetKey(KeyCode.LeftControl) | GetKey(KeyCode.RightControl))
+                {
+                    if (InputEvent != null)
+                    {
+                        string str = TextOperation.GetSelectString();//InputEvent.GetSelectString();
+                        GUIUtility.systemCopyBuffer = str;
+                    }
+                    return EditState.Done;
+                }
+            }
+            if (GetKeyDown(KeyCode.V))//粘贴
+            {
+                if (GetKey(KeyCode.LeftControl) | GetKey(KeyCode.RightControl))
+                {
+                    if (InputEvent != null)
+                    {
+                        InputEvent.OnInputChanged(systemCopyBuffer);
+                    }
+                    return EditState.Done;
+                }
+            }
+            if (GetKeyDown(KeyCode.Return) | GetKeyDown(KeyCode.KeypadEnter))
+            {
+                if (InputEvent.lineType == LineType.MultiLineNewline)
+                {
+                    if (GetKey(KeyCode.RightControl))
+                        return EditState.Finish;
+                    return EditState.NewLine;
+                }
+                else return EditState.Finish;
+            }
+            if (GetKeyDown(KeyCode.Escape))
+            {
+                return EditState.Finish;
+            }
+            return EditState.Continue;
         }
     }
 }

@@ -50,243 +50,6 @@ namespace huqiang.UIEvent
     }
     public class TextInput:TextSelect
     {
-        #region enum
-        enum EditState
-        {
-            Done,
-            Continue,
-            NewLine,
-            Finish
-        }
-        #endregion
-        #region static
-        /// <summary>
-        /// 每秒5次
-        /// </summary>
-        static float KeySpeed = 220;
-        static float MaxSpeed = 30;
-        static float KeyPressTime;
-        public static TextInput InputEvent { get; private set; }
-        static EditState KeyPressed()
-        {
-            KeyPressTime -= UserAction.TimeSlice;
-            if (Keyboard.GetKey(KeyCode.Backspace))
-            {
-                if (KeyPressTime <= 0)
-                {
-                    if (InputEvent != null)
-                    {
-                        InputEvent.DeleteLast();
-                        InputEvent.SetShowText();
-                    }
-                    KeySpeed *= 0.8f;
-                    if (KeySpeed < MaxSpeed)
-                        KeySpeed = MaxSpeed;
-                    KeyPressTime = KeySpeed;
-                }
-                return EditState.Done;
-            }
-            if (Keyboard.GetKey(KeyCode.Delete))
-            {
-                if (KeyPressTime <= 0)
-                {
-                    if (InputEvent != null)
-                    {
-                        InputEvent.DeleteNext();
-                        InputEvent.SetShowText();
-                    }
-                    KeySpeed *= 0.7f;
-                    if (KeySpeed < MaxSpeed)
-                        KeySpeed = MaxSpeed;
-                    KeyPressTime = KeySpeed;
-                }
-                return EditState.Done;
-            }
-            if (Keyboard.GetKey(KeyCode.LeftArrow))
-            {
-                if (KeyPressTime <= 0)
-                {
-                    if (InputEvent != null)
-                    {
-                        InputEvent.PointerMoveLeft();
-                    }
-                    KeySpeed *= 0.7f;
-                    if (KeySpeed < MaxSpeed)
-                        KeySpeed = MaxSpeed;
-                    KeyPressTime = KeySpeed;
-                }
-                return EditState.Done;
-            }
-            if (Keyboard.GetKey(KeyCode.RightArrow))
-            {
-                if (KeyPressTime <= 0)
-                {
-                    if (InputEvent != null)
-                    {
-                        InputEvent.PointerMoveRight();
-                    }
-                    KeySpeed *= 0.7f;
-                    if (KeySpeed < MaxSpeed)
-                        KeySpeed = MaxSpeed;
-                    KeyPressTime = KeySpeed;
-                }
-                return EditState.Done;
-            }
-            if (Keyboard.GetKey(KeyCode.UpArrow))
-            {
-                if (KeyPressTime <= 0)
-                {
-                    if (InputEvent != null)
-                    {
-                        InputEvent.PointerMoveUp();
-                    }
-                    KeySpeed *= 0.7f;
-                    if (KeySpeed < MaxSpeed)
-                        KeySpeed = MaxSpeed;
-                    KeyPressTime = KeySpeed;
-                }
-                return EditState.Done;
-            }
-            if (Keyboard.GetKey(KeyCode.DownArrow))
-            {
-                if (KeyPressTime <= 0)
-                {
-                    if (InputEvent != null)
-                    {
-                        InputEvent.PointerMoveDown();
-                    }
-                    KeySpeed *= 0.7f;
-                    if (KeySpeed < MaxSpeed)
-                        KeySpeed = MaxSpeed;
-                    KeyPressTime = KeySpeed;
-                }
-                return EditState.Done;
-            }
-            KeySpeed = 220f;
-            if (Keyboard.GetKeyDown(KeyCode.Home))
-            {
-                InputEvent.PointerMoveStart();
-                return EditState.Done;
-            }
-            if (Keyboard.GetKeyDown(KeyCode.End))
-            {
-                InputEvent.PointerMoveEnd();
-                return EditState.Done;
-            }
-            if (Keyboard.GetKeyDown(KeyCode.A))
-            {
-                if (Keyboard.GetKey(KeyCode.LeftControl) | Keyboard.GetKey(KeyCode.RightControl))
-                {
-                    if (InputEvent != null)
-                    {
-                        InputEvent.SelectAll();
-                    }
-                    return EditState.Done;
-                }
-            }
-            if (Keyboard.GetKeyDown(KeyCode.X))//剪切
-            {
-                if (Keyboard.GetKey(KeyCode.LeftControl) | Keyboard.GetKey(KeyCode.RightControl))
-                {
-                    if (InputEvent != null)
-                    {
-                        string str = InputEvent.GetSelectString();
-                        InputEvent.DeleteSelectString();
-                        GUIUtility.systemCopyBuffer = str;
-                        InputEvent.SetShowText();
-                    }
-                    return EditState.Done;
-                }
-            }
-            if (Keyboard.GetKeyDown(KeyCode.C))//复制
-            {
-                if (Keyboard.GetKey(KeyCode.LeftControl) | Keyboard.GetKey(KeyCode.RightControl))
-                {
-                    if (InputEvent != null)
-                    {
-                        string str = InputEvent.GetSelectString();
-                        GUIUtility.systemCopyBuffer = str;
-                    }
-                    return EditState.Done;
-                }
-            }
-            if (Keyboard.GetKeyDown(KeyCode.V))//粘贴
-            {
-                if (Keyboard.GetKey(KeyCode.LeftControl) | Keyboard.GetKey(KeyCode.RightControl))
-                {
-                    if (InputEvent != null)
-                    {
-                        InputEvent.OnInputChanged(Keyboard.systemCopyBuffer);
-                    }
-                    return EditState.Done;
-                }
-            }
-            if (Keyboard.GetKeyDown(KeyCode.Return) | Keyboard.GetKeyDown(KeyCode.KeypadEnter))
-            {
-                if (InputEvent.lineType == LineType.MultiLineNewline)
-                {
-                    if (Keyboard.GetKey(KeyCode.RightControl))
-                        return EditState.Finish;
-                    return EditState.NewLine;
-                }
-                else return EditState.Finish;
-            }
-            if (Keyboard.GetKeyDown(KeyCode.Escape))
-            {
-                return EditState.Finish;
-            }
-            return EditState.Continue;
-        }
-        internal static void Dispatch()
-        {
-            if (InputEvent != null)
-            {
-                if (!InputEvent.ReadOnly)
-                {
-                    if (!InputEvent.Pressed)
-                    {
-#if UNITY_STANDALONE_WIN || UNITY_EDITOR
-                        var state = KeyPressed();
-                        if (state == EditState.Continue)
-                        {
-                            if (Keyboard.InputChanged)
-                            {
-                                InputEvent.OnInputChanged(Keyboard.InputString);
-                                InputEvent.SetShowText();
-                            }
-                        }
-                        else if (state == EditState.Finish)
-                        {
-                            if (InputEvent.OnSubmit != null)
-                                InputEvent.OnSubmit(InputEvent);
-                        }
-                        else if (state == EditState.NewLine)
-                        {
-                            if (InputEvent.lineType == LineType.SingleLine)
-                            {
-                                if (InputEvent.OnSubmit != null)
-                                    InputEvent.OnSubmit(InputEvent);
-                            }
-                            else InputEvent.OnInputChanged("\n");
-                        }
-#else
-                        InputEvent.TouchInputChanged(Keyboard.TouchString);
-                        if (Keyboard.status == TouchScreenKeyboard.Status.Done)
-                        {
-                            if (InputEvent.OnSubmit != null)
-                                InputEvent.OnSubmit(InputEvent);
-                            InputEvent.Refresh();
-                            InputEvent = null;
-                            return;
-                        }
-#endif
-                    }
-                }
-                InputEvent.Refresh();
-            }
-        }
-#endregion
-
         string m_TipString = "";
         public string InputString { get { return Text.FullString; }
             set {
@@ -311,7 +74,7 @@ namespace huqiang.UIEvent
             {
                 if (TextCom == null)
                     return;
-                str = GetShowString();
+                str = TextOperation.GetShowContent();//GetShowString();
                 TextCom.MainColor = textColor;
                 if (contentType == ContentType.Password)
                     TextCom.Text = new string('*', str.Length);
@@ -481,18 +244,18 @@ namespace huqiang.UIEvent
         }
         internal override void OnClick(UserAction action)
         {
-            if (InputEvent != this)
+            if (Keyboard.InputEvent != this)
             {
-                InputEvent = this;
-                bool pass = InputEvent.contentType == ContentType.Password ? true : false;
-                Keyboard.OnInput(Text.FullString, InputEvent.touchType, InputEvent.multiLine, pass, CharacterLimit);
+                Keyboard.InputEvent = this;
+                bool pass = contentType == ContentType.Password ? true : false;
+                Keyboard.OnInput(Text.FullString, touchType, multiLine, pass, CharacterLimit);
                 InputCaret.SetParent(Context.transform);
                 pressOffset = StartPress.Offset;
                 Editing = true;
             }else if(!Keyboard.active)
             {
-                bool pass = InputEvent.contentType == ContentType.Password ? true : false;
-                Keyboard.OnInput(Text.FullString, InputEvent.touchType, InputEvent.multiLine, pass, CharacterLimit);
+                bool pass = contentType == ContentType.Password ? true : false;
+                Keyboard.OnInput(Text.FullString, touchType, multiLine, pass, CharacterLimit);
             }
             Style = 1;
             if (Click != null)
@@ -500,12 +263,12 @@ namespace huqiang.UIEvent
         }
         internal override void OnLostFocus(UserAction action)
         {
-            if (this == InputEvent)
+            if (this == Keyboard.InputEvent)
             {
-                if (InputEvent.OnDone != null)
-                    InputEvent.OnDone(InputEvent);
-                InputEvent = null;
+                Keyboard.InputEvent = null;
             }
+            if (OnDone != null)
+                OnDone(this);
             Editing = false;
             SetShowText();
 
@@ -527,7 +290,7 @@ namespace huqiang.UIEvent
             }
             return sb.ToString();
         }
-        string OnInputChanged(string input)
+        internal string OnInputChanged(string input)
         {
             if (input == null | input == "")
                 return "";
@@ -580,17 +343,6 @@ namespace huqiang.UIEvent
             return input;
         }
         public bool Editing;
-        public static void SetCurrentInput(TextInput input, UserAction action)
-        {
-            if (input == null)
-                return;
-            if (InputEvent == input)
-                return;
-            if (InputEvent != null)
-               InputEvent.LostFocus(InputEvent, action);
-            InputEvent = input;
-            InputEvent.Editing = true;
-        }
         void Refresh()
         {
             InputCaret.CaretStyle = Style;
@@ -617,7 +369,7 @@ namespace huqiang.UIEvent
                         InputCaret.Active();
                         List<HVertex> hs = new List<HVertex>();
                         List<int> tris = new List<int>();
-                        GetSelectArea(SelectionColor, tris, hs);
+                        TextOperation.GetSelectArea(SelectionColor, tris, hs);
                         InputCaret.ChangeCaret(hs.ToArray(), tris.ToArray());
                     }
                 }else if(ShowChanged)
@@ -730,16 +482,10 @@ namespace huqiang.UIEvent
         public void InsertString(string str)
         {
             Style = 1;
-            DeleteSelectString();
             var es = new EmojiString(str);
-            int c = es.Length;
-            Text.Insert(StartIndex, es);
-            GetPreferredHeight();
-            StartIndex += c;
-            pressOffset = StartPress.Offset;
-            textChanged = true;
-            lineChanged = true;
-            SetShowStart();
+            TextOperation.DeleteSelectString();
+            TextOperation.InsertContent(es);
+            SetShowText();
         }
         public void PointerMoveLeft()
         {
@@ -854,7 +600,6 @@ namespace huqiang.UIEvent
         }
         public static void Clear()
         {
-            InputEvent = null;
             InputCaret.Hide();
         }
     }

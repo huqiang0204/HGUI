@@ -44,8 +44,8 @@ namespace huqiang.UIEvent
                     }
                     else
                     {
-                        if (TextInput.InputEvent != null)
-                            TextInput.InputEvent.SetPressPointer();
+                        //if (Keyboard.InputEvent != null)
+                        //    Keyboard.SetPressPointer();
                         Caret.gameObject.SetActive(true);
                     }
                     break;

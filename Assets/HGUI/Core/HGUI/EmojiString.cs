@@ -7,7 +7,7 @@ namespace huqiang.Core.HGUI
 {
     public class EmojiString
     {
-        string m_str="";
+        string m_str = "";
         string f_str = "";
         /// <summary>
         /// 过滤表情符后的字符串
@@ -16,8 +16,8 @@ namespace huqiang.Core.HGUI
         /// <summary>
         /// 表情符信息
         /// </summary>
-        public List<EmojiInfo> emojis=new List<EmojiInfo>();
-        StringBuilder builder=new StringBuilder();
+        public List<EmojiInfo> emojis = new List<EmojiInfo>();
+        StringBuilder builder = new StringBuilder();
         /// <summary>
         /// 完整字符串
         /// </summary>
@@ -47,16 +47,16 @@ namespace huqiang.Core.HGUI
         }
         public EmojiString(string str)
         {
-            m_str = EmojiMap.CheckEmoji(str,emojis);
+            m_str = EmojiMap.CheckEmoji(str, emojis);
             builder.Append(m_str);
             f_str = str;
         }
-        public bool Remove(int index,int count = 1)
+        public bool Remove(int index, int count = 1)
         {
             if (index + count > builder.Length)
                 count = builder.Length - index;
             if (count < 1)
-                return false ;
+                return false;
             int start = index;
             int end = index + count;
             emojis.RemoveAll((o) => { return o.pos >= start & o.pos <= end; });
@@ -65,12 +65,12 @@ namespace huqiang.Core.HGUI
                 if (emojis[i].pos > index)
                     emojis[i].pos -= count;
             }
-            builder.Remove(index,count);
+            builder.Remove(index, count);
             m_str = builder.ToString();
-            f_str = EmojiMap.EmojiToFullString(m_str,emojis);
+            f_str = EmojiMap.EmojiToFullString(m_str, emojis);
             return true;
         }
-        public String SubString(int index,int count = 1)
+        public String SubString(int index, int count = 1)
         {
             if (count < 1)
                 return "";

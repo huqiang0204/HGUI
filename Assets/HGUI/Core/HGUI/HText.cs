@@ -346,11 +346,16 @@ namespace huqiang.Core.HGUI
                 m_text = value;
                 m_dirty = true;
             } }
-        EmojiString emojiString = new EmojiString();
+        internal EmojiString emojiString = new EmojiString();
         
         [SerializeField]
         internal Font _font;
-        public Font Font { get => _font;
+        public Font Font {
+            get { 
+                if (_font == null) 
+                    return DefaultFont;
+                return _font; 
+            }
             set {
                 _font = value;
             } }

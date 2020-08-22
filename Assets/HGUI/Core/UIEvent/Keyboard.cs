@@ -29,6 +29,7 @@ namespace huqiang.UIEvent
         public static List<KeyCode> KeyUps;
         public static string InputString;
         public static string TempString;
+        public static bool TempStringChanged;
         public static string CorrectionInput;
         public static string TouchString = "";
         public static string CorrectionTouch;
@@ -41,7 +42,7 @@ namespace huqiang.UIEvent
         {
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR
             IME.Update();
-            TempString = IME.CompString;
+            TempStringChanged = IME.CompStringChanged;
 #endif     
             systemCopyBuffer = GUIUtility.systemCopyBuffer;
             if (keys == null)
@@ -97,13 +98,13 @@ namespace huqiang.UIEvent
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR
                 if (IME.Inputing)
                 {
-                    if(IME.CompStringChanged)
-                    {
-                        InputChanged = true;
-                    }
-                }else if(IME.InputDone)
+                    TempString = IME.CompString;
+                }
+                else if(IME.InputDone)
                 {
+                    TempString = "";
                     InputString = IME.ResultString;
+                    InputChanged = true;
                 }
                 else
                 {
@@ -113,7 +114,7 @@ namespace huqiang.UIEvent
                     InputString = Input.inputString;
                 }
 #else
-        if (InputString != Input.inputString)
+                if (InputString != Input.inputString)
                     InputChanged = true;
                 else InputChanged = false;
                 InputString = Input.inputString;
@@ -193,10 +194,12 @@ namespace huqiang.UIEvent
                         var state = KeyPressed();
                         if (state == EditState.Continue)
                         {
-                            if (Keyboard.InputChanged)
+                            if (InputChanged)
                             {
-                                InputEvent.OnInputChanged(Keyboard.InputString);
-                                //InputEvent.SetShowText();
+                                InputEvent.OnInputChanged(InputString);
+                            }else if(TempStringChanged)
+                            {
+                               InputEvent.SetShowText();
                             }
                         }
                         else if (state == EditState.Finish)
@@ -211,7 +214,7 @@ namespace huqiang.UIEvent
                                 if (InputEvent.OnSubmit != null)
                                     InputEvent.OnSubmit(InputEvent);
                             }
-                            else InputEvent.OnInputChanged("\n");
+                            else InputEvent.OnInputChanged("\r\n");
                         }
 #else
                         InputEvent.TouchInputChanged(Keyboard.TouchString);
@@ -226,7 +229,6 @@ namespace huqiang.UIEvent
 #endif
                     }
                 }
-                //InputEvent.Refresh();
             }
         }
         static EditState KeyPressed()
@@ -239,7 +241,6 @@ namespace huqiang.UIEvent
                     if (InputEvent != null)
                     {
                         InputEvent.DeleteLast();
-                        //InputEvent.SetShowText();
                     }
                     KeySpeed *= 0.8f;
                     if (KeySpeed < MaxSpeed)
@@ -255,7 +256,6 @@ namespace huqiang.UIEvent
                     if (InputEvent != null)
                     {
                         InputEvent.DeleteNext();
-                        //InputEvent.SetShowText();
                     }
                     KeySpeed *= 0.7f;
                     if (KeySpeed < MaxSpeed)
@@ -341,7 +341,6 @@ namespace huqiang.UIEvent
                 {
                     if (InputEvent != null)
                     {
-                        //InputEvent.SelectAll();
                         TextOperation.SelectAll();
                     }
                     return EditState.Done;
@@ -353,10 +352,9 @@ namespace huqiang.UIEvent
                 {
                     if (InputEvent != null)
                     {
-                        string str = TextOperation.GetSelectString();//InputEvent.GetSelectString();
+                        string str = TextOperation.GetSelectString();
                         InputEvent.DeleteSelectString();
                         GUIUtility.systemCopyBuffer = str;
-                        //InputEvent.SetShowText();
                     }
                     return EditState.Done;
                 }
@@ -367,7 +365,7 @@ namespace huqiang.UIEvent
                 {
                     if (InputEvent != null)
                     {
-                        string str = TextOperation.GetSelectString();//InputEvent.GetSelectString();
+                        string str = TextOperation.GetSelectString();
                         GUIUtility.systemCopyBuffer = str;
                     }
                     return EditState.Done;

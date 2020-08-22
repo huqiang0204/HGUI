@@ -68,14 +68,23 @@ namespace huqiang.UIEvent
                 m_TipString = value;
             }
         }
-        void SetShowText()
+        internal void SetShowText()
         {
-            var str = InputString + Keyboard.TempString;
-            if (Editing | (str != "" & str != null))
+            var str = InputString;
+            if (Editing)
             {
                 if (TextCom == null)
                     return;
-                str = TextOperation.GetShowContent();//GetShowString();
+                str = TextOperation.GetShowContent() + Keyboard.TempString;//GetShowString();
+                TextCom.MainColor = textColor;
+                if (contentType == ContentType.Password)
+                    TextCom.Text = new string('*', str.Length);
+                else TextCom.Text = str;
+            }
+            else if (str != "" & str != null)
+            {
+                if (TextCom == null)
+                    return;
                 TextCom.MainColor = textColor;
                 if (contentType == ContentType.Password)
                     TextCom.Text = new string('*', str.Length);
@@ -89,8 +98,6 @@ namespace huqiang.UIEvent
             }
         }
         public bool ReadOnly;
-        bool lineChanged;
-        bool textChanged;
         Color textColor = Color.black;
         Color m_tipColor = new Color(0, 0, 0, 0.8f);
         public Color TipColor { get { return m_tipColor; } set { m_tipColor = value;} }
@@ -251,7 +258,6 @@ namespace huqiang.UIEvent
                 bool pass = contentType == ContentType.Password ? true : false;
                 Keyboard.OnInput(Text.FullString, touchType, multiLine, pass, CharacterLimit);
                 InputCaret.SetParent(Context.transform);
-                pressOffset = StartPress.Offset;
                 Editing = true;
             }
             else
@@ -311,7 +317,7 @@ namespace huqiang.UIEvent
                 }
             }
             str = es.FullString;
-            int s = StartIndex;
+            int s = TextOperation.StartPress.Index;
             if (CharOperation.Validate(characterValidation, Text.FullString, s, str[0]) == 0)
                 return "";
             if (ValidateChar != null)

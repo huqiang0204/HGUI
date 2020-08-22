@@ -36,7 +36,6 @@ namespace huqiang.Core.HGUI
         static int VisibleCount;
         public static int ShowStart;//当期文本框显示的内容起始行
         public static int ShowRow;//当前文本框可以显示的内容行数
-        public static int ShowEnd;//当前文本框显示的内容结束行
         public static float ContentHeight;
         static float StartY;
         public static void ChangeText(HText text, EmojiString str)
@@ -505,5 +504,13 @@ namespace huqiang.Core.HGUI
             }
         }
         public static int Style { get => StartPress.Index == EndPress.Index ? 1 : 2; }
+        public static void SetShowStart(int start)
+        {
+            ShowStart = start;
+            if (lines.Count <= ShowStart + ShowRow)
+                ShowStart = lines.Count - ShowRow + 1;
+            if (ShowStart < 0)
+                ShowStart = 0;
+        }
     }
 }

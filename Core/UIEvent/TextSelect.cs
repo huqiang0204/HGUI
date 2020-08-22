@@ -21,6 +21,7 @@ namespace huqiang.UIEvent
         protected static TextGenerationSettings settings;
         public HText TextCom;
         protected EmojiString Text = new EmojiString();
+        protected string ShowContent;
         protected float overDistance = 500;
         protected float overTime = 0;
         internal LineInfo[] lines;
@@ -41,8 +42,6 @@ namespace huqiang.UIEvent
         protected int ShowRow;
         protected bool Focus;
         protected bool ShowChanged;
-        protected PressInfo StartPress;
-        protected PressInfo EndPress;
         public int Style = 0;
         public Color32 PointColor = Color.white;
         public Color32 SelectionColor = new Color(0.65882f, 0.8078f, 1, 0.2f);
@@ -107,7 +106,7 @@ namespace huqiang.UIEvent
                             {
                                 if(TextOperation.ContentMoveUp())
                                 {
-                                    TextCom.Text = TextOperation.GetShowContent();
+                                    ShowContent = TextCom.Text = TextOperation.GetShowContent();
                                     TextCom.Populate();
                                     ShowChanged = true;
                                 }
@@ -116,7 +115,7 @@ namespace huqiang.UIEvent
                             {
                                 if(TextOperation.ContentMoveDown())
                                 {
-                                    TextCom.Text = TextOperation.GetShowContent();
+                                    ShowContent = TextCom.Text = TextOperation.GetShowContent();
                                     TextCom.Populate();
                                     ShowChanged = true;
                                 }
@@ -162,6 +161,8 @@ namespace huqiang.UIEvent
             Style = 0;
             InputCaret.Hide();
             Focus = false;
+            ShowStart = TextOperation.ShowStart;
+            ShowContent = TextOperation.GetShowContent();
         }
         protected void SetSetting()
         {
@@ -240,67 +241,6 @@ namespace huqiang.UIEvent
                 TextCom.Text = TextOperation.GetShowContent();
                 TextCom.Populate();
                 ShowChanged = true;
-            }
-        }
-        bool IsSelectLine(int row)
-        {
-            int s = StartPress.Row;
-            if (row == s)
-                return true;
-            int e = EndPress.Row;
-            if (row == e)
-                return true;
-            if(s>e)
-            {
-                int t = s;
-                s = e;
-                e = t;
-            }
-            if (row > s & row < e)
-                return true;
-            return false;
-        }
-        public int StartIndex
-        {
-            get 
-            {
-                if (lines == null)
-                    return 0;
-                return lines[StartPress.Row].StartIndex + StartPress.Offset; 
-            }
-            set { SetIndex(ref StartPress, value); }
-        }
-        public int EndIndex
-        {
-            get { return lines[EndPress.Row].StartIndex + EndPress.Offset; }
-            set { SetIndex(ref EndPress, value); }
-        }
-        void SetIndex(ref PressInfo press,int index)
-        {
-            if (index <= 0)
-            {
-                press.Row = 0;
-                press.Offset = 0;
-            }
-            else if (index > cha.Length)
-            {
-                press.Row = lines.Length - 1;
-                press.Offset = lines[StartPress.Row].Count;
-            }
-            else
-            {
-                int c = lines.Length - 1;
-                for (int i = c; i >= 0; i--)
-                {
-                    if (lines[i].StartIndex < index)
-                    {
-                        press.Row = i;
-                        press.Offset = index - lines[i].StartIndex;
-                        return;
-                    }
-                }
-                press.Row = 0;
-                press.Offset = index;
             }
         }
     }

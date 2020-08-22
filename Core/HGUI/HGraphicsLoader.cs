@@ -62,6 +62,7 @@ namespace huqiang.Core.HGUI
             tar.Shadow = src->Shadow;
             tar.shadowOffsset = src->shadowOffsset;
             tar.shadowColor = src->shadowColor;
+            tar.tris = null;
         }
         protected unsafe void SaveHGraphics(FakeStruct fake, HGraphics src)
         {

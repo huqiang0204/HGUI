@@ -32,8 +32,6 @@ namespace huqiang.Core.HGUI
         static List<UIVertex> verts = new List<UIVertex>();
         static List<LineInfo> lines = new List<LineInfo>();
         static List<UICharInfo> chars = new List<UICharInfo>();
-        static List<HVertex> hs = new List<HVertex>();
-        static List<int> tris = new List<int>();
         public static EmojiString Content;
         static int VisibleCount;
         public static int ShowStart;//当期文本框显示的内容起始行
@@ -182,42 +180,46 @@ namespace huqiang.Core.HGUI
         {
             if (StartPress.Index == EndPress.Index)
                 return false;
-            int index;
             if (EndPress.Index < StartPress.Index)
             {
                 int c = StartPress.Index - EndPress.Index;
                 Content.Remove(EndPress.Index, c);
-                index = EndPress.Index - c;
+                StartPress = EndPress;
             }
             else 
             {
                  int c = EndPress.Index - StartPress.Index;
                 Content.Remove(StartPress.Index, c);
-                index = StartPress.Index - c;
+                EndPress = StartPress;
             }
-            int lc = lines.Count;
             ChangeText(Target,Content);
-            SetPressIndex(index);
-            int cc = lines.Count;
-            int oc = lc - cc;
-            ShowStart -= oc;
-            if (ShowStart < 0)
-                ShowStart = 0;
+            if (StartPress.Row < ShowStart)
+            {
+                ShowStart = StartPress.Row;
+            }
+            else if (StartPress.Row >= ShowStart + ShowRow)
+            {
+                ShowStart = StartPress.Row - ShowRow + 1;
+            }
             return true;
         }
-        static void SetPressIndex(int index,ref PressInfo press)
+        static bool SetPressIndex(int index,ref PressInfo press)
         {
             if (index < 0)
                 index = 0;
             if (lines.Count == 0)
-                return;
+                return false;
+            if (index == press.Index)
+                return false;
             if (index >= chars.Count)
             {
                 index = chars.Count - 1;
+                if (index == press.Index)
+                    return false;
                 press.Index = index;
                 press.Row = lines.Count - 1;
                 press.Offset = index - lines[press.Row].startCharIdx;
-                return;
+                return true;
             }
             for (int i = 0; i < lines.Count; i++)
             {
@@ -229,11 +231,27 @@ namespace huqiang.Core.HGUI
                     break;
                 }
             }
+            return true;
         }
-        public static void SetPressIndex(int index)
+        public static bool SetPressIndex(int index,ref bool LineChanged)
         {
-            SetPressIndex(index,ref StartPress);
-            EndPress = StartPress;
+            if(SetPressIndex(index,ref StartPress))
+            {
+                EndPress = StartPress;
+                if (StartPress.Row < ShowStart)
+                {
+                    ShowStart = StartPress.Row;
+                    LineChanged = true;
+                }
+                else
+                if (StartPress.Row >= ShowStart + ShowRow)
+                {
+                    ShowStart = StartPress.Row - ShowRow + 1;
+                    LineChanged = true;
+                }
+                return true;
+            }
+            return false;
         }
         public static void SetStartPressIndex(int index)
         {
@@ -243,7 +261,7 @@ namespace huqiang.Core.HGUI
         {
             SetPressIndex(index, ref EndPress);
         }
-        public static void PointerMoveUp()
+        public static bool PointerMoveUp(ref bool LineChanged)
         {
             if(StartPress.Row>0)
             {
@@ -253,9 +271,16 @@ namespace huqiang.Core.HGUI
                 if (index > lines[StartPress.Row].endIdx)
                     index = lines[StartPress.Row].endIdx;
                 EndPress.Index = StartPress.Index = index;
+                if(StartPress.Row<ShowStart)
+                {
+                    ShowStart = StartPress.Row;
+                    LineChanged = true;
+                }
+                return true;
             }
+            return false;
         }
-        public static void PointerMoveDown()
+        public static bool PointerMoveDown(ref bool LineChanged)
         {
             if (StartPress.Row < lines.Count - 1)
             {
@@ -265,9 +290,16 @@ namespace huqiang.Core.HGUI
                 if (index > lines[StartPress.Row].endIdx)
                     index = lines[StartPress.Row].endIdx;
                 EndPress.Index = StartPress.Index = index;
+                if(StartPress.Row>=ShowStart+ShowRow)
+                {
+                    ShowStart = StartPress.Row - ShowRow+1;
+                    LineChanged = true;
+                }
+                return true;
             }
+            return false;
         }
-        public static void PointerMoveLeft()
+        public static bool PointerMoveLeft(ref bool LineChanged)
         {
             if (StartPress.Index > 0)
             {
@@ -277,9 +309,16 @@ namespace huqiang.Core.HGUI
                     StartPress.Row--;
                 StartPress.Offset = StartPress.Index - lines[StartPress.Row].startCharIdx;
                 EndPress = StartPress;
+                if (StartPress.Row < ShowStart)
+                {
+                    ShowStart = StartPress.Row;
+                    LineChanged = true;
+                }
+                return true;
             }
+            return false;
         }
-        public static void PointerMoveRight()
+        public static bool PointerMoveRight(ref bool LineChanged)
         {
             if (StartPress.Index < chars.Count - 1)
             {
@@ -289,39 +328,54 @@ namespace huqiang.Core.HGUI
                     StartPress.Row++;
                 StartPress.Offset = StartPress.Index - lines[StartPress.Row].startCharIdx;
                 EndPress = StartPress;
+                if (StartPress.Row >= ShowStart + ShowRow)
+                {
+                    ShowStart = StartPress.Row - ShowRow + 1;
+                    LineChanged = true;
+                }
+                return true;
             }
+            return false;
         }
         public static bool DeleteLast()
         {
+            if (DeleteSelectString())
+                return true;
+            bool b= false;
             if(StartPress.Index>0)
             {
                 Content.Remove(StartPress.Index - 1,1);
-                int index = StartPress.Index;
+                int index = StartPress.Index - 1;
                 int lc = lines.Count;
                 ChangeText(Target, Content);
-                SetPressIndex(index);
+                SetPressIndex(index,ref b);
                 int cc = lines.Count;
                 int oc = lc - cc;
                 ShowStart -= oc;
                 if (ShowStart < 0)
                     ShowStart = 0;
+                return true;
             }
             return false;
         }
         public static bool DeleteNext()
         {
-            if(StartPress.Index<chars.Count - 1)
+            if (DeleteSelectString())
+                return true;
+            bool b = false;
+            if (StartPress.Index<chars.Count - 1)
             {
                 Content.Remove(StartPress.Index, 1);
                 int index = StartPress.Index;
                 int lc = lines.Count;
                 ChangeText(Target, Content);
-                SetPressIndex(index);
+                SetPressIndex(index,ref b);
                 int cc = lines.Count;
                 int oc = lc - cc;
                 ShowStart -= oc;
                 if (ShowStart < 0)
                     ShowStart = 0;
+                return true;
             }
             return false;
         }
@@ -329,21 +383,11 @@ namespace huqiang.Core.HGUI
         {
             Content.Insert(StartPress.Index,con);
             int index = StartPress.Index + con.Length;
-            int lc = lines.Count;
             ChangeText(Target, Content);
-            SetPressIndex(index);
-            int cc = lines.Count;
-            int oc = cc - lc;
-            ShowStart += oc;
-            if (ShowStart + ShowRow > lines.Count)
-                ShowStart = lines.Count - ShowRow;
-            if (ShowStart < 0)
-                ShowStart = 0;
-            ChangeText(Target, Content);
-            int c = con.Length;
-            SetPressIndex(StartPress.Index + c);
+            bool b = false;
+            SetPressIndex(index, ref b);
         }
-        public static void GetSelectArea(Color32 color, List<int> tri, List<HVertex> vert)
+        public static void GetSelectArea(List<int> tri, List<HVertex> vert, Color32 aColor, Color32 pColor)
         {
             if (EndPress.Index == StartPress.Index)
             {
@@ -351,31 +395,40 @@ namespace huqiang.Core.HGUI
                     return;
                 if (StartPress.Row > ShowStart + ShowRow)
                     return;
-                float top = lines[StartPress.Row].topY;
-                float down = lines[StartPress.Row].endY;
-                float p = chars[StartPress.Index].cursorPos.x;
-                if (StartPress.Index >= lines[StartPress.Row].endIdx)
+                float oy = StartY - (lines[0].topY - lines[ShowStart].topY);
+                float top = lines[StartPress.Row].topY - oy;
+                float down = lines[StartPress.Row].endY - oy;
+                int index = StartPress.Index;
+                float p;
+                if (StartPress.Index > lines[StartPress.Row].endIdx)
                 {
-                    p += chars[StartPress.Index].charWidth;
+                    index--;
+                    if (index < 0)
+                        index = 0;
+                    p = chars[index].cursorPos.x+ chars[index].charWidth;
+                }
+                else
+                {
+                    p = chars[index].cursorPos.x;
                 }
                 float left = p - 1;
                 float right = p + 1;
                 var v = new HVertex();
                 v.position.x = left;
                 v.position.y = down;
-                v.color = color;
+                v.color = pColor;
                 vert.Add(v);
                 v.position.x = right;
                 v.position.y = down;
-                v.color = color;
+                v.color = pColor;
                 vert.Add(v);
                 v.position.x = left;
                 v.position.y = top;
-                v.color = color;
+                v.color = pColor;
                 vert.Add(v);
                 v.position.x = right;
                 v.position.y = top;
-                v.color = color;
+                v.color = pColor;
                 vert.Add(v);
                 tri.Add(0);
                 tri.Add(2);
@@ -386,10 +439,10 @@ namespace huqiang.Core.HGUI
                 return; 
             }
             if (EndPress.Index < StartPress.Index)
-                GetSelectArea(ref color, tri, vert, ref EndPress, ref StartPress);
-            else GetSelectArea(ref color, tri, vert, ref StartPress, ref EndPress);
+                GetSelectArea( tri, vert, ref aColor, ref EndPress, ref StartPress);
+            else GetSelectArea(tri, vert, ref aColor, ref StartPress, ref EndPress);
         }
-        static void GetSelectArea(ref Color32 color, List<int> tri, List<HVertex> vert, ref PressInfo start, ref PressInfo end)
+        static void GetSelectArea(List<int> tri, List<HVertex> vert, ref Color32 color, ref PressInfo start, ref PressInfo end)
         {
             int ss = ShowStart;
             int sr = start.Row;
@@ -451,5 +504,6 @@ namespace huqiang.Core.HGUI
                 st += 4;
             }
         }
+        public static int Style { get => StartPress.Index == EndPress.Index ? 1 : 2; }
     }
 }

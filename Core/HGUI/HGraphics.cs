@@ -140,5 +140,102 @@ namespace huqiang.Core.HGUI
             trisInfo.Release();
             trisInfo2.Release();
         }
+        public void LoadFromMesh(List<HVertex> vert, List<int> tris)
+        {
+            LoadVert(vert);
+            LoadTris(tris);
+        }
+        public void LoadVert(HVertex[] vert)
+        {
+            m_dirty = false;
+            int c = vert.Length;
+            if (c > vertInfo.Size | c + 32 < vertInfo.Size)
+            {
+                vertInfo.Release();
+                vertInfo = HGUIMesh.blockBuffer.RegNew(c);
+            }
+            unsafe
+            {
+                HVertex* hv = (HVertex*)vertInfo.Addr;
+                for (int i = 0; i < c; i++)
+                {
+                    hv[i] = vert[i];
+                }
+                vertInfo.DataCount = c;
+            }
+        }
+        public void LoadVert(List<HVertex> vert)
+        {
+            m_dirty = false;
+            int c = vert.Count;
+            if (c > vertInfo.Size | c + 32 < vertInfo.Size)
+            {
+                vertInfo.Release();
+                vertInfo = HGUIMesh.blockBuffer.RegNew(c);
+            }
+            unsafe
+            {
+                HVertex* hv = (HVertex*)vertInfo.Addr;
+                for (int i = 0; i < c; i++)
+                {
+                    hv[i] = vert[i];
+                }
+                vertInfo.DataCount = c;
+            }
+        }    
+        void LoadTris(int[] tri, ref BlockInfo info)
+        {
+            tris = null;
+            int tc = tri.Length;
+            if (tc > info.Size | tc + 48 < info.Size)
+            {
+                info.Release();
+                info = trisBuffer.RegNew(tc);
+            }
+            unsafe
+            {
+                int* ht = (int*)info.Addr;
+                for (int i = 0; i < tc; i++)
+                {
+                    ht[i] = tri[i];
+                }
+                info.DataCount = tc;
+            }
+        }
+        public void LoadTris(int[] tri)
+        {
+            LoadTris(tri,ref trisInfo);
+        }
+        public void LoadTris2(int[] tri)
+        {
+            LoadTris(tri, ref trisInfo2);
+        }
+        void LoadTris(List<int> tri, ref BlockInfo info)
+        {
+            tris = null;
+            int tc = tri.Count;
+            if (tc > info.Size | tc + 48 < info.Size)
+            {
+                info.Release();
+                info = trisBuffer.RegNew(tc);
+            }
+            unsafe
+            {
+                int* ht = (int*)info.Addr;
+                for (int i = 0; i < tc; i++)
+                {
+                    ht[i] = tri[i];
+                }
+                info.DataCount = tc;
+            }
+        }
+        public void LoadTris(List<int> tri)
+        {
+            LoadTris(tri, ref trisInfo);
+        }
+        public void LoadTris2(List<int> tri)
+        {
+            LoadTris(tri, ref trisInfo2);
+        }
     }
 }

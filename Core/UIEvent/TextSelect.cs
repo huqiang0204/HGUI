@@ -68,10 +68,10 @@ namespace huqiang.UIEvent
             Focus = true;
             if (TextCom != null)
             {
+                InputCaret.SetParent(TextCom.transform);
+                InputCaret.Styles = 2;
                 TextOperation.ChangeText(TextCom,Text);
                 TextOperation.SetStartPointer(this,action);
-                InputCaret.SetParent(TextCom.transform);
-                InputCaret.Active();
                 ShowChanged = true;
             }
             base.OnMouseDown(action);
@@ -201,33 +201,20 @@ namespace huqiang.UIEvent
         }
         internal override void Update()
         {
-            switch(Style)
-            {
-                case 0:
-                    InputCaret.Hide();
-                    break;
-                case 2:
-                    if(ShowChanged)
-                    {
-                        InputCaret.Active();
-                        ShowChanged = false;
-                        List<HVertex> hs = new List<HVertex>();
-                        List<int> tris = new List<int>();
-                        TextOperation.GetSelectArea(SelectionColor, tris, hs);
-                        InputCaret.ChangeCaret(hs.ToArray(), tris.ToArray());
-                    }
-                    break;
-            }
            if(Focus)
             {
                 if (Keyboard.GetKeyDown(KeyCode.C) & Keyboard.GetKey(KeyCode.LeftControl))
                     GUIUtility.systemCopyBuffer = TextOperation.GetSelectString();
                 if (Keyboard.GetKeyDown(KeyCode.A) & Keyboard.GetKey(KeyCode.LeftControl))
                 {
-                    Style = 2;
                     TextOperation.SelectAll();
                     ShowChanged = true;
                 }
+            }
+            if (ShowChanged)
+            {
+                InputCaret.ChangeCaret();
+                ShowChanged = false;
             }
         }
         public float Percentage

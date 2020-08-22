@@ -1,5 +1,6 @@
 ﻿using huqiang.Core.HGUI;
 using huqiang.Data;
+using huqiang.Data2D;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -236,11 +237,11 @@ namespace huqiang.UIEvent
         public override void OnMouseDown(UserAction action)
         {
             base.OnMouseDown(action);
-            if(Text.FullString =="")
-            {
-                StartPress.Row = 0;
-                StartPress.Offset = 0;
-            }
+            InputCaret.Styles = 3;
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR
+            Editing = true;
+            SetShowText();
+#endif
         }
         internal override void OnClick(UserAction action)
         {
@@ -252,7 +253,9 @@ namespace huqiang.UIEvent
                 InputCaret.SetParent(Context.transform);
                 pressOffset = StartPress.Offset;
                 Editing = true;
-            }else if(!Keyboard.active)
+            }
+            else
+            if(!Keyboard.active)
             {
                 bool pass = contentType == ContentType.Password ? true : false;
                 Keyboard.OnInput(Text.FullString, touchType, multiLine, pass, CharacterLimit);
@@ -326,16 +329,14 @@ namespace huqiang.UIEvent
             }
             if (Keyboard.selection.length > 0)
             {
-                StartIndex = Keyboard.selection.start;
-                EndIndex = Keyboard.selection.end;
-                Style = 2;
+                TextOperation.SetStartPressIndex(Keyboard.selection.start);
+                TextOperation.SetEndPressIndex(Keyboard.selection.end);
                 ShowChanged = true;
             }
             else
             {
-                StartIndex = Keyboard.selection.start;
-                SetShowStart();
-                Style = 1;
+                bool b = false;
+                TextOperation.SetPressIndex(Keyboard.selection.start,ref b);
             }
             if (OnValueChanged != null)
                 OnValueChanged(this);
@@ -343,138 +344,32 @@ namespace huqiang.UIEvent
             return input;
         }
         public bool Editing;
-        void Refresh()
-        {
-            InputCaret.CaretStyle = Style;
-            var te = TextCom;
-            if (te != null)
-            {
-                if (textChanged)
-                {
-                    textChanged = false;
-                    GetPreferredHeight();
-                }
-                if (lineChanged)
-                {
-                    lineChanged = false;
-                    SetShowText();
-                    TextCom.Populate();
-                    ShowChanged = true;
-                }
-                if(Style == 2)
-                {
-                    if(ShowChanged)
-                    {
-                        ShowChanged = false;
-                        InputCaret.Active();
-                        List<HVertex> hs = new List<HVertex>();
-                        List<int> tris = new List<int>();
-                        TextOperation.GetSelectArea(SelectionColor, tris, hs);
-                        InputCaret.ChangeCaret(hs.ToArray(), tris.ToArray());
-                    }
-                }else if(ShowChanged)
-                {
-                    ShowChanged = false;
-                    SetShowText();
-                }
-            }
-        }
-        public void SetPressPointer()
-        {
-            if (TextCom == null)
-                return;
-            int line = StartPress.Row - ShowStart;
-            if(line>=0)
-            {
-
-                var ul = TextCom.LinesInfo;
-                int c = ul.DataCount;
-                if (line < c)
-                {
-                    bool right = false;
-                    int os = StartPress.Offset;
-                    if (lines[StartPress.Row].Count == os)
-                    {
-                        right = true;
-                        os--;
-                    }
-                    unsafe
-                    {
-                        UILineInfo* lp = (UILineInfo*)ul.Addr;
-                        UICharInfo* cp = (UICharInfo*)TextCom.LinesInfo.Addr;
-                        int index = lp[line].startCharIdx + os;
-                        float h = lp[line].height;
-                        var ch = cp[index];
-                        float rx = ch.cursorPos.x - 0.5f;
-                        if (right)
-                            rx += ch.charWidth + 1;
-                        float lx = rx - 2f;
-                        float ty = ch.cursorPos.y;
-                        float dy = ty - h;
-                        InputCaret.ChangeCaret(lx, rx, ty, dy, PointColor);
-                    }
-                }
-            }
-        }
         public bool DeleteSelectString()
         {
-            if (Style == 2)
+            if(TextOperation.DeleteSelectString())
             {
-                Style = 1;
-                int s = StartIndex;
-                int e = EndIndex;
-                if(e<s)
-                {
-                    StartIndex = e;
-                    int t = s;
-                    s = e;
-                    e = t;
-                }
-                else if (s == e)
-                    return false;
-                Text.Remove(s, e - s);
-                lineChanged = true;
-                textChanged = true;
+                ShowChanged = true;
+                SetShowText();
                 return true;
             }
             return false;
         }
         public bool DeleteLast()
         {
-            if (DeleteSelectString())
-                return true;
-            Style = 1;
-            if (StartIndex < 1)
-                return false;
-            StartIndex--;
-            if (Text.Remove(StartIndex))
+            if(TextOperation.DeleteLast())
             {
-                textChanged = true;
-                lineChanged = true;
-                SetShowStart();
+                ShowChanged = true;
+                SetShowText();
                 return true;
             }
             return false;
         }
         public bool DeleteNext()
         {
-            if (DeleteSelectString())
-                return true;
-            Style = 1;
-            if (Text.Remove(StartIndex))
-            {
-                if (StartIndex >= Text.FilterString.Length)
-                {
-                    if(StartPress.Row>0)
-                    {
-                        LineCount--;
-                        StartPress.Row--;
-                        StartPress.Offset = lines[StartPress.Row].Count;
-                    }
-                }
-                SetShowStart();
-                textChanged = true;
-                lineChanged = true;
+            if (TextOperation.DeleteNext())
+            { 
+                ShowChanged = true;
+                SetShowText();
                 return true;
             }
             return false;
@@ -485,118 +380,72 @@ namespace huqiang.UIEvent
             var es = new EmojiString(str);
             TextOperation.DeleteSelectString();
             TextOperation.InsertContent(es);
+            ShowChanged = true;
             SetShowText();
         }
         public void PointerMoveLeft()
         {
-            Style = 1;
-            if (StartIndex > 0)
+            bool lc = false;
+            if (TextOperation.PointerMoveLeft(ref lc))
             {
-                int c = StartPress.Row;
-                StartIndex--;
-                if (c != StartPress.Row)
-                {
-                    lineChanged = true;
-                    SetShowStart();
-                }
-                pressOffset = StartPress.Offset;
+                ShowChanged = true;
+                if (lc)
+                    SetShowText();
             }
         }
         public void PointerMoveRight()
         {
-            Style = 1;
-            if (StartIndex<cha.Length-1)
+            bool lc = false;
+            if (TextOperation.PointerMoveRight(ref lc))
             {
-                int c = StartPress.Row;
-                StartIndex++;
-                if (c != StartPress.Row)
-                {
-                    lineChanged = true;
-                    SetShowStart();
-                }
-                pressOffset = StartPress.Offset;
+                ShowChanged = true;
+                if (lc)
+                    SetShowText();
             }
         }
         public void PointerMoveUp()
         {
-            Style = 1;
-            if (StartPress.Row > 0)
+            bool lc = false;
+            if (TextOperation.PointerMoveUp(ref lc))
             {
-                StartPress.Row--;
-                var c = pressOffset;
-                if (c > lines[StartPress.Row].Count)
-                    c = lines[StartPress.Row].Count;
-                StartPress.Offset = c;
-                if(StartPress.Row<ShowStart)
-                {
-                    ShowStart = StartPress.Row;
-                    ShowChanged = true;
-                    lineChanged = true;
-                }
+                ShowChanged = true;
+                if (lc)
+                    SetShowText();
             }
         }
         public void PointerMoveDown()
         {
-            Style = 1;
-            int l = LineCount;
-            if (StartPress.Row < l - 1)
+            bool lc = false;
+            if (TextOperation.PointerMoveDown(ref lc))
             {
-                StartPress.Row++;
-                var c = pressOffset;
-                if (c > lines[StartPress.Row].Count)
-                    c = lines[StartPress.Row].Count;
-                StartPress.Offset = c;
-                SetShowStart();
-                lineChanged = true;
+                ShowChanged = true;
+                if (lc)
+                    SetShowText();
             }
         }
         public void PointerMoveStart()
         {
-            Style = 1;
-            if (StartPress.Row != 0)
-                lineChanged = true;
-            StartPress.Row = 0;
-            StartPress.Offset = 0;
-            ShowStart = 0;
+            bool lc = false;
+            if (TextOperation.SetPressIndex(0, ref lc))
+            {
+                ShowChanged = true;
+                if (lc)
+                    SetShowText();
+            }
         }
         public void PointerMoveEnd()
         {
-            Style = 1;
-            if (cha != null)
-                StartIndex= cha.Length - 1;
-            if (lines != null)
+            bool lc = false;
+            if (TextOperation.SetPressIndex(999999999, ref lc))
             {
-                if (lines.Length > 0)
-                {
-                    var c = lines.Length - ShowRow;
-                    if (c < 0)
-                        c = 0;
-                    if (StartPress.Row != c)
-                        lineChanged = true;
-                    StartPress.Row = c;
-                    StartPress.Offset = lines[StartPress.Row].Count;
-                    ShowStart = StartPress.Row - ShowRow + 1;
-                    if (ShowStart <0)
-                    {
-                        ShowStart = 0;
-                    }
-                }
+                ShowChanged = true;
+                if (lc)
+                    SetShowText();
             }
         }
         internal override void Update()
         {
-        }
-        void SetShowStart()
-        {
-            if (ShowStart > StartPress.Row)
-                ShowStart = StartPress.Row;
-            else if (ShowStart + ShowRow <= StartPress.Row)
-                ShowStart = StartPress.Row - ShowRow + 1;
-            if (ShowStart + ShowRow > LineCount)
-                ShowStart = LineCount - ShowRow;
-            if (ShowStart < 0)
-                ShowStart = 0;
-            ShowChanged = true;
+            base.Update();
         }
         public static void Clear()
         {

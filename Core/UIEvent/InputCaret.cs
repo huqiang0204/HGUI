@@ -1,4 +1,5 @@
 ﻿using huqiang.Core.HGUI;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace huqiang.UIEvent
@@ -27,30 +28,41 @@ namespace huqiang.UIEvent
             }
         }
         static float time;
+        public static int Styles = 0;
         public static int CaretStyle = 0;
+        public static Color32 PointerColor = Color.white;
+        public static Color32 AreaColor = new Color(0.65882f, 0.8078f, 1, 0.2f);
+        static List<HVertex> hs = new List<HVertex>();
+        static List<int> tris = new List<int>();
         public static void UpdateCaret()
         {
-            switch (CaretStyle)
+            switch (TextOperation.Style)
             {
                 case 1:
-                    time += Time.deltaTime;
-                    if (time > 2f)
+                    if ((Styles & 1) > 0)
                     {
-                        time = 0;
+                        time += Time.deltaTime;
+                        if (time > 2f)
+                        {
+                            time = 0;
+                        }
+                        else if (time > 1f)
+                        {
+                            Caret.gameObject.SetActive(false);
+                        }
+                        else
+                        {
+                            Caret.gameObject.SetActive(true);
+                        }
                     }
-                    else if (time > 1f)
-                    {
-                        Caret.gameObject.SetActive(false);
-                    }
-                    else
-                    {
-                        //if (Keyboard.InputEvent != null)
-                        //    Keyboard.SetPressPointer();
-                        Caret.gameObject.SetActive(true);
-                    }
+                    else Caret.gameObject.SetActive(false);
                     break;
                 case 2:
-                    Caret.gameObject.SetActive(true);
+                    if ((Styles & 2) > 0)
+                    {
+                        Caret.gameObject.SetActive(true);
+                    }
+                    else Caret.gameObject.SetActive(false);
                     break;
                 default:
                     Caret.gameObject.SetActive(false);
@@ -65,13 +77,6 @@ namespace huqiang.UIEvent
             t.localScale = Vector3.one;
             t.localRotation = Quaternion.identity;
         }
-        public static void Active()
-        {
-            if (m_Caret != null)
-            {
-                m_Caret.gameObject.SetActive(true);
-            }
-        }
         public static void Hide()
         {
             CaretStyle = 0;
@@ -80,67 +85,12 @@ namespace huqiang.UIEvent
                 m_Caret.gameObject.SetActive(false);
             }
         }
-        public static void ChangeCaret(Vector3 pos,Vector2 size)
+        public static void ChangeCaret()
         {
-            var trans = Caret.transform;
-            trans.localPosition = pos;
-            Caret.SizeDelta = size;
-            Caret.m_vertexChange = true;
-            CaretStyle = 1;
-        }
-        public static void ChangeCaret(float left, float right, float top, float down, Color32 color)
-        {
-            if (Caret.vertInfo.Size == 0)
-            {
-                Caret.vertInfo = HGUIMesh.blockBuffer.RegNew(4);
-            }
-            else if (Caret.vertInfo.Size < 4 | Caret.vertInfo.Size > 8)
-            {
-                HGUIMesh.blockBuffer.Release(ref Caret.vertInfo);
-                Caret.vertInfo = HGUIMesh.blockBuffer.RegNew(4);
-            }
-            unsafe
-            {
-                HVertex* hv = (HVertex*)Caret.vertInfo.Addr;
-                hv[0].position.x = left;
-                hv[0].position.y = down;
-                hv[0].color = color;
-
-                hv[1].position.x = right;
-                hv[1].position.y = down;
-                hv[1].color = color;
-
-                hv[2].position.x = left;
-                hv[2].position.y = top;
-                hv[2].color = color;
-
-                hv[3].position.x = right;
-                hv[3].position.y = top;
-                hv[3].color = color;
-            }
-          
-            Caret.tris = HGUIMesh.Rectangle;
-            CaretStyle = 1;
-        }
-        public static void ChangeCaret(HVertex[] vertices,int[] tris)
-        {
-            int c = vertices.Length;
-            if (Caret.vertInfo.Size > 0)
-            {
-                HGUIMesh.blockBuffer.Release(ref Caret.vertInfo);
-            }
-            Caret.vertInfo = HGUIMesh.blockBuffer.RegNew(c);
-            unsafe
-            {
-                HVertex* hv = (HVertex*)Caret.vertInfo.Addr;
-                for (int i = 0; i < c; i++)
-                {
-                    hv[i] = vertices[i];
-                }
-            }
-            Caret.vertInfo.DataCount = c;
-            Caret.tris = tris;
-            CaretStyle = 2;
+            hs.Clear();
+            tris.Clear();
+            TextOperation.GetSelectArea(tris,hs,AreaColor,PointerColor);
+            Caret.LoadFromMesh(hs,tris);
         }
     }
 }

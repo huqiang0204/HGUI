@@ -103,7 +103,7 @@ namespace huqiang.Core.HGUI
             if(m_dirty)
             {
                 int c = GetSize();
-                if (c > vertInfo.Size)
+                if (c > vertInfo.Size | c+32 < vertInfo.Size)
                 {
                     vertInfo.Release();
                     vertInfo = HGUIMesh.blockBuffer.RegNew(c);

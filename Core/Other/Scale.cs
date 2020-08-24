@@ -39,11 +39,17 @@ public enum MarginType
     MarginX,
     MarginY,
     MarginRatioX,
-    MarginRatioY
+    MarginRatioY,
+    Size,
+    Ratio,
+    SizeX,
+    SizeY,
+    RatioX,
+    RatioY
 }
 public enum ParentType
 {
-    Tranfrom,Screen, BangsScreen
+    Tranfrom,Screen
 }
 [Serializable]
 public struct Margin

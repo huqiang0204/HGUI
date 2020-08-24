@@ -111,6 +111,8 @@ namespace huqiang.UIComposite
             Size = Enity.SizeDelta;
             eventCall.CutRect = true;
             Enity.SizeChanged = (o) => {
+                if (ItemElement != null)
+                    ItemSize = UIElement.GetSize(Enity, ItemElement);
                 Refresh(m_point,0);
             };
         }

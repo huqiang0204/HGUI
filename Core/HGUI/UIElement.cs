@@ -264,7 +264,6 @@ namespace huqiang.Core.HGUI
         public static void Resize(UIElement script,bool child = true)
         {
             Transform rect = script.transform;
-            Vector3 loclpos = rect.localPosition;
             Vector2 psize = Vector2.zero;
             Vector2 v = script.m_sizeDelta;
             var pp = Anchors[0];
@@ -292,36 +291,21 @@ namespace huqiang.Core.HGUI
                 case MarginType.None:
                     break;
                 case MarginType.Margin:
-                    var mar = script.margin;
-                    if (script.parentType == ParentType.BangsScreen)
-                        if (Scale.ScreenHeight / Scale.ScreenWidth > 2f)
-                            mar.top += 88;
-                    MarginEx(script, mar, pp, psize);
+                    MarginEx(script, script.margin, pp, psize);
                     break;
                 case MarginType.MarginRatio:
-                    mar = new Margin();
+                    var mar = new Margin();
                     mar.left = script.margin.left * psize.x;
                     mar.right = script.margin.right * psize.x;
                     mar.top = script.margin.top * psize.y;
-                    if (script.parentType == ParentType.BangsScreen)
-                        if (Scale.ScreenHeight / Scale.ScreenWidth > 2f)
-                            mar.top += 88;
                     mar.down = script.margin.down * psize.y;
                     MarginEx(script, mar, pp, psize);
                     break;
                 case MarginType.MarginX:
-                    mar = script.margin;
-                    if (script.parentType == ParentType.BangsScreen)
-                        if (Scale.ScreenHeight / Scale.ScreenWidth > 2f)
-                            mar.top += 88;
-                    MarginX(script, mar, pp, psize);
+                    MarginX(script, script.margin, pp, psize);
                     break;
                 case MarginType.MarginY:
-                    mar = script.margin;
-                    if (script.parentType == ParentType.BangsScreen)
-                        if (Scale.ScreenHeight / Scale.ScreenWidth > 2f)
-                            mar.top += 88;
-                    MarginY(script, mar, pp, psize);
+                    MarginY(script, script.margin, pp, psize);
                     break;
                 case MarginType.MarginRatioX:
                     mar = new Margin();
@@ -332,14 +316,30 @@ namespace huqiang.Core.HGUI
                 case MarginType.MarginRatioY:
                     mar = new Margin();
                     mar.top = script.margin.top * psize.y;
-                    if (script.parentType == ParentType.BangsScreen)
-                        if (Scale.ScreenHeight / Scale.ScreenWidth > 2f)
-                            mar.top += 88;
                     mar.down = script.margin.down * psize.y;
                     MarginY(script, mar, pp, psize);
                     break;
+                case MarginType.Size:
+                    script.m_sizeDelta.x = psize.x - script.margin.left;
+                    script.m_sizeDelta.y = psize.y - script.margin.down;
+                    break;
+                case MarginType.Ratio:
+                    script.m_sizeDelta.x = psize.x * (1 - script.margin.left);
+                    script.m_sizeDelta.y = psize.y * (1 - script.margin.down);
+                    break;
+                case MarginType.SizeX:
+                    script.m_sizeDelta.x = psize.x - script.margin.left;
+                    break;
+                case MarginType.SizeY:
+                    script.m_sizeDelta.y = psize.y - script.margin.down;
+                    break;
+                case MarginType.RatioX:
+                    script.m_sizeDelta.x = psize.x * (1 - script.margin.left);
+                    break;
+                case MarginType.RatioY:
+                    script.m_sizeDelta.y = psize.y * (1 - script.margin.down);
+                    break;
             }
-            //Scaling(script, script.scaleType, psize, script.DesignSize);
             switch (script.anchorType)
             {
                 case AnchorType.None:
@@ -416,9 +416,6 @@ namespace huqiang.Core.HGUI
                     break;
                 case MarginType.Margin:
                     var mar = script.margin;
-                    if (script.parentType == ParentType.BangsScreen)
-                        if (Scale.ScreenHeight / Scale.ScreenWidth > 2f)
-                            mar.top += 88;
                     MarginEx(script, mar, pp, psize);
                     break;
                 case MarginType.MarginRatio:
@@ -426,24 +423,15 @@ namespace huqiang.Core.HGUI
                     mar.left = script.margin.left * psize.x;
                     mar.right = script.margin.right * psize.x;
                     mar.top = script.margin.top * psize.y;
-                    if (script.parentType == ParentType.BangsScreen)
-                        if (Scale.ScreenHeight / Scale.ScreenWidth > 2f)
-                            mar.top += 88;
                     mar.down = script.margin.down * psize.y;
                     MarginEx(script, mar, pp, psize);
                     break;
                 case MarginType.MarginX:
                     mar = script.margin;
-                    if (script.parentType == ParentType.BangsScreen)
-                        if (Scale.ScreenHeight / Scale.ScreenWidth > 2f)
-                            mar.top += 88;
                     MarginX(script, mar, pp, psize);
                     break;
                 case MarginType.MarginY:
                     mar = script.margin;
-                    if (script.parentType == ParentType.BangsScreen)
-                        if (Scale.ScreenHeight / Scale.ScreenWidth > 2f)
-                            mar.top += 88;
                     MarginY(script, mar, pp, psize);
                     break;
                 case MarginType.MarginRatioX:
@@ -455,11 +443,28 @@ namespace huqiang.Core.HGUI
                 case MarginType.MarginRatioY:
                     mar = new Margin();
                     mar.top = script.margin.top * psize.y;
-                    if (script.parentType == ParentType.BangsScreen)
-                        if (Scale.ScreenHeight / Scale.ScreenWidth > 2f)
-                            mar.top += 88;
                     mar.down = script.margin.down * psize.y;
                     MarginY(script, mar, pp, psize);
+                    break;
+                case MarginType.Size:
+                    script.m_sizeDelta.x = psize.x - script.margin.left;
+                    script.m_sizeDelta.y = psize.y - script.margin.down;
+                    break;
+                case MarginType.Ratio:
+                    script.m_sizeDelta.x = psize.x * (1 - script.margin.left);
+                    script.m_sizeDelta.y = psize.y * (1 - script.margin.down);
+                    break;
+                case MarginType.SizeX:
+                    script.m_sizeDelta.x = psize.x - script.margin.left;
+                    break;
+                case MarginType.SizeY:
+                    script.m_sizeDelta.y = psize.y - script.margin.down;
+                    break;
+                case MarginType.RatioX:
+                    script.m_sizeDelta.x = psize.x * (1 - script.margin.left);
+                    break;
+                case MarginType.RatioY:
+                    script.m_sizeDelta.y = psize.y * (1 - script.margin.down);
                     break;
             }
         }
@@ -499,6 +504,78 @@ namespace huqiang.Core.HGUI
                 case AnchorType.Alignment:
                     AlignmentEx(script, script.anchorPointType, script.anchorOffset, pp, psize);
                     break;
+            }
+        }
+        public static Vector2 GetSize(UIElement parent,FakeStruct ele)
+        {
+            unsafe
+            {
+                Vector2 psize = Vector2.zero;
+                UIElementData* up = (UIElementData*)ele.ip;
+                switch(up->parentType)
+                {
+                    case ParentType.Screen:
+                        psize = HCanvas.MainCanvas.m_sizeDelta;
+                        break;
+                    case ParentType.Tranfrom:
+                        if(parent!=null)
+                            psize = parent.m_sizeDelta;
+                        break;
+                }
+                switch(up->marginType)
+                {
+                    case MarginType.None:
+                        return up->m_sizeDelta;
+                    case MarginType.Margin:
+                        psize.x -= up->margin.left + up->margin.right;
+                        psize.y -= up->margin.top + up->margin.down;
+                        return psize;
+                    case MarginType.MarginRatio:
+                        psize.x *=(1- up->margin.left - up->margin.right);
+                        psize.y *=(1-up->margin.top - up->margin.down);
+                        return psize;
+                    case MarginType.MarginX:
+                        psize.x -= up->margin.left + up->margin.right;
+                        psize.y = up->m_sizeDelta.y;
+                        return psize;
+                    case MarginType.MarginY:
+                        psize.x = up->m_sizeDelta.x;
+                        psize.y -= up->margin.top + up->margin.down;
+                        return psize;
+                    case MarginType.MarginRatioX:
+                        psize.x *= (1 - up->margin.left - up->margin.right);
+                        psize.y = up->m_sizeDelta.y;
+                        return psize;
+                    case MarginType.MarginRatioY:
+                        psize.x = up->m_sizeDelta.x;
+                        psize.y *= (1 - up->margin.top - up->margin.down);
+                        return psize;
+                    case MarginType.Size:
+                        psize.x -= up->margin.left;
+                        psize.y -= up->margin.down;
+                        return psize;
+                    case MarginType.Ratio:
+                        psize.x *= (1 - up->margin.left);
+                        psize.y *= (1 - up->margin.down);
+                        return psize;
+                    case MarginType.SizeX:
+                        psize.x -= up->margin.left;
+                        psize.y = up->m_sizeDelta.y;
+                        return psize;
+                    case MarginType.SizeY:
+                        psize.x = up->m_sizeDelta.x;
+                        psize.y -= up->margin.down;
+                        return psize;
+                    case MarginType.RatioX:
+                        psize.x *= (1 - up->margin.left);
+                        psize.y = up->m_sizeDelta.y;
+                        return psize;
+                    case MarginType.RatioY:
+                        psize.x = up->m_sizeDelta.x;
+                        psize.y *= (1 - up->margin.down);
+                        return psize;
+                }
+                return up->m_sizeDelta;
             }
         }
         #endregion

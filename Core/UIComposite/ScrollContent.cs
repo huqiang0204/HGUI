@@ -92,12 +92,18 @@ namespace huqiang.UIComposite
         public Vector2 ItemSize = new Vector2(1,1);
         public int SelectIndex = -1;
         FakeStruct modData;
+        protected FakeStruct ItemElement;
         public FakeStruct ItemMod
         {
             set
             {
                 modData = value;
-                var c = Items.Count;
+                if(modData!=null)
+                {
+                    ItemElement = TransfromLoader.GetComponent(modData, "UIElement");
+                    if (ItemElement != null)
+                        ItemSize = UIElement.GetSize(Enity, ItemElement);
+                }
                 Clear();
             }
             get { return modData; }
@@ -197,7 +203,6 @@ namespace huqiang.UIComposite
             if (BufferData == null)
                 return;
             var mod = HGUIManager.FindChild(BufferData,name);
-            ItemMod = mod;
             if(mod!=null)
             {
                 unsafe
@@ -212,6 +217,7 @@ namespace huqiang.UIComposite
                     }
                 }
             }
+            ItemMod = mod;
         }
         public override void Initial(FakeStruct mod, UIElement script)
         {

@@ -121,6 +121,29 @@ namespace huqiang.Data
             }
             return 0;
         }
+        public Int32 GetTypeIndex(string name)
+        {
+            for (int i = 0; i < point; i++)
+            {
+                if (types[i].name == name)
+                {
+                    return i;
+                }
+            }
+            return 0;
+        }
+        public Int32 GetTypeIndex<T>()
+        {
+            var t = typeof(T);
+            for (int i = 0; i < point; i++)
+            {
+                if (types[i].type == t)
+                {
+                    return i;
+                }
+            }
+            return 0;
+        }
         /// <summary>
         /// 获取组件的ID
         /// </summary>

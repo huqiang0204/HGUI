@@ -31,6 +31,29 @@ namespace huqiang.Data
     }
     public class TransfromLoader : DataLoader
     {
+        public static FakeStruct GetComponent(FakeStruct fake,string type)
+        {
+            unsafe
+            {
+                var transfrom = (TransfromData*)fake.ip;
+                var buff = fake.buffer;
+                int index = HGUIManager.GameBuffer.GetTypeIndex(type);
+                if(index>0)
+                {
+                    Int16[] coms = buff.GetData(transfrom->coms) as Int16[];
+                    for (int i = 1; i < coms.Length; i+=2)
+                    {
+                        int a = coms[i];
+                        if (a == index)
+                        {
+                            var fs = buff.GetData(coms[i - 1]) as FakeStruct;
+                            return fs;
+                        }
+                    }
+                }
+            }
+            return null;
+        }
         public unsafe override void LoadToObject(FakeStruct fake, Component com,Initializer initializer)
         {
             var transfrom = (TransfromData*)fake.ip;

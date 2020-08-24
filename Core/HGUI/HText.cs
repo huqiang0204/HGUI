@@ -471,28 +471,27 @@ namespace huqiang.Core.HGUI
         }
 
         internal BlockInfo TmpVerts;
-        internal BlockInfo LinesInfo;
-        internal BlockInfo CharsInfo;
         public void Populate()
         {
             if (!m_dirty)
                 return;
             emojiString.FullString = m_text;
             var str = emojiString.FilterString;
-            if(sizeFitter!=ContentSizeFitter.None)
+            if (sizeFitter != ContentSizeFitter.None)
             {
                 if (marginType != MarginType.None)
                     Margin(this);
                 GetGenerationSettings(ref m_sizeDelta, ref settings);
                 var gen = Generator;
-                if (sizeFitter==ContentSizeFitter.Horizoantal)
+                if (sizeFitter == ContentSizeFitter.Horizoantal)
                 {
                     m_sizeDelta.x = gen.GetPreferredWidth(str, settings);
                 }
-               else if(sizeFitter==ContentSizeFitter.Vertical)
+                else if (sizeFitter == ContentSizeFitter.Vertical)
                 {
                     m_sizeDelta.y = gen.GetPreferredHeight(str, settings);
-                }else if(sizeFitter == ContentSizeFitter.Both)
+                }
+                else if (sizeFitter == ContentSizeFitter.Both)
                 {
                     float w = gen.GetPreferredWidth(str, settings);
                     if (w < m_sizeDelta.x)
@@ -501,16 +500,25 @@ namespace huqiang.Core.HGUI
                 }
                 Dock(this);
             }
-            GetGenerationSettings(ref m_sizeDelta,ref settings);
+            GetGenerationSettings(ref m_sizeDelta, ref settings);
             var g = Generator;
             g.Populate(str, settings);
             var v = g.verts;
             int c = v.Count;
+            if (c == 0)
+            {
+                TmpVerts.DataCount = 0;
+                trisInfo.DataCount = 0;
+                trisInfo2.DataCount = 0;
+                return;
+            }
+            else
             if (c > TmpVerts.Size | TmpVerts.Size > c + 32)
             {
                 PopulateBuffer.Release(ref TmpVerts);
                 TmpVerts = PopulateBuffer.RegNew(c);
             }
+
             unsafe
             {
                 TextVertex* hv = (TextVertex*)TmpVerts.Addr;
@@ -522,38 +530,6 @@ namespace huqiang.Core.HGUI
                 }
             }
             TmpVerts.DataCount = c;
-            var l = g.lines;
-            c = l.Count;
-            if (c > LinesInfo.Size | LinesInfo.Size > c + 4)
-            {
-                LinesBuffer.Release(ref LinesInfo);
-                LinesInfo = LinesBuffer.RegNew(c);
-            }
-            unsafe
-            {
-                UILineInfo* hv = (UILineInfo*)LinesInfo.Addr;
-                for (int i = 0; i < c; i++)
-                {
-                    hv[i] = l[i];
-                }
-            }
-            LinesInfo.DataCount = c;
-            var s = g.characters;
-            c = s.Count;
-            if (c > CharsInfo.Size | CharsInfo.Size > c + 16)
-            {
-                CharsBuffer.Release(ref CharsInfo);
-                CharsInfo = CharsBuffer.RegNew(c);
-            }
-            unsafe
-            {
-                UICharInfo* hv = (UICharInfo*)CharsInfo.Addr;
-                for (int i = 0; i < c; i++)
-                {
-                    hv[i] = s[i];
-                }
-            }
-            LinesInfo.DataCount = c;
             m_dirty = false;
             m_vertexChange = true;
             fillColors[0] = true;
@@ -613,8 +589,6 @@ namespace huqiang.Core.HGUI
             base.OnDestroy();
             TextBuffer.Remove(this);
             TmpVerts.Release();
-            LinesInfo.Release();
-            CharsInfo.Release();
         }
         public override void ReSized()
         {

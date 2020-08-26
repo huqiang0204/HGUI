@@ -55,6 +55,7 @@ namespace huqiang.UIComposite
             }
         }
         public Action<UISlider> OnValueChanged;
+        public Action<UISlider> ValueEndChange;
         public float Percentage { get { return ratio; } set {
                 if (value < 0)
                     value = 0;
@@ -74,7 +75,8 @@ namespace huqiang.UIComposite
             base.Initial(mod,script);
             var trans = script.transform;
             callBack = Enity.RegEvent<UserEvent>();
-            callBack.Drag = callBack.DragEnd = Draging;
+            callBack.Drag  = Draging;
+            callBack.DragEnd = DragEnd;
             callBack.PointerDown = PointDown;
             callBack.AutoColor = false;
             var tmp = trans.Find("FillImage");
@@ -95,6 +97,13 @@ namespace huqiang.UIComposite
             ApplyValue();
             if (OnValueChanged != null)
                 OnValueChanged(this);
+        }
+        void DragEnd(UserEvent back, UserAction action, Vector2 v)
+        {
+            pos += v;
+            ApplyValue();
+            if (ValueEndChange != null)
+                ValueEndChange(this);
         }
         void PointDown(UserEvent back, UserAction action)
         {

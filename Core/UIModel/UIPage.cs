@@ -39,12 +39,13 @@ namespace huqiang.UIModel
             Root.localRotation = Quaternion.identity;
         }
         public static UIPage CurrentPage { get; private set; }
-        public static void LoadPage<T>(object dat = null) where T : UIPage, new()
+        public static T LoadPage<T>(object dat = null) where T : UIPage, new()
         {
-            if (CurrentPage is T)
+            var p = CurrentPage as T;
+            if (p!=null)
             {
                 CurrentPage.Show(dat);
-                return;
+                return p;
             }
             if (HCanvas.MainCanvas != null)//释放当前页面所有事件
                 HCanvas.MainCanvas.ClearAllAction();
@@ -59,8 +60,9 @@ namespace huqiang.UIModel
             t.Initial(Root, dat);
             t.ChangeLanguage();
             t.ReSize();
+            return t;
         }
-        public static void LoadPage(Type type, object dat = null)
+        public static UIPage LoadPage(Type type, object dat = null)
         {
             if (typeof(UIPage).IsAssignableFrom(type))
             {
@@ -68,7 +70,7 @@ namespace huqiang.UIModel
                     if (CurrentPage.GetType() == type)
                     {
                         CurrentPage.Show(dat);
-                        return;
+                        return CurrentPage;
                     }
                 if (HCanvas.MainCanvas != null)//释放当前页面所有事件
                     HCanvas.MainCanvas.ClearAllAction();
@@ -81,7 +83,9 @@ namespace huqiang.UIModel
                 t.ChangeLanguage();
                 t.ReSize();
                 t.Recovery();
+                return t;
             }
+            return null;
         }
         public static void Back()
         {

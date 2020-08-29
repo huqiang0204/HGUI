@@ -75,7 +75,7 @@ namespace huqiang.UIEvent
             {
                 if (TextCom == null)
                     return;
-                str = TextOperation.GetShowContent() + Keyboard.TempString;//GetShowString();
+                str = TextOperation.GetShowContent() + Keyboard.CompositionString;//GetShowString();
                 TextCom.MainColor = textColor;
                 if (contentType == ContentType.Password)
                     TextCom.Text = new string('*', str.Length);

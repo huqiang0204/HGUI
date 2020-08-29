@@ -9,13 +9,6 @@ using UnityEngine;
 
 namespace huqiang.UIEvent
 {
-    struct LineInfo
-    {
-        public float top;
-        public int StartIndex;
-        public int Count;
-        public float y;
-    }
     public class TextSelect:UserEvent
     {
         protected static TextGenerationSettings settings;
@@ -24,10 +17,6 @@ namespace huqiang.UIEvent
         protected string ShowContent;
         protected float overDistance = 500;
         protected float overTime = 0;
-        internal LineInfo[] lines;
-        protected UICharInfo[] cha;
-        protected UILineInfo[] showLines;
-        protected UICharInfo[] showChars;
         /// <summary>
         /// 总计行数
         /// </summary>

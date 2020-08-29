@@ -36,7 +36,8 @@ namespace huqiang.Core.HGUI
         DockPanel,
         DesignedDockPanel, 
         DragContent,
-        DataGrid
+        DataGrid,
+        InputBox
     }
     public class UIElement:MonoBehaviour
     {
@@ -701,6 +702,9 @@ namespace huqiang.Core.HGUI
                     break;
                 case CompositeType.DataGrid:
                     new DataGrid().Initial(ex,script);
+                    break;
+                case CompositeType.InputBox:
+                    new InputBox().Initial(ex,script);
                     break;
             }
         }

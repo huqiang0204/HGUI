@@ -29,6 +29,7 @@ namespace huqiang.UIEvent
         public static List<KeyCode> KeyUps;
         public static string InputString;
         public static string TempString;
+        public static string CompositionString;
         public static bool TempStringChanged;
         public static string CorrectionInput;
         public static string TouchString = "";
@@ -95,6 +96,7 @@ namespace huqiang.UIEvent
             }
             else
             {
+                CompositionString = Input.compositionString;
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR
                 if (IME.Inputing)
                 {

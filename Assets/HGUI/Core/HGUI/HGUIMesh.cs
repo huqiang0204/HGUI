@@ -56,7 +56,7 @@ namespace huqiang.Core.HGUI
                 Vector4 tang = image.uvrect;
                 unsafe
                 {
-                    HVertex* hv = (HVertex*)image.vertInfo.Addr;
+                    HVertex* hv = image.vertInfo.Addr;
                     for (int i = 0; i < c; i++)
                     {
                         hv[i].color = col;
@@ -76,7 +76,7 @@ namespace huqiang.Core.HGUI
             }
             else if (image.vertInfo.Size < 4 | image.vertInfo.Size > 8)
             {
-                blockBuffer.Release(ref image.vertInfo);
+                image.vertInfo.Release();
                 image.vertInfo = blockBuffer.RegNew(4);
             }
             image.vertInfo.DataCount = 4;
@@ -88,7 +88,7 @@ namespace huqiang.Core.HGUI
             float ty = 0.5f * y;
             unsafe
             {
-                HVertex* hv = (HVertex*)image.vertInfo.Addr;
+                HVertex* hv = image.vertInfo.Addr;
                 hv[0].position.x = lx;
                 hv[0].position.y = dy;
                 hv[0].uv.x = 0;
@@ -119,7 +119,7 @@ namespace huqiang.Core.HGUI
             }
             else if (image.vertInfo.Size < 4 | image.vertInfo.Size > 8)
             {
-                blockBuffer.Release(ref image.vertInfo);
+                image.vertInfo.Release();
                 image.vertInfo = blockBuffer.RegNew(4);
             }
             image.vertInfo.DataCount = 4;
@@ -131,7 +131,7 @@ namespace huqiang.Core.HGUI
             float ty = (1 - py) * y;
             unsafe
             {
-                HVertex* hv = (HVertex*)image.vertInfo.Addr;
+                HVertex* hv = image.vertInfo.Addr;
                 hv[0].position.x = lx;
                 hv[0].position.y = dy;
                 hv[1].position.x = rx;
@@ -194,13 +194,13 @@ namespace huqiang.Core.HGUI
             }
             else if (image.vertInfo.Size < 16 | image.vertInfo.Size > 20)
             {
-                blockBuffer.Release(ref image.vertInfo);
+                image.vertInfo.Release();
                 image.vertInfo = blockBuffer.RegNew(16);
             }
             image.vertInfo.DataCount = 16;
             unsafe
             {
-                HVertex* hv = (HVertex*)image.vertInfo.Addr;
+                HVertex* hv = image.vertInfo.Addr;
                 hv[0].position.x = lx;
                 hv[0].position.y = dy;
                 hv[1].position.x = slx;
@@ -252,7 +252,7 @@ namespace huqiang.Core.HGUI
 
             unsafe
             {
-                HVertex* hv = (HVertex*)image.vertInfo.Addr;
+                HVertex* hv = image.vertInfo.Addr;
                 hv[0].uv.x = lx;
                 hv[0].uv.y = dy;
                 hv[1].uv.x = slx;
@@ -498,13 +498,13 @@ namespace huqiang.Core.HGUI
             }
             else if (image.vertInfo.Size < 4 | image.vertInfo.Size > 8)
             {
-                blockBuffer.Release(ref image.vertInfo);
+                image.vertInfo.Release();
                 image.vertInfo = blockBuffer.RegNew(4);
             }
             image.vertInfo.DataCount = 4;
             unsafe
             {
-                HVertex* hv = (HVertex*)image.vertInfo.Addr;
+                HVertex* hv = image.vertInfo.Addr;
                 hv[0].position.x = lx;
                 hv[0].position.y = dy;
                 hv[1].position.x = rx;
@@ -561,13 +561,13 @@ namespace huqiang.Core.HGUI
             }
             else if (image.vertInfo.Size < 4 | image.vertInfo.Size > 8)
             {
-                blockBuffer.Release(ref image.vertInfo);
+                image.vertInfo.Release();
                 image.vertInfo = blockBuffer.RegNew(4);
             }
             image.vertInfo.DataCount = 4;
             unsafe
             {
-                HVertex* hv = (HVertex*)image.vertInfo.Addr;
+                HVertex* hv = image.vertInfo.Addr;
                 hv[0].position.x = lx;
                 hv[0].position.y = dy;
                 hv[1].position.x = rx;
@@ -611,12 +611,12 @@ namespace huqiang.Core.HGUI
             }
             else if (image.vertInfo.Size < 4 | image.vertInfo.Size > 8)
             {
-                blockBuffer.Release(ref image.vertInfo);
+                image.vertInfo.Release();
                 image.vertInfo = blockBuffer.RegNew(4);
             }
             unsafe
             {
-                HVertex* hv = (HVertex*)image.vertInfo.Addr;
+                HVertex* hv = image.vertInfo.Addr;
                 if (a > 0.5f)
                 {
                     hv[0].position.x = lx;
@@ -777,12 +777,12 @@ namespace huqiang.Core.HGUI
             }
             else if (image.vertInfo.Size < 8 | image.vertInfo.Size > 12)
             {
-                blockBuffer.Release(ref image.vertInfo);
+                image.vertInfo.Release();
                 image.vertInfo = blockBuffer.RegNew(8);
             }
             unsafe
             {
-                HVertex* hv = (HVertex*)image.vertInfo.Addr;
+                HVertex* hv = image.vertInfo.Addr;
                 if (a > 0.75f)
                 {
                     a -= 0.75f;
@@ -912,12 +912,12 @@ namespace huqiang.Core.HGUI
             }
             else if (image.vertInfo.Size < 8 | image.vertInfo.Size > 12)
             {
-                blockBuffer.Release(ref image.vertInfo);
+                image.vertInfo.Release();
                 image.vertInfo = blockBuffer.RegNew(8);
             }
             unsafe
             {
-                HVertex* hv = (HVertex*)image.vertInfo.Addr;
+                HVertex* hv = image.vertInfo.Addr;
                 if (a > 0.75f)
                 {
                     a -= 0.75f;
@@ -1048,12 +1048,12 @@ namespace huqiang.Core.HGUI
             }
             else if (image.vertInfo.Size < 8 | image.vertInfo.Size > 12)
             {
-                blockBuffer.Release(ref image.vertInfo);
+                image.vertInfo.Release();
                 image.vertInfo = blockBuffer.RegNew(8);
             }
             unsafe
             {
-                HVertex* hv = (HVertex*)image.vertInfo.Addr;
+                HVertex* hv = image.vertInfo.Addr;
                 if (a > 0.75f)
                 {
                     a -= 0.75f;
@@ -1182,12 +1182,12 @@ namespace huqiang.Core.HGUI
             }
             else if (image.vertInfo.Size < 8 | image.vertInfo.Size > 12)
             {
-                blockBuffer.Release(ref image.vertInfo);
+                image.vertInfo.Release();
                 image.vertInfo = blockBuffer.RegNew(8);
             }
             unsafe
             {
-                HVertex* hv = (HVertex*)image.vertInfo.Addr;
+                HVertex* hv = image.vertInfo.Addr;
                 if (a > 0.75f)
                 {
                     a -= 0.75f;
@@ -1380,12 +1380,12 @@ namespace huqiang.Core.HGUI
             }
             else if (image.vertInfo.Size < 12 | image.vertInfo.Size > 16)
             {
-                blockBuffer.Release(ref image.vertInfo);
+                image.vertInfo.Release();
                 image.vertInfo = blockBuffer.RegNew(12);
             }
             unsafe
             {
-                HVertex* hv = (HVertex*)image.vertInfo.Addr;
+                HVertex* hv = image.vertInfo.Addr;
                 if (a > 0.875f)
                 {
                     a -= 0.875f;
@@ -1721,12 +1721,12 @@ namespace huqiang.Core.HGUI
             }
             else if (image.vertInfo.Size < 12 | image.vertInfo.Size > 16)
             {
-                blockBuffer.Release(ref image.vertInfo);
+                image.vertInfo.Release();
                 image.vertInfo = blockBuffer.RegNew(12);
             }
             unsafe
             {
-                HVertex* hv = (HVertex*)image.vertInfo.Addr;
+                HVertex* hv = image.vertInfo.Addr;
                 if (a > 0.875f)
                 {
                     a -= 0.875f;
@@ -2057,12 +2057,12 @@ namespace huqiang.Core.HGUI
             }
             else if (image.vertInfo.Size < 12 | image.vertInfo.Size > 16)
             {
-                blockBuffer.Release(ref image.vertInfo);
+                image.vertInfo.Release();
                 image.vertInfo = blockBuffer.RegNew(12);
             }
             unsafe
             {
-                HVertex* hv = (HVertex*)image.vertInfo.Addr;
+                HVertex* hv = image.vertInfo.Addr;
                 if (a > 0.875f)
                 {
                     a -= 0.875f;
@@ -2396,12 +2396,12 @@ namespace huqiang.Core.HGUI
             }
             else if (image.vertInfo.Size < 12 | image.vertInfo.Size > 16)
             {
-                blockBuffer.Release(ref image.vertInfo);
+                image.vertInfo.Release();
                 image.vertInfo = blockBuffer.RegNew(12);
             }
             unsafe
             {
-                HVertex* hv = (HVertex*)image.vertInfo.Addr;
+                HVertex* hv = image.vertInfo.Addr;
                 if (a > 0.875f)
                 {
                     a -= 0.875f;

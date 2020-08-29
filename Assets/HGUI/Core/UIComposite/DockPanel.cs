@@ -9,8 +9,11 @@ namespace huqiang.UIComposite
 {
     public class DockPanelLine
     {
+        public static Texture2D CursorX;
+        public static Texture2D CursorY;
         public DockPanel layout;
         UserEvent callBack;
+        public UIElement Enity;
         public Direction direction { get; private set; }
         /// <summary>
         /// 需要绘制线
@@ -21,12 +24,15 @@ namespace huqiang.UIComposite
             realLine= real;
             layout = lay;
             layout.lines.Add(this);
-            model = mod;
+            Enity = mod;
             if (real)
             {
-                callBack = model.RegEvent<UserEvent>();
+                callBack = Enity.RegEvent<UserEvent>();
                 callBack.Drag = Drag;
-
+                callBack.DragEnd = (o, e, v) => {
+                    if (layout.LayOutChanged != null)
+                        layout.LayOutChanged(layout);
+                };
                 direction = dir;
                 switch(dir)
                 {
@@ -39,17 +45,21 @@ namespace huqiang.UIComposite
                            
                 }
 #if UNITY_EDITOR || UNITY_STANDALONE_WIN
-                //callBack.PointerEntry = (o, e) => {
-                //    ThreadMission.InvokeToMain((y) => {
-                //        Cursor.SetCursor(UnityEngine.Resources.Load<Texture2D>("emoji"),Vector2.zero,CursorMode.Auto);
-                //    },null);
-                //};
-                //callBack.DragEnd = (o, e, v) => {
-                //    ThreadMission.InvokeToMain((y) =>
-                //    {
-                //        Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
-                //    }, null);
-                //};
+                callBack.PointerEntry = (o, e) =>
+                {
+                    if(direction==Direction.Horizontal)
+                    {
+                        Cursor.SetCursor(CursorY, new Vector2(64, 64), CursorMode.Auto);
+                    }
+                    else
+                    {
+                        Cursor.SetCursor(CursorX, new Vector2(64, 64), CursorMode.Auto);
+                    } 
+                };
+                callBack.PointerLeave = (o, e) => {
+                    if (!o.Pressed)
+                        Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+                };
 #endif
             }
             else mod.gameObject.SetActive(false);
@@ -85,64 +95,65 @@ namespace huqiang.UIComposite
             for (int i = 0; i < AdjacentLines.Count; i++)
                 AdjacentLines[i].SizeChanged();
         }
+       
         void MoveLeft(float dis)
         {
-            var trans = model.transform;
+            var trans = Enity.transform;
             Vector3 pos = trans.localPosition;
             pos.x += dis;
             for (int i = 0; i < Left.Count; i++)
             {
-                var lx = Left[i].Left.model.transform.localPosition.x;
-                if (pos.x <= lx)
-                    pos.x = lx + 1;
+                var lx = Left[i].Left.Enity.transform.localPosition.x;
+                if (pos.x <= lx + layout.AreaWidth)
+                    pos.x = lx + layout.AreaWidth;
             }
             trans.localPosition = pos;
         }
         void MoveTop(float dis)
         {
-            var trans = model.transform;
+            var trans = Enity.transform;
             Vector3 pos = trans.localPosition;
             pos.y += dis;
             for (int i = 0; i < Top.Count; i++)
             {
-                var ty = Top[i].Top.model.transform.localPosition.y;
-                if (pos.y >= ty)
-                    pos.y = ty - 1;
+                var ty = Top[i].Top.Enity.transform.localPosition.y;
+                if (pos.y >= ty - layout.AreaWidth)
+                    pos.y = ty - layout.AreaWidth;
             }
             trans.localPosition = pos;
         }
         void MoveRight(float dis)
         {
-            var trans = model.transform;
+            var trans = Enity.transform;
             Vector3 pos = trans.localPosition;
             pos.x += dis;
             for (int i = 0; i < Right.Count; i++)
             {
-                var rx = Right[i].Right.model.transform.localPosition.x;
-                if (pos.x >= rx)
-                    pos.x = rx - 1;
+                var rx = Right[i].Right.Enity.transform.localPosition.x;
+                if (pos.x >= rx- layout.AreaWidth)
+                    pos.x = rx - layout.AreaWidth;
             }
             trans.localPosition = pos;
         }
         void MoveDown(float dis)
         {
-            var trans = model.transform;
+            var trans = Enity.transform;
             Vector3 pos = trans.localPosition;
             pos.y += dis;
             for (int i = 0; i < Down.Count; i++)
             {
-                var ty = Down[i].Down.model.transform.localPosition.y;
-                if (pos.y <= ty)
-                    pos.y = ty - 1;
+                var ty = Down[i].Down.Enity.transform.localPosition.y;
+                if (pos.y <= ty + layout.AreaWidth)
+                    pos.y = ty + layout.AreaWidth;
             }
             trans.localPosition = pos;
         }
         public void SetSize(Vector3 pos,Vector2 size)
         {
-            model.transform.localPosition = pos;
-            model.SizeDelta = size;
+            Enity.transform.localPosition = pos;
+            Enity.SizeDelta = size;
         }
-        public UIElement model;
+    
         /// <summary>
         /// 左边相邻的所有区域
         /// </summary>
@@ -168,33 +179,33 @@ namespace huqiang.UIComposite
             {
                 if(direction==Direction.Horizontal)
                 {
-                    float sx = LineStart.model.transform.localPosition.x;
-                    float ex = LineEnd.model.transform.localPosition.x;
+                    float sx = LineStart.Enity.transform.localPosition.x;
+                    float ex = LineEnd.Enity.transform.localPosition.x;
                     float w= ex - sx;
-                    var trans = model.transform;
+                    var trans = Enity.transform;
                     var pos = trans.localPosition;
                     pos.x = sx + 0.5f * w;
                     trans.localPosition = pos;
                     if (w < 0)
                         w = -w;
-                    var size = model.SizeDelta;
+                    var size = Enity.SizeDelta;
                     size.x = w;
-                    model.SizeDelta = size;
+                    Enity.SizeDelta = size;
                 }
                 else
                 {
-                    float sx = LineStart.model.transform.localPosition.y;
-                    float ex = LineEnd.model.transform.localPosition.y;
+                    float sx = LineStart.Enity.transform.localPosition.y;
+                    float ex = LineEnd.Enity.transform.localPosition.y;
                     float w = ex - sx;
-                    var trans = model.transform;
+                    var trans = Enity.transform;
                     var pos = trans.localPosition;
                     pos.y = sx + 0.5f * w;
                     trans.localPosition= pos;
                     if (w < 0)
                         w = -w;
-                    var size = model.SizeDelta;
+                    var size = Enity.SizeDelta;
                     size.y = w;
-                    model.SizeDelta = size;
+                    Enity.SizeDelta = size;
                 }
                 for (int i = 0; i < Left.Count; i++)
                     Left[i].SizeChanged();
@@ -227,7 +238,7 @@ namespace huqiang.UIComposite
             if (LineEnd != null)
                 LineEnd.AdjacentLines.Remove(this);
             layout.lines.Remove(this);
-            HGUIManager.GameBuffer.RecycleGameObject(model.gameObject);
+            HGUIManager.GameBuffer.RecycleGameObject(Enity.gameObject);
         }
         void Release()
         {
@@ -245,9 +256,9 @@ namespace huqiang.UIComposite
             var areas = line.Left;
             for (int i = 0; i < areas.Count; i++)
                 areas[i].Right = this;
-            var trans = model.transform;
+            var trans = Enity.transform;
             var pos = trans.localPosition;
-            pos.y = line.model.transform.localPosition.y;
+            pos.y = line.Enity.transform.localPosition.y;
             trans.localPosition = pos;
             var al = line.AdjacentLines;
             int c = al.Count - 1;
@@ -264,9 +275,9 @@ namespace huqiang.UIComposite
             var areas = line.Right;
             for (int i = 0; i < areas.Count; i++)
                 areas[i].Left = this;
-            var trans = model.transform;
+            var trans = Enity.transform;
             var pos = trans.localPosition;
-            pos.y = line.model.transform.localPosition.y;
+            pos.y = line.Enity.transform.localPosition.y;
             trans.localPosition = pos;
             var al = line.AdjacentLines;
             int c = al.Count - 1;
@@ -283,9 +294,9 @@ namespace huqiang.UIComposite
             var areas = line.Top;
             for (int i = 0; i < areas.Count; i++)
                 areas[i].Down = this;
-            var trans = model.transform;
+            var trans = Enity.transform;
             var pos = trans.localPosition;
-            pos.x = line.model.transform.localPosition.x;
+            pos.x = line.Enity.transform.localPosition.x;
             trans.localPosition = pos;
             var al = line.AdjacentLines;
             int c = al.Count - 1;
@@ -302,9 +313,9 @@ namespace huqiang.UIComposite
             var areas = line.Down;
             for (int i = 0; i < areas.Count; i++)
                 areas[i].Top = this;
-            var trans = model.transform;
+            var trans = Enity.transform;
             var pos = trans.localPosition;
-            pos.x = line.model.transform.localPosition.x;
+            pos.x = line.Enity.transform.localPosition.x;
             trans.localPosition = pos;
             var al = line.AdjacentLines;
             int c = al.Count-1;
@@ -312,6 +323,65 @@ namespace huqiang.UIComposite
             {
                 var l = al[c];
                 l.SetLineEnd(this);
+            }
+        }
+        public void SaveToDataBuffer(FakeStructArray fake,int index)
+        {
+            fake[index,0] = (int)direction;
+            fake.SetFloat(index, 1,Enity.m_sizeDelta.x);
+            fake.SetFloat(index,2, Enity.m_sizeDelta.y);
+            fake.SetFloat(index,3,Enity.transform.localPosition.x);
+            fake.SetFloat(index,4, Enity.transform.localPosition.y);
+            fake[index,5] = layout.GetLineID(LineStart);
+            fake[index,6] = layout.GetLineID(LineEnd);
+            fake.SetData(index,7,SaveAdjacentArea(Left));
+            fake.SetData(index,8, SaveAdjacentArea(Right));
+            fake.SetData(index,9, SaveAdjacentArea(Top));
+            fake.SetData(index,10, SaveAdjacentArea(Down));
+            if(AdjacentLines.Count>0)
+            {
+                int[] tmp = new int[AdjacentLines.Count];
+                for (int i = 0; i < tmp.Length; i++)
+                    tmp[i] = layout.GetLineID(AdjacentLines[i]);
+                fake.SetData(index,11,tmp);
+            }
+        }
+        int[] SaveAdjacentArea(List<DockpanelArea> areas)
+        {
+            if(areas.Count>0)
+            {
+                int[] tmp = new int[areas.Count];
+                for (int i = 0; i < tmp.Length; i++)
+                    tmp[i] = layout.GetAreaID(areas[i]);
+                return tmp;
+            }
+            return null;
+        }
+        public void LoadFromBuffer(FakeStructArray fake, int index)
+        {
+            direction =(Direction)fake[index,0];
+            Enity.m_sizeDelta.x = fake.GetFloat(index,1);
+            Enity.m_sizeDelta.y = fake.GetFloat(index,2);
+            Enity.transform.localPosition = new Vector3(fake.GetFloat(index,3),fake.GetFloat(index,4),0);
+            LineStart = layout.GetLine(fake[index,5]);
+            LineEnd = layout.GetLine(fake[index,6]);
+            LoadAdjacentArea(Left, fake.GetData<int[]>(index,7));
+            LoadAdjacentArea(Right, fake.GetData<int[]>(index,8));
+            LoadAdjacentArea(Top, fake.GetData<int[]>(index,9));
+            LoadAdjacentArea(Down, fake.GetData<int[]>(index,10));
+            int[] ids = fake.GetData<int[]>(index,11);
+            if (ids != null)
+            {
+                for (int i = 0; i < ids.Length; i++)
+                    AdjacentLines.Add(layout.GetLine(ids[i]));
+            }
+        }
+        void LoadAdjacentArea(List<DockpanelArea> areas, int[] ids)
+        {
+            if(ids!=null)
+            {
+                for (int i = 0; i < ids.Length; i++)
+                    areas.Add(layout.GetArea(ids[i]));
             }
         }
     }
@@ -381,16 +451,16 @@ namespace huqiang.UIComposite
         public void SizeChanged()
         {
             float hl = DockPanel.LineWidth * 0.5f;
-            float rx = Right.model.transform.localPosition.x;
+            float rx = Right.Enity.transform.localPosition.x;
             if (Right.realLine)
                 rx -= hl;
-            float lx = Left.model.transform.localPosition.x;
+            float lx = Left.Enity.transform.localPosition.x;
             if (Left.realLine)
                 lx += hl;
-            float ty = Top.model.transform.localPosition.y;
+            float ty = Top.Enity.transform.localPosition.y;
             if (Top.realLine)
                 ty -= hl;
-            float dy = Down.model.transform.localPosition.y;
+            float dy = Down.Enity.transform.localPosition.y;
             if (Down.realLine)
                 dy += hl;
             float w = rx - lx;
@@ -409,109 +479,126 @@ namespace huqiang.UIComposite
                 UIElement.ResizeChild(model);//触发SizeChange事件
             }
         }
-        public DockpanelArea AddArea(Dock dock, float r = 0.5f)
+        public DockpanelArea AddAreaR(Dock dock, float r = 0.5f)
         {
             switch (dock)
             {
                 case Dock.Left:
-                    return AddLeftArea(r);
+                    float dx = Left.Enity.transform.localPosition.x;
+                    float x = Right.Enity.transform.localPosition.x - dx;
+                    x *= r;
+                    x += dx;
+                    return AddLeftArea(x);
                 case Dock.Top:
-                    return AddTopArea(r);
+                    float dy = Down.Enity.transform.localPosition.y;
+                    float y = Top.Enity.transform.localPosition.y - dy;
+                    y *=(1- r);
+                    y += dy;
+                    return AddTopArea(y);
                 case Dock.Right:
-                    return AddRightArea(r);
+                    dx = Left.Enity.transform.localPosition.x;
+                    x = Right.Enity.transform.localPosition.x - dx;
+                    x *= (1 - r);
+                    x += dx;
+                    return AddRightArea(x);
                 case Dock.Down:
-                    return AddDownArea(r);
+                    dy = Down.Enity.transform.localPosition.y;
+                    y = Top.Enity.transform.localPosition.y - dy;
+                    y *= r;
+                    y += dy;
+                    return AddDownArea(y);
             }
             return this;
         }
-        DockPanelLine AddHorizontalLine(float r)
+        public DockpanelArea AddArea(Dock dock, float w = 100f)
+        {
+            switch (dock)
+            {
+                case Dock.Left:
+                    return AddLeftArea(Left.Enity.transform.localPosition.x + w);
+                case Dock.Top:
+                    return AddTopArea(Top.Enity.transform.localPosition.y - w);
+                case Dock.Right:
+                    return AddRightArea(Right.Enity.transform.localPosition.x - w);
+                case Dock.Down:
+                    return AddDownArea(Down.Enity.transform.localPosition.y + w);
+            }
+            return this;
+        }
+        DockPanelLine AddHLine(float y)
         {
             var m = HGUIManager.GameBuffer.Clone(layout.LineMod).GetComponent<UIElement>();
-            float ex = Right.model.transform.localPosition.x;
-            float sx = Left.model.transform.localPosition.x;
+            float ex = Right.Enity.transform.localPosition.x;
+            float sx = Left.Enity.transform.localPosition.x;
             float w = ex - sx;
             if (w < 0)
                 w = -w;
             DockPanelLine line = new DockPanelLine(layout, m, Direction.Horizontal);
             var pos = model.transform.localPosition;
-            float dy = Down.model.transform.localPosition.y;
-            pos.y = Top.model.transform.localPosition.y - dy;
-            pos.y *= r;
-            pos.y += dy;
+            pos.y = y;
             line.SetSize(pos, new Vector2(w, DockPanel.LineWidth));
             line.SetLineStart(Left);
             line.SetLineEnd(Right);
             return line;
         }
-        DockPanelLine AddVerticalLine(float r)
+        DockPanelLine AddVLine(float x)
         {
             var m = HGUIManager.GameBuffer.Clone(layout.LineMod).GetComponent<UIElement>();
-            float ex = Top.model.transform.localPosition.y;
-            float sx = Down.model.transform.localPosition.y;
+            float ex = Top.Enity.transform.localPosition.y;
+            float sx = Down.Enity.transform.localPosition.y;
             float w = ex - sx;
             if (w < 0)
                 w = -w;
             DockPanelLine line = new DockPanelLine(layout, m, Direction.Vertical);
             var pos = model.transform.localPosition;
-            float dx = Left.model.transform.localPosition.x;
-            pos.x = Right.model.transform.localPosition.x - dx;
-            pos.x *= r;
-            pos.x += dx;
+            pos.x = x;
             line.SetSize(pos, new Vector2(DockPanel.LineWidth, w));
             line.SetLineStart(Down);
             line.SetLineEnd(Top);
             return line;
         }
-        DockpanelArea AddLeftArea(float r)
+        DockpanelArea AddLeftArea(float x)
         {
             DockpanelArea area = new DockpanelArea(layout);
-            layout.areas.Add(area);
-            var line = AddVerticalLine(r);
+            var line = AddVLine(x);
             area.SetLeftLine(Left);
             area.SetRightLine(line);
             area.SetTopLine(Top);
             area.SetDownLine(Down);
             SetLeftLine(line);
-            //UIElement.ResizeChild(model);
             return area;
         }
-        DockpanelArea AddRightArea(float r)
+        DockpanelArea AddRightArea(float x)
         {
             DockpanelArea area = new DockpanelArea(layout);
-            layout.areas.Add(area);
-            var line = AddVerticalLine(1 - r);
+            var line = AddVLine(x);
             area.SetLeftLine(line);
             area.SetRightLine(Right);
             area.SetTopLine(Top);
             area.SetDownLine(Down);
             SetRightLine(line);
-            //UIElement.ResizeChild(model);
             return area;
         }
-        DockpanelArea AddTopArea(float r)
+        DockpanelArea AddTopArea(float y)
         {
             DockpanelArea area = new DockpanelArea(layout);
-            layout.areas.Add(area);
-            var line = AddHorizontalLine(1 - r);
+            var line = AddHLine(y);
             area.SetLeftLine(Left);
             area.SetRightLine(Right);
             area.SetTopLine(Top);
             area.SetDownLine(line);
             SetTopLine(line);
-            //UIElement.ResizeChild(model);
             return area;
         }
-        DockpanelArea AddDownArea(float r)
+        DockpanelArea AddDownArea(float y)
         {
             DockpanelArea area = new DockpanelArea(layout);
-            layout.areas.Add(area);
-            var line = AddHorizontalLine(r);
+            var line = AddHLine(y);
             area.SetLeftLine(Left);
             area.SetRightLine(Right);
             area.SetTopLine(line);
             area.SetDownLine(Down);
             SetDownLine(line);
-            //UIElement.ResizeChild(model);
             return area;
         }
         public void Dispose()
@@ -566,9 +653,24 @@ namespace huqiang.UIComposite
                 }
             }
         }
+        public void SaveToDataBuffer(FakeStructArray fake, int index)
+        {
+            fake[index, 0] = layout.GetLineID(Left);
+            fake[index, 1] = layout.GetLineID(Right);
+            fake[index, 2] = layout.GetLineID(Top);
+            fake[index, 3] = layout.GetLineID(Down);
+        }
+        public void LoadFromBuffer(FakeStructArray fake, int index)
+        {
+            Left = layout.GetLine(fake[index, 0]);
+            Right = layout.GetLine(fake[index, 1]);
+            Top = layout.GetLine(fake[index, 2]);
+            Down = layout.GetLine(fake[index, 3]);
+        }
     }
     public class DockPanel : Composite
     {
+        public float AreaWidth = 40f;
         public static float LineWidth = 8f;
         public List<DockPanelLine> lines = new List<DockPanelLine>();
         public List<DockpanelArea> areas = new List<DockpanelArea>();
@@ -592,7 +694,8 @@ namespace huqiang.UIComposite
         public FakeStruct AreaMod;
         public Transform LineLevel;
         public Transform AreaLevel;
-  
+
+        public Action<DockPanel> LayOutChanged;
         public DockpanelArea MainArea { get; private set; }
         public override void Initial(FakeStruct fake,UIElement element)
         {
@@ -607,6 +710,14 @@ namespace huqiang.UIComposite
             InitialFixLine();
             InitialArea();
             Enity.SizeChanged = SizeChanged;
+            unsafe
+            {
+                var ex = fake.buffer.GetData(((TransfromData*)fake.ip)->ex) as FakeStruct;
+                if (ex != null)
+                {
+                    LoadFromBuffer(ex);
+                }
+            }
         }
         void InitialFixLine()
         {
@@ -638,7 +749,6 @@ namespace huqiang.UIComposite
             area.Right = Right;
             area.Top = Top;
             area.Down = Down;
-            areas.Add(area);
             MainArea = area;
             area.SizeChanged();
         }
@@ -654,6 +764,8 @@ namespace huqiang.UIComposite
             Down.SetSize(new Vector2(0, -ty), new Vector2(size.x, LineWidth));
             for (int i = 0; i < lines.Count; i++)
                 lines[i].SizeChanged();
+            if (LayOutChanged != null)
+                LayOutChanged(this);
         }
         public void Refresh()
         {
@@ -666,5 +778,80 @@ namespace huqiang.UIComposite
         /// 锁定布局
         /// </summary>
         public bool LockLayout;
+        public void LoadFromBuffer(FakeStruct fake)
+        {
+            var fsa = fake.GetData<FakeStructArray>(0);
+            var fsa2 = fake.GetData<FakeStructArray>(1);
+            int max = fsa.Length;
+            if (max > lines.Count)
+                max = lines.Count;
+            for (int i = 0; i < max; i++)
+                lines[i].LoadFromBuffer(fsa, i);
+            max = fsa2.Length;
+            if (max > areas.Count)
+                max = areas.Count;
+            for (int i = 0; i < max; i++)
+                areas[i].LoadFromBuffer(fsa2,i);
+        }
+        public FakeStruct SaveToDataBuffer(DataBuffer db)
+        {
+            FakeStruct fake = new FakeStruct(db, 2);
+            FakeStructArray fsa = new FakeStructArray(db, 12, lines.Count);
+            for (int i = 0; i < lines.Count; i++)
+                lines[i].SaveToDataBuffer(fsa, i);
+            fake.SetData(0,fsa);
+            fsa = new FakeStructArray(db,4, areas.Count);
+            for (int i = 0; i < areas.Count; i++)
+                areas[i].SaveToDataBuffer(fsa,i);
+            fake.SetData(1,fsa);
+            return fake;
+        }
+        public int GetLineID(DockPanelLine line)
+        {
+            if(line==Left)
+            return 0;
+            if (line == Right)
+                return 1;
+            if (line == Top)
+                return 2;
+            if (line == Down)
+                return 3;
+            for (int i = 0; i < lines.Count; i++)
+                if (lines[i] == line)
+                    return i + 3;
+            return -1;
+        }
+        public DockPanelLine GetLine(int id)
+        {
+            if (id < 0)
+                return null;
+            if (id == 0)
+                return Left;
+            if (id == 1)
+                return Right;
+            if (id == 2)
+                return Top;
+            if (id == 3)
+                return Down;
+            id -= 3;
+            if (id < lines.Count)
+                return lines[id];
+            return null;
+        }
+        public int GetAreaID(DockpanelArea area)
+        {
+            for (int i = 0; i < areas.Count; i++)
+                if (areas[i] == area)
+                    return i;
+            return -1;
+        }
+        public DockpanelArea GetArea(int id)
+        {
+            if (id < 0)
+                return null;
+            if (id < areas.Count)
+                return areas[id];
+            return null;
+        }
     }
 }

@@ -108,7 +108,7 @@ namespace huqiang.UIEvent
         public Action<TextInput, UserAction> OnSelectChanged;
         public Action<TextInput, UserAction> OnSelectEnd;
         public InputType inputType = InputType.Standard;
-        public LineType lineType = LineType.MultiLineNewline;
+        public LineType lineType = LineType.SingleLine;
         ContentType m_ctpye;
         bool multiLine = true;
         public ContentType contentType
@@ -326,7 +326,7 @@ namespace huqiang.UIEvent
             InsertString(str);
             return input;
         }
-        string TouchInputChanged(string input)
+        internal string TouchInputChanged(string input)
         {
             if(Keyboard.InputChanged)
             {

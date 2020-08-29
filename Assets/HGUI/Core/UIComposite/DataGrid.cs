@@ -156,12 +156,14 @@ namespace huqiang.UIComposite
             eventCall.CutRect = true;
             eventCall.Drag = (o, e, s) => { Scrolling(o, s); };
             eventCall.DragEnd = (o, e, s) => { Scrolling(o, s); };
+            eventCall.MouseWheel = (o, e) => { Scrolling(o, new Vector2(0, e.MouseWheelDelta * 100)); };
             eventCall.Scrolling = Scrolling;
             eventCall.ForceEvent = true;
             eventCall.AutoColor = false;
             var ue = Grid.GetComponent<UIElement>().RegEvent<UserEvent>();
             ue.CutRect = true;
             ue.Penetrate = true;
+            Enity.SizeChanged = (o) => { Refresh(); };
         }
         void Scrolling(UserEvent back, Vector2 v)
         {

@@ -35,9 +35,9 @@ namespace huqiang.Core.HGUI
         public override Color32 MainColor { get => m_color; set { m_color = value; m_colorChanged = true;} }
         public override Vector2 SizeDelta { get => m_sizeDelta; set { m_sizeDelta = value; m_vertexChange = true; } }
         internal int[] tris;
-        internal BlockInfo vertInfo;
-        internal BlockInfo trisInfo;
-        internal BlockInfo trisInfo2;
+        internal BlockInfo<HVertex> vertInfo;
+        internal BlockInfo<int> trisInfo;
+        internal BlockInfo<int> trisInfo2;
         [SerializeField]
         internal Material m_material;
         public Material Material { get => m_material; set {
@@ -122,7 +122,7 @@ namespace huqiang.Core.HGUI
                 {
                     unsafe
                     {
-                        HVertex* hv = (HVertex*) vertInfo.Addr;
+                        HVertex* hv = vertInfo.Addr;
                         for (int i = 0; i < vertInfo.DataCount; i++)
                             hv[i].color = m_color;
                     }
@@ -156,7 +156,7 @@ namespace huqiang.Core.HGUI
             }
             unsafe
             {
-                HVertex* hv = (HVertex*)vertInfo.Addr;
+                HVertex* hv = vertInfo.Addr;
                 for (int i = 0; i < c; i++)
                 {
                     hv[i] = vert[i];
@@ -175,7 +175,7 @@ namespace huqiang.Core.HGUI
             }
             unsafe
             {
-                HVertex* hv = (HVertex*)vertInfo.Addr;
+                HVertex* hv = vertInfo.Addr;
                 for (int i = 0; i < c; i++)
                 {
                     hv[i] = vert[i];
@@ -183,7 +183,7 @@ namespace huqiang.Core.HGUI
                 vertInfo.DataCount = c;
             }
         }    
-        void LoadTris(int[] tri, ref BlockInfo info)
+        void LoadTris(int[] tri, ref BlockInfo<int> info)
         {
             tris = null;
             int tc = tri.Length;
@@ -210,7 +210,7 @@ namespace huqiang.Core.HGUI
         {
             LoadTris(tri, ref trisInfo2);
         }
-        void LoadTris(List<int> tri, ref BlockInfo info)
+        void LoadTris(List<int> tri, ref BlockInfo<int> info)
         {
             tris = null;
             int tc = tri.Count;

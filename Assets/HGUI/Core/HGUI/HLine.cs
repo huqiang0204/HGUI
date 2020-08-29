@@ -148,7 +148,7 @@ namespace huqiang.Core.HGUI
                 }
             }
         }
-        static void CreateVert(ref Vector2 start, ref Vector2 end, ref BlockInfo vert, ref BlockInfo tris,ref Color32 color, float lineWidth)
+        static void CreateVert(ref Vector2 start, ref Vector2 end, ref BlockInfo<HVertex> vert, ref BlockInfo<int> tris,ref Color32 color, float lineWidth)
         {
             float vx = end.x - start.x;
             float vy = end.y - start.y;
@@ -158,7 +158,7 @@ namespace huqiang.Core.HGUI
             int index = vert.DataCount;
             unsafe
             {
-                HVertex* p =(HVertex*)vert.Addr;
+                HVertex* p =vert.Addr;
                 p[index].position.x = start.x + ny;
                 p[index].position.y = start.y - nx;
                 p[index].position.z = 0;
@@ -187,7 +187,7 @@ namespace huqiang.Core.HGUI
             int t = tris.DataCount;
             unsafe
             {
-                int* p = (int*)tris.Addr;
+                int* p = tris.Addr;
                 p[t] = index;
                 t++;
                 p[t] = index + 1;

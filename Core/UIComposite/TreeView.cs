@@ -161,6 +161,7 @@ namespace huqiang.UIComposite
             eventCall = script.RegEvent<UserEvent>();
             eventCall.Drag = (o, e, s) => { Scrolling(o, s); };
             eventCall.DragEnd = (o, e, s) => { Scrolling(o, s); };
+            eventCall.MouseWheel = (o, e) => { Scrolling(o,new Vector2(0, e.MouseWheelDelta*100)); };
             eventCall.Scrolling = Scrolling;
             eventCall.ForceEvent = true;
             eventCall.AutoColor = false;

@@ -222,7 +222,6 @@ namespace huqiang.UIEvent
                         {
                             if (InputEvent.OnSubmit != null)
                                 InputEvent.OnSubmit(InputEvent);
-                            InputEvent.Refresh();
                             InputEvent = null;
                             return;
                         }

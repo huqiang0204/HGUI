@@ -2,8 +2,6 @@
 using huqiang.Data;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using huqiang.Core.HGUI;
 using UnityEngine;
 using huqiang.UIModel;

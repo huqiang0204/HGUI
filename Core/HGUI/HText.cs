@@ -18,8 +18,6 @@ namespace huqiang.Core.HGUI
         static List<HText> TextBuffer = new List<HText>();
         public static BlockBuffer<HVertex> VertexBuffer = new BlockBuffer<HVertex>(32, 1024);
         public static BlockBuffer<TextVertex> PopulateBuffer = new BlockBuffer<TextVertex>(32, 1024);
-        public static BlockBuffer<UILineInfo> LinesBuffer = new BlockBuffer<UILineInfo>(2, 1024);
-        public static BlockBuffer<UICharInfo> CharsBuffer = new BlockBuffer<UICharInfo>(8,1024);
         static Font defFont;
         static char[] key_noMesh = new char[] { ' ' ,'\n', '\r' };
         static List<int> bufferA = new List<int>();
@@ -58,15 +56,15 @@ namespace huqiang.Core.HGUI
             else
             if (text.vertInfo.Size < c| text.vertInfo.Size> c+32)
             {
-                VertexBuffer.Release(ref text.vertInfo);
+                text.vertInfo.Release();
                 text.vertInfo = VertexBuffer.RegNew(c);
             }
             text.vertInfo.DataCount = c;
             int e = c / 4;
             unsafe
             {
-                HVertex* hv= (HVertex*)text.vertInfo.Addr;
-                TextVertex* v = (TextVertex*)verts.Addr;
+                HVertex* hv= text.vertInfo.Addr;
+                TextVertex* v = verts.Addr;
                 for (int i = 0; i < c; i++)
                 {
                     hv[i].position = v[i].position;
@@ -103,7 +101,7 @@ namespace huqiang.Core.HGUI
                             int o = p * 4;
                             unsafe
                             {
-                                HVertex* hv = (HVertex*)text.vertInfo.Addr;
+                                HVertex* hv = text.vertInfo.Addr;
                                 hv[o].uv = info.uv[0];
                                 hv[o].color = col;
                                 hv[o].picture = 1;
@@ -148,7 +146,7 @@ namespace huqiang.Core.HGUI
                     }
                 }
                 if (text.trisInfo.Size > 0)
-                    trisBuffer.Release(ref text.trisInfo);
+                    text.trisInfo.Release();
                 int ic = bufferA.Count;
                 if(ic>0)
                 {
@@ -156,7 +154,7 @@ namespace huqiang.Core.HGUI
                     text.trisInfo.DataCount = ic;
                     unsafe
                     {
-                        int* ip = (int*)text.trisInfo.Addr;
+                        int* ip = text.trisInfo.Addr;
                         for (int i = 0; i < ic; i++)
                             ip[i] = bufferA[i];
                     }
@@ -170,12 +168,12 @@ namespace huqiang.Core.HGUI
                 if (ic > 0)
                 {
                     if (text.trisInfo2.Size > 0)
-                        trisBuffer.Release(ref text.trisInfo2);
+                        text.trisInfo2.Release();
                     text.trisInfo2 = trisBuffer.RegNew(ic);
                     text.trisInfo2.DataCount = ic;
                     unsafe
                     {
-                        int* ip = (int*)text.trisInfo2.Addr;
+                        int* ip = text.trisInfo2.Addr;
                         for (int i = 0; i < ic; i++)
                             ip[i] = bufferB[i];
                     }
@@ -191,13 +189,13 @@ namespace huqiang.Core.HGUI
                 text.trisInfo2.DataCount = 0;
             }
         }
-        static void OutLineVertex(ref BlockInfo buf, int start, ref BlockInfo src, float x,float y,ref Color32 color)
+        static void OutLineVertex(ref BlockInfo<HVertex> buf, int start, ref BlockInfo<HVertex> src, float x,float y,ref Color32 color)
         {
             int l = src.DataCount;
             unsafe
             {
-                HVertex* tar =(HVertex*) buf.Addr;
-                HVertex* ori = (HVertex*)src.Addr;
+                HVertex* tar = buf.Addr;
+                HVertex* ori = src.Addr;
                 for (int i = 0; i < l; i++)
                 {
                     tar[start] = ori[i];
@@ -209,12 +207,12 @@ namespace huqiang.Core.HGUI
             }
          
         }
-        static void OutLineTris(ref BlockInfo buf, int start, ref BlockInfo src, int offset)
+        static void OutLineTris(ref BlockInfo<int> buf, int start, ref BlockInfo<int> src, int offset)
         {
             unsafe
             {
-                int* tar = (int*)buf.Addr;
-                int* ori = (int*)src.Addr;
+                int* tar = buf.Addr;
+                int* ori = src.Addr;
                 for (int i = 0; i < src.DataCount; i++)
                 {
                     tar[start] = ori[i] + offset;
@@ -228,7 +226,7 @@ namespace huqiang.Core.HGUI
             int c = text.vertInfo.DataCount;
             if (c == 0)
                 return;
-            BlockInfo tmp = VertexBuffer.RegNew(c*5);
+            BlockInfo<HVertex> tmp = VertexBuffer.RegNew(c*5);
             tmp.DataCount = c * 5;
             float d = text.OutLine;
             OutLineVertex(ref tmp, 0,ref text.vertInfo, d, d, ref text.shadowColor);
@@ -237,8 +235,8 @@ namespace huqiang.Core.HGUI
             OutLineVertex(ref tmp, c * 3, ref text.vertInfo, -d, d, ref text.shadowColor);
             unsafe
             {
-                HVertex* tar = (HVertex*)tmp.Addr;
-                HVertex* ori = (HVertex*)text.vertInfo.Addr;
+                HVertex* tar = tmp.Addr;
+                HVertex* ori = text.vertInfo.Addr;
                 int s = c * 4;
                 for (int i = 0; i < c; i++)
                 {
@@ -247,7 +245,7 @@ namespace huqiang.Core.HGUI
                 }
             }
 
-            VertexBuffer.Release(ref text.vertInfo);
+            text.vertInfo.Release();
             text.vertInfo = tmp;
             if (text.trisInfo.DataCount>0)
             {
@@ -259,7 +257,7 @@ namespace huqiang.Core.HGUI
                 OutLineTris(ref tris, l * 2, ref text.trisInfo, c * 2);
                 OutLineTris(ref tris, l * 3, ref text.trisInfo, c * 3);
                 OutLineTris(ref tris, l * 4, ref text.trisInfo, c * 4);
-                trisBuffer.Release(ref text.trisInfo);
+                text.trisInfo.Release();
                 text.trisInfo = tris;
             }
             if (text.trisInfo2.DataCount>0)
@@ -272,11 +270,11 @@ namespace huqiang.Core.HGUI
                 OutLineTris(ref tris, l * 2, ref text.trisInfo2, c * 2);
                 OutLineTris(ref tris, l * 3, ref text.trisInfo2, c * 3);
                 OutLineTris(ref tris, l * 4, ref text.trisInfo2, c * 4);
-                trisBuffer.Release(ref text.trisInfo2);
+                text.trisInfo2.Release();
                 text.trisInfo2 = tris;
             }
         }
-        static void CreateTri(int len,ref BlockInfo block)
+        static void CreateTri(int len,ref BlockInfo<int> block)
         {
             int c = len / 4;
             if (c < 0)
@@ -291,13 +289,13 @@ namespace huqiang.Core.HGUI
             }
             else if(block.Size<max|block.Size>max+48)
             {
-                trisBuffer.Release(ref block);
+                block.Release();
                 block= trisBuffer.RegNew(max);
             }
             block.DataCount = max;
             unsafe
             {
-                int* tri =(int*) block.Addr;
+                int* tri = block.Addr;
                 for (int i = 0; i < c; i++)
                 {
                     int p = i * 4;
@@ -470,7 +468,7 @@ namespace huqiang.Core.HGUI
             sett.alignByGeometry = m_align;
         }
 
-        internal BlockInfo TmpVerts;
+        internal BlockInfo<TextVertex> TmpVerts;
         public void Populate()
         {
             if (!m_dirty)
@@ -515,13 +513,13 @@ namespace huqiang.Core.HGUI
             else
             if (c > TmpVerts.Size | TmpVerts.Size > c + 32)
             {
-                PopulateBuffer.Release(ref TmpVerts);
+                TmpVerts.Release();
                 TmpVerts = PopulateBuffer.RegNew(c);
             }
 
             unsafe
             {
-                TextVertex* hv = (TextVertex*)TmpVerts.Addr;
+                TextVertex* hv = TmpVerts.Addr;
                 for (int i = 0; i < c; i++)
                 {
                     hv[i].position = v[i].position;

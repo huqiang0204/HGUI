@@ -85,6 +85,7 @@ namespace huqiang.UIComposite
                 if (eventCall.VelocityY == 0)
                     OnScrollEnd(o);
             };
+            eventCall.MouseWheel = (o, e) => { Scrolling(o, new Vector2(0, e.MouseWheelDelta * 100)); };
             eventCall.Scrolling = Scrolling;
             eventCall.ScrollEndY = OnScrollEnd;
             eventCall.ForceEvent = true;

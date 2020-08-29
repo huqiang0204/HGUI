@@ -120,8 +120,8 @@ namespace huqiang.Core.HGUI
             if (UIPage.CurrentPage != null)
                 UIPage.CurrentPage.Update(UserAction.TimeSlice);
             UINotify.UpdateAll(UserAction.TimeSlice);
-            Keyboard.Dispatch();
-            InputCaret.UpdateCaret();
+            //Keyboard.Dispatch();
+            //InputCaret.UpdateCaret();
             CheckSize();
             ThreadMission.ExtcuteMain();
         }

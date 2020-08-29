@@ -15,15 +15,15 @@ namespace huqiang.Core.HGUI
         public int Offset;
         public int Index;
     }
+    public struct LineInfo
+    {
+        public int startCharIdx;
+        public int endIdx;
+        public float topY;
+        public float endY;
+    }
     public class TextOperation
     {
-        public struct LineInfo
-        {
-            public int startCharIdx;
-            public int endIdx;
-            public float topY;
-            public float endY;
-        }
         public static HText Target;
         public static PressInfo StartPress;
         public static PressInfo EndPress;
@@ -156,7 +156,17 @@ namespace huqiang.Core.HGUI
             int e = VisibleCount;
             if(end < lines.Count)
                 e = lines[end].endIdx + 1;
-            return Content.SubString(s, e - s);
+            string str =Content.SubString(s, e - s);
+            string cs = Keyboard.CompositionString;
+            if(cs!=null&cs!="")
+            {
+                int ss = StartPress.Index - s;
+                if (ss > 0 & ss < e - s)
+                {
+                   str = str.Insert(ss, cs);
+                }
+            }
+            return str;
         }
         public static void SelectAll()
         {
@@ -511,6 +521,40 @@ namespace huqiang.Core.HGUI
                 ShowStart = lines.Count - ShowRow + 1;
             if (ShowStart < 0)
                 ShowStart = 0;
+        }
+        public static void SetPress(ref PressInfo press)
+        {
+            StartPress = press;
+            StartPress.Row += ShowStart;
+            EndPress = StartPress;
+        }
+        public static void SetStartPress(ref PressInfo press)
+        {
+            StartPress = press;
+            StartPress.Row += ShowStart;
+        }
+        public static void SetEndPress(ref PressInfo press)
+        {
+            EndPress = press;
+            EndPress.Row += ShowStart;
+        }
+        public static PressInfo GetStartPress()
+        {
+            PressInfo p = new PressInfo();
+            if (EndPress.Index < StartPress.Index)
+                p = EndPress;
+            else p = StartPress;
+            p.Row -= ShowStart;
+            return p;
+        }
+        public static PressInfo GetEndtPress()
+        {
+            PressInfo p = new PressInfo();
+            if (StartPress.Index > EndPress.Index)
+                p = StartPress;
+            else p = EndPress;
+            p.Row -= ShowStart;
+            return p;
         }
     }
 }

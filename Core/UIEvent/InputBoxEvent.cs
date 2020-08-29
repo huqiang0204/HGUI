@@ -143,8 +143,6 @@ namespace huqiang.UIEvent
                 var scale = GlobalScale;//全局尺寸
                 offset.x /= scale.x;
                 offset.y /= scale.y;
-                float oy = lines[0].topY;
-                offset.y -= oy;
                 int end = Content.FilterString.Length;
                 int row = 0;
                 if (lines.Count > 0)
@@ -222,7 +220,7 @@ namespace huqiang.UIEvent
         public void GetSelectArea(List<int> tri, List<HVertex> vert, ref Color32 color, ref PressInfo start, ref PressInfo end)
         {
             int sr = start.Row;
-            int er = end.Row;
+            int er = end.Row + 1;
             int st = 0;
             int c = lines.Count;
             if (c > er)

@@ -216,6 +216,15 @@ namespace huqiang.UIEvent
             tri.Add(0);
             tri.Add(3);
             tri.Add(1);
+            //var gl =UIElement.GetGlobaInfo(text.transform,false);
+            //float rx = gl.Scale.x * right;
+            //float rd = gl.Scale.y * down;
+            //gl.Postion.x += rx;
+            //gl.Postion.y += rd;
+            //gl.Postion /= HCanvas.MainCanvas.PhysicalScale;
+            //gl.Postion.x += Screen.width / 2;
+            //gl.Postion.y += Screen.height / 2;
+            //Input.compositionCursorPos = new Vector2(gl.Postion.x,Screen.height-gl.Postion.y);
         }
         public void GetSelectArea(List<int> tri, List<HVertex> vert, ref Color32 color, ref PressInfo start, ref PressInfo end)
         {

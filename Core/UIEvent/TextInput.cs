@@ -94,7 +94,6 @@ namespace huqiang.UIEvent
             {
                 TextCom.MainColor = TipColor;
                 TextCom.Text = m_TipString;
-                InputCaret.CaretStyle = 0;
             }
         }
         public bool ReadOnly;
@@ -244,7 +243,6 @@ namespace huqiang.UIEvent
         public override void OnMouseDown(UserAction action)
         {
             base.OnMouseDown(action);
-            InputCaret.Styles = 3;
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR
             Editing = true;
             SetShowText();
@@ -257,7 +255,6 @@ namespace huqiang.UIEvent
                 Keyboard.InputEvent = this;
                 bool pass = contentType == ContentType.Password ? true : false;
                 Keyboard.OnInput(Text.FullString, touchType, multiLine, pass, CharacterLimit);
-                InputCaret.SetParent(Context.transform);
                 Editing = true;
             }
             else
@@ -281,7 +278,6 @@ namespace huqiang.UIEvent
             Editing = false;
             SetShowText();
 
-            InputCaret.Hide();
             Keyboard.EndInput();
         }
         string ValidateString(string input)
@@ -455,7 +451,6 @@ namespace huqiang.UIEvent
         }
         public static void Clear()
         {
-            InputCaret.Hide();
         }
     }
 }

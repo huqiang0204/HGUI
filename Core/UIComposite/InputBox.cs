@@ -173,8 +173,8 @@ namespace huqiang.UIComposite
                 }
             }
             FullString.FullString = m_InputString;
-            InputEvent = new InputBoxEvent();
-            InputEvent.Initial(this);
+            InputEvent = txt.RegEvent<InputBoxEvent>();
+            InputEvent.input = this;
             Caret = Enity.GetComponentInChildren<HImage>();
         }
         public void OnMouseDown(UserAction action, ref PressInfo press)
@@ -274,7 +274,6 @@ namespace huqiang.UIComposite
             {
                 TextCom.MainColor = m_tipColor;
                 TextCom.Text = m_TipString;
-                InputCaret.CaretStyle = 0;
                 ShowString = m_TipString;
             }
         }

@@ -14,7 +14,7 @@ namespace Assets.Scripts
         class View
         {
             public HImage chatbox;
-            public HText input;
+            public InputBox input;
             public HImage Scroll;
             public UIElement opts;
             public UIElement left;
@@ -24,6 +24,7 @@ namespace Assets.Scripts
             public HImage send;
             public UserEvent last;
             public UserEvent next;
+            
         }
   
         class ChatItem
@@ -74,7 +75,7 @@ namespace Assets.Scripts
 
             //input = view.input.userEvent as TextInput;
            
-            //input.OnSubmit = OnSubmit;
+            view.input.OnSubmit = OnSubmit;
             container = view.chatbox.composite as UIContainer;
             other = new UILinker<ChatItem, ChatData>(container, "other");
             //other.CalculItemHigh = GetContentSize;
@@ -84,7 +85,7 @@ namespace Assets.Scripts
             self.ItemUpdate = ItemUpdate;
             tip = new UILinker<TipItem, TipData>(container ,"tip");
             //tip.ItemUpdate = TipItemUpdate;
-            //view.send.userEvent.Click = (o, e) => {OnSubmit(input); };
+            view.send.userEvent.Click = (o, e) => {OnSubmit(view.input); };
         }
         void SelectChanged(OptionGroup option,UserAction action)
         {

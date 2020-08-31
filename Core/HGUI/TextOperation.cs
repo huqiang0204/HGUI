@@ -80,6 +80,7 @@ namespace huqiang.Core.HGUI
                 line.endY = g.lines[0].topY - ContentHeight - g.lines[g.lines.Count-1].leading;
                 lines.Add(line);
             }
+            SetShowStart(ShowStart);
         }
         public static void SetStartPointer(UserEvent user, UserAction action)
         {
@@ -156,14 +157,14 @@ namespace huqiang.Core.HGUI
             int e = VisibleCount;
             if(end < lines.Count)
                 e = lines[end].endIdx + 1;
-            string str =Content.SubString(s, e - s);
+            string str = Content.SubString(s, e - s);
             string cs = Keyboard.CompositionString;
-            if(cs!=null&cs!="")
+            if (cs != null & cs != "")
             {
                 int ss = StartPress.Index - s;
-                if (ss > 0 & ss < e - s)
+                if (ss >= 0 & ss <= e - s)
                 {
-                   str = str.Insert(ss, cs);
+                    str = str.Insert(ss, cs);
                 }
             }
             return str;
@@ -518,25 +519,33 @@ namespace huqiang.Core.HGUI
         {
             ShowStart = start;
             if (lines.Count <= ShowStart + ShowRow)
-                ShowStart = lines.Count - ShowRow + 1;
+                ShowStart = lines.Count - ShowRow;
             if (ShowStart < 0)
                 ShowStart = 0;
         }
         public static void SetPress(ref PressInfo press)
         {
-            StartPress = press;
-            StartPress.Row += ShowStart;
+            int row = press.Row + ShowStart;
+            //if (row >= lines.Count)
+            //    row = lines.Count - 1;
+            StartPress.Index = lines[row].startCharIdx + press.Offset;
+            StartPress.Row = row;
+            StartPress.Offset = press.Offset;
             EndPress = StartPress;
         }
         public static void SetStartPress(ref PressInfo press)
         {
-            StartPress = press;
-            StartPress.Row += ShowStart;
+            int row = press.Row + ShowStart;
+            StartPress.Index = lines[row].startCharIdx + press.Offset;
+            StartPress.Row = row;
+            StartPress.Offset = press.Offset;
         }
         public static void SetEndPress(ref PressInfo press)
         {
-            EndPress = press;
-            EndPress.Row += ShowStart;
+            int row = press.Row + ShowStart;
+            EndPress.Index = lines[row].startCharIdx + press.Offset;
+            EndPress.Row = row;
+            EndPress.Offset = press.Offset;
         }
         public static PressInfo GetStartPress()
         {
@@ -545,15 +554,19 @@ namespace huqiang.Core.HGUI
                 p = EndPress;
             else p = StartPress;
             p.Row -= ShowStart;
+            p.Index -= lines[ShowStart].startCharIdx;
+            if (Keyboard.CompositionString != null)
+                p.Index += Keyboard.CompositionString.Length;
             return p;
         }
-        public static PressInfo GetEndtPress()
+        public static PressInfo GetEndPress()
         {
             PressInfo p = new PressInfo();
             if (StartPress.Index > EndPress.Index)
                 p = StartPress;
             else p = EndPress;
             p.Row -= ShowStart;
+            p.Index -= lines[ShowStart].startCharIdx;
             return p;
         }
     }

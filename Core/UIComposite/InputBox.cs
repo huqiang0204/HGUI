@@ -33,10 +33,20 @@ namespace huqiang.UIComposite
         bool Editing;
         EmojiString FullString = new EmojiString();
         HImage Caret;
-        public string TipString { get; set; }
-        public string InputString { get; set; }
-        public string ShowString { get; }
-        public string SelectString { get; }
+        public string TipString { get { return m_TipString; } set { 
+                m_TipString = value;
+                SetShowText();
+            } }
+        public string InputString { get { return FullString.FullString; } set { 
+                FullString.FullString = value;
+                SetShowText();
+            } }
+        public string ShowString { get; private set; }
+        public string SelectString { get {
+                if (Editing)
+                    return TextOperation.GetSelectString();
+                return "";
+            } }
         public HText TextCom;
         public ContentType contentType
         {
@@ -190,9 +200,6 @@ namespace huqiang.UIComposite
         {
             TextOperation.SetEndPress(ref press);
         }
-        internal void OnMouseWheel(UserAction action)
-        {
-        }
         public string OnInputChanged(string input)
         {
             if (input == null | input == "")
@@ -220,9 +227,9 @@ namespace huqiang.UIComposite
             InsertString(str);
             return input;
         }
-        void SetShowText()
+        public void SetShowText()
         {
-            var str = InputString;
+            var str = FullString.FullString;
             if (Editing)
             {
                 if (TextCom == null)
@@ -233,6 +240,7 @@ namespace huqiang.UIComposite
                     TextCom.Text = new string('*', str.Length);
                 else TextCom.Text = str;
                 InputEvent.ChangeText(str);
+                ShowString = str;
             }
             else if (str != "" & str != null)
             {
@@ -242,12 +250,14 @@ namespace huqiang.UIComposite
                 if (contentType == ContentType.Password)
                     TextCom.Text = new string('*', str.Length);
                 else TextCom.Text = str;
+                ShowString = str;
             }
             else
             {
                 TextCom.MainColor = m_tipColor;
                 TextCom.Text = m_TipString;
                 InputCaret.CaretStyle = 0;
+                ShowString = m_TipString;
             }
         }
         public bool DeleteSelectString()
@@ -421,15 +431,20 @@ namespace huqiang.UIComposite
                             else
                             {
                                 Caret.gameObject.SetActive(true);
-                                InputEvent.GetPointer(tris, hs, ref PointColor, ref TextOperation.StartPress);
+                                PressInfo start = TextOperation.GetStartPress();
+                                InputEvent.GetPointer(tris, hs, ref PointColor, ref start);
                                 Caret.LoadFromMesh(hs, tris);
+                                PressInfo end = TextOperation.GetEndPress();
+                                InputEvent.SetCursorPos(ref end);
                             }
                         }
                         else Caret.gameObject.SetActive(false);
                         break;
                     case 2:
                         Caret.gameObject.SetActive(true);
-                        InputEvent.GetSelectArea(tris, hs, ref SelectionColor, ref TextOperation.StartPress,ref TextOperation.EndPress);
+                        PressInfo s = TextOperation.GetStartPress();
+                        PressInfo e = TextOperation.GetEndPress();
+                        InputEvent.GetSelectArea(tris, hs, ref SelectionColor, ref s,ref e);
                         Caret.LoadFromMesh(hs, tris);
                         break;
                     default:

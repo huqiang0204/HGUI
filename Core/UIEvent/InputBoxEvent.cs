@@ -18,7 +18,6 @@ namespace huqiang.UIEvent
         List<UIVertex> verts = new List<UIVertex>();
         List<LineInfo> lines = new List<LineInfo>();
         List<UICharInfo> chars = new List<UICharInfo>();
-        //float ContentHeight;
         protected float overDistance = 500;
         protected float overTime = 0;
         public void Initial(InputBox box)
@@ -107,14 +106,14 @@ namespace huqiang.UIEvent
                             {
                                 if (TextOperation.ContentMoveUp())
                                 {
-                                    ChangeText(TextOperation.GetShowContent());
+                                    input.SetShowText();
                                 }
                             }
                             else
                             {
                                 if (TextOperation.ContentMoveDown())
                                 {
-                                    ChangeText(TextOperation.GetShowContent());
+                                    input.SetShowText();
                                 }
                             }
                         }
@@ -128,7 +127,21 @@ namespace huqiang.UIEvent
         }
         internal override void OnMouseWheel(UserAction action)
         {
-            input.OnMouseWheel(action);
+            float oy = action.MouseWheelDelta;
+            if (oy > 0)
+            {
+                if (TextOperation.ContentMoveUp())
+                {
+                    input.SetShowText();
+                }
+            }
+            else
+            {
+                if (TextOperation.ContentMoveDown())
+                {
+                    input.SetShowText();
+                }
+            }
             base.OnMouseWheel(action);
         }
         void CheckPointer(UserAction action, ref PressInfo press)
@@ -157,6 +170,8 @@ namespace huqiang.UIEvent
                         else row = i;
                     }
                 }
+                if (end > chars.Count)
+                    end = chars.Count;
                 int start = lines[row].startCharIdx;
                 int col = end - start;
                 for (int i = start; i < end; i++)
@@ -174,13 +189,28 @@ namespace huqiang.UIEvent
         }
         public void GetPointer(List<int> tri, List<HVertex> vert, ref Color32 color, ref PressInfo start)
         {
+            if (start.Row < 0)
+                return;
             if (start.Row >= lines.Count)
                 return;
             int index = start.Index;
-            float top = lines[start.Row].topY;
-            float down = lines[start.Row].endY;
+            if (index < 0)
+                return;
+            if (index >= chars.Count)
+                return;
+            int row = start.Row;
+            for (int i = 0; i < lines.Count; i++)
+            {
+                if (index <= lines[i].endIdx)
+                {
+                    row = i;
+                    break;
+                }
+            }
+            float top = lines[row].topY;
+            float down = lines[row].endY;
             float p;
-            if (index > lines[start.Row].endIdx)
+            if (index > lines[row].endIdx)
             {
                 index--;
                 if (index < 0)
@@ -216,15 +246,50 @@ namespace huqiang.UIEvent
             tri.Add(0);
             tri.Add(3);
             tri.Add(1);
-            //var gl =UIElement.GetGlobaInfo(text.transform,false);
-            //float rx = gl.Scale.x * right;
-            //float rd = gl.Scale.y * down;
-            //gl.Postion.x += rx;
-            //gl.Postion.y += rd;
-            //gl.Postion /= HCanvas.MainCanvas.PhysicalScale;
-            //gl.Postion.x += Screen.width / 2;
-            //gl.Postion.y += Screen.height / 2;
-            //Input.compositionCursorPos = new Vector2(gl.Postion.x,Screen.height-gl.Postion.y);
+        }
+        public void SetCursorPos(ref PressInfo start)
+        {
+            if (start.Row < 0)
+                return;
+            if (start.Row >= lines.Count)
+                return;
+            int index = start.Index;
+            if (index < 0)
+                return;
+            if (index >= chars.Count)
+                return;
+            int row = start.Row;
+            for (int i = 0; i < lines.Count; i++)
+            {
+                if (index <= lines[i].endIdx)
+                {
+                    row = i;
+                    break;
+                }
+            }
+            float p;
+            if (index > lines[row].endIdx)
+            {
+                index--;
+                if (index < 0)
+                    index = 0;
+                p = chars[index].cursorPos.x + chars[index].charWidth;
+            }
+            else
+            {
+                p = chars[index].cursorPos.x;
+            }
+            float right = p + 1;
+            float down = lines[row].endY;
+            var gl = UIElement.GetGlobaInfo(text.transform, false);
+            float rx = gl.Scale.x * right;
+            float rd = gl.Scale.y * down;
+            gl.Postion.x += rx;
+            gl.Postion.y += rd;
+            gl.Postion /= HCanvas.MainCanvas.PhysicalScale;
+            gl.Postion.x += Screen.width / 2;
+            gl.Postion.y += Screen.height / 2;
+            Keyboard.CursorPos = new Vector2(gl.Postion.x, Screen.height - gl.Postion.y);
         }
         public void GetSelectArea(List<int> tri, List<HVertex> vert, ref Color32 color, ref PressInfo start, ref PressInfo end)
         {
@@ -234,6 +299,8 @@ namespace huqiang.UIEvent
             int c = lines.Count;
             if (c > er)
                 c = er;
+            if (sr < 0)
+                sr = 0;
             for (int i = sr; i < c; i++)
             {
                 LineInfo info = lines[i];

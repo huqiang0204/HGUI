@@ -56,8 +56,6 @@ namespace huqiang.UIEvent
             Focus = true;
             if (TextCom != null)
             {
-                InputCaret.SetParent(TextCom.transform);
-                InputCaret.Styles = 2;
                 TextOperation.ChangeText(TextCom,Text);
                 TextOperation.SetStartPointer(this,action);
                 ShowChanged = true;
@@ -141,14 +139,12 @@ namespace huqiang.UIEvent
         internal override void OnClick(UserAction action)
         {
             Style = 0;
-            InputCaret.Hide();
             if (Click != null)
                 Click(this, action);
         }
         internal override void OnLostFocus(UserAction eventCall)
         {
             Style = 0;
-            InputCaret.Hide();
             Focus = false;
             ShowStart = TextOperation.ShowStart;
             ShowContent = TextOperation.GetShowContent();
@@ -203,7 +199,6 @@ namespace huqiang.UIEvent
             }
             if (ShowChanged)
             {
-                InputCaret.ChangeCaret();
                 ShowChanged = false;
             }
         }

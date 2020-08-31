@@ -1,5 +1,6 @@
 ﻿using huqiang.Core.HGUI;
 using huqiang.Core.Line;
+using huqiang.Data;
 using huqiang.UIComposite;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace huqiang.UIEvent
 {
     public class InputBoxEvent:UserEvent
     {
-        InputBox input;
+        public InputBox input;
         HText text;
         public string InputString;
         EmojiString Content=new EmojiString();
@@ -20,12 +21,10 @@ namespace huqiang.UIEvent
         List<UICharInfo> chars = new List<UICharInfo>();
         protected float overDistance = 500;
         protected float overTime = 0;
-        public void Initial(InputBox box)
+        internal override void Initial(FakeStruct mod)
         {
-            input = box;
-            text = input.TextCom;
-            Context = text;
-            text.userEvent = this;
+            base.Initial(mod);
+            text = Context as HText;
         }
         public void ChangeText(string str)
         {

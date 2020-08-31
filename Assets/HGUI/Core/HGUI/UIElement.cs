@@ -12,7 +12,6 @@ namespace huqiang.Core.HGUI
     {
         None,
         UserEvent,
-        TextSelect,
         TextInput,
         GestureEvent
     }
@@ -637,8 +636,7 @@ namespace huqiang.Core.HGUI
             {
                 case EventType.None: break;
                 case EventType.UserEvent:RegEvent<UserEvent>(ex); break;
-                case EventType.TextSelect: RegEvent<TextSelect>(ex); break;
-                case EventType.TextInput: RegEvent<TextInput>(ex); break;
+                case EventType.TextInput: RegEvent<InputBoxEvent>(ex); break;
                 case EventType.GestureEvent: RegEvent<GestureEvent>(ex); break;
             }
             CreateUIComposite(this,ex);
@@ -708,12 +706,5 @@ namespace huqiang.Core.HGUI
                     break;
             }
         }
-        //protected virtual void Update()
-        //{
-        //    if (userEvent != null)
-        //        userEvent.Update();
-        //    if (composite != null)
-        //        composite.Update(UserAction.TimeSlice);
-        //}
     }
 }

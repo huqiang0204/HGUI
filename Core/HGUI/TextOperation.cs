@@ -80,6 +80,11 @@ namespace huqiang.Core.HGUI
                 line.endY = g.lines[0].topY - ContentHeight - g.lines[g.lines.Count-1].leading;
                 lines.Add(line);
             }
+            if (StartPress.Index > fs.Length)
+            {
+                SetPressIndex(fs.Length, ref StartPress);
+                EndPress = StartPress;
+            }
             SetShowStart(ShowStart);
         }
         public static void SetStartPointer(UserEvent user, UserAction action)

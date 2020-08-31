@@ -35,6 +35,7 @@ namespace huqiang.UIComposite
             } }
         public string InputString { get { return FullString.FullString; } set { 
                 FullString.FullString = value;
+                TextOperation.ChangeText(TextCom,FullString);
                 SetShowText();
             } }
         public string ShowString { get; private set; }

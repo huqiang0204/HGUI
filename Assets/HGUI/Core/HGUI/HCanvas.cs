@@ -147,13 +147,15 @@ namespace huqiang.Core.HGUI
             Collection(transform, -1, 0);
             for (int i = 0; i < max; i++)
                 scripts[i].MainUpdate();
+            for (int i = 0; i < top_txt; i++)
+                texts[i].Populate();
             if (ftr)//纹理被改变了,需要重新计算
             {
                 ftr = false;
                 HText.DirtyAll();
+                for (int i = 0; i < top_txt; i++)
+                    texts[i].Populate();
             }
-            for (int i = 0; i < top_txt; i++)
-                texts[i].Populate();
             Batch();
             ApplyMeshRenderer();
             ApplyToCamera();

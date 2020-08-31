@@ -3,9 +3,6 @@ using huqiang.Data;
 using huqiang.UIEvent;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace huqiang.UIComposite
@@ -31,6 +28,7 @@ namespace huqiang.UIComposite
         bool Editing;
         EmojiString FullString = new EmojiString();
         HImage Caret;
+        public object DataContext;
         public string TipString { get { return m_TipString; } set { 
                 m_TipString = value;
                 SetShowText();
@@ -144,11 +142,12 @@ namespace huqiang.UIComposite
         TouchScreenKeyboardType touchType = TouchScreenKeyboardType.Default;
         public InputBoxEvent InputEvent;
         public Action<InputBox> OnSubmit;
+        public Action<InputBox> OnDone;
         public Func<InputBox, int, char, char> ValidateChar;
         public override void Initial(FakeStruct mod, UIElement element)
         {
             base.Initial(mod,element);
-            var txt = TextCom = element as HText;
+            var txt = TextCom = element.GetComponentInChildren<HText>();
             textColor = txt.m_color;
             unsafe
             {
@@ -175,7 +174,7 @@ namespace huqiang.UIComposite
             FullString.FullString = m_InputString;
             InputEvent = txt.RegEvent<InputBoxEvent>();
             InputEvent.input = this;
-            Caret = Enity.GetComponentInChildren<HImage>();
+            Caret = txt.GetComponentInChildren<HImage>();
         }
         public void OnMouseDown(UserAction action, ref PressInfo press)
         {
@@ -208,9 +207,11 @@ namespace huqiang.UIComposite
             {
                 ReplaceTarget.Text = ShowString;
                 ReplaceTarget.FullString = FullString.FullString;
-                TextCom.gameObject.SetActive(false);
+                Enity.gameObject.SetActive(false);
             }
             else SetShowText();
+            if (OnDone != null)
+                OnDone(this);
         }
         public void OnDrag(UserAction action, ref PressInfo press)
         {
@@ -601,25 +602,25 @@ namespace huqiang.UIComposite
             {
                 return;
             }
-            var son = TextCom.transform;
+            var son = Enity.transform;
             var par = text.transform;
             son.SetParent(par);
             son.localPosition = Vector3.zero;
             son.localScale = Vector3.one;
             son.localRotation = Quaternion.identity;
-            TextCom.marginType = MarginType.Margin;
-            TextCom.margin.left = 0;
-            TextCom.margin.right = 0;
-            TextCom.margin.top = 0;
-            TextCom.margin.down = 0;
-            UIElement.Resize(TextCom);
+            Enity.marginType = MarginType.Margin;
+            Enity.margin.left = 0;
+            Enity.margin.right = 0;
+            Enity.margin.top = 0;
+            Enity.margin.down = 0;
+            UIElement.Resize(Enity);
             HTextLoader.CopyTo(text,TextCom);
             if (text.FullString == null)
                 FullString.FullString = text.Text;
             else FullString.FullString = text.FullString;
             TextOperation.ChangeText(TextCom,FullString);
             action.AddFocus(InputEvent);
-            TextCom.gameObject.SetActive(true);
+            Enity.gameObject.SetActive(true);
             text.Text = "";
             Editing = true;
             SetShowText();

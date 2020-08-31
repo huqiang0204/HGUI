@@ -63,8 +63,7 @@ namespace Assets.Game.HotFix
             _app.DelegateManager.RegisterMethodDelegate<UIElement>();
             _app.DelegateManager.RegisterMethodDelegate<UserEvent, UserAction>();
             _app.DelegateManager.RegisterMethodDelegate<UserEvent, UserAction, Vector2>();
-            _app.DelegateManager.RegisterMethodDelegate<TextInput>();
-            _app.DelegateManager.RegisterMethodDelegate<TextInput, UserAction>();
+            _app.DelegateManager.RegisterMethodDelegate<InputBox>();
             _app.DelegateManager.RegisterMethodDelegate<GestureEvent>();
 
             _app.DelegateManager.RegisterMethodDelegate<UIRocker>();
@@ -89,7 +88,7 @@ namespace Assets.Game.HotFix
             _app.DelegateManager.RegisterMethodDelegate<AsyncOperation>();
 
             _app.DelegateManager.RegisterFunctionDelegate<object>();
-            _app.DelegateManager.RegisterFunctionDelegate<TextInput, int, char, char>();
+            _app.DelegateManager.RegisterFunctionDelegate<InputBox, int, char, char>();
 
         }
         public void Start(Transform uiRoot, string Cmd, object data)

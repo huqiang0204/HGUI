@@ -4,7 +4,6 @@ using huqiang.Data;
 using huqiang.UIEvent;
 using UnityEngine;
 
-[RequireComponent(typeof(HText))]
 public class TextInputHelper:UICompositeHelp
 {
     public Color inputColor = Color.white;
@@ -35,7 +34,7 @@ public class TextInputHelper:UICompositeHelp
     }
     public override void Refresh()
     {
-        var txt = GetComponent<HText>();
+        var txt = GetComponentInChildren<HText>();
         if (txt == null)
             return;
         if (InputString==null|InputString=="")

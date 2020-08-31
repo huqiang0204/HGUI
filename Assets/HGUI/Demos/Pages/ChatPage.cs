@@ -55,7 +55,6 @@ namespace Assets.Scripts
         UILinker<ChatItem, ChatData> other;
         UILinker<ChatItem, ChatData> self;
         UILinker<TipItem, TipData> tip;
-        TextInput input;
         public override void Initial(Transform parent, object dat = null)
         {
             base.Initial(parent, dat);
@@ -73,9 +72,9 @@ namespace Assets.Scripts
             option.SelectChanged = SelectChanged;
             option.Selecet = view.right.userEvent;
 
-            input = view.input.userEvent as TextInput;
+            //input = view.input.userEvent as TextInput;
            
-            input.OnSubmit = OnSubmit;
+            //input.OnSubmit = OnSubmit;
             container = view.chatbox.composite as UIContainer;
             other = new UILinker<ChatItem, ChatData>(container, "other");
             //other.CalculItemHigh = GetContentSize;
@@ -85,7 +84,7 @@ namespace Assets.Scripts
             self.ItemUpdate = ItemUpdate;
             tip = new UILinker<TipItem, TipData>(container ,"tip");
             //tip.ItemUpdate = TipItemUpdate;
-            view.send.userEvent.Click = (o, e) => {OnSubmit(input); };
+            //view.send.userEvent.Click = (o, e) => {OnSubmit(input); };
         }
         void SelectChanged(OptionGroup option,UserAction action)
         {
@@ -105,7 +104,7 @@ namespace Assets.Scripts
                 trans.GetComponentInChildren<HText>().MainColor = Color.red;
             }
         }
-        void OnSubmit(TextInput input)
+        void OnSubmit(InputBox input)
         {
             string str = input.InputString;
             if (str == "")

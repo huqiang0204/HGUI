@@ -27,7 +27,7 @@ namespace huqiang.Core.HGUI
         public static int Size = sizeof(HTextData);
         public static int ElementSize = Size / 4;
     }
-    public class HTextLoader:HGraphicsLoader
+    public class HTextLoader : HGraphicsLoader
     {
         public static List<Font> fonts = new List<Font>();
         public static Font FindFont(string str)
@@ -50,12 +50,12 @@ namespace huqiang.Core.HGUI
             return fonts[0];
         }
         protected string fontName;
-        protected unsafe void LoadHText(FakeStruct fake,HText tar)
+        protected unsafe void LoadHText(FakeStruct fake, HText tar)
         {
             HTextData* src = (HTextData*)fake.ip;
             var buffer = fake.buffer;
-            tar.m_text = buffer.GetData(src->text)as string;
-            fontName = buffer.GetData(src->font)as string;
+            tar.m_text = buffer.GetData(src->text) as string;
+            fontName = buffer.GetData(src->font) as string;
             if (fontName != null)
                 tar._font = FindFont(fontName);
             else tar._font = null;
@@ -89,7 +89,7 @@ namespace huqiang.Core.HGUI
             tar->sizeFitter = src.sizeFitter;
             tar->OutLine = src.OutLine;
         }
-        public unsafe override void LoadToComponent(FakeStruct fake, Component com,FakeStruct main)
+        public unsafe override void LoadToComponent(FakeStruct fake, Component com, FakeStruct main)
         {
             HText image = com.GetComponent<HText>();
             if (image == null)
@@ -110,6 +110,22 @@ namespace huqiang.Core.HGUI
             SaveHGraphics(fake, src);
             SaveHText(fake, src);
             return fake;
+        }
+        public static void CopyTo(HText src, HText tar)
+        {
+            tar.Text = src.Text;
+            tar._font = src._font;
+            tar.m_pivot = src.m_pivot;
+            tar.m_hof = src.m_hof;
+            tar.m_vof = src.m_vof;
+            tar.anchor = src.anchor;
+            tar.m_richText = src.m_richText;
+            tar.m_lineSpace = src.m_lineSpace;
+            tar.m_fontSize = src.m_fontSize;
+            tar.m_align = src.m_align;
+            tar.m_fontStyle = src.m_fontStyle;
+            tar.sizeFitter = src.sizeFitter;
+            tar.OutLine = src.OutLine;
         }
     }
 }

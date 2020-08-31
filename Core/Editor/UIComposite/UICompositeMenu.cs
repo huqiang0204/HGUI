@@ -117,10 +117,12 @@ public static class UICompositeMenu
         trans.localScale = Vector3.one;
         trans.localRotation = Quaternion.identity;
         var img = go.GetComponent<HImage>();
+        img.compositeType = CompositeType.InputBox;
         img.Sprite = EditorModelManager.FindSprite(icons, box);
         img.SprType = SpriteType.Sliced;
         img.SizeDelta = new Vector2(400,100);
-
+        var help = go.AddComponent<TextInputHelper>();
+     
         go = new GameObject("InputText", typeof(HText));
         var son = go.transform;
         son.SetParent(trans);
@@ -130,9 +132,12 @@ public static class UICompositeMenu
         var txt = go.GetComponent<HText>();
         txt.SizeDelta = new Vector2(380,90);
         txt.eventType = huqiang.Core.HGUI.EventType.TextInput;
+       
         txt.marginType = MarginType.Margin;
         txt.margin = new Margin(5,5,5,5);
-        var help = go.AddComponent<TextInputHelper>();
+       
+
+        UICreator.CreateHImage(Vector3.zero, new Vector2(2, 28), "Cursor", son);
         help.Refresh();
     }
     [MenuItem("GameObject/HGUI/UISliderH", false, 6)]

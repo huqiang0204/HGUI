@@ -49,7 +49,6 @@ namespace huqiang.UIModel
             }
             if (HCanvas.MainCanvas != null)//释放当前页面所有事件
                 HCanvas.MainCanvas.ClearAllAction();
-            TextInput.Clear();
             if (CurrentPage != null)
             {
                 CurrentPage.Save();
@@ -74,7 +73,6 @@ namespace huqiang.UIModel
                     }
                 if (HCanvas.MainCanvas != null)//释放当前页面所有事件
                     HCanvas.MainCanvas.ClearAllAction();
-                TextInput.Clear();
                 if (CurrentPage != null)
                     CurrentPage.Dispose();
                 var t = Activator.CreateInstance(type) as UIPage;

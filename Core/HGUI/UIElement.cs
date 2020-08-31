@@ -614,6 +614,7 @@ namespace huqiang.Core.HGUI
         public UserEvent userEvent;
         public Composite composite;
         public FakeStruct mod;
+        public object DataContext;
         internal int PipelineIndex;
         public virtual Color32 MainColor { get; set; }
         public T RegEvent<T>(FakeStruct fake = null) where T : UserEvent, new()

@@ -143,13 +143,6 @@ public class Scale
         ScreenDpi = Screen.dpi;
         DpiRatio = ScreenDpi / NormalDpi;
     }
-    public static void MainUpdate()
-    {
-        ScreenDpi = Screen.dpi;
-        DpiRatio = ScreenDpi / NormalDpi;
-        ScreenCurrentWidth = Screen.width;
-        ScreenCurrentHeight = Screen.height;
-    }
     public static bool DpiScale;
     public static bool ScreenChanged()
     {

@@ -39,6 +39,7 @@ namespace huqiang.UIEvent
         public static bool _touch = false;
         public static IMECompositionMode iME;
         public static string systemCopyBuffer;
+        public static Vector2 CursorPos;
         public static void InfoCollection()
         {
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR
@@ -101,6 +102,7 @@ namespace huqiang.UIEvent
                 if (IME.Inputing)
                 {
                     TempString = IME.CompString;
+                    Input.compositionCursorPos = CursorPos;
                 }
                 else if(IME.InputDone)
                 {

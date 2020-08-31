@@ -345,6 +345,8 @@ namespace huqiang.Core.HGUI
                 m_dirty = true;
             } }
         internal EmojiString emojiString = new EmojiString();
+        [NonSerialized]
+        public string FullString;
         
         [SerializeField]
         internal Font _font;

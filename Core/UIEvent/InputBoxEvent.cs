@@ -144,7 +144,7 @@ namespace huqiang.UIEvent
             }
             base.OnMouseWheel(action);
         }
-        void CheckPointer(UserAction action, ref PressInfo press)
+        public void CheckPointer(UserAction action, ref PressInfo press)
         {
             if(lines.Count>0)
             {

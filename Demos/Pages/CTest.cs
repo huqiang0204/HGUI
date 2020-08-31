@@ -15,26 +15,21 @@ public class CTest:UIPage
     //反射UI界面上的物体
     class View
     {
+        public HText A;
+        public HText B;
+        public InputBox Text;
     }
     View view;
     public override void Initial(Transform parent, object dat = null)
     {
         base.Initial(parent, dat);
         view = LoadUI<View>("baseUI", "CTest");//"baseUI"创建的bytes文件名,"page"为创建的页面名
+        InitialEvent();
     }
-    //语言切换功能用
-    public override void ChangeLanguage()
+    void InitialEvent()
     {
-        base.ChangeLanguage();
+        view.A.userEvent.Click = (o, e) => { view.Text.Replace(view.A, o,e); };
+        view.B.userEvent.Click = (o, e) => { view.Text.Replace(view.B,o, e); };
     }
-    //接收消息
-    public override void Cmd(DataBuffer dat)
-    {
-        base.Cmd(dat);
-    }
-    //页面弹窗
-    public override T PopUpWindow<T>(object obj = null)
-    {
-        return base.PopUpWindow<T>(obj);
-    }
+
 }

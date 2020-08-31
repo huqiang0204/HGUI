@@ -384,17 +384,21 @@ namespace huqiang.UIComposite
                 }
                 else if (state == EditState.Finish)
                 {
-                    if (OnSubmit != null)
-                        OnSubmit(this);
+                    if (!ReadOnly)
+                        if (OnSubmit != null)
+                            OnSubmit(this);
                 }
                 else if (state == EditState.NewLine)
                 {
-                    if (lineType == LineType.SingleLine)
+                    if(!ReadOnly)
                     {
-                        if (OnSubmit != null)
-                            OnSubmit(this);
+                        if (lineType == LineType.SingleLine)
+                        {
+                            if (OnSubmit != null)
+                                OnSubmit(this);
+                        }
+                        else OnInputChanged("\r\n");
                     }
-                    else OnInputChanged("\r\n");
                 }
 #else
                         InputEvent.TouchInputChanged(Keyboard.TouchString);
@@ -472,20 +476,22 @@ namespace huqiang.UIComposite
             KeyPressTime -= UserAction.TimeSlice;
             if (Keyboard.GetKey(KeyCode.Backspace))
             {
-                if (KeyPressTime <= 0)
-                {
-                    DeleteLast();
-                    KeySpeedUp();
-                }
+                if (!ReadOnly)
+                    if (KeyPressTime <= 0)
+                    {
+                        DeleteLast();
+                        KeySpeedUp();
+                    }
                 return EditState.Done;
             }
             if (Keyboard.GetKey(KeyCode.Delete))
             {
-                if (KeyPressTime <= 0)
-                {
-                    DeleteNext();
-                    KeySpeedUp();
-                }
+                if (!ReadOnly)
+                    if (KeyPressTime <= 0)
+                    {
+                        DeleteNext();
+                        KeySpeedUp();
+                    }
                 return EditState.Done;
             }
             if (Keyboard.GetKey(KeyCode.LeftArrow))
@@ -548,7 +554,8 @@ namespace huqiang.UIComposite
                 if (Keyboard.GetKey(KeyCode.LeftControl) | Keyboard.GetKey(KeyCode.RightControl))
                 {
                     string str = TextOperation.GetSelectString();
-                    DeleteSelectString();
+                    if (!ReadOnly)
+                        DeleteSelectString();
                     GUIUtility.systemCopyBuffer = str;
                     return EditState.Done;
                 }

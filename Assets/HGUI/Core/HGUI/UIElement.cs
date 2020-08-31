@@ -42,14 +42,14 @@ namespace huqiang.Core.HGUI
     public class UIElement:MonoBehaviour
     {
         #region static method
-        static Transform[] buff = new Transform[32];
+        static Transform[] buff = new Transform[64];
         public static Coordinates GetGlobaInfo(Transform trans, bool Includeroot = true)
         {
             buff[0] = trans;
             var parent = trans.parent;
             int max = 1;
             if (parent != null)
-                for (; max < 32; max++)
+                for (; max < 64; max++)
                 {
                     buff[max] = parent;
                     parent = parent.parent;

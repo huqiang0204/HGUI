@@ -210,6 +210,7 @@ namespace huqiang.UIComposite
                 ReplaceTarget.FullString = FullString.FullString;
                 TextCom.gameObject.SetActive(false);
             }
+            else SetShowText();
         }
         public void OnDrag(UserAction action, ref PressInfo press)
         {
@@ -587,7 +588,7 @@ namespace huqiang.UIComposite
             return EditState.Continue;
         }
         public HText ReplaceTarget { get; private set; }
-        public void Replace(HText text, UserAction action)
+        public void Replace(HText text, UserEvent user, UserAction action)
         {
             ReplaceTarget = text;
             if (text == null)
@@ -607,11 +608,21 @@ namespace huqiang.UIComposite
             TextCom.margin.down = 0;
             UIElement.Resize(TextCom);
             HTextLoader.CopyTo(text,TextCom);
-            FullString.FullString = text.FullString;
+            if (text.FullString == null)
+                FullString.FullString = text.Text;
+            else FullString.FullString = text.FullString;
             TextOperation.ChangeText(TextCom,FullString);
             action.AddFocus(InputEvent);
             TextCom.gameObject.SetActive(true);
             text.Text = "";
+            Editing = true;
+            SetShowText();
+            PressInfo press = new PressInfo();
+            InputEvent.GlobalPosition = user.GlobalPosition;
+            InputEvent.GlobalScale = user.GlobalScale;
+            InputEvent.GlobalRotation = user.GlobalRotation;
+            InputEvent.CheckPointer(action,ref press);
+            TextOperation.SetPress(ref press);
         }
     }
 }

@@ -28,8 +28,6 @@ namespace huqiang.UIComposite
         public InputType inputType = InputType.Standard;
         public LineType lineType = LineType.SingleLine;
         ContentType m_ctpye;
-        bool multiLine = true;
-        bool ShowChanged;
         bool Editing;
         EmojiString FullString = new EmojiString();
         HImage Caret;
@@ -185,16 +183,33 @@ namespace huqiang.UIComposite
             SetShowText();
             TextOperation.SetPress(ref press);
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR
-            Editing = true;
+            if (!ReadOnly)
+                Editing = true;
 #endif
         }
         public void OnClick(UserAction action)
         {
-            Editing = true;
+            if (!ReadOnly)
+            {
+                Editing = true;
+                if (!Keyboard.active)
+                {
+                    bool pass = contentType == ContentType.Password ? true : false;
+                    bool multiLine = lineType == LineType.MultiLineNewline ? true : false;
+                    Keyboard.OnInput(FullString.FullString, touchType, multiLine, pass, CharacterLimit);
+                }
+            }
         }
         public void OnLostFocus(UserAction action)
         {
             Editing = false;
+            TextCom.FullString = FullString.FullString;
+            if (ReplaceTarget != null)
+            {
+                ReplaceTarget.Text = ShowString;
+                ReplaceTarget.FullString = FullString.FullString;
+                TextCom.gameObject.SetActive(false);
+            }
         }
         public void OnDrag(UserAction action, ref PressInfo press)
         {
@@ -202,6 +217,8 @@ namespace huqiang.UIComposite
         }
         public string OnInputChanged(string input)
         {
+            if (ReadOnly)
+                return "";
             if (input == null | input == "")
                 return "";
             EmojiString es = new EmojiString(input);
@@ -264,7 +281,6 @@ namespace huqiang.UIComposite
         {
             if (TextOperation.DeleteSelectString())
             {
-                ShowChanged = true;
                 SetShowText();
                 return true;
             }
@@ -274,7 +290,6 @@ namespace huqiang.UIComposite
         {
             if (TextOperation.DeleteLast())
             {
-                ShowChanged = true;
                 SetShowText();
                 return true;
             }
@@ -284,7 +299,6 @@ namespace huqiang.UIComposite
         {
             if (TextOperation.DeleteNext())
             {
-                ShowChanged = true;
                 SetShowText();
                 return true;
             }
@@ -295,7 +309,6 @@ namespace huqiang.UIComposite
             var es = new EmojiString(str);
             TextOperation.DeleteSelectString();
             TextOperation.InsertContent(es);
-            ShowChanged = true;
             SetShowText();
         }
         public void PointerMoveLeft()
@@ -303,7 +316,6 @@ namespace huqiang.UIComposite
             bool lc = false;
             if (TextOperation.PointerMoveLeft(ref lc))
             {
-                ShowChanged = true;
                 if (lc)
                     SetShowText();
             }
@@ -313,7 +325,6 @@ namespace huqiang.UIComposite
             bool lc = false;
             if (TextOperation.PointerMoveRight(ref lc))
             {
-                ShowChanged = true;
                 if (lc)
                     SetShowText();
             }
@@ -323,7 +334,6 @@ namespace huqiang.UIComposite
             bool lc = false;
             if (TextOperation.PointerMoveUp(ref lc))
             {
-                ShowChanged = true;
                 if (lc)
                     SetShowText();
             }
@@ -333,7 +343,6 @@ namespace huqiang.UIComposite
             bool lc = false;
             if (TextOperation.PointerMoveDown(ref lc))
             {
-                ShowChanged = true;
                 if (lc)
                     SetShowText();
             }
@@ -343,7 +352,6 @@ namespace huqiang.UIComposite
             bool lc = false;
             if (TextOperation.SetPressIndex(0, ref lc))
             {
-                ShowChanged = true;
                 if (lc)
                     SetShowText();
             }
@@ -353,7 +361,6 @@ namespace huqiang.UIComposite
             bool lc = false;
             if (TextOperation.SetPressIndex(999999999, ref lc))
             {
-                ShowChanged = true;
                 if (lc)
                     SetShowText();
             }
@@ -579,6 +586,32 @@ namespace huqiang.UIComposite
             }
             return EditState.Continue;
         }
-
+        public HText ReplaceTarget { get; private set; }
+        public void Replace(HText text, UserAction action)
+        {
+            ReplaceTarget = text;
+            if (text == null)
+            {
+                return;
+            }
+            var son = TextCom.transform;
+            var par = text.transform;
+            son.SetParent(par);
+            son.localPosition = Vector3.zero;
+            son.localScale = Vector3.one;
+            son.localRotation = Quaternion.identity;
+            TextCom.marginType = MarginType.Margin;
+            TextCom.margin.left = 0;
+            TextCom.margin.right = 0;
+            TextCom.margin.top = 0;
+            TextCom.margin.down = 0;
+            UIElement.Resize(TextCom);
+            HTextLoader.CopyTo(text,TextCom);
+            FullString.FullString = text.FullString;
+            TextOperation.ChangeText(TextCom,FullString);
+            action.AddFocus(InputEvent);
+            TextCom.gameObject.SetActive(true);
+            text.Text = "";
+        }
     }
 }

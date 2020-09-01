@@ -82,10 +82,10 @@ namespace huqiang.Core.HGUI
             var act = PipeLine[index].active = trans.gameObject.activeSelf;
             var script = trans.GetComponent<UIElement>();
             PipeLine[index].script = script;
-            bool mask = false;
+            //bool mask = false;
             if (script != null)
             {
-                mask = script.Mask;
+                //mask = script.Mask;
                 script.PipelineIndex = index;
                 scripts[max] = script;
                 max++;
@@ -120,8 +120,6 @@ namespace huqiang.Core.HGUI
             if (UIPage.CurrentPage != null)
                 UIPage.CurrentPage.Update(UserAction.TimeSlice);
             UINotify.UpdateAll(UserAction.TimeSlice);
-            //Keyboard.Dispatch();
-            //InputCaret.UpdateCaret();
             CheckSize();
             ThreadMission.ExtcuteMain();
         }

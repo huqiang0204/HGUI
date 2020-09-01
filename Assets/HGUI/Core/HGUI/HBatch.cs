@@ -92,7 +92,7 @@ namespace huqiang.Core.HGUI
                         Vector2 uv2 = Vector2.zero;
                         unsafe
                         {
-                            HVertex* hv = (HVertex*)graphics.vertInfo.Addr;
+                            HVertex* hv = graphics.vertInfo.Addr;
                             for (int j = 0; j < dc; j++)
                             {
                                 var tp = hv[j].position;//局部顶点
@@ -137,7 +137,7 @@ namespace huqiang.Core.HGUI
                             if (tc>0)
                             {
                                 unsafe {
-                                    int* ip = (int*)graphics.trisInfo.Addr;
+                                    int* ip = graphics.trisInfo.Addr;
                                     for (int k = 0; k < tc; k++)
                                     {
                                         TriBuffer[k] = ip[k] + vc;
@@ -152,7 +152,7 @@ namespace huqiang.Core.HGUI
                                 int ks = tc;
                                 unsafe
                                 {
-                                    int* ip = (int*)graphics.trisInfo2.Addr;
+                                    int* ip = graphics.trisInfo2.Addr;
                                     for (int k = 0; k < tc2; k++)
                                     {
                                         TriBuffer[ks] = ip[k] + vc;
@@ -166,7 +166,7 @@ namespace huqiang.Core.HGUI
                             canvas.MatCollector.CombinationMaterial(graphics, TriBuffer, Arrays, IDBuffer, l, ref clip);
                             unsafe
                             {
-                                HVertex* hv = (HVertex*)graphics.vertInfo.Addr;
+                                HVertex* hv = graphics.vertInfo.Addr;
                                 AddUV1(canvas, IDBuffer, hv, dc, l);
                             }
                         }
@@ -199,7 +199,7 @@ namespace huqiang.Core.HGUI
                 Vector2 uv2 = Vector2.zero;
                 unsafe
                 {
-                    HVertex* vert = (HVertex*)graphics.vertInfo.Addr;
+                    HVertex* vert = graphics.vertInfo.Addr;
                     for (int j = 0; j < dc; j++)
                     {
                         var tp = vert[j].position;//局部顶点
@@ -243,7 +243,7 @@ namespace huqiang.Core.HGUI
                     {
                         unsafe
                         {
-                            int* ip = (int*)graphics.trisInfo.Addr;
+                            int* ip = graphics.trisInfo.Addr;
                             for (int k = 0; k < tc; k++)
                             {
                                 TriBuffer[k] = ip[k] + vc;
@@ -258,7 +258,7 @@ namespace huqiang.Core.HGUI
                         int ks = tc;
                         unsafe
                         {
-                            int* ip = (int*)graphics.trisInfo2.Addr;
+                            int* ip = graphics.trisInfo2.Addr;
                             for (int k = 0; k < tc2; k++)
                             {
                                 TriBuffer[ks] = ip[k] + vc;
@@ -272,7 +272,7 @@ namespace huqiang.Core.HGUI
                     canvas.MatCollector.CombinationMaterial(graphics, TriBuffer, Arrays, IDBuffer, l, ref clip);
                     unsafe
                     {
-                        HVertex* hv = (HVertex*)graphics.vertInfo.Addr;
+                        HVertex* hv = graphics.vertInfo.Addr;
                         AddUV1(canvas, IDBuffer, hv, dc, l);
                     }
                 }

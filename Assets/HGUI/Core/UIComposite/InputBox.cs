@@ -33,7 +33,9 @@ namespace huqiang.UIComposite
                 m_TipString = value;
                 SetShowText();
             } }
-        public string InputString { get { return FullString.FullString; } set { 
+        public string InputString { get { return FullString.FullString; } set {
+                if (value == null)
+                    value = "";
                 FullString.FullString = value;
                 TextOperation.ChangeText(TextCom,FullString);
                 SetShowText();

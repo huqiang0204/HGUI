@@ -112,9 +112,9 @@ namespace huqiang.UIComposite
         float lineHigh;
         List<DataGridColumn> columns = new List<DataGridColumn>();
         public List<DataGridColumn> BindingData { get => columns; }
-        public SwapBuffer<DataGridHead, DataGridColumn> HeadSwap;
+        SwapBuffer<DataGridHead, DataGridColumn> HeadSwap;
         QueueBuffer<DataGridHead> headQueue;
-        public SwapBuffer<DataGridItem, DataGridItemContext> ItemSwap;
+        SwapBuffer<DataGridItem, DataGridItemContext> ItemSwap;
         QueueBuffer<DataGridItem> itemQueue;
         SwapBuffer<UserEvent, DataGridHead> dragSwap;
         //List<HImage> lines;

@@ -220,7 +220,7 @@ namespace huqiang.UIComposite
         {
             TextOperation.SetEndPress(ref press);
         }
-        public string OnInputChanged(string input)
+        string OnInputChanged(string input)
         {
             if (ReadOnly)
                 return "";
@@ -248,6 +248,10 @@ namespace huqiang.UIComposite
                     return "";
             InsertString(str);
             return input;
+        }
+        void TouchInputChanged(string input)
+        {
+
         }
         public void SetShowText()
         {
@@ -405,11 +409,11 @@ namespace huqiang.UIComposite
                     }
                 }
 #else
-                        InputEvent.TouchInputChanged(Keyboard.TouchString);
+                        TouchInputChanged(Keyboard.TouchString);
                         if (Keyboard.status == TouchScreenKeyboard.Status.Done)
                         {
-                            if (InputEvent.OnSubmit != null)
-                                InputEvent.OnSubmit(InputEvent);
+                            if (OnSubmit != null)
+                                OnSubmit(this);
                             InputEvent = null;
                             return;
                         }

@@ -74,18 +74,18 @@ namespace huqiang.Core.HGUI
         /// <param name="trans"></param>
         void Collection(Transform trans, int parent, int index)
         {
+            var act = PipeLine[index].active = trans.gameObject.activeSelf;
+            if (!act)
+                return;
             PipeLine[index].parentIndex = parent;
             PipeLine[index].localPosition = trans.localPosition;
             PipeLine[index].localRotation = trans.localRotation;
             PipeLine[index].localScale = trans.localScale;
             PipeLine[index].trans = trans;
-            var act = PipeLine[index].active = trans.gameObject.activeSelf;
             var script = trans.GetComponent<UIElement>();
             PipeLine[index].script = script;
-            //bool mask = false;
             if (script != null)
             {
-                //mask = script.Mask;
                 script.PipelineIndex = index;
                 scripts[max] = script;
                 max++;
@@ -102,12 +102,11 @@ namespace huqiang.Core.HGUI
             int s = point;
             point += c;
             PipeLine[index].childOffset = s;
-            if (act)
-                for (int i = 0; i < c; i++)
-                {
-                    Collection(trans.GetChild(i), index, s);
-                    s++;
-                }
+            for (int i = 0; i < c; i++)
+            {
+                Collection(trans.GetChild(i), index, s);
+                s++;
+            }
         }
   
         protected virtual void Update()

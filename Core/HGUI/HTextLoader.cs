@@ -29,6 +29,31 @@ namespace huqiang.Core.HGUI
     }
     public class HTextLoader : HGraphicsLoader
     {
+        public static void GetGenerationSettings(FakeStruct fake, Font font, ref Vector2 size, ref TextGenerationSettings sett,ref Color color)
+        {
+            sett.font = font;
+            unsafe
+            {
+                var src = (HTextData*)fake.ip;
+                sett.pivot = src->pivot;
+                sett.generationExtents = size;
+                sett.horizontalOverflow = src->m_hof;
+                sett.verticalOverflow = src->m_vof;
+                sett.textAnchor = src->anchor;
+                sett.fontStyle = src->m_fontStyle;
+                sett.richText = src->m_richText;
+                sett.lineSpacing =src-> m_lineSpace;
+                sett.fontSize = src->m_fontSize;
+                sett.alignByGeometry = src->m_align;
+                sett.color = color;
+                
+                sett.scaleFactor = 1;//src->scaleFactor;
+                sett.resizeTextMaxSize = 40;
+                sett.resizeTextMinSize = 10;
+                sett.generateOutOfBounds = false;
+                sett.resizeTextForBestFit = false;
+            }
+        }
         public static List<Font> fonts = new List<Font>();
         public static Font FindFont(string str)
         {

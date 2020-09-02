@@ -11,7 +11,13 @@ namespace huqiang.UIModel
 {
     public class UIBase
     {
-        public static INIReader Lan = new INIReader();
+        internal static string LanName;
+        internal static INIReader Lan = new INIReader();
+        public static void SetLanguage(string name,byte[] iniData)
+        {
+            LanName = name;
+            Lan.LoadData(iniData);
+        }
         static int point;
         static UIBase[] buff = new UIBase[1024];
         public static T GetUI<T>() where T : UIBase
@@ -154,18 +160,23 @@ namespace huqiang.UIModel
         public virtual void Update(float time)
         {
         }
+        protected INISection LanSection;
+        internal string CurLan;
         public virtual void ChangeLanguage()
         {
+            if (CurLan == LanName)
+                return;
             if (Lan == null)
                 return;
+            CurLan = LanName;
             if (uiName != null)
             {
-                var sec = Lan.FindSection(uiName);
-                if (sec != null)
+               LanSection = Lan.FindSection(uiName);
+                if (LanSection != null)
                 {
                     if (uiInitializer != null)
                     {
-                        uiInitializer.ChangeLanguage(sec);
+                        uiInitializer.ChangeLanguage(LanSection);
                     }
                 }
             }

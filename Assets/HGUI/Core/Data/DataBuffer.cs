@@ -305,8 +305,9 @@ namespace huqiang.Data
             {
                 len /= 4;
                 Single[] buf = new Single[len];
+                float* sp = (float*)p;
                 for (int i = 0; i < len; i++)
-                { buf[i] = *p; p++; }
+                { buf[i] = *sp; sp++; }
                 return buf;
             }
             else if (type == DataType.Int16Array)

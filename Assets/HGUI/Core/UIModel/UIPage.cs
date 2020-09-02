@@ -162,6 +162,8 @@ namespace huqiang.UIModel
                 {
                     currentPop = pops[i];
                     pops[i].Show(obj);
+                    if (pops[i].CurLan != LanName)
+                        pops[i].ChangeLanguage();
                     return pops[i] as T;
                 }
             var t = new T();
@@ -186,6 +188,8 @@ namespace huqiang.UIModel
                 {
                     currentPop = pops[i];
                     pops[i].Show(obj);
+                    if (pops[i].CurLan != LanName)
+                        pops[i].ChangeLanguage();
                     return pops[i];
                 }
             var t = Activator.CreateInstance(type) as PopWindow;

@@ -70,6 +70,7 @@ namespace huqiang.Core.HGUI
             tar.m_fontStyle = src->m_fontStyle;
             tar.sizeFitter = src->sizeFitter;
             tar.OutLine = src->OutLine;
+            tar.FullString = null;
         }
         protected unsafe void SaveHText(FakeStruct fake, HText src)
         {

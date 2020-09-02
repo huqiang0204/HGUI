@@ -179,7 +179,7 @@ namespace huqiang
                     byte[] buffer = new byte[strLen];
                     ImmGetCompositionStringW(hIMC, GCS_RESULTSTR, buffer, strLen);
                     string str = Encoding.Unicode.GetString(buffer, 0, strLen);
-                    str = str.Replace("\b", "");
+                    str = str.Replace("\b","");
                     LastResultString = ResultString = str;
                 }
                 else 

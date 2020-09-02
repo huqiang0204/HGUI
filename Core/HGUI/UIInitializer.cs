@@ -145,7 +145,11 @@ namespace huqiang.Core.HGUI
                 {
                     var str = section.GetValue(all[i].name);
                     if (str != null)
-                        txt.Text = str;
+                    {
+                        if (str != "")
+                            txt.Text = str.Replace("\\n", "\n");
+                        else txt.Text = str;
+                    }
                 }
             }
         }

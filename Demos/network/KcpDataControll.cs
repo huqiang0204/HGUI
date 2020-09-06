@@ -30,9 +30,10 @@ namespace Assets.Net
     [Serializable]
     public class LogData
     {
+        public int count;
+        public LogType type;
         public string condition;
         public string stackTrace;
-        public LogType type;
     }
     public class KcpData
     {
@@ -105,6 +106,7 @@ namespace Assets.Net
         {
 
         }
+        List<LogData> logs;
         public void OpenLog(string ip=null,int port=0)
         {
             Application.logMessageReceived += Log;
@@ -114,13 +116,25 @@ namespace Assets.Net
                 var address = IPAddress.Parse(ip);
                 logLink= server.FindOrCreateLink(new IPEndPoint(address, port));
             }
+            if (logs == null)
+                logs = new List<LogData>();
         }
         void Log(string condtion, string stack, LogType type)
         {
+            for(int i=0;i<logs.Count;i++)
+            {
+                if (logs[i].stackTrace == stack)
+                {
+                    logs[i].count++;
+                    return; 
+                }
+            }
             LogData log = new LogData();
+            log.count = 1;
             log.condition = condtion;
             log.stackTrace = stack;
             log.type = type;
+            logs.Add(log);
             var str = JsonUtility.ToJson(log);
             logLink.Send(EnvelopeType.String, Encoding.UTF8.GetBytes(str));
         }
@@ -132,6 +146,8 @@ namespace Assets.Net
             if (link != null)
                 link.Dispose();
             link = null;
+            if (logs != null)
+                logs.Clear();
         }
         public void DispatchMessage()
         {

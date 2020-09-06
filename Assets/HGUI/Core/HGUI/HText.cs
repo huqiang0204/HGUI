@@ -391,7 +391,7 @@ namespace huqiang.Core.HGUI
         public bool ResizeForBestFit {
             get => m_resizeBestFit;
             set {
-                m_resizeBestFit = value;
+                m_resizeBestFit = true;
                 m_dirty = true;
             } }
         [SerializeField]
@@ -452,7 +452,7 @@ namespace huqiang.Core.HGUI
         {
             var font = Font;
             sett.font = font;
-            sett.pivot = m_pivot;
+            sett.pivot = TextPivot;
             sett.generationExtents = size;
             sett.horizontalOverflow = m_hof;
             sett.verticalOverflow = m_vof;

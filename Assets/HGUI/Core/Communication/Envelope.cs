@@ -1,4 +1,5 @@
-﻿using System;
+﻿using huqiang.Data;
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
@@ -45,12 +46,13 @@ namespace huqiang
         public byte[] data;
         public byte type;
     }
+
     public class EnvelopePart
     {
-        public byte type;
         public EnvelopeHead head;
         public byte[] data;
     }
+
     public class Envelope
     {
         const UInt16 EnvelopeHeadSize = 14;
@@ -140,7 +142,7 @@ namespace huqiang
         /// <param name="id">数据包标志</param>
         /// <param name="fs">每个分卷大小</param>
         /// <returns></returns>
-        public static byte[][] SubVolume(byte[] buff, byte type, UInt16 id, UInt16 fs)
+        public static byte[][] SubVolume(byte[] buff, byte type, UInt16 id , UInt16 fs)
         {
             fs -= EnvelopeHeadSize;
             if (buff.Length < 2)
@@ -239,7 +241,7 @@ namespace huqiang
             if (r > 0)
                 p++;
             int len = p * 4 + slen;
-            byte[] tar = new byte[len + 8];
+            byte[] tar = new byte[len+8];
             tar[0] = 255;
             tar[1] = 255;
             tar[2] = 255;
@@ -468,6 +470,8 @@ namespace huqiang
             }
             return parts;
         }
+        [ThreadStatic]
+        static byte[] tmpBuffer = new byte[1490];
         /// <summary>
         /// 当数据量较大,使用分卷
         /// Tcp每个数据包大小1460字节,Udp每个数据包大小1472字节
@@ -476,7 +480,7 @@ namespace huqiang
         /// <param name="dat"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static byte[][] PackAll(byte[] dat, byte type, UInt16 msgId, int fs)
+        public static byte[][] PackAll(byte[] dat, byte type, UInt16 msgId ,int fs)
         {
             int part = fs - 8;//每个分卷的最大长度
             int a = part / 124;
@@ -494,40 +498,43 @@ namespace huqiang
             byte[][] tmp = new byte[all][];
             unsafe
             {
-                byte* buf = stackalloc byte[1490];
-                for (int i = 0; i < p; i++)
+                fixed(byte* bp=&tmpBuffer[0])
                 {
-                    EnvelopeHead* head = (EnvelopeHead*)buf;
-                    head->Type = type;
-                    head->MsgID = msgId;
-                    head->CurPart = (UInt16)i;
-                    head->AllPart = (UInt16)all;
-                    head->PartLen = (UInt16)ds;
-                    head->Lenth = (UInt32)len;
-                    byte* dp = buf + EnvelopeHead.Size;
-                    for (int j = 0; j < ds; j++)
+                    byte* buf = stackalloc byte[1490];
+                    for (int i = 0; i < p; i++)
                     {
-                        dp[j] = dat[s];
-                        s++;
+                        EnvelopeHead* head = (EnvelopeHead*)buf;
+                        head->Type = type;
+                        head->MsgID = msgId;
+                        head->CurPart = (UInt16)i;
+                        head->AllPart = (UInt16)all;
+                        head->PartLen = (UInt16)ds;
+                        head->Lenth = (UInt32)len;
+                        byte* dp = buf + EnvelopeHead.Size;
+                        for (int j = 0; j < ds; j++)
+                        {
+                            dp[j] = dat[s];
+                            s++;
+                        }
+                        tmp[i] = PackInt(buf, ds + 14);
                     }
-                    tmp[i] = PackInt(buf, ds + 14);
-                }
-                if (r > 0)
-                {
-                    EnvelopeHead* head = (EnvelopeHead*)buf;
-                    head->Type = type;
-                    head->MsgID = msgId;
-                    head->CurPart = (UInt16)p;
-                    head->AllPart = (UInt16)all;
-                    head->PartLen = (UInt16)r;
-                    head->Lenth = (UInt32)len;
-                    byte* dp = buf + EnvelopeHead.Size;
-                    for (int j = 0; j < r; j++)
+                    if (r > 0)
                     {
-                        dp[j] = dat[s];
-                        s++;
+                        EnvelopeHead* head = (EnvelopeHead*)buf;
+                        head->Type = type;
+                        head->MsgID = msgId;
+                        head->CurPart = (UInt16)p;
+                        head->AllPart = (UInt16)all;
+                        head->PartLen = (UInt16)r;
+                        head->Lenth = (UInt32)len;
+                        byte* dp = buf + EnvelopeHead.Size;
+                        for (int j = 0; j < r; j++)
+                        {
+                            dp[j] = dat[s];
+                            s++;
+                        }
+                        tmp[all - 1] = PackInt(buf, r + 14);
                     }
-                    tmp[all - 1] = PackInt(buf, r + 14);
                 }
             }
             return tmp;
@@ -543,18 +550,17 @@ namespace huqiang
                 head->Type = type;
                 return PackInt(buf, 14);
             }
-
         }
-        public static byte[][] Pack(byte[] dat, byte tag, PackType type, UInt16 msgID, UInt16 fs)
+        public static byte[][] Pack(byte[] dat, byte tag, PackType type, UInt16 msgID,UInt16 fs)
         {
             switch (type)
             {
                 case PackType.Part:
-                    return SubVolume(dat, tag, msgID, fs);
+                    return SubVolume(dat, tag, msgID,fs);
                 case PackType.Total:
-                    return new byte[][] { PackingInt(dat, tag) };
+                    return new byte[][] { PackingInt(dat, tag)};
                 case PackType.All:
-                    return PackAll(dat, tag, msgID, fs);
+                    return PackAll(dat, tag, msgID,fs);
             }
             return null;
         }

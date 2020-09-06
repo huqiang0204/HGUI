@@ -72,7 +72,7 @@ namespace huqiang
                     soc.SendTo(dat,  ip);
                     break;
                 case PackType.All:
-                    all = Envelope.PackAll(dat, tag, id, 1472);//1472-25
+                    all = Envelope.PackAll(dat, tag, id, 1472);//1472-22
                     for (int i = 0; i < all.Length; i++)
                         soc.SendTo(all[i],  ip);
                     id += (UInt16)all.Length;
@@ -99,7 +99,7 @@ namespace huqiang
                     SendAll(Envelope.PackingInt(dat, tag));
                     break;
                 case PackType.All:
-                    all = Envelope.PackAll(dat, tag, id, 1472);//1472-25
+                    all = Envelope.PackAll(dat, tag, id, 1472);//1472-22
                     SendAll(all);
                     id++;
                     if (id > MaxID)
@@ -163,9 +163,9 @@ namespace huqiang
                         }
                     }
                 }
-                catch (Exception ex)
+                catch //(Exception ex)
                 {
-                    
+                    //ServerLog.Error(ex.StackTrace);
                 }
             }
         }

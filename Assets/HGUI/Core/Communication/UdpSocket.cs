@@ -72,9 +72,9 @@ namespace huqiang
                         }
                     }
                 }
-                catch (Exception ex)
+                catch //(Exception ex)
                 {
-                   
+                    //ServerLog.Error(ex.StackTrace);
                 }
             }
         }

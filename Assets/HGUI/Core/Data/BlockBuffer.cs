@@ -6,11 +6,6 @@ using System.Text;
 
 namespace huqiang.Data
 {
-    public interface Addressable
-    {
-        IntPtr Addr { get; }
-        void Release(int Offset, int Size);
-    }
     public struct BlockInfo<T> where T : unmanaged
     {
         public int DataCount;
@@ -47,6 +42,14 @@ namespace huqiang.Data
                 add.Release(Index, Length);
             Length = 0;
         }
+        public void Zero()
+        {
+            var add = BlockBuffer.buffers[bufID];
+            if (add != null)
+            {
+                add.Zero(Index, Length);
+            }
+        }
         public void Clear()
         {
             Length = 0;
@@ -54,23 +57,34 @@ namespace huqiang.Data
     }
     public class BlockBuffer
     {
-        internal static Addressable[] buffers = new Addressable[256];
+        internal static BlockBuffer[] buffers = new BlockBuffer[1024];
+        public int eSize { get; protected set; }
+        protected IntPtr ptr;
+        protected int pe;
+        public IntPtr Addr => ptr + pe;
+        public virtual void Release(int offset, int size)
+        {
+        }
+        public virtual void Zero(int offset, int size)
+        {
+
+        }
     }
-    public class BlockBuffer<T> : BlockBuffer, Addressable, IDisposable where T : unmanaged
+    public class BlockBuffer<T> : BlockBuffer, IDisposable where T : unmanaged
     {
-        IntPtr ptr;
         int blockSize;
-        int pe;
         int dataLength;
         int allLength;
-        int eSize;
+
         int usage;
         int ID;
-        public IntPtr Addr => ptr + pe;
+        public int AllMemory { get => allLength; }
+        public int UsageMemory { get => usage * blockSize * eSize; }
+        public int PEMemory { get => pe; }
         /// <summary>
         /// 剩余容量
         /// </summary>
-        public int Remain { get => pe - usage; }
+        public int RemainBlock { get => pe - usage; }
         public unsafe BlockBuffer(int block = 32, int len = 32)
         {
             eSize = sizeof(T);
@@ -82,14 +96,17 @@ namespace huqiang.Data
             byte* bp = (byte*)ptr;
             for (int i = 0; i < pe; i++)//填0
                 bp[i] = 0;
-            var buf = buffers;
-            for (int i = 1; i < buf.Length; i++)
+            lock (buffers)
             {
-                if (buf[i] == null)
+                var buf = buffers;
+                for (int i = 1; i < buf.Length; i++)
                 {
-                    ID = i;
-                    buf[i] = this;
-                    break;
+                    if (buf[i] == null)
+                    {
+                        ID = i;
+                        buf[i] = this;
+                        break;
+                    }
                 }
             }
         }
@@ -120,11 +137,11 @@ namespace huqiang.Data
                 bp[o] = 1;
                 o++;
             }
-            int os = index * blockSize * eSize + pe;
             len = block * blockSize;
+            usage += block;
             return new BlockInfo<T>(ID, index, len, blockSize * eSize);
         }
-        public unsafe void Release(int offset, int size)
+        public unsafe override void Release(int offset, int size)
         {
             int block = size / blockSize;
             byte* bp = (byte*)ptr;
@@ -134,6 +151,22 @@ namespace huqiang.Data
                 offset++;
             }
             usage -= block;
+        }
+        public override void Zero(int offset, int size)
+        {
+            int area = blockSize * eSize;
+            int os = offset * area + pe;
+            int len = area * size;
+            int block = size / blockSize;
+            unsafe
+            {
+                byte* bp = (byte*)ptr;
+                for (int i = 0; i < len; i++)
+                {
+                    bp[os] = 0;
+                    os++;
+                }
+            }
         }
         public unsafe bool RegNew(ref BlockInfo<T> blockInfo, int len)
         {
@@ -164,7 +197,6 @@ namespace huqiang.Data
                 bp[o] = 1;
                 o++;
             }
-            int os = index * blockSize * eSize + pe;
             len = block * blockSize;
             blockInfo = new BlockInfo<T>(ID, index, len, blockSize * eSize);
             usage += block;

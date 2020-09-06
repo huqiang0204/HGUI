@@ -7,13 +7,13 @@ using System.Threading;
 
 namespace huqiang
 {
-    public class LinkBuffer<T> where T : NetworkLink, new()
+    public class ThreadBuffer<T> where T : NetworkLink, new()
     {
         protected T[] buffer;
         protected int max;
         protected int top;
         public bool running;
-        public LinkBuffer(int size = 2048)
+        public ThreadBuffer(int size = 2048)
         {
             buffer = new T[size];
             max = size;
@@ -47,7 +47,7 @@ namespace huqiang
             buffer[top] = link;
             top++;
         }
-        public void Delete(KcpLink link)
+        public void Delete(NetworkLink link)
         {
             int index = link.Index;
             buffer[index] = null;
@@ -70,17 +70,6 @@ namespace huqiang
                 if (l != null)
                     for (int j = 0; j < data.Length; j++)
                         soc.SendTo(data[j], l.endpPoint);
-            }
-        }
-        public void SendAll(Socket soc, long now)
-        {
-            for (int i = 0; i < top; i++)
-            {
-                var l = buffer[i];
-                if (l != null)
-                {
-                    l.Send(soc, now);
-                }
             }
         }
         public void AddMsg(byte[][] dat, long now,UInt16 msgID)
@@ -112,7 +101,7 @@ namespace huqiang
             }
         }
     }
-    public class LinkThread<T> : LinkBuffer<T> where T :NetworkLink, new()
+    public class LinkThread<T> : ThreadBuffer<T> where T :NetworkLink, new()
     {
         class Mission
         {
@@ -147,18 +136,9 @@ namespace huqiang
                                 mis.action(mis.data);
                     }
                 }
-                catch
+                catch //(Exception ex)
                 {
-                    
-                }
-                try
-                {
-                    if (soc != null)
-                        SendAll(soc, now);
-                }
-                catch
-                {
-
+                    //ServerLog.Error(ex.StackTrace);
                 }
                 long t = DateTime.Now.Ticks;
                 t -= now;

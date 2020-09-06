@@ -255,10 +255,10 @@ namespace huqiang.UIComposite
             if (Keyboard.InputChanged)
             {
                 FullString.FullString = input;
+                SetTouchString();
             }
             if (OnValueChanged != null)
                 OnValueChanged(this);
-            SetShowText();
         }
         public void SetShowText()
         {
@@ -290,6 +290,34 @@ namespace huqiang.UIComposite
                 TextCom.MainColor = m_tipColor;
                 TextCom.Text = m_TipString;
                 ShowString = m_TipString;
+            }
+        }
+        void SetTouchString()
+        {
+            string str = Keyboard.TouchString;
+            if (Editing)
+            {
+                if (TextCom == null)
+                    return;
+                TextCom.MainColor = textColor;
+                if (contentType == ContentType.Password)
+                    TextCom.Text = new string('*', str.Length);
+                else TextCom.Text = str;
+                InputEvent.ChangeText(str);
+            }
+            else if (str != "" & str != null)
+            {
+                if (TextCom == null)
+                    return;
+                TextCom.MainColor = textColor;
+                if (contentType == ContentType.Password)
+                    TextCom.Text = new string('*', str.Length);
+                else TextCom.Text = str;
+            }
+            else
+            {
+                TextCom.MainColor = m_tipColor;
+                TextCom.Text = m_TipString;
             }
         }
         public bool DeleteSelectString()

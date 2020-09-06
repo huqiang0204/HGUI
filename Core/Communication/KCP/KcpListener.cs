@@ -9,6 +9,7 @@ namespace huqiang
 {
     public class KcpListener
     {
+        public static byte[] Heart = new byte[] { 255, 255, 255, 255, 0, 255, 255, 255, 254 };
         public static long TimeOut = 50000000;//5*1000*10000
         public static KcpListener Instance;
         public Socket soc;

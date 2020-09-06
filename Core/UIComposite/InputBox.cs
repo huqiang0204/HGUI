@@ -146,6 +146,7 @@ namespace huqiang.UIComposite
         public InputBoxEvent InputEvent;
         public Action<InputBox> OnSubmit;
         public Action<InputBox> OnDone;
+        public Action<InputBox> OnValueChanged;
         public Func<InputBox, int, char, char> ValidateChar;
         public override void Initial(FakeStruct mod, UIElement element)
         {
@@ -251,7 +252,13 @@ namespace huqiang.UIComposite
         }
         void TouchInputChanged(string input)
         {
-
+            if (Keyboard.InputChanged)
+            {
+                FullString.FullString = input;
+            }
+            if (OnValueChanged != null)
+                OnValueChanged(this);
+            SetShowText();
         }
         public void SetShowText()
         {

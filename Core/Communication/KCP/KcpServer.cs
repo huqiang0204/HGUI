@@ -7,7 +7,6 @@ namespace huqiang
 {
     public class KcpServer<T> : KcpListener where T : KcpLink, new()
     {
-
         static Random random = new Random();
         public static int SingleCount = 2048;
         public KcpThread<T>[] linkBuff;
@@ -152,7 +151,7 @@ namespace huqiang
                 bid = 60000;
         }
         bool heart;
-        byte[] Heart = new byte[] { 255, 255, 255, 255, 0, 255, 255, 255, 254 };
+     
         long last;
         public override void SendAll()
         {
@@ -162,7 +161,7 @@ namespace huqiang
             kcp.UnPack(time);
             if(heart)
             {
-                long c = now / 10000;
+                long c = now / 1000;
                 bool n = c > last ? true : false;
                 if (n)
                 {

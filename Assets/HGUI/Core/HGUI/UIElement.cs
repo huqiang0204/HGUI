@@ -707,5 +707,8 @@ namespace huqiang.Core.HGUI
                     break;
             }
         }
+        public virtual void Clear()
+        {
+        }
     }
 }

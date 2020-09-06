@@ -51,7 +51,7 @@ namespace huqiang.Core.HGUI
         {
 
         }
-        public void Clear()
+        public override void Clear()
         {
             if (beelines != null)
                 beelines.Clear();

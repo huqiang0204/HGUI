@@ -419,9 +419,8 @@ namespace huqiang.UIComposite
                         TouchInputChanged(Keyboard.TouchString);
                         if (Keyboard.status == TouchScreenKeyboard.Status.Done)
                         {
-                            if (OnSubmit != null)
-                                OnSubmit(this);
-                            InputEvent = null;
+                            if (OnDone!= null)
+                                OnDone(this);
                             return;
                         }
 #endif

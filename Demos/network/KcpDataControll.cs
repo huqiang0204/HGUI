@@ -46,27 +46,29 @@ namespace Assets.Net
         {
             datas = new QueueBuffer<KcpData>();
         }
-        public override void Dispatch(byte[] dat, byte tag)
+        public override void Dispatch(BlockInfo<byte> dat, byte tag)
         {
+        
             KcpData data = new KcpData();
-            data.dat = dat;
             data.tag = tag;
+            unsafe
+            {
+                byte[] buf = new byte[dat.DataCount];
+                byte* src = dat.Addr;
+                for (int i = 0; i < buf.Length; i++)
+                {
+                    buf[i] = src[i];
+                }
+                data.dat = buf;
+            }
             datas.Enqueue(data);
         }
-        public override bool Send(byte[] data, byte type)
+        public override bool Disconnect()
         {
-            if (data.Length > 30000 * 1024)
-                return false;
-            envelope.Pack(data, type);
-            envelope.Send(kcp.soc, DateTime.Now.Ticks,endpPoint);
-            return true;
-        }
-        public override void Disconnect()
-        {
+            return false;
         }
         public override void ConnectionOK()
         {
-
         }
     }
     public class KcpDataControll
@@ -92,7 +94,7 @@ namespace Assets.Net
             server.Run(1);
             server.OpenHeart();
             link = server.FindOrCreateLink(new IPEndPoint(address, port));
-            link.Send(new byte[1], 0);
+            link.Send(0,new byte[1]);
         }
         public int pin;
         public int userId;
@@ -117,7 +119,7 @@ namespace Assets.Net
             log.stackTrace = stack;
             log.type = type;
             var str = JsonUtility.ToJson(log);
-            logLink.Send(Encoding.UTF8.GetBytes(str), EnvelopeType.String);
+            logLink.Send(EnvelopeType.String, Encoding.UTF8.GetBytes(str));
         }
         public void CloseLog()
         {
@@ -147,7 +149,6 @@ namespace Assets.Net
             }
             catch (Exception e)
             {
-
             }
         }
         float Time;
@@ -256,7 +257,7 @@ namespace Assets.Net
             msg.Args = json;
             string str = JsonUtility.ToJson(msg);
             var dat = Encoding.UTF8.GetBytes(str);
-            link.Send(dat, EnvelopeType.Json);
+            link.Send(EnvelopeType.Json, dat);
         }
         public void SendAesJson(int cmd,int type,string json)
         {
@@ -282,7 +283,7 @@ namespace Assets.Net
         }
         public void SendStream(DataBuffer db)
         {
-            link.Send(db.ToBytes(),EnvelopeType.DataBuffer);
+            link.Send(EnvelopeType.DataBuffer, db.ToBytes());
         }
         public void SendAesStream(DataBuffer db)
         {
@@ -314,7 +315,7 @@ namespace Assets.Net
         }
         public void SendMate(byte[] buf)
         {
-            link.Send(buf, EnvelopeType.Mate);
+            link.Send(EnvelopeType.Mate, buf);
         }
         public void Dispose()
         {

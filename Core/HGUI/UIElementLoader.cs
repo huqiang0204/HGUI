@@ -30,6 +30,7 @@ namespace huqiang.Core.HGUI
     {
         protected unsafe void LoadScript(byte* ip, UIElement tar)
         {
+            tar.Clear();
             var src = (UIElementData*)ip;
             tar.m_sizeDelta = src->m_sizeDelta;
             tar.Pivot = src->Pivot;

@@ -539,7 +539,6 @@ namespace huqiang.Core.HGUI
                 //这里会产生一次GC
                 mr.sharedMaterials = MatCollector.GenerateMaterial();
             }
-               
         }
 #endif
 #endregion

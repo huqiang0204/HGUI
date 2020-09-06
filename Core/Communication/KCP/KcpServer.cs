@@ -1,40 +1,42 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
-using System.Threading;
+using System.Text;
 
 namespace huqiang
 {
-    public class KcpServer<T>:KcpListener where T:KcpLink,new()
+    public class KcpServer<T> : KcpListener where T : KcpLink, new()
     {
+
         static Random random = new Random();
         public static int SingleCount = 2048;
-        public LinkThread<T>[] linkBuff;
+        public KcpThread<T>[] linkBuff;
         int tCount = 0;
-        public KcpServer(int port = 0) :base(port)
+        Kcp kcp;
+        public KcpServer(int port = 0) : base(port)
         {
             Instance = this;
-            Day = DateTime.Now.Day;
+            kcp = new Kcp();
         }
-        public void Run(int threadCount = 8,int threadbuff = 2048)
+        public void Run(int threadCount = 8, int threadbuff = 2048)
         {
             tCount = threadCount;
-            Start();
             if (tCount > 0)
             {
-                linkBuff = new LinkThread<T>[threadCount];
+                linkBuff = new KcpThread<T>[threadCount];
                 for (int i = 0; i < threadCount; i++)
                 {
-                    linkBuff[i] = new LinkThread<T>(threadbuff);
-                    linkBuff[i].soc = soc;
+                    linkBuff[i] = new KcpThread<T>(threadbuff);
                 }
             }
             else
             {
                 tCount = 1;
-                linkBuff = new LinkThread<T>[1];
-                linkBuff[0] = new LinkThread<T>();
-                linkBuff[0].soc = soc;
+                linkBuff = new KcpThread<T>[1];
+                linkBuff[0] = new KcpThread<T>();
             }
+            kcp.Run(this, tCount);
+            Start();
         }
         public void Close()
         {
@@ -50,7 +52,7 @@ namespace huqiang
                 fixed (byte* bp = &b[0])
                     ip = *(Int32*)bp;
             }
-            var link = FindLink(ip,ep.Port);
+            var link = FindLink(ip, ep.Port);
             if (link == null)
             {
                 link = new T();
@@ -60,7 +62,6 @@ namespace huqiang
                 byte[] iv = new byte[16];
                 random.NextBytes(iv);
                 link.Iv = iv;
-                link.envelope = new KcpEnvelope();
                 link.kcp = this;
                 link.ConnectTime = DateTime.Now.Ticks;
                 link.endpPoint = ep;
@@ -82,23 +83,23 @@ namespace huqiang
             }
             return link;
         }
-        public override void Dispatch(byte[] dat, IPEndPoint ep)
+        public override void Dispatch(byte[] dat, int len, IPEndPoint ep)
         {
             var link = FindOrCreateLink(ep);
-            if(link!=null)
+            if (link != null)
             {
                 link._connect = true;
-                link.metaData.Enqueue(dat);
+                link.RecvTime = DateTime.Now.Ticks;
+                kcp.ReciveMsg(dat, len, link);
             }
         }
-        public override void RemoveLink(KcpLink link)
+        public override void RemoveLink(NetworkLink link)
         {
             linkBuff[link.buffIndex].Delete(link);
         }
         public override void Dispose()
         {
             base.Dispose();
-            soc.Close();
             Instance = null;
             for (int i = 0; i < tCount; i++)
                 linkBuff[i].running = false;
@@ -113,7 +114,7 @@ namespace huqiang
             }
             return null;
         }
-        public T FindLink(int ip,int port)
+        public T FindLink(int ip, int port)
         {
             for (int i = 0; i < tCount; i++)
             {
@@ -123,43 +124,19 @@ namespace huqiang
             }
             return null;
         }
-        ThreadTimer timer;
-        static byte[] Heart = new byte[1];
-        static int Day;
-        static byte[][] HeartData;
         /// <summary>
         /// 开启心跳,防止超时断线
         /// </summary>
         public void OpenHeart()
         {
-            HeartData = Envelope.PackAll(Heart, EnvelopeType.Heart, 0, 1472);
-            if (timer==null)
-            {
-                timer = new ThreadTimer(1000);
-                timer.Tick = (o,e) => {
-                    try
-                    {
-                        for (int i = 0; i < tCount; i++)
-                        {
-                            linkBuff[i].SendAll(soc, HeartData);
-                        }
-                    }
-                    catch
-                    {
-                    }
-                };
-            }
+            heart = true;
         }
         /// <summary>
         /// 关闭心跳
         /// </summary>
         public void CloseHeart()
         {
-            if(timer!=null)
-            {
-                timer.Dispose();
-                timer = null;
-            }
+            heart = false;
         }
         UInt16 bid = 60000;
         public override void Broadcast(byte[] dat, byte type)
@@ -168,18 +145,55 @@ namespace huqiang
             long now = DateTime.Now.Ticks;
             for (int i = 0; i < tCount; i++)
             {
-                linkBuff[i].AddMsg(tmp, now,bid);
+                linkBuff[i].AddMsg(tmp, now, bid);
             }
             bid++;
             if (bid > 64000)
                 bid = 60000;
         }
-        public void SendAll()
+        bool heart;
+        byte[] Heart = new byte[] { 255, 255, 255, 255, 0, 255, 255, 255, 254 };
+        long last;
+        public override void SendAll()
+        {
+            long now = DateTime.Now.Ticks / 10000;
+            long r = now % 10000;
+            Int16 time = (Int16)r;
+            kcp.UnPack(time);
+            if(heart)
+            {
+                long c = now / 10000;
+                bool n = c > last ? true : false;
+                if (n)
+                {
+                    last = c;
+                    for (int i = 0; i < tCount; i++)
+                    {
+                        linkBuff[i].SendAll(soc, kcp, time, Heart);
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < tCount; i++)
+                    {
+                        linkBuff[i].SendAll(kcp, time);
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; i < tCount; i++)
+                {
+                    linkBuff[i].SendAll(kcp, time);
+                }
+            }
+        }
+        protected override void ManageLinks()
         {
             long now = DateTime.Now.Ticks;
             for (int i = 0; i < tCount; i++)
             {
-                linkBuff[i].SendAll(soc, now);
+                linkBuff[i].DeleteTimeOutLink(this, now);
             }
         }
     }

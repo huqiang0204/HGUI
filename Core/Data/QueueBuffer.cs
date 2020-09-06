@@ -54,4 +54,54 @@ namespace huqiang.Data
                 buffer[i] = null;
         }
     }
+    public class QueueBufferS<T> where T : struct//, IDisposable
+    {
+        int start = 0;
+        int end = 0;
+        T[] buffer;
+        int mlen;
+        public QueueBufferS(int len = 2048)
+        {
+            buffer = new T[len];
+            mlen = len;
+        }
+        public int BufferLenth { get { return mlen; } }
+        public int Count
+        {
+            get
+            {
+                int a = end - start;
+                if (a < 0)
+                    a += mlen;
+                return a;
+            }
+        }
+        public void Enqueue(T t)
+        {
+            buffer[end] = t;
+            if (end >= mlen - 1)
+                end = 0;
+            else end++;
+        }
+        public T Dequeue()
+        {
+            if (start != end)
+            {
+                int a = start;
+                T t = buffer[a];
+                if (start >= mlen - 1)
+                    start = 0;
+                else start++;
+                //buffer[a].Dispose();
+                return t;
+            }
+            return new T();
+        }
+        public void Clear()
+        {
+            start = end;
+            //for (int i = 0; i < mlen; i++)
+            //    buffer[i].Dispose();
+        }
+    }
 }

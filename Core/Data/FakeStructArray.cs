@@ -227,5 +227,124 @@ namespace huqiang.Data
             int os = *(Int32*)(ip + o);
             return buffer.GetData(os) as T;
         }
+
+        #region //提高容错率,做了范围鉴定,需要速度可以使用上面的函数
+        int row;
+        int offset;
+        public bool Seek(int index ,int os = 0)
+        {
+            if (index < 0)
+                return false;
+            if (index >= m_len)
+                return false;
+            if (os < 0)
+                return false;
+            if (os >= m_size)
+                return false;
+            row = index;
+            offset = os;
+            return true;
+        }
+        public bool WriteInt(int value)
+        {
+            if (offset < m_size)
+            {
+                SetInt32(row, offset, value);
+                offset++;
+                return true;
+            }
+            return false;
+        }
+        public bool WriteFloat(float value)
+        {
+            if (offset < m_size)
+            {
+                SetFloat(row, offset, value);
+                offset++;
+                return true;
+            }
+            return false;
+        }
+        public bool WriteInt64(Int64 value)
+        {
+            if (offset + 1 < m_size)
+            {
+                SetInt64(row, offset, value);
+                offset += 2;
+                return true;
+            }
+            return false;
+        }
+        public bool WriteDouble(double value)
+        {
+            if (offset + 1 < m_size)
+            {
+                SetDouble(row, offset, value);
+                offset += 2;
+                return true;
+            }
+            return false;
+        }
+        public bool WriteData(object value)
+        {
+            if (offset < m_size)
+            {
+                SetData(row, offset, value);
+                offset++;
+                return true;
+            }
+            return false;
+        }
+        public int ReadInt()
+        {
+            if (offset < Length)
+            {
+                var value = GetInt32(row, offset);
+                offset++;
+                return value;
+            }
+            return 0;
+        }
+        public float ReadFloat()
+        {
+            if (offset < Length)
+            {
+                var value = GetFloat(row, offset);
+                offset++;
+                return value;
+            }
+            return 0;
+        }
+        public Int64 ReadInt64()
+        {
+            if (offset + 1 < Length)
+            {
+                var value = GetInt64(row, offset);
+                offset += 2;
+                return value;
+            }
+            return 0;
+        }
+        public double ReadDouble()
+        {
+            if (offset + 1 < Length)
+            {
+                var value = GetDouble(row, offset);
+                offset += 2;
+                return value;
+            }
+            return 0;
+        }
+        public T ReadData<T>() where T : class
+        {
+            if (offset < Length)
+            {
+                var value = GetData<T>(row, offset);
+                offset++;
+                return value;
+            }
+            return null;
+        }
+        #endregion
     }
 }

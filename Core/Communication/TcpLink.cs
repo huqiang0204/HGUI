@@ -46,14 +46,16 @@ namespace huqiang
                         {
                             var ss = envelope.Pack(data,type);
                             for (int i = 0; i < ss.Length; i++)
+                            {
                                 Link.Send(ss[i]);
+                            }
                             return 1;
                         }
                         else return -1;
             }
-            catch (Exception ex)
+            catch //(Exception ex)
             {
-               
+                //ServerLog.Error(ex.StackTrace);
                 return -1;
             }
             return 0;
@@ -72,9 +74,9 @@ namespace huqiang
                         }
                         else return -1;
             }
-            catch (Exception ex)
+            catch //(Exception ex)
             {
-             
+                //ServerLog.Error(ex.StackTrace);
                 return -1;
             }
             return 0;

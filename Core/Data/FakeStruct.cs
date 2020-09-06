@@ -254,5 +254,118 @@ namespace huqiang.Data
             Marshal.FreeHGlobal(ptr);
             ptr = tp;
         }
+
+        #region //提高容错率,做了范围鉴定,需要速度可以使用上面的函数
+        int offset;
+        public bool Seek(int index = 0)
+        {
+            if (index < 0)
+                return false;
+            if (index >= element)
+                return false;
+            offset = index;
+            return true;
+        }
+        public bool WriteInt(int value)
+        {
+            if(offset<element)
+            {
+                this[offset] = value;
+                offset ++;
+                return true;
+            }
+            return false;
+        }
+        public bool WriteFloat(float value)
+        {
+            if (offset < element)
+            {
+                SetFloat(offset,value);
+                offset++;
+                return true;
+            }
+            return false;
+        }
+        public bool WriteInt64(Int64 value)
+        {
+            if (offset + 1 < element)
+            {
+                SetInt64(offset, value);
+                offset+=2;
+                return true;
+            }
+            return false;
+        }
+        public bool WriteDouble(double value)
+        {
+            if (offset + 1 < element)
+            {
+                SetDouble(offset, value);
+                offset += 2;
+                return true;
+            }
+            return false;
+        }
+        public bool WriteData(object value)
+        {
+            if (offset < element)
+            {
+                SetData(offset, value);
+                offset++;
+                return true;
+            }
+            return false;
+        }
+        public int ReadInt()
+        {
+            if (offset < element)
+            {
+                var value = this[offset];
+                offset++;
+                return value;
+            }
+            return 0;
+        }
+        public float ReadFloat()
+        {
+            if (offset < element)
+            {
+                var value = GetFloat(offset);
+                offset++;
+                return value;
+            }
+            return 0;
+        }
+        public Int64 ReadInt64()
+        {
+            if (offset+1 < element)
+            {
+                var value = GetInt64(offset);
+                offset+=2;
+                return value;
+            }
+            return 0;
+        }
+        public double ReadDouble()
+        {
+            if (offset + 1 < element)
+            {
+                var value = GetDouble(offset);
+                offset += 2;
+                return value;
+            }
+            return 0;
+        }
+        public T ReadData<T>() where T : class
+        {
+            if (offset < element)
+            {
+                var value = GetData<T>(offset);
+                offset++;
+                return value;
+            }
+            return null;
+        }
+        #endregion
     }
 }

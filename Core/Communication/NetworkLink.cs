@@ -14,13 +14,19 @@ namespace huqiang
         public int buffIndex;
         public Int64 id;
         public IPEndPoint endpPoint;
+        internal bool _connect;
+        public long RecyclingTime;
+        public bool Connected { get { return _connect; } }
         public virtual void Recive(long now)
         {
         }
-        public virtual void Send(Socket soc, long now)
+        public virtual void AddMsg(byte[][] dat, long now,UInt16 msgID)
         {
         }
-        public virtual void AddMsg(byte[][] dat, long now,UInt16 msgID)
+        internal virtual void FreeMemory()
+        {
+        }
+        public virtual void Dispose()
         {
         }
     }

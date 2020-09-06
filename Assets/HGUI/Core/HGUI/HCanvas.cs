@@ -138,14 +138,28 @@ namespace huqiang.Core.HGUI
         }
         private void LateUpdate()
         {
+            LateFrame++;
             point = 1;
             max = 0;
             top_txt = 0;
             Collection(transform, -1, 0);
             for (int i = 0; i < max; i++)
-                scripts[i].MainUpdate();
+            {
+                var scr = scripts[i];
+                if(scr.LateFrame!=LateFrame)
+                {
+                    scr.LateFrame = LateFrame;
+                    scr.MainUpdate();
+                }
+                else
+                {
+                    Debug.Log("脚本重复更新");
+                }
+            }
             for (int i = 0; i < top_txt; i++)
-                texts[i].Populate();
+            {
+                texts[i].Populate(); 
+            }
             if (ftr)//纹理被改变了,需要重新计算
             {
                 ftr = false;

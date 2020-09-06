@@ -8,6 +8,7 @@ namespace huqiang.UIEvent
 {
     public class UserEvent
     {
+        internal int Frame;
         public static long ClickTime = 1800000;
         public static float ClickArea = 400;
         internal static void DispatchEvent(UserAction action, HGUIElement[] pipeLine)

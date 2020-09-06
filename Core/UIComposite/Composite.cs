@@ -8,6 +8,7 @@ namespace huqiang.UIComposite
     {
         public FakeStruct BufferData;
         public UIElement Enity;
+        public int Frame;
         public virtual void Initial(FakeStruct mod, UIElement element)
         {
             BufferData = mod;

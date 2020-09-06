@@ -40,6 +40,7 @@ namespace huqiang.Core.HGUI
     }
     public class UIElement:MonoBehaviour
     {
+        internal int LateFrame;
         #region static method
         static Transform[] buff = new Transform[64];
         public static Coordinates GetGlobaInfo(Transform trans, bool Includeroot = true)
@@ -596,9 +597,29 @@ namespace huqiang.Core.HGUI
         public virtual void MainUpdate()
         {
             if (userEvent != null)
-                userEvent.Update();
+            {
+                if (userEvent.Frame != LateFrame)
+                {
+                    userEvent.Frame = LateFrame;
+                    userEvent.Update();
+                }
+                else
+                {
+                    Debug.Log("事件重复调用");
+                }
+            }
             if (composite != null)
-                composite.Update(UserAction.TimeSlice);
+            {
+                if(composite.Frame!=LateFrame)
+                {
+                    composite.Frame = LateFrame;
+                    composite.Update(UserAction.TimeSlice);
+                }
+                else
+                {
+                    Debug.Log("组合件重复调用");
+                }
+            }
         }
         public virtual void SubUpdate()
         {

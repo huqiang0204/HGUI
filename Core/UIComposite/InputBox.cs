@@ -255,7 +255,22 @@ namespace huqiang.UIComposite
             if (Keyboard.InputChanged)
             {
                 FullString.FullString = input;
-                SetTouchString();
+                TextOperation.ChangeText(TextCom,FullString);
+                var sel = Keyboard.selection;
+                int start = sel.start;
+                int end = sel.start + sel.length;
+                if (end != start)
+                {
+                    TextOperation.SetStartPressIndex(start);
+                    TextOperation.SetEndPressIndex(end);
+                }
+                else 
+                {
+                    bool lc = false;
+                    TextOperation.SetPressIndex(start,ref lc); 
+                }
+                //SetTouchString();
+                SetShowText();
             }
             if (OnValueChanged != null)
                 OnValueChanged(this);
@@ -290,34 +305,6 @@ namespace huqiang.UIComposite
                 TextCom.MainColor = m_tipColor;
                 TextCom.Text = m_TipString;
                 ShowString = m_TipString;
-            }
-        }
-        void SetTouchString()
-        {
-            string str = Keyboard.TouchString;
-            if (Editing)
-            {
-                if (TextCom == null)
-                    return;
-                TextCom.MainColor = textColor;
-                if (contentType == ContentType.Password)
-                    TextCom.Text = new string('*', str.Length);
-                else TextCom.Text = str;
-                InputEvent.ChangeText(str);
-            }
-            else if (str != "" & str != null)
-            {
-                if (TextCom == null)
-                    return;
-                TextCom.MainColor = textColor;
-                if (contentType == ContentType.Password)
-                    TextCom.Text = new string('*', str.Length);
-                else TextCom.Text = str;
-            }
-            else
-            {
-                TextCom.MainColor = m_tipColor;
-                TextCom.Text = m_TipString;
             }
         }
         public bool DeleteSelectString()

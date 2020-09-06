@@ -24,9 +24,16 @@ public class MainScript : HCanvas
         //    UIPage.LoadPage<ChatPage>();
         //};
         UIPage.LoadPage<StartPage>();
-        KcpDataControll.Instance.Connection("192.168.0.144", 8899);
+        KcpDataControll.Instance.Connection("192.168.0.134", 8899);
+        KcpDataControll.Instance.OpenLog();
     }
-   protected override void OnDestroy()
+
+    protected override void Update()
+    {
+        base.Update();
+        KcpDataControll.Instance.DispatchMessage();
+    }
+    protected override void OnDestroy()
     {
         base.OnDestroy();
         App.Dispose();

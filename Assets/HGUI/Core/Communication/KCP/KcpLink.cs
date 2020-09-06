@@ -29,25 +29,6 @@ namespace huqiang
         public override void Recive(long now)
         {
             int c = recvQueue.Count;
-            if (c == 0)
-            {
-                if (now - lastTime > TimeOut)
-                {
-                    lastTime = now;
-                    if (_connect)
-                    {
-                        Disconnect();
-                        _connect = false;
-                    }
-                }
-            }
-            else
-            {
-                lastTime = now;
-                if (!_connect)
-                    ConnectionOK();
-                _connect = true;
-            }
             for (int i = 0; i < c; i++)
             {
                 var dat = recvQueue.Dequeue();
@@ -59,9 +40,6 @@ namespace huqiang
         {
         }
         public virtual void Connect()
-        {
-        }
-        public virtual void ConnectionOK()
         {
         }
         public virtual void Dispatch(BlockInfo<byte> dat, byte tag)

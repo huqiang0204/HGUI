@@ -42,13 +42,13 @@ namespace Assets.Net
     public class KcpSocket : KcpLink
     {
         public QueueBuffer<KcpData> datas;
+        public bool connect;
         public KcpSocket()
         {
             datas = new QueueBuffer<KcpData>();
         }
         public override void Dispatch(BlockInfo<byte> dat, byte tag)
         {
-        
             KcpData data = new KcpData();
             data.tag = tag;
             unsafe
@@ -65,10 +65,12 @@ namespace Assets.Net
         }
         public override bool Disconnect()
         {
+
             return false;
         }
-        public override void ConnectionOK()
+        public void ConnectionOK()
         {
+            
         }
     }
     public class KcpDataControll
@@ -93,8 +95,9 @@ namespace Assets.Net
             server = new KcpServer<KcpSocket>(0);
             server.Run(1);
             server.OpenHeart();
-            link = server.FindOrCreateLink(new IPEndPoint(address, port));
-            link.Send(0,new byte[1]);
+            var remote = new IPEndPoint(address, port);
+            link = server.FindOrCreateLink(remote);
+            server.soc.SendTo(KcpListener.Heart, remote);
         }
         public int pin;
         public int userId;
@@ -136,6 +139,12 @@ namespace Assets.Net
             {
                 if (link != null)
                 {
+                    if(link._connect)
+                        if(!link.connect)
+                        {
+                            link.connect = true;
+                            link.ConnectionOK();
+                        }
                     lock (link.datas)
                     {
                         int c = link.datas.Count;

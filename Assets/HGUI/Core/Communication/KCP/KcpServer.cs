@@ -84,7 +84,22 @@ namespace huqiang
         }
         public override void Dispatch(byte[] dat, int len, IPEndPoint ep)
         {
-            var link = FindOrCreateLink(ep);
+            T link;
+            if (RejectAutoConnections)
+            {
+                var b = ep.Address.GetAddressBytes();
+                int ip = 0;
+                unsafe
+                {
+                    fixed (byte* bp = &b[0])
+                        ip = *(Int32*)bp;
+                }
+                link = FindLink(ip, ep.Port);
+            }
+            else
+            {
+                link = FindOrCreateLink(ep);
+            }
             if (link != null)
             {
                 link._connect = true;
@@ -195,5 +210,6 @@ namespace huqiang
                 linkBuff[i].DeleteTimeOutLink(this, now);
             }
         }
+        public bool RejectAutoConnections = false;
     }
 }

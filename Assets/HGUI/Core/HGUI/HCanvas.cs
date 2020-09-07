@@ -143,7 +143,8 @@ namespace huqiang.Core.HGUI
             max = 0;
             top_txt = 0;
             Collection(transform, -1, 0);
-            for (int i = 0; i < max; i++)
+            MainUpdate();
+            for (int i = 1; i < max; i++)
             {
                 var scr = scripts[i];
                 if(scr.LateFrame!=LateFrame)

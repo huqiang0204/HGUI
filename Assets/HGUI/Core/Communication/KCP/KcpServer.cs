@@ -11,6 +11,10 @@ namespace huqiang
         public static int SingleCount = 2048;
         public KcpThread<T>[] linkBuff;
         int tCount = 0;
+        /// <summary>
+        /// 拒绝外部发起的新连接
+        /// </summary>
+        public bool RejectAutoConnections = false;
         Kcp kcp;
         public KcpServer(int port = 0) : base(port)
         {
@@ -210,6 +214,6 @@ namespace huqiang
                 linkBuff[i].DeleteTimeOutLink(this, now);
             }
         }
-        public bool RejectAutoConnections = false;
+     
     }
 }

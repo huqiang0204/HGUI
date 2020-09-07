@@ -99,6 +99,7 @@ namespace Assets.Net
             var remote = new IPEndPoint(address, port);
             link = server.FindOrCreateLink(remote);
             server.soc.SendTo(KcpListener.Heart, remote);
+            server.RejectAutoConnections = true;
         }
         public int pin;
         public int userId;

@@ -170,7 +170,7 @@ namespace huqiang
                 bid = 60000;
         }
         bool heart;
-     
+
         long last;
         public override void SendAll()
         {
@@ -178,7 +178,7 @@ namespace huqiang
             long r = now % 10000;
             Int16 time = (Int16)r;
             kcp.UnPack(time);
-            if(heart)
+            if (heart)
             {
                 long c = now / 1000;
                 bool n = c > last ? true : false;
@@ -214,6 +214,6 @@ namespace huqiang
                 linkBuff[i].DeleteTimeOutLink(this, now);
             }
         }
-     
+
     }
 }

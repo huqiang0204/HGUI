@@ -86,6 +86,7 @@ namespace huqiang.UIModel
                 if (menus[i] is T)
                 {
                     CurrentMenu = menus[i];
+                    CurrentMenu.ChangeLanguage();
                     menus[i].Show(context, pos, dic, obj);
                     return menus[i] as T;
                 }
@@ -93,6 +94,7 @@ namespace huqiang.UIModel
             menus.Add(t);
             CurrentMenu = t;
             t.Initial(Root, context, obj);
+            t.ChangeLanguage();
             t.Show(context, pos, dic, obj);
             t.ReSize();
             return t;

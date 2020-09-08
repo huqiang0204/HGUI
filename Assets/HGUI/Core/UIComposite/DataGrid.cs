@@ -91,6 +91,8 @@ namespace huqiang.UIComposite
     }
     public class DataGrid:Composite
     {
+        public static Texture2D CursorX;
+        public static Texture2D CursorY;
         /// <summary>
         /// 当前滚动的位置
         /// </summary>
@@ -313,6 +315,16 @@ namespace huqiang.UIComposite
                 dragSwap.Push(item);
                 item.Drag = Draging;
                 item.DragEnd = DragEnd;
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN
+                item.PointerEntry = (o, e) =>
+                {
+                    Cursor.SetCursor(CursorX, new Vector2(64, 64), CursorMode.Auto);
+                };
+                item.PointerLeave = (o, e) => {
+                    if (!o.Pressed)
+                        Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+                };
+#endif
                 var trans = go.transform;
                 trans.SetParent(Drags);
                 trans.localScale = Vector3.one;
@@ -348,6 +360,9 @@ namespace huqiang.UIComposite
             head.Head.m_sizeDelta.x = col.width;
             UIElement.ResizeChild(head.Head);
             Refresh();
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN
+            Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+#endif
             if (ColumnResized != null)
                 ColumnResized(this, col);
         }

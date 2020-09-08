@@ -162,12 +162,12 @@ namespace huqiang.UIModel
         }
         protected INISection LanSection;
         internal string CurLan;
-        public virtual void ChangeLanguage()
+        public virtual bool ChangeLanguage()
         {
             if (CurLan == LanName)
-                return;
+                return false;
             if (Lan == null)
-                return;
+                return false;
             CurLan = LanName;
             if (uiName != null)
             {
@@ -180,6 +180,7 @@ namespace huqiang.UIModel
                     }
                 }
             }
+            return true;
         }
     }
 }

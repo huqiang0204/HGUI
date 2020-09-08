@@ -17,6 +17,7 @@ namespace huqiang.UIComposite
             public HText Label;
             public HImage Back;
             public UIElement Content;
+            public object Context;
         }
         /// <summary>
         /// 选项头停靠方向
@@ -84,10 +85,10 @@ namespace huqiang.UIComposite
         /// </summary>
         /// <param name="model"></param>
         /// <param name="label"></param>
-        public void AddContent(UIElement model, string label)
+        public TableContent AddContent(UIElement model, string label)
         {
             if (Item == null)
-                return;
+                return null;
             TableContent content = new TableContent();
             content.Parent = this;
             var mod = HGUIManager.GameBuffer.Clone(Item).transform;
@@ -117,6 +118,7 @@ namespace huqiang.UIComposite
             CurContent.Back.MainColor = SelectColor;
             contents.Add(CurContent);
             mod.SetParent(Items);
+            return content;
         }
         /// <summary>
         /// 使用自定义标签页,标签模型自行管理

@@ -30,6 +30,9 @@ namespace huqiang.UIComposite
                 callBack = Enity.RegEvent<UserEvent>();
                 callBack.Drag = Drag;
                 callBack.DragEnd = (o, e, v) => {
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN
+                    Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+#endif
                     if (layout.LayOutChanged != null)
                         layout.LayOutChanged(layout);
                 };

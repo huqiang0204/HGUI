@@ -46,6 +46,7 @@ namespace huqiang.UIModel
                 if (notifys[i] is T)
                 {
                     CurrentNotify = notifys[i];
+                    CurrentNotify.ChangeLanguage();
                     notifys[i].Show(context, obj);
                     return notifys[i] as T;
                 }
@@ -53,6 +54,7 @@ namespace huqiang.UIModel
             notifys.Add(t);
             CurrentNotify = t;
             t.Initial(Root, context, obj);
+            t.ChangeLanguage();
             t.Show(context, obj);
             t.ReSize();
             return t;

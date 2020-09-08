@@ -144,7 +144,7 @@ namespace huqiang.Core.HGUI
             top_txt = 0;
             Collection(transform, -1, 0);
             MainUpdate();
-            for (int i = 1; i < max; i++)
+            for (int i = 1; i < max; i++)//跳过HCanvas
             {
                 var scr = scripts[i];
                 if(scr.LateFrame!=LateFrame)

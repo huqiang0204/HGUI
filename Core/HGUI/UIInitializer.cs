@@ -151,6 +151,20 @@ namespace huqiang.Core.HGUI
                         else txt.Text = str;
                     }
                 }
+                else
+                {
+                    InputBox box = all[i].Value as InputBox;
+                    if(box!=null)
+                    {
+                        var str = section.GetValue(all[i].name);
+                        if (str != null)
+                        {
+                            if (str != "")
+                                box.TipString = str.Replace("\\n", "\n");
+                            else box.TipString = str;
+                        }
+                    }
+                }
             }
         }
     }

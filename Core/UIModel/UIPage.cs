@@ -44,6 +44,7 @@ namespace huqiang.UIModel
             var p = CurrentPage as T;
             if (p!=null)
             {
+                CurrentPage.ChangeLanguage();
                 CurrentPage.Show(dat);
                 return p;
             }
@@ -68,6 +69,7 @@ namespace huqiang.UIModel
                 if (CurrentPage != null)
                     if (CurrentPage.GetType() == type)
                     {
+                        CurrentPage.ChangeLanguage();
                         CurrentPage.Show(dat);
                         return CurrentPage;
                     }
@@ -278,6 +280,12 @@ namespace huqiang.UIModel
         {
             if (currentPop != null)
                 currentPop.Update(time);
+        }
+        public override bool ChangeLanguage()
+        {
+            if (currentPop != null)
+                currentPop.ChangeLanguage();
+            return base.ChangeLanguage();
         }
     }
 }

@@ -386,7 +386,9 @@ namespace huqiang
             }
             msg.SendTime = time;
             msg.SendCount++;
-            kcpListener.soc.SendTo(tmpBuffer,c,SocketFlags.None,link.endpPoint);
+            var soc = kcpListener.soc;
+            if (soc != null)
+                soc.SendTo(tmpBuffer, c, SocketFlags.None, link.endpPoint);
         }
         static int PackInt(byte[] src, int slen, byte[] tar)
         {

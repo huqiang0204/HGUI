@@ -269,7 +269,6 @@ namespace huqiang.UIComposite
                     bool lc = false;
                     TextOperation.SetPressIndex(start,ref lc); 
                 }
-                //SetTouchString();
                 SetShowText();
             }
             if (OnValueChanged != null)

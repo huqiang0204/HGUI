@@ -143,7 +143,6 @@ namespace huqiang
             public BlockInfo<byte> buff;
             public long time;
             public BlockInfo<int> states;
-            public bool done;//保留一定时效
         }
         MsgCache[] caches = new MsgCache[128];
         int delayStart;

@@ -113,13 +113,13 @@ namespace huqiang
                             var dat = list[i];
                             Dispatch(dat.data, dat.type);
                         }
-                    }catch (Exception ex)
+                    }catch //(Exception ex)
                     {
-                        System.Diagnostics.Debug.WriteLine(ex);
+                        //System.Diagnostics.Debug.WriteLine(ex);
                     }
                 }
             }
-            catch (Exception ex)
+            catch //(Exception ex)
             {
             }
         }

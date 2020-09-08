@@ -15,6 +15,7 @@ namespace huqiang
 
     public class Kcp
     {
+        public static int FragmentSize = (1472 - 8 - 15) - 12 * 4;//包头4字节,包尾4字节,数据头21字节,12个节点,每个节点4字节=1399
         public static int MsgTimeOut = 500;
         const UInt16 Fragment = 1472;
         public static UInt16 MinID = 34000;
@@ -303,22 +304,16 @@ namespace huqiang
         }
         void PackAll(KcpData link, byte[] dat, byte type, UInt16 msgId,Int16 time)
         {
-            int part = Fragment - 8;//每个分卷的最大长度
-            int a = part / 124;
-            int b = part % 124;
-            if (b > 0)
-                a++;
-            int ds = part - KcpHead.Size - a * 4;//每个分卷的内容最大长度
             int len = dat.Length;
-            int p = len / ds;
+            int p = len / FragmentSize;
+            int r = len % FragmentSize;
             int all = p;//总计分卷数量
-            int r = len % ds;
             if (r > 0)
                 all++;
             int s = 0;
             unsafe
             {
-                fixed(byte* bp=&tmpBuffer[0])
+                fixed (byte* bp = &tmpBuffer[0])
                 {
                     for (int i = 0; i < p; i++)
                     {
@@ -327,16 +322,16 @@ namespace huqiang
                         head->MsgID = msgId;
                         head->CurPart = (UInt16)i;
                         head->AllPart = (UInt16)all;
-                        head->PartLen = (UInt16)ds;
+                        head->PartLen = (UInt16)FragmentSize;
                         head->Lenth = (UInt32)len;
                         head->Time = time;
                         byte* dp = bp + KcpHead.Size;
-                        for (int j = 0; j < ds; j++)
+                        for (int j = 0; j < FragmentSize; j++)
                         {
                             dp[j] = dat[s];
                             s++;
                         }
-                        BlockInfo<byte> block = PackInt(ds + KcpHead.Size);
+                        BlockInfo<byte> block = PackInt(FragmentSize + KcpHead.Size);
                         MsgInfo msg = new MsgInfo();
                         msg.data = block;
                         msg.MsgID = msgId;
@@ -367,7 +362,7 @@ namespace huqiang
                         msg.MsgID = msgId;
                         msg.CurPart = (UInt16)p;
                         msg.CreateTime = time;
-                        SendMsg(link,ref msg, time);
+                        SendMsg(link, ref msg, time);
                         link.Msgs.Add(msg);
                     }
                 }

@@ -67,7 +67,7 @@ namespace huqiang
                         {
                             client.Close();
                         }
-                        catch (Exception ex)
+                        catch// (Exception ex)
                         {
                         }
                         Connect();

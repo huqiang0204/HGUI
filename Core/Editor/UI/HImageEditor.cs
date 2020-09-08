@@ -13,7 +13,7 @@ public class HImageEditor:UIElementEditor
     Vector3 scale;
     Vector3 angle;
     Sprite sprite;
-    private void OnEnable()
+    public override void OnEnable()
     {
         HImage img = target as HImage;
         if (img != null)

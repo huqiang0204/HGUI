@@ -91,7 +91,7 @@ namespace huqiang
                 lock (Link)
                     Link.Close();
         }
-        public virtual void Dispose()
+        public override void Dispose()
         {
             if (Link != null)
                 lock (Link)

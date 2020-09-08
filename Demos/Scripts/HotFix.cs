@@ -57,6 +57,7 @@ namespace Assets.Game.HotFix
         }
         void RegDelegate()
         {
+            _app.DelegateManager.RegisterMethodDelegate<byte[], byte>();
             _app.DelegateManager.RegisterMethodDelegate<object>();
             _app.DelegateManager.RegisterMethodDelegate<object, object, int>();
             _app.DelegateManager.RegisterMethodDelegate<object, object, float>();

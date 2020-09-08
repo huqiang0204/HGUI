@@ -383,7 +383,6 @@ namespace huqiang.Core.HGUI
                     tris[i] = FourCorners[i];
 
                 int index = 16;
-                int ti = 24;
                 ///填充左边的顶点
                 float ys = udy;
                 for (int i = 0; i < row; i++)

@@ -175,6 +175,7 @@ namespace Assets.Net
             }
             catch (Exception e)
             {
+                Debug.Log(e.StackTrace);
             }
         }
         float Time;

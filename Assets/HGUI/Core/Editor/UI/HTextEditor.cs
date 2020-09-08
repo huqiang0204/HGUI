@@ -13,7 +13,7 @@ public class HTextEditor:UIElementEditor
     Vector3 scale;
     Vector3 angle;
     string str;
-    private void OnEnable()
+    public override void OnEnable()
     {
         HText img = target as HText;
         if (img != null)

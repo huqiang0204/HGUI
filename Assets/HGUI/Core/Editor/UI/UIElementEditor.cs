@@ -15,7 +15,7 @@ public class UIElementEditor : Editor
             return FindHCanvas(trans.parent);
         return can;
     }
-    public void OnEnable()
+    public virtual void OnEnable()
     {
         var scr = target as UIElement;
         if(scr!=null)

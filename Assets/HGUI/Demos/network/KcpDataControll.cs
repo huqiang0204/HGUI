@@ -90,6 +90,7 @@ namespace Assets.Net
         KcpSocket link;
         KcpSocket logLink;
         KcpServer<KcpSocket> server;
+        public Action<byte[], byte> Dispatch;
         public void Connection(string ip, int port)
         {
             var address = IPAddress.Parse(ip);
@@ -168,7 +169,11 @@ namespace Assets.Net
                         for (int i = 0; i < c; i++)
                         {
                             var dat = link.datas.Dequeue();
-                            DispatchEx(dat.dat, dat.tag);
+                            if(Dispatch!=null)
+                            {
+                                Dispatch(dat.dat,dat.tag);
+                            }
+                            else DispatchEx(dat.dat, dat.tag);
                         }
                     }
                 }

@@ -35,10 +35,6 @@ public class ButtonPage:UIPage
         view.buttonText.Text = "点击按钮次数 " + buttonClickNum;
     }
     //语言切换功能用
-    public override void ChangeLanguage()
-    {
-        base.ChangeLanguage();
-    }
     //接收消息
     public override void Cmd(DataBuffer dat)
     {

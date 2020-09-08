@@ -36,9 +36,9 @@ public class ";
     private const string PageModelEnd = @""");//""baseUI""创建的bytes文件名,""page""为创建的页面名
     }
     //语言切换功能用
-    public override void ChangeLanguage()
+    public override bool ChangeLanguage()
     {
-        base.ChangeLanguage();
+        return base.ChangeLanguage();
     }
     //接收消息
     public override void Cmd(DataBuffer dat)

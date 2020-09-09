@@ -52,6 +52,7 @@ namespace huqiang.Core.HGUI
         int top_txt=0;
         public UserAction[] inputs;
         public bool PauseEvent;
+        public bool Pause;
         protected virtual void Start()
         {
             MainCanvas = this;
@@ -111,6 +112,8 @@ namespace huqiang.Core.HGUI
   
         protected virtual void Update()
         {
+            if (Pause)
+                return;
             MainCanvas = this;
             UserAction.Update();
             Keyboard.InfoCollection();
@@ -138,6 +141,8 @@ namespace huqiang.Core.HGUI
         }
         private void LateUpdate()
         {
+            if (Pause)
+                return;
             LateFrame++;
             point = 1;
             max = 0;
@@ -333,7 +338,7 @@ namespace huqiang.Core.HGUI
                 }
             }
             if (inputs.Length > 0)
-                GestureEvent.Dispatch(new List<UserAction>(inputs));
+                GestureEvent.Dispatch(inputs);
         }
         /// <summary>
         /// 派发鼠标事件
@@ -359,7 +364,7 @@ namespace huqiang.Core.HGUI
                 for (int i = 0; i < 10; i++)
                     inputs[i] = new UserAction(i);
             }
-            var touches = Input.touches;
+            var touches = Input.touches;//此处会产生一次GC
             for (int i = 0; i < 10; i++)
             {
                 if (touches != null)
@@ -394,7 +399,7 @@ namespace huqiang.Core.HGUI
                 for (int i = 0; i < 10; i++)
                     inputs[i] = new UserAction(i);
             }
-            var touches = Input.touches;
+            var touches = Input.touches;//此处会产生一次GC
             for (int i = 0; i < 10; i++)
             {
                 int id = i;
@@ -431,8 +436,12 @@ namespace huqiang.Core.HGUI
                 for (int i = 0; i < inputs.Length; i++)
                     inputs[i].Clear();
         }
-#endregion
-#region UI绘制与合批
+        public void OnApplicationFocus(bool focus)
+        {
+            Pause = !focus;
+        }
+        #endregion
+        #region UI绘制与合批
         void Batch()
         {
             int len = max;

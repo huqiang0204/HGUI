@@ -8,12 +8,12 @@ namespace huqiang.UIEvent
 {
     public class GestureEvent : UserEvent
     {
-        internal static void Dispatch(List<UserAction> actions)
+        internal static void Dispatch(UserAction[] actions)
         {
             if (events == null)
                 events = new List<GestureEvent>();
             else events.Clear();
-            for(int i=0;i<actions.Count;i++)
+            for(int i=0;i<actions.Length;i++)
             {
                 if(actions[i].IsActive)
                 {

@@ -157,7 +157,7 @@ namespace Assets.Net
             {
                 if (link != null)
                 {
-                    if(link._connect)
+                    if(link.Connected)
                         if(!link.connect)
                         {
                             link.connect = true;

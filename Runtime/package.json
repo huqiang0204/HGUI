@@ -1,0 +1,17 @@
+{
+  "name": "com.huqiang.HGUI",
+  "displayName": "HGUI",
+  "version": "1.0.0",
+  "unity": "2018.1",
+  "description": "https://github.com/huqiang0204/HGUI",
+  "keywords": [
+    "UI"
+  ],
+  "author": {
+    "name": "huqiang",
+    "email": "huqing1990@outlook.com",
+    "url": "https://github.com/huqiang0204/HGUI"
+  },
+  "category": "UI"
+  }
+}

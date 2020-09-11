@@ -1,7 +1,7 @@
 {
-  "name": "com.huqiang.HGUI",
+  "name": "com.huqiang.hgui",
   "displayName": "HGUI",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "unity": "2018.1",
   "description": "https://github.com/huqiang0204/HGUI",
   "keywords": ["UI"],

@@ -7,40 +7,126 @@ using huqiang.Data;
 using System.IO;
 using System.Runtime.InteropServices;
 using huqiang.Core.HGUI;
+using SevenZip.Compression.LZMA;
+using System.Threading.Tasks;
 
 public class AssetBundleCreate : Editor {
 
-    [MenuItem("Custom Editor/Create Scene")]
-    static void CreateSceneALL()
+    [MenuItem("Assets/Create Scene/StreamedScenes")]
+    static void CreateSceneA()
     {
         //清空一下缓存  
         Caching.ClearCache();
-        string Path = Application.dataPath + "/MyScene.unity3d";
-        string[] levels = { "Assets/Level.unity" };
-        //打包场景  
-        BuildPipeline.BuildPlayer(levels, Path, BuildTarget.StandaloneWindows, BuildOptions.BuildAdditionalStreamedScenes);
-        AssetDatabase.Refresh();
+        string o_path = EditorUtility.SaveFilePanel("Save Resource", "Assets/StreamingAssets", "Assets", "unity3d");
+        int index = o_path.LastIndexOf('/');
+        string o_folder = o_path.Substring(0, index);
+        index++;
+        string o_file = o_path.Substring(index, o_path.Length - index);
+        if (o_path.Length != 0)
+        {
+            List<string> names = new List<string>();
+            var o = Selection.GetFiltered(typeof(UnityEngine.Object), SelectionMode.Assets);
+            foreach (UnityEngine.Object obj in o)
+            {
+                string filePath =  AssetDatabase.GetAssetPath(obj);
+                if (filePath.IndexOf(".unity") > 0)
+                {
+                    names.Add(filePath);
+                }
+            }
+            BuildPipeline.BuildPlayer(names.ToArray(), o_path, BuildTarget.StandaloneWindows, BuildOptions.BuildAdditionalStreamedScenes);
+            AssetDatabase.Refresh();
+            Debug.Log("打包完成");
+        }
+    }
+    [MenuItem("Assets/Create Scene/Uncompressed")]
+    static void CreateSceneB()
+    {
+        //清空一下缓存  
+        Caching.ClearCache();
+        string o_path = EditorUtility.SaveFilePanel("Save Resource", "Assets/StreamingAssets", "Assets", "unity3d");
+        int index = o_path.LastIndexOf('/');
+        string o_folder = o_path.Substring(0, index);
+        index++;
+        string o_file = o_path.Substring(index, o_path.Length - index);
+        if (o_path.Length != 0)
+        {
+            List<string> names = new List<string>();
+            var o = Selection.GetFiltered(typeof(UnityEngine.Object), SelectionMode.Assets);
+            foreach (UnityEngine.Object obj in o)
+            {
+                string filePath = AssetDatabase.GetAssetPath(obj);
+                if (filePath.IndexOf(".unity") > 0)
+                {
+                    names.Add(filePath);
+                }
+            }
+            BuildPipeline.BuildPlayer(names.ToArray(), o_path, BuildTarget.StandaloneWindows, 
+                BuildOptions.BuildAdditionalStreamedScenes | BuildOptions.UncompressedAssetBundle);
+            AssetDatabase.Refresh();
+            Debug.Log("打包完成");
+        }
+    }
+    [MenuItem("Assets/Create Scene/Lzma")]
+    static async void CreateSceneC()
+    {
+        //清空一下缓存  
+        Caching.ClearCache();
+        string o_path = EditorUtility.SaveFilePanel("Save Resource", "Assets/StreamingAssets", "Assets", "unity3d");
+        int index = o_path.LastIndexOf('/');
+        string o_folder = o_path.Substring(0, index);
+        index++;
+        string o_file = o_path.Substring(index, o_path.Length - index);
+        if (o_path.Length != 0)
+        {
+            List<string> names = new List<string>();
+            var o = Selection.GetFiltered(typeof(UnityEngine.Object), SelectionMode.Assets);
+            foreach (UnityEngine.Object obj in o)
+            {
+                string filePath = AssetDatabase.GetAssetPath(obj);
+                if (filePath.IndexOf(".unity") > 0)
+                {
+                    names.Add(filePath);
+                }
+            }
+            BuildPipeline.BuildPlayer(names.ToArray(), o_path, BuildTarget.StandaloneWindows, 
+                BuildOptions.BuildAdditionalStreamedScenes | BuildOptions.UncompressedAssetBundle);
+            var decoder = new Decoder();
+            await Task.Run(() => { decoder.DecompressFile(o_path, o_path+".lzma"); });
+            AssetDatabase.Refresh();
+            Debug.Log("打包完成");
+        }
     }
 
-    [MenuItem("Assets/ExportBundlesForWin")]
-    static void BuildAssetBundlesForWIn()
+    [MenuItem("Assets/ExportBundles/Win/Default")]
+    static void BuildAssetBundlesForWin()
     {
-        BuildAllAssetBundles(BuildTarget.StandaloneWindows);
+        BuildAllAssetBundles(BuildTarget.StandaloneWindows,BuildAssetBundleOptions.None);
     }
-    [MenuItem("Assets/ExportBundlesForAndroid")]
+    [MenuItem("Assets/ExportBundles/Win/Uncompressed")]
+    static void BuildBundlesForWin()
+    {
+        BuildAllAssetBundles(BuildTarget.StandaloneWindows, BuildAssetBundleOptions.UncompressedAssetBundle);
+    }
+    [MenuItem("Assets/ExportBundles/Android/Default")]
     static void BuildAssetBundlesForAndroid()
     {
-        BuildAllAssetBundles(BuildTarget.Android);
+        BuildAllAssetBundles(BuildTarget.Android,BuildAssetBundleOptions.None);
     }
-    [MenuItem("Assets/ExportBundlesForIOS")]
+    [MenuItem("Assets/ExportBundles/Android/Uncompressed")]
+    static void BuildBundlesForAndroid()
+    {
+        BuildAllAssetBundles(BuildTarget.Android, BuildAssetBundleOptions.UncompressedAssetBundle);
+    }
+    [MenuItem("Assets/ExportBundles/IOS/Default")]
     static void BuildAssetBundlesForIos()
     {
-        BuildAllAssetBundles(BuildTarget.iOS);
+        BuildAllAssetBundles(BuildTarget.iOS, BuildAssetBundleOptions.None);
     }
-    [MenuItem("Assets/ExportBundlesWebGL")]
-    static void BuildAssetBundlesForWebGL()
+    [MenuItem("Assets/ExportBundles/IOS/Uncompressed")]
+    static void BuildtBundlesForIos()
     {
-        BuildAllAssetBundles(BuildTarget.WebGL);
+        BuildAllAssetBundles(BuildTarget.iOS, BuildAssetBundleOptions.UncompressedAssetBundle);
     }
     static void BuildAllAssetBundlesFolder(BuildTarget target)
     {
@@ -79,13 +165,13 @@ public class AssetBundleCreate : Editor {
         }
         else Debug.Log("请选择 " + Application.dataPath + "里面的文件夹");
     }
-    static void BuildAllAssetBundles(BuildTarget target)
+    static void BuildAllAssetBundles(BuildTarget target, BuildAssetBundleOptions option)
     {
         string o_path = EditorUtility.SaveFilePanel("Save Resource", "Assets/StreamingAssets", "Assets", "unity3d");
-        char[] buff = o_path.ToCharArray();
-        int s = FallFindChar(buff, '/');
-        string o_folder = new string(CopyCharArry(buff, 0, s));
-        string o_file = new string(CopyCharArry(buff, s + 1, buff.Length - s - 1));
+        int index = o_path.LastIndexOf('/');
+        string o_folder = o_path.Substring(0,index);
+        index++;
+        string o_file = o_path.Substring(index, o_path.Length - index);
         if (o_path.Length != 0)
         {
             List<string> names = new List<string>();
@@ -101,7 +187,7 @@ public class AssetBundleCreate : Editor {
             AssetBundleBuild[] abb = new AssetBundleBuild[1];
             abb[0].assetBundleName = o_file;
             abb[0].assetNames = names.ToArray();
-            BuildPipeline.BuildAssetBundles(o_folder, abb, BuildAssetBundleOptions.UncompressedAssetBundle, target);
+            BuildPipeline.BuildAssetBundles(o_folder, abb, option, target);
             Debug.Log("打包完成");
         }
     }
@@ -125,7 +211,7 @@ public class AssetBundleCreate : Editor {
         }
         return temp;
     }
-    [MenuItem("Assets/CreateEmojiInfo")]
+    [MenuItem("Assets/CreateDataBuffer/EmojiInfo")]
     static void CreateEmojiInfo()
     {
         var o = Selection.activeObject;
@@ -282,7 +368,7 @@ public class AssetBundleCreate : Editor {
         Marshal.Copy(Marshal.UnsafeAddrOfPinnedArrayElement(array, 0), tmp, 0, len);
         stream.Write(tmp, 0, len);
     }
-    [MenuItem("Assets/CreateSpriteInfo")]
+    [MenuItem("Assets/CreateDataBuffer/SpriteInfo")]
     public static void GetAllSprite()
     {
         SpriteData data = new SpriteData();

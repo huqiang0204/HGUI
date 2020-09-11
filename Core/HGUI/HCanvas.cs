@@ -115,13 +115,13 @@ namespace huqiang.Core.HGUI
             if (Pause)
                 return;
             MainCanvas = this;
-            UserAction.Update();
-            Keyboard.InfoCollection();
-            DispatchUserAction();
             AnimationManage.Manage.Update();
             if (UIPage.CurrentPage != null)
                 UIPage.CurrentPage.Update(UserAction.TimeSlice);
             UINotify.UpdateAll(UserAction.TimeSlice);
+            UserAction.Update();
+            Keyboard.InfoCollection();
+            DispatchUserAction();
             CheckSize();
             ThreadMission.ExtcuteMain();
         }

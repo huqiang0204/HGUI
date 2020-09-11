@@ -10,5 +10,6 @@
     "email": "huqing1990@outlook.com",
     "url": "https://github.com/huqiang0204/HGUI"
   },
-  "category": "UI"
+  "category": "UI",
+  "publishConfig": {"registry": "https://npm.pkg.github.com/" }
 }

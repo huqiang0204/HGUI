@@ -3,11 +3,7 @@ using huqiang.Data;
 using huqiang.UIComposite;
 using System;
 
-#if Hot
-namespace huqiang.HotUIModel
-#else
 namespace huqiang.UIModel
-#endif
 {
     public class HotUILinker<T, U> where T : class, new() where U : class, new()
     {

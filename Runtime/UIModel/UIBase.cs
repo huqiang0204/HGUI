@@ -3,16 +3,13 @@ using huqiang.Data;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-#if Hot
-namespace huqiang.HotUIModel
-#else
+
 namespace huqiang.UIModel
-#endif
 {
     public class UIBase
     {
         internal static string LanName;
-        internal static INIReader Lan = new INIReader();
+        public static INIReader Lan = new INIReader();
         public static void SetLanguage(string name,byte[] iniData)
         {
             LanName = name;

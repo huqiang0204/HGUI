@@ -5,11 +5,7 @@ using huqiang.Core.HGUI;
 using huqiang.Data;
 using huqiang.UIComposite;
 
-#if Hot
-namespace huqiang.HotUIModel
-#else
 namespace huqiang.UIModel
-#endif
 {
     public class HotConstructor<T, U> where T : class, new()
     {

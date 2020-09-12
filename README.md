@@ -19,9 +19,11 @@ UDP，TCP，KCP，数据封包，线程池，等等
 
 #### 安装教程
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+1.  打开工程的下的文件Packages/manifest.json
+2.  添加对应的版本包，例如
+    "dependencies": {
+    "com.huqiang.hguiframework": "https://gitee.com/huqiang0204/HGUI.git#1.0.6"
+	}
 
 #### 使用说明
 

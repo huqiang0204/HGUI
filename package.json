@@ -3,13 +3,12 @@
   "displayName": "HGUIFramework",
   "version": "1.0.6",
   "unity": "2018.1",
-  "description": "https://github.com/huqiang0204/HGUI",
+  "description": "https://gitee.com/huqiang0204/HGUI",
   "keywords": ["UI"],
   "author": {
     "name": "huqiang",
     "email": "huqing1990@outlook.com",
-    "url": "https://github.com/huqiang0204/HGUI"
+    "url": "https://gitee.com/huqiang0204/HGUI"
   },
   "category": "UI",
-  "publishConfig": {"registry": "https://npm.pkg.github.com/" }
 }

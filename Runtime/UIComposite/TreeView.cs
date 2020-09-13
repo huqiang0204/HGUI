@@ -135,6 +135,25 @@ namespace huqiang.UIComposite
                 Invoke(obj as T, dat as U);
         }
     }
+    public class HotTVMiddleware : TVConstructor
+    {
+        public object Context;
+        public Func<TreeViewItem> creator;
+        public Action<TreeViewItem , TreeViewNode> caller;
+        public override TreeViewItem Create()
+        {
+            if (creator != null)
+                return creator();
+            return base.Create();
+        }
+        public override void Update(TreeViewItem obj, TreeViewNode dat)
+        {
+            if (caller != null)
+                caller(obj, dat);
+            else
+                base.Update(obj, dat);
+        }
+    }
     public class TreeView : Composite
     {
         public Vector2 Size;//scrollView的尺寸
@@ -419,6 +438,10 @@ namespace huqiang.UIComposite
         {
             var m = new TVMiddleware<T, U>();
             m.Invoke = action;
+            creator = m;
+        }
+        public void SetItemUpdate(HotTVMiddleware m)
+        {
             creator = m;
         }
         public void Clear()

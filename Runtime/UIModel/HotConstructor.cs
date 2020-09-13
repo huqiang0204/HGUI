@@ -49,4 +49,38 @@ namespace huqiang.UIModel
             }
         }
     }
+    public class HotTVConstructor<T, U> where T : TreeViewItem, new() where U : TreeViewNode, new()
+    {
+        public HotTVMiddleware middle;
+        public HotTVConstructor(Action<T, U> action)
+        {
+            middle = new HotTVMiddleware();
+            middle.Context = this;
+            middle.initializer = new UIInitializer(UIBase.ObjectFields(typeof(T)));
+            middle.creator = Create;
+            middle.caller = Call;
+            Invoke = action;
+        }
+        public Action<T, U> Invoke;
+        public TreeViewItem Create()
+        {
+            var t = new T();
+            middle.initializer.Reset(t);
+            return t;
+        }
+        public void Call(TreeViewItem obj, TreeViewNode dat)
+        {
+            if (Invoke != null)
+            {
+                try
+                {
+                    Invoke(obj as T, dat as U);
+                }
+                catch (Exception ex)
+                {
+                    UnityEngine.Debug.LogError(ex.StackTrace);
+                }
+            }
+        }
+    }
 }

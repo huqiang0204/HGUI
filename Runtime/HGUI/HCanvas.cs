@@ -10,25 +10,25 @@ namespace huqiang.Core.HGUI
 {
     public class HCanvas:UIElement
     {
-        class TempBuffer
-        {
-            public int Max;
-            public TempBuffer(int len=4096)
-            {
-                Max = len;
-                PipeLine = new HGUIElement[len];
-                scripts = new UIElement[len];
-            }
-            public HGUIElement[] PipeLine;
-            public UIElement[] scripts;
-            public List<Vector3> vertex = new List<Vector3>();
-            public List<Vector2> uv = new List<Vector2>();
-            public List<Vector2> uv1 = new List<Vector2>();
-            public List<Vector2> uv2 = new List<Vector2>();
-            public List<Vector2> uv3 = new List<Vector2>();
-            public List<Vector2> uv4 = new List<Vector2>();
-            public List<Color32> colors = new List<Color32>();
-        }
+        //class TempBuffer
+        //{
+        //    public int Max;
+        //    public TempBuffer(int len = 4096)
+        //    {
+        //        Max = len;
+        //        PipeLine = new HGUIElement[len];
+        //        scripts = new UIElement[len];
+        //    }
+        //    public HGUIElement[] PipeLine;
+        //    public UIElement[] scripts;
+        //    public List<Vector3> vertex = new List<Vector3>();
+        //    public List<Vector2> uv = new List<Vector2>();
+        //    public List<Vector2> uv1 = new List<Vector2>();
+        //    public List<Vector2> uv2 = new List<Vector2>();
+        //    public List<Vector2> uv3 = new List<Vector2>();
+        //    public List<Vector2> uv4 = new List<Vector2>();
+        //    public List<Color32> colors = new List<Color32>();
+        //}
         //protected static ThreadMission thread = new ThreadMission("UI");
         public Camera camera;
         public Vector2 DesignSize = new Vector2(1920, 1080);
@@ -43,7 +43,7 @@ namespace huqiang.Core.HGUI
         public static HCanvas MainCanvas;
         //public bool SubBatch;//是否开启子线程合批处理,开启后画面会延迟一帧
         //LoopBuffer<HGUIElement[]> loopBuffer = new LoopBuffer<HGUIElement[]>(3);
-        QueueBuffer<TempBuffer> Main,Sub;
+        //QueueBuffer<TempBuffer> Main,Sub;
         HGUIElement[] PipeLine = new HGUIElement[4096];
         UIElement[] scripts = new UIElement[4096];
         HText[] texts = new HText[2048];
@@ -57,8 +57,8 @@ namespace huqiang.Core.HGUI
         {
             MainCanvas = this;
             Font.textureRebuilt += FontTextureRebuilt;
-            Main = new QueueBuffer<TempBuffer>();
-            Sub = new QueueBuffer<TempBuffer>();
+            //Main = new QueueBuffer<TempBuffer>();
+            //Sub = new QueueBuffer<TempBuffer>();
         }
         bool ftr;
         void FontTextureRebuilt(Font font)
@@ -457,28 +457,40 @@ namespace huqiang.Core.HGUI
             ClearMesh();
             HBatch.Batch(this, PipeLine);
         }
-        void SubBatch(object obj)
-        {
-            var m = Sub.Dequeue();
-            if(m!=null)
-            {
-                PipeLine = m.PipeLine;
-                scripts = m.scripts;
-                vertex = m.vertex;
-                uv = m.uv;
-                uv1 = m.uv1;
-                uv2 = m.uv2;
-                uv3 = m.uv3;
-                colors = m.colors;
-                Batch();
-                Main.Enqueue(m);
-            }
-        }
+        //void SubBatch(object obj)
+        //{
+        //    var m = Sub.Dequeue();
+        //    if(m!=null)
+        //    {
+        //        PipeLine = m.PipeLine;
+        //        scripts = m.scripts;
+        //        vertex = m.vertex;
+        //        uv = m.uv;
+        //        uv1 = m.uv1;
+        //        uv2 = m.uv2;
+        //        uv3 = m.uv3;
+        //        colors = m.colors;
+        //        Batch();
+        //        Main.Enqueue(m);
+        //    }
+        //}
         internal List<Vector3> vertex = new List<Vector3>();
         internal List<Vector2> uv = new List<Vector2>();
+        /// <summary>
+        /// picture index
+        /// </summary>
         internal List<Vector2> uv1 = new List<Vector2>();
+        /// <summary>
+        /// cut rect
+        /// </summary>
         internal List<Vector2> uv2 = new List<Vector2>();
+        /// <summary>
+        /// uv tiling
+        /// </summary>
         internal List<Vector2> uv3 = new List<Vector2>();
+        /// <summary>
+        /// uv offset
+        /// </summary>
         internal List<Vector2> uv4 = new List<Vector2>();
         internal List<Color32> colors = new List<Color32>();
 

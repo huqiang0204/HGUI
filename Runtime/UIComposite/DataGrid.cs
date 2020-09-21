@@ -25,8 +25,8 @@ namespace huqiang.UIComposite
         public HText Text;
         public DataGridItemContext Context;
         public DataGridColumn GridColumn;
-        public int Row;
-        public int Column;
+        public int Row = -1;
+        public int Column = -1;
     }
     public class DataGridItemContext
     {
@@ -283,8 +283,6 @@ namespace huqiang.UIComposite
                 }
             }
             pos.y = -pos.y;
-            item.Row = row;
-            item.Column = col;
             item.GridColumn = colunn;
             float w = columns[col].width;
             var size = item.Item.SizeDelta;
@@ -295,8 +293,10 @@ namespace huqiang.UIComposite
                 UIElement.ResizeChild(item.Item);
             }
             item.target.transform.localPosition = pos;
-            if(item.Context!=data)
+            if (item.Row != row | item.Column != col)
             {
+                item.Row = row;
+                item.Column = col;
                 item.Context = data;
                 if (colunn.itemCreator != null)
                     colunn.itemCreator.Update(item, data);

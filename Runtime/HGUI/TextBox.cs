@@ -82,8 +82,10 @@ namespace huqiang.Core.HGUI
         public override void Populate()
         {
             GetGenerationSettings(ref m_sizeDelta, ref settings);
+            emojiString.FullString = m_text;
+            var str = emojiString.FilterString;
             var g = Generator;
-            g.Populate(m_text, settings);
+            g.Populate(str, settings);
             verts.Clear();
             lines.Clear();
             chars.Clear();
@@ -217,7 +219,10 @@ namespace huqiang.Core.HGUI
                     TextVertex* hv = TmpVerts.Addr;
                     c = e - s;
                     int l = StartLine;
-                    for (int i = 0; i < ShowRow; i++)
+                    int ol = ShowRow;
+                    if (ol > lines.Count)
+                        ol = lines.Count;
+                    for (int i = 0; i < ol; i++)
                     {
                         int os = lines[l].vertIndex * 4;
                         int oc = lines[l].visibleCount;
@@ -264,6 +269,10 @@ namespace huqiang.Core.HGUI
                     CreateOutLine(this);
                 m_vertexChange = false;
             }
+        }
+        public void GetShowContent()
+        {
+
         }
     }
 }

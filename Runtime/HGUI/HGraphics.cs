@@ -47,8 +47,11 @@ namespace huqiang.Core.HGUI
                 else MatID = value.GetInstanceID();
             } }
         internal int MatID;
+        [HideInInspector]
         public bool m_dirty = true;
+        [HideInInspector]
         public bool m_vertexChange = true;
+        [HideInInspector]
         public bool m_colorChanged = true;
         [HideInInspector]
         [SerializeField]

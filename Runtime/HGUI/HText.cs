@@ -12,6 +12,7 @@ namespace huqiang.Core.HGUI
         public Vector3 position;
         public Color32 color;
         public Vector2 uv;
+        public int Index;
     }
     public class HText:HGraphics
     {
@@ -83,20 +84,31 @@ namespace huqiang.Core.HGUI
                 int p = 0;
                 int si = 0;
                 int len = str.Length;
-                for (int i = 0; i < len; i++)
+                bool cull = true;
+                if (text.m_hof == HorizontalWrapMode.Wrap & text.m_vof == VerticalWrapMode.Truncate)
+                    cull =false;
+                for (int i = 0; i < e; i++)
                 {
+                    int index = 0;
                     bool yes = true;
-                    for(int j=0;j<key_noMesh.Length;j++)
+                    if (cull)
                     {
-                        if(key_noMesh[j]==str[i])
+                        unsafe
                         {
-                            yes = false;
-                            break;
+                            index = verts.Addr[i * 4].Index;
+                        }
+                        for (int j = 0; j < key_noMesh.Length; j++)
+                        {
+                            if (key_noMesh[j] == str[index])
+                            {
+                                yes = false;
+                                break;
+                            }
                         }
                     }
                     if (yes)
                     {
-                        if (i == info.pos)
+                        if (index == info.pos)
                         {
                             int o = p * 4;
                             unsafe
@@ -519,14 +531,24 @@ namespace huqiang.Core.HGUI
                 TmpVerts = PopulateBuffer.RegNew(c);
             }
 
+            var chs = g.characters;
+            int cc = c / 4;
+            int s = 0;
             unsafe
             {
+                int oc = 0;
                 TextVertex* hv = TmpVerts.Addr;
-                for (int i = 0; i < c; i++)
+                for (int i = 0; i < cc; i++)
                 {
-                    hv[i].position = v[i].position;
-                    hv[i].uv = v[i].uv0;
-                    hv[i].color = v[i].color;
+                    for (int j = 0; j < 4; j++)
+                    {
+                        hv[s].position = v[s].position;
+                        hv[s].uv = v[s].uv0;
+                        hv[s].color = v[s].color;
+                        hv[s].Index = oc;
+                        s++;
+                    }
+                    oc++;
                 }
             }
             TmpVerts.DataCount = c;

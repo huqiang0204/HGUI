@@ -12,6 +12,7 @@ namespace huqiang.Core.HGUI
         public Vector3 position;
         public Color32 color;
         public Vector2 uv;
+        public float charWidth;
         public int Index;
     }
     public class HText:HGraphics
@@ -685,7 +686,7 @@ namespace huqiang.Core.HGUI
             var g = Generator;
             g.Populate(str, settings);
             var v = g.verts;
-            int c = v.Count;
+            int c = g.characters.Count * 4;
             if (c == 0)
             {
                 TmpVerts.DataCount = 0;
@@ -705,19 +706,52 @@ namespace huqiang.Core.HGUI
             int s = 0;
             unsafe
             {
-                int oc = 0;
                 TextVertex* hv = TmpVerts.Addr;
-                for (int i = 0; i < cc; i++)
+                if (v.Count != c)
                 {
-                    for (int j = 0; j < 4; j++)
+                    for (int i = 0; i < chs.Count; i++)
                     {
-                        hv[s].position = v[s].position;
-                        hv[s].uv = v[s].uv0;
-                        hv[s].color = v[s].color;
-                        hv[s].Index = oc;
-                        s++;
+                        int o = i * 4;
+                        if (chs[i].charWidth > 0)
+                        {
+                            for (int j = 0; j < 4; j++)
+                            {
+                                hv[o].position = v[s].position;
+                                hv[o].uv = v[s].uv0;
+                                hv[o].color = v[s].color;
+                                hv[o].Index = i;
+                                hv[o].charWidth = chs[i].charWidth;
+                                s++;
+                                o++;
+                            }
+                        }
+                        else
+                        {
+                            for (int j = 0; j < 4; j++)
+                            {
+                                hv[o].position = Vector3.zero;
+                                hv[o].uv = Vector2.zero;
+                                hv[o].Index = i;
+                                hv[o].charWidth = 0;
+                                o++;
+                            }
+                        }
                     }
-                    oc++;
+                }
+                else
+                {
+                    for (int i = 0; i < chs.Count; i++)
+                    {
+                        for (int j = 0; j < 4; j++)
+                        {
+                            hv[s].position = v[s].position;
+                            hv[s].uv = v[s].uv0;
+                            hv[s].color = v[s].color;
+                            hv[s].Index = i;
+                            hv[s].charWidth = chs[i].charWidth;
+                            s++;
+                        }
+                    }
                 }
             }
             TmpVerts.DataCount = c;

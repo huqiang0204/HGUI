@@ -21,6 +21,8 @@ namespace huqiang.Core.HGUI
         public int endIdx;
         public float topY;
         public float endY;
+        public int vertIndex;
+        public int visibleCount;
     }
     public class TextOperation
     {

@@ -68,13 +68,14 @@ public class HTextEditor:UIElementEditor
             str = txt.Text;
             if(GUI.changed |changed)
             {
+                txt.m_dirty = true;
                 var can = FindHCanvas(txt.transform);
                 if (can != null)
                     can.Refresh();
             }
         }
     }
-    HCanvas FindHCanvas(Transform trans)
+    protected HCanvas FindHCanvas(Transform trans)
     {
         if (trans == null)
             return null;

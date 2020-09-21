@@ -33,7 +33,7 @@ namespace huqiang.Core.HGUI
                 else ht.m_dirty = true;
             }
         }
-        static void CreateEmojiMesh(HText text)
+        protected static void CreateEmojiMesh(HText text)
         {
             if (text.TmpVerts.DataCount == 0)
             {
@@ -221,7 +221,7 @@ namespace huqiang.Core.HGUI
             }
        
         }
-        static void CreateOutLine(HText text)
+        protected static void CreateOutLine(HText text)
         {
             int c = text.vertInfo.DataCount;
             if (c == 0)
@@ -471,7 +471,7 @@ namespace huqiang.Core.HGUI
         }
 
         internal BlockInfo<TextVertex> TmpVerts;
-        public void Populate()
+        public virtual void Populate()
         {
             if (!m_dirty)
                 return;

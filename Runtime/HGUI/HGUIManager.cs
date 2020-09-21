@@ -21,6 +21,7 @@ namespace huqiang.Core.HGUI
             GameBuffer = new GameobjectBuffer(buff);
             GameBuffer.RegComponent(new ComponentInfo<Transform>() { loader = new TransfromLoader() });
             GameBuffer.RegComponent(new ComponentInfo<HImage>() { loader = new HImageLoader() });
+            GameBuffer.RegComponent(new ComponentInfo<TextBox>() { loader = new HTextLoader() });
             GameBuffer.RegComponent(new ComponentInfo<HText>() { loader = new HTextLoader() });
             GameBuffer.RegComponent(new ComponentInfo<HLine>() { loader = new HGraphicsLoader() });
             GameBuffer.RegComponent(new ComponentInfo<UIElement>() { loader = new UIElementLoader() });

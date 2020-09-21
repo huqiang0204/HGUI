@@ -34,6 +34,175 @@ namespace huqiang.Core.HGUI
                 else ht.m_dirty = true;
             }
         }
+        unsafe static bool AddMesh(TextVertex* src, HVertex* tar, EmojiString emoji, EmojiInfo info)
+        {
+            tar->position = src->position;
+            tar->color = src->color;
+            tar->uv = src->uv;
+            tar->uv4.x = 1;
+            tar->uv4.y = 1;
+            tar->picture = 0;
+            if (src->Index == info.pos)
+            {
+                return true;
+            }
+            return false;
+        }
+        static void AddTris(List<int> tris, int s)
+        {
+            tris.Add(s);
+            tris.Add(s + 1);
+            tris.Add(s + 2);
+            tris.Add(s + 2);
+            tris.Add(s + 3);
+            tris.Add(s);
+        }
+        protected static void CreateEmojiMeshA(HText text)
+        {
+            if (text.TmpVerts.DataCount == 0)
+            {
+                text.vertInfo.DataCount = 0;
+                text.trisInfo.DataCount = 0;
+                text.trisInfo2.DataCount = 0;
+                return;
+            }
+            bufferA.Clear();
+            bufferB.Clear();
+            var emojis = text.emojiString.emojis;
+            var str = text.emojiString.FilterString;
+            var verts = text.TmpVerts;
+            int c = verts.DataCount;
+            text.tris = null;
+            if (text.vertInfo.Size == 0)
+            {
+                text.vertInfo = VertexBuffer.RegNew(c);
+            }
+            else
+            if (text.vertInfo.Size < c | text.vertInfo.Size > c + 32)
+            {
+                text.vertInfo.Release();
+                text.vertInfo = VertexBuffer.RegNew(c);
+            }
+            text.vertInfo.DataCount = c;
+            var emoji = text.emojiString;
+            EmojiInfo info = null;
+            if (emoji.emojis.Count > 0)
+                info = emoji.emojis[0];
+            int index = 0;
+            int e = c / 4;
+            Color32 col = Color.white;
+            unsafe
+            {
+                HVertex* hv = text.vertInfo.Addr;
+                TextVertex* src = verts.Addr;
+                for (int i = 0; i < e; i++)
+                {
+                    int s = i * 4;
+                    for (int j = 0; j < 4; j++)
+                    {
+                        hv[s].position = src[s].position;
+                        hv[s].color = src[s].color;
+                        hv[s].uv = src[s].uv;
+                        hv[s].uv4.x = 1;
+                        hv[s].uv4.y = 1;
+                        hv[s].picture = 0;
+                        s++;
+                    }
+                    s = i * 4;
+                    if(info!=null)
+                    {
+                        if (src[s].Index > info.pos)
+                        {
+                            info = null;
+                            for (int j = index; j < emoji.emojis.Count; j++)
+                            {
+                                if (emoji.emojis[j].pos >= src[s].Index)
+                                {
+                                    index = j;
+                                    info = emoji.emojis[j];
+                                    break;
+                                }
+                            }
+                        }
+                        if(info!=null)
+                        {
+                            if (src[s].Index == info.pos)
+                            {
+                                AddTris(bufferB, s);
+                                hv[s].uv = info.uv[0];
+                                hv[s].color = col;
+                                hv[s].picture = 1;
+                                s++;
+                                hv[s].uv = info.uv[1];
+                                hv[s].color = col;
+                                hv[s].picture = 1;
+                                s++;
+                                hv[s].uv = info.uv[2];
+                                hv[s].color = col;
+                                hv[s].picture = 1;
+                                s++;
+                                hv[s].uv = info.uv[3];
+                                hv[s].color = col;
+                                hv[s].picture = 1;
+                            }
+                            else
+                            {
+                                AddTris(bufferA, s);
+                            }
+                        }
+                        else
+                        {
+                            AddTris(bufferA, s);
+                        }
+                    }
+                    else
+                    {
+                        AddTris(bufferA, s);
+                    }
+                }
+            }
+            ApplyTris(text);
+        }
+        static void ApplyTris(HText text)
+        {
+            if (text.trisInfo.Size > 0)
+                text.trisInfo.Release();
+            int ic = bufferA.Count;
+            if (ic > 0)
+            {
+                text.trisInfo = trisBuffer.RegNew(ic);
+                text.trisInfo.DataCount = ic;
+                unsafe
+                {
+                    int* ip = text.trisInfo.Addr;
+                    for (int i = 0; i < ic; i++)
+                        ip[i] = bufferA[i];
+                }
+            }
+            else
+            {
+                text.trisInfo.DataCount = 0;
+            }
+
+            ic = bufferB.Count;
+            if (ic > 0)
+            {
+                if (text.trisInfo2.Size > 0)
+                    text.trisInfo2.Release();
+                text.trisInfo2 = trisBuffer.RegNew(ic);
+                text.trisInfo2.DataCount = ic;
+                unsafe
+                {
+                    int* ip = text.trisInfo2.Addr;
+                    for (int i = 0; i < ic; i++)
+                        ip[i] = bufferB[i];
+                }
+            }
+            else
+            {
+                text.trisInfo2.DataCount = 0;
+            }
+        }
         protected static void CreateEmojiMesh(HText text)
         {
             if (text.TmpVerts.DataCount == 0)
@@ -562,7 +731,7 @@ namespace huqiang.Core.HGUI
         {
             if (m_vertexChange)
             {
-                CreateEmojiMesh(this);
+                CreateEmojiMeshA(this);
                 if (OutLine > 0)
                     CreateOutLine(this);
                 m_vertexChange = false;

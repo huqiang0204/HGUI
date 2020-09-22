@@ -12,7 +12,6 @@ namespace huqiang.Core.HGUI
         public Vector3 position;
         public Color32 color;
         public Vector2 uv;
-        public float charWidth;
         public int Index;
     }
     public class HText:HGraphics
@@ -21,7 +20,7 @@ namespace huqiang.Core.HGUI
         public static BlockBuffer<HVertex> VertexBuffer = new BlockBuffer<HVertex>(32, 1024);
         public static BlockBuffer<TextVertex> PopulateBuffer = new BlockBuffer<TextVertex>(32, 1024);
         static Font defFont;
-        static char[] key_noMesh = new char[] { ' ' ,'\n', '\r' };
+        protected static char[] key_noMesh = new char[] { ' ' ,'\n', '\r' };
         static List<int> bufferA = new List<int>();
         static List<int> bufferB = new List<int>();
         public static void DirtyAll()
@@ -85,62 +84,55 @@ namespace huqiang.Core.HGUI
                 for (int i = 0; i < e; i++)
                 {
                     int s = i * 4;
-                    if(src[s].charWidth>0)
+                    int ss = ac;
+                    int ti = src[s].Index;
+                    for (int j = 0; j < 4; j++)
                     {
-                        int ss = ac;
-                        int ti = src[s].Index;
-                        for (int j = 0; j < 4; j++)
+                        hv[ss].position = src[s].position;
+                        hv[ss].color = src[s].color;
+                        hv[ss].uv = src[s].uv;
+                        hv[ss].uv4.x = 1;
+                        hv[ss].uv4.y = 1;
+                        hv[ss].picture = 0;
+                        s++;
+                        ss++;
+                    }
+                    if (info != null)
+                    {
+                        if (ti > info.pos)
                         {
-                            hv[ss].position = src[s].position;
-                            hv[ss].color = src[s].color;
-                            hv[ss].uv = src[s].uv;
-                            hv[ss].uv4.x = 1;
-                            hv[ss].uv4.y = 1;
-                            hv[ss].picture = 0;
-                            s++;
-                            ss++;
-                        }
-                        if (info != null)
-                        {
-                            if (ti > info.pos)
+                            info = null;
+                            for (int j = index; j < emoji.emojis.Count; j++)
                             {
-                                info = null;
-                                for (int j = index; j < emoji.emojis.Count; j++)
+                                if (emoji.emojis[j].pos >= ti)
                                 {
-                                    if (emoji.emojis[j].pos >= ti)
-                                    {
-                                        index = j;
-                                        info = emoji.emojis[j];
-                                        break;
-                                    }
+                                    index = j;
+                                    info = emoji.emojis[j];
+                                    break;
                                 }
                             }
-                            ss = ac;
-                            if (info != null)
+                        }
+                        ss = ac;
+                        if (info != null)
+                        {
+                            if (ti == info.pos)
                             {
-                                if (ti == info.pos)
-                                {
-                                    AddTris(bufferB, ac);
-                                    hv[ss].uv = info.uv[0];
-                                    hv[ss].color = col;
-                                    hv[ss].picture = 1;
-                                    ss++;
-                                    hv[ss].uv = info.uv[1];
-                                    hv[ss].color = col;
-                                    hv[ss].picture = 1;
-                                    ss++;
-                                    hv[ss].uv = info.uv[2];
-                                    hv[ss].color = col;
-                                    hv[ss].picture = 1;
-                                    ss++;
-                                    hv[ss].uv = info.uv[3];
-                                    hv[ss].color = col;
-                                    hv[ss].picture = 1;
-                                }
-                                else
-                                {
-                                    AddTris(bufferA, ac);
-                                }
+                                AddTris(bufferB, ac);
+                                hv[ss].uv = info.uv[0];
+                                hv[ss].color = col;
+                                hv[ss].picture = 1;
+                                ss++;
+                                hv[ss].uv = info.uv[1];
+                                hv[ss].color = col;
+                                hv[ss].picture = 1;
+                                ss++;
+                                hv[ss].uv = info.uv[2];
+                                hv[ss].color = col;
+                                hv[ss].picture = 1;
+                                ss++;
+                                hv[ss].uv = info.uv[3];
+                                hv[ss].color = col;
+                                hv[ss].picture = 1;
                             }
                             else
                             {
@@ -151,8 +143,12 @@ namespace huqiang.Core.HGUI
                         {
                             AddTris(bufferA, ac);
                         }
-                        ac += 4;
                     }
+                    else
+                    {
+                        AddTris(bufferA, ac);
+                    }
+                    ac += 4;
                 }
             }
             text.vertInfo.DataCount = ac;
@@ -478,6 +474,41 @@ namespace huqiang.Core.HGUI
         }
 
         internal BlockInfo<TextVertex> TmpVerts;
+        protected void GetTempVertex(IList<UIVertex> v, ref BlockInfo<TextVertex> vert, string filterStr)
+        {
+            int o = 0;
+            unsafe
+            {
+                TextVertex* hv = vert.Addr;
+                for (int i = 0; i < filterStr.Length; i++)
+                {
+                    var ch = filterStr[i];
+                    bool mesh = true;
+                    for (int j = 0; j < key_noMesh.Length; j++)
+                    {
+                        if (key_noMesh[j] == ch)
+                        {
+                            mesh = false;
+                            break;
+                        }
+                    }
+                    if (mesh)
+                    {
+                        for (int j = 0; j < 4; j++)
+                        {
+                            hv[o].position = v[o].position;
+                            hv[o].uv = v[o].uv0;
+                            hv[o].color = v[o].color;
+                            hv[o].Index = i;
+                            o++;
+                        }
+                        if (o >= v.Count)
+                            break;
+                    }
+                }
+            }
+            vert.DataCount = o;
+        }
         public virtual void Populate()
         {
             if (!m_dirty)
@@ -511,7 +542,7 @@ namespace huqiang.Core.HGUI
             var g = Generator;
             g.Populate(str, settings);
             var v = g.verts;
-            int c = g.characters.Count * 4;
+            int c = g.characterCountVisible * 4;
             if (c == 0)
             {
                 TmpVerts.DataCount = 0;
@@ -525,61 +556,7 @@ namespace huqiang.Core.HGUI
                 TmpVerts.Release();
                 TmpVerts = PopulateBuffer.RegNew(c);
             }
-
-            var chs = g.characters;
-            int cc = c / 4;
-            int s = 0;
-            unsafe
-            {
-                TextVertex* hv = TmpVerts.Addr;
-                if (v.Count != c)
-                {
-                    for (int i = 0; i < chs.Count; i++)
-                    {
-                        int o = i * 4;
-                        if (chs[i].charWidth > 0)
-                        {
-                            for (int j = 0; j < 4; j++)
-                            {
-                                hv[o].position = v[s].position;
-                                hv[o].uv = v[s].uv0;
-                                hv[o].color = v[s].color;
-                                hv[o].Index = i;
-                                hv[o].charWidth = chs[i].charWidth;
-                                s++;
-                                o++;
-                            }
-                        }
-                        else
-                        {
-                            for (int j = 0; j < 4; j++)
-                            {
-                                hv[o].position = Vector3.zero;
-                                hv[o].uv = Vector2.zero;
-                                hv[o].Index = i;
-                                hv[o].charWidth = 0;
-                                o++;
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    for (int i = 0; i < chs.Count; i++)
-                    {
-                        for (int j = 0; j < 4; j++)
-                        {
-                            hv[s].position = v[s].position;
-                            hv[s].uv = v[s].uv0;
-                            hv[s].color = v[s].color;
-                            hv[s].Index = i;
-                            hv[s].charWidth = chs[i].charWidth;
-                            s++;
-                        }
-                    }
-                }
-            }
-            TmpVerts.DataCount = c;
+            GetTempVertex(v, ref TmpVerts, str);
             m_dirty = false;
             m_vertexChange = true;
             fillColors[0] = true;

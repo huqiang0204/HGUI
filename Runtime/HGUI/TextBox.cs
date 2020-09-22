@@ -8,7 +8,7 @@ namespace huqiang.Core.HGUI
 {
     public class TextBox:HText
     {
-        List<UIVertex> verts = new List<UIVertex>();
+        List<TextVertex> verts = new List<TextVertex>();
         List<LineInfo> lines = new List<LineInfo>();
         List<UICharInfo> chars = new List<UICharInfo>();
         int startLine;
@@ -94,19 +94,51 @@ namespace huqiang.Core.HGUI
                 g.Populate(m_text, settings);
             }
         }
+        string filterString;
+        protected void GetTempVertex(IList<UIVertex> v, List<TextVertex> vert, string filterStr)
+        {
+            TextVertex tv = new TextVertex();
+            int o = 0;
+            for (int i = 0; i < filterStr.Length; i++)
+            {
+                var ch = filterStr[i];
+                bool mesh = true;
+                for (int j = 0; j < key_noMesh.Length; j++)
+                {
+                    if (key_noMesh[j] == ch)
+                    {
+                        mesh = false;
+                        break;
+                    }
+                }
+                if (mesh)
+                {
+                    for (int j = 0; j < 4; j++)
+                    {
+                        tv.position = v[o].position;
+                        tv.uv = v[o].uv0;
+                        tv.color = v[o].color;
+                        tv.Index = i;
+                        vert.Add(tv);
+                        o++;
+                    }
+                    if (o >= v.Count)
+                        break;
+                }
+            }
+        }
         public override void Populate()
         {
             GetGenerationSettings(ref m_sizeDelta, ref settings);
             settings.horizontalOverflow = HorizontalWrapMode.Overflow;
             settings.verticalOverflow = VerticalWrapMode.Overflow;
             emojiString.FullString = m_text;
-            var str = emojiString.FilterString;
+            filterString = emojiString.FilterString;
             var g = Generator;
-            g.Populate(str, settings);
+            g.Populate(filterString, settings);
             verts.Clear();
             lines.Clear();
             chars.Clear();
-            verts.AddRange(g.verts);
             chars.AddRange(g.characters);
             LineInfo line = new LineInfo();
             int c = g.lineCount;
@@ -116,6 +148,7 @@ namespace huqiang.Core.HGUI
             StartX = -EndX;
             if (g.characterCountVisible > 0)
             {
+                GetTempVertex(g.verts,verts,filterString);
                 int s = c - 1;
                 StartY = g.lines[0].topY;
                 EndY = g.lines[s].topY - g.lines[s].height - g.lines[s].leading;
@@ -123,19 +156,11 @@ namespace huqiang.Core.HGUI
                 float per = ch / g.lines.Count;
                 ShowRow = (int)(m_sizeDelta.y / per);
                 var l = g.lines[0];
-                int vc = 0;
                 for (int i = 1; i < c ; i++)
                 {
                     var n = g.lines[i];
                     line.startCharIdx = l.startCharIdx;
-                    line.vertIndex = vc;
                     line.endIdx = n.startCharIdx - 1;
-                    int tc = 0;
-                    for (int j = line.startCharIdx; j < n.startCharIdx; j++)
-                        if (chars[j].charWidth > 0)
-                            tc++;
-                    line.visibleCount = tc;
-                    vc += tc;
                     line.topY = l.topY;
                     line.endY = n.topY;
                     l = n;
@@ -153,12 +178,6 @@ namespace huqiang.Core.HGUI
                 l = g.lines[s];
                 line.startCharIdx = l.startCharIdx;
                 line.endIdx = g.characterCountVisible - 1;
-                int otc = 0;
-                for (int j = line.startCharIdx; j < g.characterCountVisible; j++)
-                    if (chars[j].charWidth > 0)
-                        otc++;
-                line.vertIndex = vc;
-                line.visibleCount = otc;
                 line.topY = l.topY;
                 line.endY = EndY;
                 lines.Add(line);
@@ -174,6 +193,9 @@ namespace huqiang.Core.HGUI
             }
             else
             {
+                TmpVerts.DataCount = 0;
+                trisInfo.DataCount = 0;
+                trisInfo2.DataCount = 0;
                 ShowRow = (int)m_sizeDelta.y / FontSize;
                 ch = 0;
                 StartY = 0;
@@ -245,19 +267,29 @@ namespace huqiang.Core.HGUI
                     int ol = ShowRow;
                     if (ol > lines.Count)
                         ol = lines.Count;
+                    int next = 0;
                     for (int i = 0; i < ol; i++)
                     {
-                        int os = lines[l].vertIndex * 4;
                         int start = lines[l].startCharIdx;
                         int oc = lines[l].endIdx - start + 1;
+                        for(int k=0;k<verts.Count;k+=4)
+                        {
+                            if(verts[k].Index>=start)
+                            {
+                                next = k;
+                                break;
+                            }
+                        }
                         for (int k = 0; k < oc; k++)
                         {
-                            var ax = verts[os].position.x;
-                            var bx = verts[os + 1].position.x;
+                            if (next >= verts.Count)
+                                break;
+                            var ax = verts[next].position.x;
+                            var bx = verts[next + 1].position.x;
                             float cx = (bx - ax) * 0.5f + ax - ox;
                             if (cx < lx)
                             {
-                                os += 4;
+                                next += 4;
                             }
                             else if (cx > rx)
                             {
@@ -267,15 +299,11 @@ namespace huqiang.Core.HGUI
                             {
                                 for (int j = 0; j < 4; j++)
                                 {
-                                    hv[ac].position = verts[os].position;
+                                    hv[ac] = verts[next];
                                     hv[ac].position.y -= oy;
                                     hv[ac].position.x -= ox;
-                                    hv[ac].uv = verts[os].uv0;
-                                    hv[ac].color = verts[os].color;
-                                    hv[ac].charWidth = chs[start].charWidth;
-                                    hv[ac].Index = start;
                                     ac++;
-                                    os++;
+                                    next++;
                                 }
                             }
                             start++;

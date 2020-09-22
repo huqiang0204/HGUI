@@ -35,20 +35,6 @@ namespace huqiang.Core.HGUI
                 else ht.m_dirty = true;
             }
         }
-        unsafe static bool AddMesh(TextVertex* src, HVertex* tar, EmojiString emoji, EmojiInfo info)
-        {
-            tar->position = src->position;
-            tar->color = src->color;
-            tar->uv = src->uv;
-            tar->uv4.x = 1;
-            tar->uv4.y = 1;
-            tar->picture = 0;
-            if (src->Index == info.pos)
-            {
-                return true;
-            }
-            return false;
-        }
         static void AddTris(List<int> tris, int s)
         {
             tris.Add(s);
@@ -58,7 +44,7 @@ namespace huqiang.Core.HGUI
             tris.Add(s + 3);
             tris.Add(s);
         }
-        protected static void CreateEmojiMeshA(HText text)
+        protected static void CreateEmojiMesh(HText text)
         {
             if (text.TmpVerts.DataCount == 0)
             {
@@ -84,13 +70,13 @@ namespace huqiang.Core.HGUI
                 text.vertInfo.Release();
                 text.vertInfo = VertexBuffer.RegNew(c);
             }
-            text.vertInfo.DataCount = c;
             var emoji = text.emojiString;
             EmojiInfo info = null;
             if (emoji.emojis.Count > 0)
                 info = emoji.emojis[0];
             int index = 0;
             int e = c / 4;
+            int ac = 0;
             Color32 col = Color.white;
             unsafe
             {
@@ -99,69 +85,77 @@ namespace huqiang.Core.HGUI
                 for (int i = 0; i < e; i++)
                 {
                     int s = i * 4;
-                    for (int j = 0; j < 4; j++)
+                    if(src[s].charWidth>0)
                     {
-                        hv[s].position = src[s].position;
-                        hv[s].color = src[s].color;
-                        hv[s].uv = src[s].uv;
-                        hv[s].uv4.x = 1;
-                        hv[s].uv4.y = 1;
-                        hv[s].picture = 0;
-                        s++;
-                    }
-                    s = i * 4;
-                    if(info!=null)
-                    {
-                        if (src[s].Index > info.pos)
+                        int ss = ac;
+                        int ti = src[s].Index;
+                        for (int j = 0; j < 4; j++)
                         {
-                            info = null;
-                            for (int j = index; j < emoji.emojis.Count; j++)
+                            hv[ss].position = src[s].position;
+                            hv[ss].color = src[s].color;
+                            hv[ss].uv = src[s].uv;
+                            hv[ss].uv4.x = 1;
+                            hv[ss].uv4.y = 1;
+                            hv[ss].picture = 0;
+                            s++;
+                            ss++;
+                        }
+                        if (info != null)
+                        {
+                            if (ti > info.pos)
                             {
-                                if (emoji.emojis[j].pos >= src[s].Index)
+                                info = null;
+                                for (int j = index; j < emoji.emojis.Count; j++)
                                 {
-                                    index = j;
-                                    info = emoji.emojis[j];
-                                    break;
+                                    if (emoji.emojis[j].pos >= ti)
+                                    {
+                                        index = j;
+                                        info = emoji.emojis[j];
+                                        break;
+                                    }
                                 }
                             }
-                        }
-                        if(info!=null)
-                        {
-                            if (src[s].Index == info.pos)
+                            ss = ac;
+                            if (info != null)
                             {
-                                AddTris(bufferB, s);
-                                hv[s].uv = info.uv[0];
-                                hv[s].color = col;
-                                hv[s].picture = 1;
-                                s++;
-                                hv[s].uv = info.uv[1];
-                                hv[s].color = col;
-                                hv[s].picture = 1;
-                                s++;
-                                hv[s].uv = info.uv[2];
-                                hv[s].color = col;
-                                hv[s].picture = 1;
-                                s++;
-                                hv[s].uv = info.uv[3];
-                                hv[s].color = col;
-                                hv[s].picture = 1;
+                                if (ti == info.pos)
+                                {
+                                    AddTris(bufferB, ac);
+                                    hv[ss].uv = info.uv[0];
+                                    hv[ss].color = col;
+                                    hv[ss].picture = 1;
+                                    ss++;
+                                    hv[ss].uv = info.uv[1];
+                                    hv[ss].color = col;
+                                    hv[ss].picture = 1;
+                                    ss++;
+                                    hv[ss].uv = info.uv[2];
+                                    hv[ss].color = col;
+                                    hv[ss].picture = 1;
+                                    ss++;
+                                    hv[ss].uv = info.uv[3];
+                                    hv[ss].color = col;
+                                    hv[ss].picture = 1;
+                                }
+                                else
+                                {
+                                    AddTris(bufferA, ac);
+                                }
                             }
                             else
                             {
-                                AddTris(bufferA, s);
+                                AddTris(bufferA, ac);
                             }
                         }
                         else
                         {
-                            AddTris(bufferA, s);
+                            AddTris(bufferA, ac);
                         }
-                    }
-                    else
-                    {
-                        AddTris(bufferA, s);
+                        ac += 4;
                     }
                 }
             }
+            text.vertInfo.DataCount = ac;
             ApplyTris(text);
         }
         static void ApplyTris(HText text)
@@ -201,173 +195,6 @@ namespace huqiang.Core.HGUI
             }
             else
             {
-                text.trisInfo2.DataCount = 0;
-            }
-        }
-        protected static void CreateEmojiMesh(HText text)
-        {
-            if (text.TmpVerts.DataCount == 0)
-            {
-                text.vertInfo.DataCount = 0;
-                text.trisInfo.DataCount = 0;
-                text.trisInfo2.DataCount = 0;
-                return; 
-            }
-            bufferA.Clear();
-            bufferB.Clear();
-            var emojis = text.emojiString.emojis;
-            var str = text.emojiString.FilterString;
-            var verts = text.TmpVerts;
-            int c = verts.DataCount;
-            text.tris = null;
-            if(text.vertInfo.Size==0)
-            {
-                text.vertInfo = VertexBuffer.RegNew(c);
-            }
-            else
-            if (text.vertInfo.Size < c| text.vertInfo.Size> c+32)
-            {
-                text.vertInfo.Release();
-                text.vertInfo = VertexBuffer.RegNew(c);
-            }
-            text.vertInfo.DataCount = c;
-            int e = c / 4;
-            unsafe
-            {
-                HVertex* hv= text.vertInfo.Addr;
-                TextVertex* v = verts.Addr;
-                for (int i = 0; i < c; i++)
-                {
-                    hv[i].position = v[i].position;
-                    hv[i].color = v[i].color;
-                    hv[i].uv = v[i].uv;
-                    hv[i].uv4.x = 1;
-                    hv[i].uv4.y = 1;
-                    hv[i].picture = 0;
-                }
-            }
-  
-            if(emojis.Count>0)
-            {
-                var info = emojis[0];
-                Color col = Color.white;
-                int p = 0;
-                int si = 0;
-                int len = str.Length;
-                bool cull = true;
-                if (text.m_hof == HorizontalWrapMode.Wrap & text.m_vof == VerticalWrapMode.Truncate)
-                    cull =false;
-                for (int i = 0; i < e; i++)
-                {
-                    int index = 0;
-                    bool yes = true;
-                    if (cull)
-                    {
-                        unsafe
-                        {
-                            index = verts.Addr[i * 4].Index;
-                        }
-                        for (int j = 0; j < key_noMesh.Length; j++)
-                        {
-                            if (key_noMesh[j] == str[index])
-                            {
-                                yes = false;
-                                break;
-                            }
-                        }
-                    }
-                    if (yes)
-                    {
-                        if (index == info.pos)
-                        {
-                            int o = p * 4;
-                            unsafe
-                            {
-                                HVertex* hv = text.vertInfo.Addr;
-                                hv[o].uv = info.uv[0];
-                                hv[o].color = col;
-                                hv[o].picture = 1;
-                                o++;
-                                hv[o].uv = info.uv[1];
-                                hv[o].color = col;
-                                hv[o].picture = 1;
-                                o++;
-                                hv[o].uv = info.uv[2];
-                                hv[o].color = col;
-                                hv[o].picture = 1;
-                                o++;
-                                hv[o].uv = info.uv[3];
-                                hv[o].color = col;
-                                hv[o].picture = 1;
-                            }
-                         
-                            si++;
-                            if (si < emojis.Count)
-                                info = emojis[si];
-                            int s = p * 4;
-                            bufferB.Add(s);
-                            bufferB.Add(s + 1);
-                            bufferB.Add(s + 2);
-                            bufferB.Add(s + 2);
-                            bufferB.Add(s + 3);
-                            bufferB.Add(s);
-                        }
-                        else
-                        {
-                            int s = p * 4;
-                            bufferA.Add(s);
-                            bufferA.Add(s + 1);
-                            bufferA.Add(s + 2);
-                            bufferA.Add(s + 2);
-                            bufferA.Add(s + 3);
-                            bufferA.Add(s);
-                        }
-                        p++;
-                        if (p >= e)
-                            break;
-                    }
-                }
-                if (text.trisInfo.Size > 0)
-                    text.trisInfo.Release();
-                int ic = bufferA.Count;
-                if(ic>0)
-                {
-                    text.trisInfo = trisBuffer.RegNew(ic);
-                    text.trisInfo.DataCount = ic;
-                    unsafe
-                    {
-                        int* ip = text.trisInfo.Addr;
-                        for (int i = 0; i < ic; i++)
-                            ip[i] = bufferA[i];
-                    }
-                }
-                else
-                {
-                    text.trisInfo.DataCount = 0;
-                }
-
-                ic = bufferB.Count;
-                if (ic > 0)
-                {
-                    if (text.trisInfo2.Size > 0)
-                        text.trisInfo2.Release();
-                    text.trisInfo2 = trisBuffer.RegNew(ic);
-                    text.trisInfo2.DataCount = ic;
-                    unsafe
-                    {
-                        int* ip = text.trisInfo2.Addr;
-                        for (int i = 0; i < ic; i++)
-                            ip[i] = bufferB[i];
-                    }
-                }
-                else
-                { 
-                    text.trisInfo2.DataCount = 0; 
-                }
-            }
-            else
-            {
-                CreateTri(c,ref text.trisInfo);
                 text.trisInfo2.DataCount = 0;
             }
         }
@@ -527,8 +354,6 @@ namespace huqiang.Core.HGUI
                 m_dirty = true;
             } }
         internal EmojiString emojiString = new EmojiString();
-        [NonSerialized]
-        public string FullString;
         
         [SerializeField]
         internal Font _font;
@@ -765,7 +590,7 @@ namespace huqiang.Core.HGUI
         {
             if (m_vertexChange)
             {
-                CreateEmojiMeshA(this);
+                CreateEmojiMesh(this);
                 if (OutLine > 0)
                     CreateOutLine(this);
                 m_vertexChange = false;

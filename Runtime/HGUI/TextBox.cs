@@ -68,6 +68,8 @@ namespace huqiang.Core.HGUI
         float StartX;
         float EndX;
         float offsetX;
+        float StartY;
+        float EndY;
         float ContentWidth;
         float ContentHeight;
         public void Apply()
@@ -82,6 +84,8 @@ namespace huqiang.Core.HGUI
         public override void Populate()
         {
             GetGenerationSettings(ref m_sizeDelta, ref settings);
+            settings.horizontalOverflow = HorizontalWrapMode.Overflow;
+            settings.verticalOverflow = VerticalWrapMode.Overflow;
             emojiString.FullString = m_text;
             var str = emojiString.FilterString;
             var g = Generator;
@@ -97,11 +101,12 @@ namespace huqiang.Core.HGUI
             ContentWidth = m_sizeDelta.x;
             EndX = m_sizeDelta.x * 0.5f;
             StartX = -EndX;
-            if (c > 0)
+            if (g.characterCountVisible > 0)
             {
                 int s = c - 1;
-                ContentHeight = g.lines[0].topY - g.lines[s].topY + g.lines[s].height + g.lines[s].leading;
-                int t = c - 1;
+                StartY = g.lines[0].topY;
+                EndY = g.lines[s].topY - g.lines[s].height - g.lines[s].leading;
+                ContentHeight = StartY- EndY;
                 float per = ContentHeight / g.lines.Count;
                 ShowRow = (int)(m_sizeDelta.y / per);
                 var l = g.lines[0];
@@ -132,7 +137,7 @@ namespace huqiang.Core.HGUI
                         EndX = lx + w;
                     }
                 }
-                l = g.lines[t];
+                l = g.lines[s];
                 line.startCharIdx = l.startCharIdx;
                 line.endIdx = g.characterCountVisible - 1;
                 int otc = 0;
@@ -142,7 +147,7 @@ namespace huqiang.Core.HGUI
                 line.vertIndex = vc;
                 line.visibleCount = otc;
                 line.topY = l.topY;
-                line.endY = g.lines[0].topY - ContentHeight - g.lines[g.lines.Count - 1].leading;
+                line.endY = EndY;
                 lines.Add(line);
                 float olx = chars[line.startCharIdx].cursorPos.x;
                 float orx = chars[line.endIdx].cursorPos.x;
@@ -158,6 +163,8 @@ namespace huqiang.Core.HGUI
             {
                 ShowRow = (int)m_sizeDelta.y / FontSize;
                 ContentHeight = 0;
+                StartY = 0;
+                EndY = 0;
             }
             if (StartLine + ShowRow >= AllLine)
             {
@@ -209,11 +216,14 @@ namespace huqiang.Core.HGUI
                     ox = offsetX + StartX + m_sizeDelta.x * 0.5f;
                 }
                 if (ContentHeight > m_sizeDelta.y)
-                    oy = lines[0].topY - lines[StartLine].topY;
-                float rx = m_sizeDelta.x * 0.5f+m_fontSize;
+                {
+                    oy = lines[StartLine].topY - StartY+ StartY - m_sizeDelta.y * 0.5f ;
+                }
+                float rx = m_sizeDelta.x * 0.5f + m_fontSize;
                 float lx = -rx;
                 int ac = 0;
                 int max = verts.Count;
+                var chs = chars;
                 unsafe
                 {
                     TextVertex* hv = TmpVerts.Addr;
@@ -225,7 +235,8 @@ namespace huqiang.Core.HGUI
                     for (int i = 0; i < ol; i++)
                     {
                         int os = lines[l].vertIndex * 4;
-                        int oc = lines[l].visibleCount;
+                        int start = lines[l].startCharIdx;
+                        int oc = lines[l].endIdx - start + 1;
                         for (int k = 0; k < oc; k++)
                         {
                             var ax = verts[os].position.x;
@@ -244,14 +255,17 @@ namespace huqiang.Core.HGUI
                                 for (int j = 0; j < 4; j++)
                                 {
                                     hv[ac].position = verts[os].position;
-                                    hv[ac].position.y += oy;
+                                    hv[ac].position.y -= oy;
                                     hv[ac].position.x -= ox;
                                     hv[ac].uv = verts[os].uv0;
                                     hv[ac].color = verts[os].color;
+                                    hv[ac].charWidth = chs[start].charWidth;
+                                    hv[ac].Index = start;
                                     ac++;
                                     os++;
                                 }
                             }
+                            start++;
                         }
                         l++;
                     }

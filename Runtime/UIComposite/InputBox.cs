@@ -206,11 +206,10 @@ namespace huqiang.UIComposite
         public void OnLostFocus(UserAction action)
         {
             Editing = false;
-            TextCom.FullString = FullString.FullString;
+            TextCom.Text = FullString.FullString;
             if (ReplaceTarget != null)
             {
-                ReplaceTarget.Text = ShowString;
-                ReplaceTarget.FullString = FullString.FullString;
+                ReplaceTarget.Text = FullString.FullString;
                 Enity.gameObject.SetActive(false);
             }
             else SetShowText();
@@ -642,9 +641,7 @@ namespace huqiang.UIComposite
             Enity.margin.down = 0;
             UIElement.Resize(Enity);
             HTextLoader.CopyTo(text,TextCom);
-            if (text.FullString == null)
-                FullString.FullString = text.Text;
-            else FullString.FullString = text.FullString;
+            FullString.FullString = text.Text;
             TextOperation.ChangeText(TextCom,FullString);
             action.AddFocus(InputEvent);
             Enity.gameObject.SetActive(true);

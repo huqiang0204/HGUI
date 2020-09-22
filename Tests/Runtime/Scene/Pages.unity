@@ -8114,9 +8114,9 @@ MonoBehaviour:
   selectColor: {r: 0.65882, g: 0.8078, b: 1, a: 0.2}
   InputString: 
   TipString: "\u8BF7\u8F93\u5165..."
-  CharacterLimit: 11
+  CharacterLimit: 0
   ReadyOnly: 0
-  contentType: 8
+  contentType: 10
   lineType: 2
 --- !u!114 &839744659
 MonoBehaviour:

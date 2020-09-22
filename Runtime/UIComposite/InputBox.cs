@@ -182,6 +182,7 @@ namespace huqiang.UIComposite
         }
         public void OnMouseDown(UserAction action, ref PressInfo press)
         {
+            TextOperation.contentType = m_ctpye;
             TextOperation.ChangeText(TextCom, FullString);
             SetShowText();
             TextOperation.SetPress(ref press);
@@ -195,6 +196,7 @@ namespace huqiang.UIComposite
             if (!ReadOnly)
             {
                 Editing = true;
+                TextOperation.contentType = m_ctpye;
                 if (!Keyboard.active)
                 {
                     bool pass = contentType == ContentType.Password ? true : false;
@@ -236,7 +238,7 @@ namespace huqiang.UIComposite
                     int len = CharacterLimit - str.Length;
                     if (len <= 0)
                         return "";
-                    es.Remove(fs.Length - len, len);
+                    es.Remove(len,fs.Length - len);
                 }
             }
             str = es.FullString;
@@ -247,7 +249,7 @@ namespace huqiang.UIComposite
                 if (ValidateChar(this, s, str[0]) == 0)
                     return "";
             InsertString(str);
-            return input;
+            return str;
         }
         void TouchInputChanged(string input)
         {
@@ -283,8 +285,8 @@ namespace huqiang.UIComposite
                 str = TextOperation.GetShowContent();//GetShowString();
                 TextCom.MainColor = textColor;
                 if (contentType == ContentType.Password)
-                    TextCom.Text = new string('*', str.Length);
-                else TextCom.Text = str;
+                    str = new string('●', str.Length);
+                TextCom.Text = str;
                 InputEvent.ChangeText(str);
                 ShowString = str;
             }
@@ -294,8 +296,8 @@ namespace huqiang.UIComposite
                     return;
                 TextCom.MainColor = textColor;
                 if (contentType == ContentType.Password)
-                    TextCom.Text = new string('*', str.Length);
-                else TextCom.Text = str;
+                    str = new string('●', str.Length);
+                TextCom.Text = str;
                 ShowString = str;
             }
             else
@@ -337,7 +339,6 @@ namespace huqiang.UIComposite
             var es = new EmojiString(str);
             TextOperation.DeleteSelectString();
             TextOperation.InsertContent(es);
-            SetShowText();
         }
         public void PointerMoveLeft()
         {
@@ -404,6 +405,7 @@ namespace huqiang.UIComposite
                     if (Keyboard.InputChanged)
                     {
                         OnInputChanged(Keyboard.InputString);
+                        SetShowText();
                     }
                     else if (Keyboard.TempStringChanged)
                     {
@@ -642,6 +644,7 @@ namespace huqiang.UIComposite
             UIElement.Resize(Enity);
             HTextLoader.CopyTo(text,TextCom);
             FullString.FullString = text.Text;
+            TextOperation.contentType = m_ctpye;
             TextOperation.ChangeText(TextCom,FullString);
             action.AddFocus(InputEvent);
             Enity.gameObject.SetActive(true);

@@ -11,23 +11,32 @@ namespace huqiang.Core.HGUI
         List<UIVertex> verts = new List<UIVertex>();
         List<LineInfo> lines = new List<LineInfo>();
         List<UICharInfo> chars = new List<UICharInfo>();
+        int startLine;
+        float StartX;
+        float EndX;
+        float offsetX;
+        float StartY;
+        float EndY;
+        float cw;
+        float ch;
         public float PercentageX
         {
             get 
             {
-                if (ContentWidth <= m_sizeDelta.x)
+                if (cw <= m_sizeDelta.x)
                     return 0;
-                return offsetX / (ContentWidth - m_sizeDelta.x);
+                return offsetX / (cw - m_sizeDelta.x);
             }
             set 
             {
-                if(ContentWidth>m_sizeDelta.x)
+                if(cw>m_sizeDelta.x)
                 {
                     if (value < 0)
                         value = 0;
                     else if (value > 1)
                         value = 1;
-                    offsetX = value * (ContentWidth - m_sizeDelta.x);
+                    offsetX = value * (cw - m_sizeDelta.x);
+                    m_vertexChange = true;
                 }
             }
         }
@@ -38,16 +47,16 @@ namespace huqiang.Core.HGUI
                     return 0;
                 if (AllLine <= ShowRow)
                     return 0;
-                float a = StartLine;
+                float a = startLine;
                 float b = AllLine;
                 float c = ShowRow;
                 return a/ (b - c);
             }
             set
             {
-                if(AllLine>0)
+                if (AllLine > 0)
                 {
-                    if(AllLine>ShowRow)
+                    if (AllLine > ShowRow)
                     {
                         if (value < 0)
                             value = 0;
@@ -55,23 +64,27 @@ namespace huqiang.Core.HGUI
                             value = 1;
                         int r = AllLine - ShowRow;
                         float s = value * r;
-                        StartLine = (int)s;
+                        startLine = (int)s;
                         m_vertexChange = true;
                     }
                 }
             }
         }
-        public int StartIndex { get; set; }
-        public int StartLine { get; set; }
+        public int StartLine { get => startLine;set {
+                if (value < 0)
+                    value = 0;
+                else if (value+ ShowRow > AllLine)
+                    value = AllLine - ShowRow;
+                if(value!=startLine)
+                {
+                    startLine = value;
+                    m_vertexChange = true;
+                }
+            } }
         public int AllLine { get; private set; }
         public int ShowRow { get; private set; }
-        float StartX;
-        float EndX;
-        float offsetX;
-        float StartY;
-        float EndY;
-        float ContentWidth;
-        float ContentHeight;
+        public float ContentWidth { get => cw; }
+        public float ContentHeight { get => ch; }
         public void Apply()
         {
             if(m_dirty)
@@ -98,7 +111,7 @@ namespace huqiang.Core.HGUI
             LineInfo line = new LineInfo();
             int c = g.lineCount;
             AllLine = c;
-            ContentWidth = m_sizeDelta.x;
+            cw = m_sizeDelta.x;
             EndX = m_sizeDelta.x * 0.5f;
             StartX = -EndX;
             if (g.characterCountVisible > 0)
@@ -106,8 +119,8 @@ namespace huqiang.Core.HGUI
                 int s = c - 1;
                 StartY = g.lines[0].topY;
                 EndY = g.lines[s].topY - g.lines[s].height - g.lines[s].leading;
-                ContentHeight = StartY- EndY;
-                float per = ContentHeight / g.lines.Count;
+                ch = StartY- EndY;
+                float per = ch / g.lines.Count;
                 ShowRow = (int)(m_sizeDelta.y / per);
                 var l = g.lines[0];
                 int vc = 0;
@@ -130,9 +143,9 @@ namespace huqiang.Core.HGUI
                     float lx = chars[line.startCharIdx].cursorPos.x;
                     float rx = chars[line.endIdx].cursorPos.x;
                     float w = rx - lx + chars[line.endIdx].charWidth;
-                    if (w > ContentWidth)
+                    if (w > cw)
                     { 
-                        ContentWidth = w;
+                        cw = w;
                         StartX = lx;
                         EndX = lx + w;
                     }
@@ -152,9 +165,9 @@ namespace huqiang.Core.HGUI
                 float olx = chars[line.startCharIdx].cursorPos.x;
                 float orx = chars[line.endIdx].cursorPos.x;
                 float ow = orx - olx + chars[line.endIdx].charWidth;
-                if (ow > ContentWidth)
+                if (ow > cw)
                 {
-                    ContentWidth = ow;
+                    cw = ow;
                     StartX = olx;
                     EndX = olx + ow;
                 }
@@ -162,23 +175,23 @@ namespace huqiang.Core.HGUI
             else
             {
                 ShowRow = (int)m_sizeDelta.y / FontSize;
-                ContentHeight = 0;
+                ch = 0;
                 StartY = 0;
                 EndY = 0;
             }
-            if (StartLine + ShowRow >= AllLine)
+            if (startLine + ShowRow >= AllLine)
             {
-                StartLine = AllLine - ShowRow;
-                if (StartLine <= 0)
-                    StartLine = 0;
+                startLine = AllLine - ShowRow;
+                if (startLine <= 0)
+                    startLine = 0;
             }
-            if (ContentWidth < m_sizeDelta.x)
+            if (cw < m_sizeDelta.x)
             {
                 offsetX = 0;
             }
-            else if(offsetX+m_sizeDelta.x>ContentWidth)
+            else if(offsetX+m_sizeDelta.x>cw)
             {
-                offsetX = ContentWidth - m_sizeDelta.x;
+                offsetX = cw - m_sizeDelta.x;
             }
             m_dirty = false;
             m_vertexChange = true;
@@ -198,8 +211,8 @@ namespace huqiang.Core.HGUI
             }
             else
             {
-                int s = lines[StartLine].startCharIdx;
-                int e = StartLine + ShowRow - 1;
+                int s = lines[startLine].startCharIdx;
+                int e = startLine + ShowRow - 1;
                 if (e >= lines.Count)
                     e = lines.Count - 1;
                 e = lines[e].endIdx + 1;
@@ -211,13 +224,13 @@ namespace huqiang.Core.HGUI
                 }
                 float oy = 0;
                 float ox = offsetX;
-                if(ContentWidth>m_sizeDelta.x)
+                if(cw>m_sizeDelta.x)
                 {
                     ox = offsetX + StartX + m_sizeDelta.x * 0.5f;
                 }
-                if (ContentHeight > m_sizeDelta.y)
+                if (ch > m_sizeDelta.y)
                 {
-                    oy = lines[StartLine].topY - StartY+ StartY - m_sizeDelta.y * 0.5f ;
+                    oy = lines[startLine].topY - StartY+ StartY - m_sizeDelta.y * 0.5f ;
                 }
                 float rx = m_sizeDelta.x * 0.5f + m_fontSize;
                 float lx = -rx;
@@ -228,7 +241,7 @@ namespace huqiang.Core.HGUI
                 {
                     TextVertex* hv = TmpVerts.Addr;
                     c = e - s;
-                    int l = StartLine;
+                    int l = startLine;
                     int ol = ShowRow;
                     if (ol > lines.Count)
                         ol = lines.Count;
@@ -283,10 +296,6 @@ namespace huqiang.Core.HGUI
                     CreateOutLine(this);
                 m_vertexChange = false;
             }
-        }
-        public void GetShowContent()
-        {
-
         }
     }
 }

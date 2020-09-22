@@ -372,8 +372,7 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 116292708}
+  m_Materials: []
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -415,7 +414,6 @@ Transform:
   - {fileID: 1108735405}
   - {fileID: 1039798465}
   - {fileID: 1876342491}
-  - {fileID: 1436255193}
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -893,9 +891,9 @@ MonoBehaviour:
     rgba: 4294967295
   uvrect: {x: 0, y: 0, z: 1, w: 1}
   m_material: {fileID: 0}
-  m_dirty: 1
-  m_vertexChange: 1
-  m_colorChanged: 1
+  m_dirty: 0
+  m_vertexChange: 0
+  m_colorChanged: 0
   textures:
   - {fileID: 2800000, guid: 976bc3d6b0309c34ea5ab78e8caa5a31, type: 3}
   - {fileID: 0}
@@ -1700,46 +1698,6 @@ MonoBehaviour:
   m_fontSize: 24
   sizeFitter: 0
   OutLine: 0
---- !u!21 &116292708
-Material:
-  serializedVersion: 6
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Custom/UIDef
-  m_Shader: {fileID: 4800000, guid: 0fdc8503d22bfc045b118c88aa6aaf22, type: 3}
-  m_ShaderKeywords: 
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _FTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTex:
-        m_Texture: {fileID: 10103, guid: 0000000000000000e000000000000000, type: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _STex:
-        m_Texture: {fileID: 2800000, guid: 396c8615632ee734d9064776445eaa50, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _TTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Floats: []
-    m_Colors:
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _FillColor: {r: 1, g: 0, b: 0, a: 0}
-    - _Rect: {r: 0, g: 0, b: 1, a: 1}
 --- !u!1 &149535095
 GameObject:
   m_ObjectHideFlags: 0
@@ -2409,11 +2367,11 @@ MonoBehaviour:
   m_vertexChange: 0
   m_colorChanged: 0
   textures:
-  - {fileID: 1980428027}
+  - {fileID: 1607381531}
   - {fileID: 2800000, guid: 396c8615632ee734d9064776445eaa50, type: 3}
   - {fileID: 0}
   - {fileID: 0}
-  texIds: fa97feff063900000000000000000000
+  texIds: f4f7ffff063900000000000000000000
   fillColors: 01000000
   Shadow: 0
   shadowOffsset: {x: 1, y: -1}
@@ -2432,46 +2390,6 @@ MonoBehaviour:
   m_fontSize: 30
   sizeFitter: 0
   OutLine: 0
---- !u!28 &255157093
-Texture2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Arial
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_ForcedFallbackFormat: 4
-  m_DownscaleFallback: 0
-  serializedVersion: 2
-  m_Width: 0
-  m_Height: 0
-  m_CompleteImageSize: 0
-  m_TextureFormat: 4
-  m_MipCount: 1
-  m_IsReadable: 1
-  m_StreamingMipmaps: 0
-  m_StreamingMipmapsPriority: 0
-  m_AlphaIsTransparency: 0
-  m_ImageCount: 0
-  m_TextureDimension: 2
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 1
-    m_Aniso: 1
-    m_MipBias: 0
-    m_WrapU: 0
-    m_WrapV: 0
-    m_WrapW: 0
-  m_LightmapFormat: 0
-  m_ColorSpace: 0
-  image data: 0
-  _typelessdata: 
-  m_StreamData:
-    offset: 0
-    size: 0
-    path: 
 --- !u!1 &278606160
 GameObject:
   m_ObjectHideFlags: 0
@@ -3335,17 +3253,7 @@ Mesh:
   m_PrefabAsset: {fileID: 0}
   m_Name: 
   serializedVersion: 9
-  m_SubMeshes:
-  - serializedVersion: 2
-    firstByte: 0
-    indexCount: 96
-    topology: 0
-    baseVertex: 0
-    firstVertex: 0
-    vertexCount: 64
-    localAABB:
-      m_Center: {x: -8, y: 57, z: 0}
-      m_Extent: {x: 43, y: 79, z: 0}
+  m_SubMeshes: []
   m_Shapes:
     vertices: []
     shapes: []
@@ -3359,10 +3267,10 @@ Mesh:
   m_KeepVertices: 1
   m_KeepIndices: 1
   m_IndexFormat: 0
-  m_IndexBuffer: 0000010002000200030000000400050006000600070004000c000d000e000e000f000c001c001d001e001e001f001c00200021002200220023002000240025002600260027002400300031003200320033003000340035003600360037003400380039003a003a003b0038003c003d003e003e003f003c00080009000a000a000b000800100011001200120013001000140015001600160017001400180019001a001a001b001800280029002a002a002b0028002c002d002e002e002f002c00
+  m_IndexBuffer: 
   m_VertexData:
     serializedVersion: 2
-    m_VertexCount: 64
+    m_VertexCount: 0
     m_Channels:
     - stream: 0
       offset: 0
@@ -3377,29 +3285,25 @@ Mesh:
       format: 0
       dimension: 0
     - stream: 0
-      offset: 12
-      format: 2
-      dimension: 4
-    - stream: 0
-      offset: 16
+      offset: 0
       format: 0
-      dimension: 2
+      dimension: 0
     - stream: 0
-      offset: 24
+      offset: 0
       format: 0
-      dimension: 2
+      dimension: 0
     - stream: 0
-      offset: 32
+      offset: 0
       format: 0
-      dimension: 2
+      dimension: 0
     - stream: 0
-      offset: 40
+      offset: 0
       format: 0
-      dimension: 2
+      dimension: 0
     - stream: 0
-      offset: 48
+      offset: 0
       format: 0
-      dimension: 2
+      dimension: 0
     - stream: 0
       offset: 0
       format: 0
@@ -3420,8 +3324,12 @@ Mesh:
       offset: 0
       format: 0
       dimension: 0
-    m_DataSize: 3584
-    _typelessdata: 00004cc20000084300000000ffffffff00006c3e000000000000000000000000c4b1fe3ea5bd013f00000000000000000000803f0000803f0000a8c10000084300000000ffffffff0000b23e0000000000000000000000006076ff3ea5bd013f00000000000000000000803f0000803f0000a8c10000d44200000000ffffffff0000b23e0000f03d00000000000000006076ff3e575b013f00000000000000000000803f0000803f00004cc20000d44200000000ffffffff00006c3e0000f03d0000000000000000c4b1fe3e575b013f00000000000000000000803f0000803f0000b8c10000084300000000ffffffff00006c3e0000000000000000000000004469ff3ea5bd013f00000000000000000000803f0000803f0000e0400000084300000000ffffffff0000b23e000000000000000000000000f016003fa5bd013f00000000000000000000803f0000803f0000e0400000d44200000000ffffffff0000b23e0000f03d0000000000000000f016003f575b013f00000000000000000000803f0000803f0000b8c10000d44200000000ffffffff00006c3e0000f03d00000000000000004469ff3e575b013f00000000000000000000803f0000803f0000c0400000054300000000ffffffff00c0903e00a0153f000000000000803fa913003fd0b3013f00000000000000000000803f0000803f00000c420000054300000000ffffffff00c0983e00a0153f000000000000803fb072003fd0b3013f00000000000000000000803f0000803f00000c420000d04200000000ffffffff00c0983e00a0113f000000000000803fb072003fca54013f00000000000000000000803f0000803f0000c0400000d04200000000ffffffff00c0903e00a0113f000000000000803fa913003fca54013f00000000000000000000803f0000803f000048c20000ca4200000000ffffffff000000000000003c000000000000000052b8fe3ef54a013f00000000000000000000803f0000803f0000a8c10000ca4200000000ffffffff0000e83d0000003c00000000000000006076ff3ef54a013f00000000000000000000803f0000803f0000a8c10000904200000000ffffffff0000e83d0000f83d00000000000000006076ff3eeeeb003f00000000000000000000803f0000803f000048c20000904200000000ffffffff000000000000f83d000000000000000052b8fe3eeeeb003f00000000000000000000803f0000803f0000b0c10000ca4200000000ffffffff00c0903e00e0083f000000000000803fd26fff3ef54a013f00000000000000000000803f0000803f0000e0400000ca4200000000ffffffff00c0983e00e0083f000000000000803ff016003ff54a013f00000000000000000000803f0000803f0000e0400000904200000000ffffffff00c0983e00e0043f000000000000803ff016003feeeb003f00000000000000000000803f0000803f0000b0c10000904200000000ffffffff00c0903e00e0043f000000000000803fd26fff3eeeeb003f00000000000000000000803f0000803f0000c0400000ca4200000000ffffffff00c0903e0000f53d000000000000803fa913003ff54a013f00000000000000000000803f0000803f00000c420000ca4200000000ffffffff00c0983e0000f53d000000000000803fb072003ff54a013f00000000000000000000803f0000803f00000c420000904200000000ffffffff00c0983e0000d53d000000000000803fb072003feeeb003f00000000000000000000803f0000803f0000c0400000904200000000ffffffff00c0903e0000d53d000000000000803fa913003feeeb003f00000000000000000000803f0000803f00004cc200007c4200000000ffffffff0060503f00a0373f000000000000803fc4b1fe3e70ce003f00000000000000000000803f0000803f00000cc200007c4200000000ffffffff0060543f00a0373f000000000000803fa01aff3e70ce003f00000000000000000000803f0000803f00000cc20000384200000000ffffffff0060543f00a0333f000000000000803fa01aff3ebc96003f00000000000000000000803f0000803f00004cc20000384200000000ffffffff0060503f00a0333f000000000000803fc4b1fe3ebc96003f00000000000000000000803f0000803f000014c200007c4200000000ffffffff000000000000f83d0000000000000000840dff3e70ce003f00000000000000000000803f0000803f0000a8c100007c4200000000ffffffff0000803d0000f83d00000000000000006076ff3e70ce003f00000000000000000000803f0000803f0000a8c10000384200000000ffffffff0000803d0000403e00000000000000006076ff3ebc96003f00000000000000000000803f0000803f000014c20000384200000000ffffffff000000000000403e0000000000000000840dff3ebc96003f00000000000000000000803f0000803f0000b0c100008a4200000000ffffffff000000000000003c0000000000000000d26fff3e19e2003f00000000000000000000803f0000803f0000e04000008a4200000000ffffffff0000e83d0000003c0000000000000000f016003f19e2003f00000000000000000000803f0000803f0000e0400000204200000000ffffffff0000e83d0000f83d0000000000000000f016003f1283003f00000000000000000000803f0000803f0000b0c10000204200000000ffffffff000000000000f83d0000000000000000d26fff3e1283003f00000000000000000000803f0000803f0000c04000008a4200000000ffffffff000000000000003c0000000000000000a913003f19e2003f00000000000000000000803f0000803f00000c4200008a4200000000ffffffff0000e83d0000003c0000000000000000b072003f19e2003f00000000000000000000803f0000803f00000c420000204200000000ffffffff0000e83d0000f83d0000000000000000b072003f1283003f00000000000000000000803f0000803f0000c0400000204200000000ffffffff000000000000f83d0000000000000000a913003f1283003f00000000000000000000803f0000803f000048c20000184200000000ffffffff00c0903e0060113f000000000000803f52b8fe3e857c003f00000000000000000000803f0000803f0000a8c10000184200000000ffffffff00c0983e0060113f000000000000803f6076ff3e857c003f00000000000000000000803f0000803f0000a8c10000204100000000ffffffff00c0983e00600d3f000000000000803f6076ff3ec520003f00000000000000000000803f0000803f000048c20000204100000000ffffffff00c0903e00600d3f000000000000803f52b8fe3ec520003f00000000000000000000803f0000803f0000b8c10000204200000000ffffffff00c0903e0000f53d000000000000803f4469ff3e1283003f00000000000000000000803f0000803f0000e0400000204200000000ffffffff00c0983e0000f53d000000000000803ff016003f1283003f00000000000000000000803f0000803f0000e0400000204100000000ffffffff00c0983e0000d53d000000000000803ff016003fc520003f00000000000000000000803f0000803f0000b8c10000204100000000ffffffff00c0903e0000d53d000000000000803f4469ff3ec520003f00000000000000000000803f0000803f0000a0400000204200000000ffffffff0000e83d0000000000000000000000006210003f1283003f00000000000000000000803f0000803f00000c420000204200000000ffffffff00006c3e000000000000000000000000b072003f1283003f00000000000000000000803f0000803f00000c420000204100000000ffffffff00006c3e0000f03d0000000000000000b072003fc520003f00000000000000000000803f0000803f0000a0400000204100000000ffffffff0000e83d0000f03d00000000000000006210003fc520003f00000000000000000000803f0000803f000048c20000c04000000000ffffffff0000e03d0000b43e000000000000000052b8fe3ea913003f00000000000000000000803f0000803f0000a8c10000c04000000000ffffffff0000e03d0000743e00000000000000006076ff3ea913003f00000000000000000000803f0000803f0000a8c10000b0c100000000ffffffff000000000000743e00000000000000006076ff3ed26fff3e00000000000000000000803f0000803f000048c20000b0c100000000ffffffff000000000000b43e000000000000000052b8fe3ed26fff3e00000000000000000000803f0000803f0000b8c10000004100000000ffffffff0000803d0000f83d00000000000000004469ff3e371a003f00000000000000000000803f0000803f0000e0400000004100000000ffffffff0000383e0000f83d0000000000000000f016003f371a003f00000000000000000000803f0000803f0000e0400000b0c100000000ffffffff0000383e0000743e0000000000000000f016003fd26fff3e00000000000000000000803f0000803f0000b8c10000b0c100000000ffffffff0000803d0000743e00000000000000004469ff3ed26fff3e00000000000000000000803f0000803f0000a0400000004100000000ffffffff0000e83d0000000000000000000000006210003f371a003f00000000000000000000803f0000803f00000c420000004100000000ffffffff00006c3e000000000000000000000000b072003f371a003f00000000000000000000803f0000803f00000c420000b0c100000000ffffffff00006c3e0000f03d0000000000000000b072003fd26fff3e00000000000000000000803f0000803f0000a0400000b0c100000000ffffffff0000e83d0000f03d00000000000000006210003fd26fff3e00000000000000000000803f0000803f
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    m_DataSize: 0
+    _typelessdata: 
   m_CompressedMesh:
     m_Vertices:
       m_NumItems: 0
@@ -3475,8 +3383,8 @@ Mesh:
       m_BitSize: 0
     m_UVInfo: 0
   m_LocalAABB:
-    m_Center: {x: -8, y: 57, z: 0}
-    m_Extent: {x: 43, y: 79, z: 0}
+    m_Center: {x: 12.5, y: 91.5, z: 0}
+    m_Extent: {x: 114.5, y: 145.5, z: 0}
   m_MeshUsageFlags: 0
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
@@ -4106,15 +4014,15 @@ MonoBehaviour:
     rgba: 4278190080
   uvrect: {x: 0, y: 0, z: 1, w: 1}
   m_material: {fileID: 0}
-  m_dirty: 1
-  m_vertexChange: 1
-  m_colorChanged: 1
+  m_dirty: 0
+  m_vertexChange: 0
+  m_colorChanged: 0
   textures:
-  - {fileID: 255157093}
+  - {fileID: 1407912548}
   - {fileID: 2800000, guid: 396c8615632ee734d9064776445eaa50, type: 3}
   - {fileID: 0}
   - {fileID: 0}
-  texIds: 36f7ffffe24700000000000000000000
+  texIds: a4f4ffffe24700000000000000000000
   fillColors: 01000000
   Shadow: 0
   shadowOffsset: {x: 1, y: -1}
@@ -4412,11 +4320,11 @@ MonoBehaviour:
   m_vertexChange: 0
   m_colorChanged: 0
   textures:
-  - {fileID: 1980428027}
+  - {fileID: 1607381531}
   - {fileID: 2800000, guid: 396c8615632ee734d9064776445eaa50, type: 3}
   - {fileID: 0}
   - {fileID: 0}
-  texIds: fa97feff6a4900000000000000000000
+  texIds: f4f7ffff6a4900000000000000000000
   fillColors: 01000000
   Shadow: 0
   shadowOffsset: {x: 1, y: -1}
@@ -5199,15 +5107,15 @@ MonoBehaviour:
     rgba: 4278190080
   uvrect: {x: 0, y: 0, z: 1, w: 1}
   m_material: {fileID: 0}
-  m_dirty: 1
-  m_vertexChange: 1
-  m_colorChanged: 1
+  m_dirty: 0
+  m_vertexChange: 0
+  m_colorChanged: 0
   textures:
-  - {fileID: 255157093}
+  - {fileID: 1407912548}
   - {fileID: 2800000, guid: 396c8615632ee734d9064776445eaa50, type: 3}
   - {fileID: 0}
   - {fileID: 0}
-  texIds: 36f7ffffe24700000000000000000000
+  texIds: a4f4ffffe24700000000000000000000
   fillColors: 01000000
   Shadow: 0
   shadowOffsset: {x: 1, y: -1}
@@ -6124,15 +6032,15 @@ MonoBehaviour:
     rgba: 4294903808
   uvrect: {x: 0, y: 0, z: 1, w: 1}
   m_material: {fileID: 0}
-  m_dirty: 1
+  m_dirty: 0
   m_vertexChange: 0
   m_colorChanged: 0
   textures:
-  - {fileID: 1980428027}
+  - {fileID: 1607381531}
   - {fileID: 2800000, guid: 396c8615632ee734d9064776445eaa50, type: 3}
   - {fileID: 0}
   - {fileID: 0}
-  texIds: fa97feff6a4900000000000000000000
+  texIds: f4f7ffff6a4900000000000000000000
   fillColors: 01000000
   Shadow: 0
   shadowOffsset: {x: 1, y: -1}
@@ -7617,9 +7525,9 @@ MonoBehaviour:
     rgba: 4294967295
   uvrect: {x: 0, y: 0, z: 1, w: 1}
   m_material: {fileID: 0}
-  m_dirty: 1
-  m_vertexChange: 1
-  m_colorChanged: 1
+  m_dirty: 0
+  m_vertexChange: 0
+  m_colorChanged: 0
   textures:
   - {fileID: 2800000, guid: 976bc3d6b0309c34ea5ab78e8caa5a31, type: 3}
   - {fileID: 0}
@@ -8168,7 +8076,7 @@ MonoBehaviour:
   TipString: "\u8BF7\u8F93\u5165..."
   CharacterLimit: 11
   ReadyOnly: 0
-  contentType: 2
+  contentType: 8
   lineType: 2
 --- !u!114 &839744659
 MonoBehaviour:
@@ -8211,7 +8119,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  texIds: 622e0000000000000000000000000000
+  texIds: 662e0000000000000000000000000000
   fillColors: 00000000
   Shadow: 0
   shadowOffsset: {x: 1, y: -1}
@@ -9584,7 +9492,7 @@ MonoBehaviour:
     rgba: 4294967295
   uvrect: {x: 0, y: 0, z: 1, w: 1}
   m_material: {fileID: 0}
-  m_dirty: 0
+  m_dirty: 1
   m_vertexChange: 0
   m_colorChanged: 0
   textures:
@@ -11132,15 +11040,15 @@ MonoBehaviour:
     rgba: 4278190080
   uvrect: {x: 0, y: 0, z: 1, w: 1}
   m_material: {fileID: 0}
-  m_dirty: 1
-  m_vertexChange: 1
-  m_colorChanged: 1
+  m_dirty: 0
+  m_vertexChange: 0
+  m_colorChanged: 0
   textures:
-  - {fileID: 255157093}
+  - {fileID: 1407912548}
   - {fileID: 2800000, guid: 396c8615632ee734d9064776445eaa50, type: 3}
   - {fileID: 0}
   - {fileID: 0}
-  texIds: 36f7ffffe24700000000000000000000
+  texIds: a4f4ffffe24700000000000000000000
   fillColors: 01000000
   Shadow: 0
   shadowOffsset: {x: 1, y: -1}
@@ -12477,15 +12385,15 @@ MonoBehaviour:
     rgba: 4278190080
   uvrect: {x: 0, y: 0, z: 1, w: 1}
   m_material: {fileID: 0}
-  m_dirty: 1
-  m_vertexChange: 1
-  m_colorChanged: 1
+  m_dirty: 0
+  m_vertexChange: 0
+  m_colorChanged: 0
   textures:
-  - {fileID: 255157093}
+  - {fileID: 1407912548}
   - {fileID: 2800000, guid: 396c8615632ee734d9064776445eaa50, type: 3}
   - {fileID: 0}
   - {fileID: 0}
-  texIds: 36f7ffff063900000000000000000000
+  texIds: a4f4ffff063900000000000000000000
   fillColors: 01000000
   Shadow: 0
   shadowOffsset: {x: 1, y: -1}
@@ -12572,11 +12480,11 @@ MonoBehaviour:
   m_vertexChange: 0
   m_colorChanged: 0
   textures:
-  - {fileID: 1980428027}
+  - {fileID: 1607381531}
   - {fileID: 2800000, guid: 396c8615632ee734d9064776445eaa50, type: 3}
   - {fileID: 0}
   - {fileID: 0}
-  texIds: fa97feff063900000000000000000000
+  texIds: f4f7ffff063900000000000000000000
   fillColors: 01000000
   Shadow: 0
   shadowOffsset: {x: 1, y: -1}
@@ -13071,15 +12979,15 @@ MonoBehaviour:
     rgba: 4278190080
   uvrect: {x: 0, y: 0, z: 1, w: 1}
   m_material: {fileID: 0}
-  m_dirty: 1
-  m_vertexChange: 1
-  m_colorChanged: 1
+  m_dirty: 0
+  m_vertexChange: 0
+  m_colorChanged: 0
   textures:
-  - {fileID: 255157093}
+  - {fileID: 1407912548}
   - {fileID: 2800000, guid: 396c8615632ee734d9064776445eaa50, type: 3}
   - {fileID: 0}
   - {fileID: 0}
-  texIds: 36f7ffffe24700000000000000000000
+  texIds: a4f4ffffe24700000000000000000000
   fillColors: 01000000
   Shadow: 0
   shadowOffsset: {x: 1, y: -1}
@@ -13489,15 +13397,15 @@ MonoBehaviour:
     rgba: 4278190080
   uvrect: {x: 0, y: 0, z: 1, w: 1}
   m_material: {fileID: 0}
-  m_dirty: 1
-  m_vertexChange: 1
-  m_colorChanged: 1
+  m_dirty: 0
+  m_vertexChange: 0
+  m_colorChanged: 0
   textures:
-  - {fileID: 255157093}
+  - {fileID: 1407912548}
   - {fileID: 2800000, guid: 396c8615632ee734d9064776445eaa50, type: 3}
   - {fileID: 0}
   - {fileID: 0}
-  texIds: 36f7ffffe24700000000000000000000
+  texIds: a4f4ffffe24700000000000000000000
   fillColors: 01000000
   Shadow: 0
   shadowOffsset: {x: 1, y: -1}
@@ -13584,11 +13492,11 @@ MonoBehaviour:
   m_vertexChange: 0
   m_colorChanged: 0
   textures:
-  - {fileID: 1980428027}
+  - {fileID: 1607381531}
   - {fileID: 2800000, guid: 396c8615632ee734d9064776445eaa50, type: 3}
   - {fileID: 0}
   - {fileID: 0}
-  texIds: fa97feff6a4900000000000000000000
+  texIds: f4f7ffff6a4900000000000000000000
   fillColors: 01000000
   Shadow: 0
   shadowOffsset: {x: 1, y: -1}
@@ -13874,6 +13782,46 @@ MonoBehaviour:
   m_fillOrigin: 0
   m_fillAmount: 1
   m_preserveAspect: 0
+--- !u!28 &1407912548
+Texture2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Arial
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_ForcedFallbackFormat: 4
+  m_DownscaleFallback: 0
+  serializedVersion: 2
+  m_Width: 0
+  m_Height: 0
+  m_CompleteImageSize: 0
+  m_TextureFormat: 4
+  m_MipCount: 1
+  m_IsReadable: 1
+  m_StreamingMipmaps: 0
+  m_StreamingMipmapsPriority: 0
+  m_AlphaIsTransparency: 0
+  m_ImageCount: 0
+  m_TextureDimension: 2
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 1
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 0
+    m_WrapV: 0
+    m_WrapW: 0
+  m_LightmapFormat: 0
+  m_ColorSpace: 0
+  image data: 0
+  _typelessdata: 
+  m_StreamData:
+    offset: 0
+    size: 0
+    path: 
 --- !u!1 &1411121835
 GameObject:
   m_ObjectHideFlags: 0
@@ -13947,7 +13895,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  texIds: 622e0000000000000000000000000000
+  texIds: 662e0000000000000000000000000000
   fillColors: 00000000
   Shadow: 0
   shadowOffsset: {x: 1, y: -1}
@@ -14050,97 +13998,6 @@ MonoBehaviour:
   m_richText: 0
   m_lineSpace: 1
   m_fontSize: 32
-  sizeFitter: 0
-  OutLine: 0
---- !u!1 &1436255192
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1436255193}
-  - component: {fileID: 1436255194}
-  m_Layer: 0
-  m_Name: Text
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1436255193
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1436255192}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 86, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 24788670}
-  m_RootOrder: 11
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1436255194
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1436255192}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f25e2f8db5c86484ca21b4cbba5a8220, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_sizeDelta: {x: 100, y: 100}
-  Pivot: {x: 0.5, y: 0.5}
-  scaleType: 0
-  anchorType: 0
-  anchorPointType: 0
-  anchorOffset: {x: 0, y: 0}
-  marginType: 0
-  parentType: 0
-  margin:
-    left: 0
-    down: 0
-    right: 0
-    top: 0
-  eventType: 0
-  compositeType: 0
-  Mask: 0
-  m_color:
-    serializedVersion: 2
-    rgba: 4294967295
-  uvrect: {x: 0, y: 0, z: 1, w: 1}
-  m_material: {fileID: 0}
-  m_dirty: 0
-  m_vertexChange: 0
-  m_colorChanged: 0
-  textures:
-  - {fileID: 10103, guid: 0000000000000000e000000000000000, type: 0}
-  - {fileID: 2800000, guid: 396c8615632ee734d9064776445eaa50, type: 3}
-  - {fileID: 0}
-  - {fileID: 0}
-  texIds: 3a020000e82d00000000000000000000
-  fillColors: 01000000
-  Shadow: 0
-  shadowOffsset: {x: 1, y: -1}
-  shadowColor:
-    serializedVersion: 2
-    rgba: 4278190080
-  m_text: "\u94B1\u94B1\U0001F601\n\U0001F604\U0001F61D\U0001F643\nvv\U0001F602\U0001F61D\u963F\u677E\u5927\u963F\u677E\u5927"
-  _font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-  m_hof: 0
-  m_vof: 1
-  updateBounds: 0
-  anchor: 0
-  m_fontStyle: 0
-  m_richText: 0
-  m_lineSpace: 1
-  m_fontSize: 28
   sizeFitter: 0
   OutLine: 0
 --- !u!1 &1441812930
@@ -15396,9 +15253,9 @@ MonoBehaviour:
     rgba: 4294967295
   uvrect: {x: 0, y: 0, z: 1, w: 1}
   m_material: {fileID: 0}
-  m_dirty: 1
-  m_vertexChange: 1
-  m_colorChanged: 1
+  m_dirty: 0
+  m_vertexChange: 0
+  m_colorChanged: 0
   textures:
   - {fileID: 2800000, guid: 976bc3d6b0309c34ea5ab78e8caa5a31, type: 3}
   - {fileID: 0}
@@ -15697,6 +15554,46 @@ MonoBehaviour:
   m_fontSize: 30
   sizeFitter: 0
   OutLine: 0
+--- !u!28 &1607381531
+Texture2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Arial
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_ForcedFallbackFormat: 4
+  m_DownscaleFallback: 0
+  serializedVersion: 2
+  m_Width: 0
+  m_Height: 0
+  m_CompleteImageSize: 0
+  m_TextureFormat: 4
+  m_MipCount: 1
+  m_IsReadable: 1
+  m_StreamingMipmaps: 0
+  m_StreamingMipmapsPriority: 0
+  m_AlphaIsTransparency: 0
+  m_ImageCount: 0
+  m_TextureDimension: 2
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 1
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 0
+    m_WrapV: 0
+    m_WrapW: 0
+  m_LightmapFormat: 0
+  m_ColorSpace: 0
+  image data: 0
+  _typelessdata: 
+  m_StreamData:
+    offset: 0
+    size: 0
+    path: 
 --- !u!1 &1612387232
 GameObject:
   m_ObjectHideFlags: 0
@@ -18332,15 +18229,15 @@ MonoBehaviour:
     rgba: 4278190080
   uvrect: {x: 0, y: 0, z: 1, w: 1}
   m_material: {fileID: 0}
-  m_dirty: 1
-  m_vertexChange: 1
-  m_colorChanged: 1
+  m_dirty: 0
+  m_vertexChange: 0
+  m_colorChanged: 0
   textures:
-  - {fileID: 255157093}
+  - {fileID: 1407912548}
   - {fileID: 2800000, guid: 396c8615632ee734d9064776445eaa50, type: 3}
   - {fileID: 0}
   - {fileID: 0}
-  texIds: 36f7ffffe24700000000000000000000
+  texIds: a4f4ffffe24700000000000000000000
   fillColors: 01000000
   Shadow: 0
   shadowOffsset: {x: 1, y: -1}
@@ -19339,46 +19236,6 @@ MonoBehaviour:
   eventType: 0
   compositeType: 0
   Mask: 0
---- !u!28 &1980428027
-Texture2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Arial
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_ForcedFallbackFormat: 4
-  m_DownscaleFallback: 0
-  serializedVersion: 2
-  m_Width: 0
-  m_Height: 0
-  m_CompleteImageSize: 0
-  m_TextureFormat: 4
-  m_MipCount: 1
-  m_IsReadable: 1
-  m_StreamingMipmaps: 0
-  m_StreamingMipmapsPriority: 0
-  m_AlphaIsTransparency: 0
-  m_ImageCount: 0
-  m_TextureDimension: 2
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 1
-    m_Aniso: 1
-    m_MipBias: 0
-    m_WrapU: 0
-    m_WrapV: 0
-    m_WrapW: 0
-  m_LightmapFormat: 0
-  m_ColorSpace: 0
-  image data: 0
-  _typelessdata: 
-  m_StreamData:
-    offset: 0
-    size: 0
-    path: 
 --- !u!1 &1980793171
 GameObject:
   m_ObjectHideFlags: 0
@@ -20799,15 +20656,15 @@ MonoBehaviour:
     rgba: 4278190080
   uvrect: {x: 0, y: 0, z: 1, w: 1}
   m_material: {fileID: 0}
-  m_dirty: 1
-  m_vertexChange: 1
-  m_colorChanged: 1
+  m_dirty: 0
+  m_vertexChange: 0
+  m_colorChanged: 0
   textures:
-  - {fileID: 255157093}
+  - {fileID: 1407912548}
   - {fileID: 2800000, guid: 396c8615632ee734d9064776445eaa50, type: 3}
   - {fileID: 0}
   - {fileID: 0}
-  texIds: 36f7ffff063900000000000000000000
+  texIds: a4f4ffff063900000000000000000000
   fillColors: 01000000
   Shadow: 0
   shadowOffsset: {x: 1, y: -1}
@@ -20982,9 +20839,9 @@ MonoBehaviour:
     rgba: 4294967295
   uvrect: {x: 0, y: 0, z: 1, w: 1}
   m_material: {fileID: 0}
-  m_dirty: 1
-  m_vertexChange: 1
-  m_colorChanged: 1
+  m_dirty: 0
+  m_vertexChange: 0
+  m_colorChanged: 0
   textures:
   - {fileID: 2800000, guid: 976bc3d6b0309c34ea5ab78e8caa5a31, type: 3}
   - {fileID: 0}

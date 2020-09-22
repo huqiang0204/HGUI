@@ -40,6 +40,7 @@ namespace huqiang.Core.HGUI
         public static int ShowRow;//当前文本框可以显示的内容行数
         public static float ContentHeight;
         static float StartY;
+        public static ContentType contentType;
         public static void ChangeText(HText text, EmojiString str)
         {
             verts.Clear();
@@ -50,7 +51,14 @@ namespace huqiang.Core.HGUI
             text.GetGenerationSettings(ref text.m_sizeDelta,ref HText.settings);
             var g = HText.Generator;
             string fs = Content.FilterString;
-            ContentHeight = g.GetPreferredHeight(fs, HText.settings);
+            if (contentType == ContentType.Password)
+            {
+                ContentHeight = g.GetPreferredHeight(new string('●', fs.Length), HText.settings);
+            }
+            else
+            { 
+                ContentHeight = g.GetPreferredHeight(fs, HText.settings); 
+            }
             VisibleCount = g.characterCountVisible;
             if (g.lines.Count > 0)
             {

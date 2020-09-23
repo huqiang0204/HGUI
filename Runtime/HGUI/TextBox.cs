@@ -94,7 +94,6 @@ namespace huqiang.Core.HGUI
                 g.Populate(m_text, settings);
             }
         }
-        string filterString;
         protected void GetTempVertex(IList<UIVertex> v, List<TextVertex> vert, string filterStr)
         {
             TextVertex tv = new TextVertex();
@@ -133,9 +132,9 @@ namespace huqiang.Core.HGUI
             settings.horizontalOverflow = HorizontalWrapMode.Overflow;
             settings.verticalOverflow = VerticalWrapMode.Overflow;
             emojiString.FullString = m_text;
-            filterString = emojiString.FilterString;
+            string str = emojiString.FilterString;
             var g = Generator;
-            g.Populate(filterString, settings);
+            g.Populate(str, settings);
             verts.Clear();
             lines.Clear();
             chars.Clear();
@@ -148,7 +147,12 @@ namespace huqiang.Core.HGUI
             StartX = -EndX;
             if (g.characterCountVisible > 0)
             {
-                GetTempVertex(g.verts,verts,filterString);
+                if (RichText)
+                {
+                    emojiString.FullString = RichTextHelper.DeleteLabel(m_text);
+                    str = emojiString.FilterString;
+                }
+                GetTempVertex(g.verts,verts,str);
                 int s = c - 1;
                 StartY = g.lines[0].topY;
                 EndY = g.lines[s].topY - g.lines[s].height - g.lines[s].leading;

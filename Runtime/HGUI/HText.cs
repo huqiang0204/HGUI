@@ -556,6 +556,11 @@ namespace huqiang.Core.HGUI
                 TmpVerts.Release();
                 TmpVerts = PopulateBuffer.RegNew(c);
             }
+            if (RichText)
+            {
+                emojiString.FullString = RichTextHelper.DeleteLabel(m_text);
+                str = emojiString.FilterString;
+            }
             GetTempVertex(v, ref TmpVerts, str);
             m_dirty = false;
             m_vertexChange = true;

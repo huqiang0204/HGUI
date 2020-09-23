@@ -6,13 +6,14 @@ using huqiang;
 using Assets.Scripts;
 using huqiang.Communication;
 using huqiang.UIModel;
+using huqiang.Core.HGUI;
 
 public class UITest : TestPageHelper
 {
     public override void LoadTestPage()
     {
         //RemoteLog.Instance.Connection("192.168.0.144",8899);
-       
+        Debug.Log(RichTextHelper.DeleteLabel("New Text<i>cccc<b>aaa</b></i><color></color>"));
         Application.targetFrameRate = 1000;
 #if UNITY_IPHONE || UNITY_ANDROID
         //Scale.DpiScale = true;

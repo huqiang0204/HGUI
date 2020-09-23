@@ -556,7 +556,7 @@ namespace huqiang.Core.HGUI
                 TmpVerts.Release();
                 TmpVerts = PopulateBuffer.RegNew(c);
             }
-            if (RichText)
+            if (m_richText)
             {
                 emojiString.FullString = RichTextHelper.DeleteLabel(m_text);
                 str = emojiString.FilterString;

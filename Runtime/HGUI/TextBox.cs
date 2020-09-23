@@ -147,7 +147,7 @@ namespace huqiang.Core.HGUI
             StartX = -EndX;
             if (g.characterCountVisible > 0)
             {
-                if (RichText)
+                if (m_richText)
                 {
                     emojiString.FullString = RichTextHelper.DeleteLabel(m_text);
                     str = emojiString.FilterString;

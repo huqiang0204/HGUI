@@ -1,4 +1,4 @@
-﻿Shader "Custom/UIDef"
+﻿Shader "HGUI/UIDef"
 {
 	Properties
 	{

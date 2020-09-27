@@ -49,15 +49,21 @@ public class UIElementEditor : Editor
         Handles.color = Color.red;
         Vector3[] verts = new Vector3[8];
         var p = txt.transform.position;
+        var z = p.z;
         var size = txt.SizeDelta;
         size.x *= txt.transform.lossyScale.x;
         size.y *= txt.transform.lossyScale.y;
         var bor = new Border(size, txt.Pivot);
+
         var q = txt.transform.rotation;
         var lt = p + q * new Vector3(bor.left, bor.top, 0);
+        lt.z = z;
         var rt = p + q * new Vector3(bor.right, bor.top, 0);
+        rt.z = z;
         var rd = p + q * new Vector3(bor.right, bor.down, 0);
+        rd.z = z;
         var ld = p + q * new Vector3(bor.left, bor.down, 0);
+        ld.z = z;
         verts[0] = lt;
         verts[1] = rt;
         verts[2] = rt;

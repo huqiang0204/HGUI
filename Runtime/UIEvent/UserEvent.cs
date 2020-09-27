@@ -6,8 +6,15 @@ using UnityEngine;
 
 namespace huqiang.UIEvent
 {
+    public enum EntityType
+    {
+        Default,
+        Circle,
+
+    }
     public class UserEvent
     {
+    
         internal int Frame;
         public static long ClickTime = 1800000;
         public static float ClickArea = 400;
@@ -385,7 +392,6 @@ namespace huqiang.UIEvent
                 }
             }
         }
-
         protected virtual void OnMouseMove(UserAction action)
         {
             if (!entry)
@@ -548,6 +554,18 @@ namespace huqiang.UIEvent
             if (endy)
                 if (back.ScrollEndY != null)
                     back.ScrollEndY(back);
+        }
+        public Vector3 GetOffset()
+        {
+            Vector3 os = Vector3.zero;
+            var size =Context.m_sizeDelta;
+            var pivot = Context.Pivot;
+            os.x = (0.5f - pivot.x) * size.x;
+            os.y = (0.5f - pivot.y) * size.y;
+            os.x *= GlobalScale.x;
+            os.y *= GlobalScale.y;
+            os = GlobalRotation * os;
+            return os;
         }
     }
 }

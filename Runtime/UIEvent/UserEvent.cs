@@ -22,7 +22,6 @@ namespace huqiang.UIEvent
         {
             HGUIElement root = pipeLine[0];
             float s = HCanvas.MainCanvas.PhysicalScale;
-            Vector3 a= new Vector3(s,s,s);
             if (root.script != null)
             {
                  int c = root.childCount;
@@ -30,7 +29,7 @@ namespace huqiang.UIEvent
                 {
                     try
                     {
-                        if (DispatchEvent(pipeLine, i, Vector3.zero, a, Quaternion.identity, action))
+                        if (DispatchEvent(pipeLine, i, action))
                             return;
                     }
                     catch (Exception ex)
@@ -50,20 +49,15 @@ namespace huqiang.UIEvent
         /// <param name="quate">父级旋转</param>
         /// <param name="action">用户操作指令</param>
         /// <returns></returns>
-        static bool DispatchEvent(HGUIElement[] pipeLine, int index,Vector3 pos,Vector3 scale,Quaternion quate, UserAction action)
+        static bool DispatchEvent(HGUIElement[] pipeLine, int index,UserAction action)
         {
             if (!pipeLine[index].active)
                 return false;
-            Vector3 p = quate * pipeLine[index].localPosition;
-            Vector3 o = Vector3.zero;
-            o.x = p.x * scale.x;
-            o.y = p.y * scale.y;
-            o.z = p.z * scale.z;
-            o += pos;
-            Vector3 s = pipeLine[index].localScale;
-            Quaternion q = quate * pipeLine[index].localRotation;
-            s.x *= scale.x;
-            s.y *= scale.y;
+            int pi = pipeLine[index].parentIndex;
+            Vector3 o = pipeLine[index].Position;
+            Vector3 scale = pipeLine[index].Scale;
+            Quaternion q = pipeLine[index].Rotation;
+
             var script = pipeLine[index].script;
             if (script != null)
             {
@@ -77,7 +71,7 @@ namespace huqiang.UIEvent
                         for (int i = 0; i < c; i++)
                         {
                             os--;
-                            if (DispatchEvent(pipeLine, os, o, s, q, action))
+                            if (DispatchEvent(pipeLine, os,action))
                             {
                                 return true;
                             }
@@ -93,7 +87,7 @@ namespace huqiang.UIEvent
                         for (int i = 0; i < c; i++)
                         {
                             os--;
-                            if (DispatchEvent(pipeLine, os, o, s, q, action))
+                            if (DispatchEvent(pipeLine, os, action))
                             {
                                 return true;
                             }
@@ -102,8 +96,8 @@ namespace huqiang.UIEvent
                 }
                 else
                 {
-                    ue.pgs = scale;
-                    ue.GlobalScale = s;
+                    ue.pgs = pipeLine[pi].Scale;
+                    ue.GlobalScale = scale;
                     ue.GlobalPosition = o;
                     ue.GlobalRotation = q;
                     bool inside = false;
@@ -119,7 +113,7 @@ namespace huqiang.UIEvent
                             for (int i = 0; i < c; i++)
                             {
                                 os--;
-                                if (DispatchEvent(pipeLine, os, o, s, q, action))
+                                if (DispatchEvent(pipeLine, os, action))
                                 {
                                     if (ue.ForceEvent)
                                     {
@@ -155,7 +149,7 @@ namespace huqiang.UIEvent
                             for (int i = 0; i < c; i++)
                             {
                                 os--;
-                                if (DispatchEvent(pipeLine, os, o, s, q, action))
+                                if (DispatchEvent(pipeLine, os, action))
                                 {
                                     return true;
                                 }
@@ -173,7 +167,7 @@ namespace huqiang.UIEvent
                     for (int i = 0; i < c; i++)
                     {
                         os--;
-                        if (DispatchEvent(pipeLine, os, o, s, q, action))
+                        if (DispatchEvent(pipeLine, os, action))
                         {
                             return true;
                         }

@@ -11,6 +11,9 @@ namespace huqiang.Core.HGUI
         public Vector3 localPosition;
         public Quaternion localRotation;
         public Vector3 localScale;
+        public Vector3 Position;
+        public Quaternion Rotation;
+        public Vector3 Scale;
         public bool active;
         public Transform trans;
         public UIElement script;

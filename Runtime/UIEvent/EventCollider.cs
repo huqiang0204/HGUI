@@ -58,14 +58,15 @@ namespace huqiang.UIEvent
                 w *= 0.5f;
                 w *= Ratio;
             }
+            w *= user.GlobalScale.x;
             Vector3 os = Vector3.zero;
             float px = script.Pivot.x;
             os.x = (0.5f - px) * script.m_sizeDelta.x;
             float py = script.Pivot.y;
             os.y = (0.5f - py) * script.m_sizeDelta.y;
             os = user.GlobalRotation * os;
-            float x = dot.x - o.x - os.x;
-            float y = dot.y - o.y - os.y;
+            float x = dot.x - o.x - os.x ;
+            float y = dot.y - o.y - os.y ;
             if (x * x + y * y < w * w)
                 return true;
             return false;

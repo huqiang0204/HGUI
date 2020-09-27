@@ -23,7 +23,6 @@ namespace huqiang.UIEvent
         protected float overTime = 0;
         internal override void Initial(FakeStruct mod)
         {
-            base.Initial(mod);
             text = Context as HText;
         }
         public void ChangeText(string str)

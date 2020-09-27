@@ -35,11 +35,10 @@ namespace huqiang.UIComposite
         public override void Initial(FakeStruct fake,UIElement script)
         {
             base.Initial(fake,script);
-            callBack = script.RegEvent<UserEvent>();
+            callBack = script.RegEvent<UserEvent>(new UICircleCollider());
             callBack.Drag = Draging;
             callBack.DragEnd = DragEnd;
             callBack.PointerDown = PointDown;
-            callBack.IsCircular = true;
             _r = Enity.SizeDelta.x * 0.5f;
             if (_r <= 0)
                 _r = 0.01f;

@@ -31,7 +31,7 @@ namespace huqiang.Data
     }
     public class TransfromLoader : DataLoader
     {
-        public static FakeStruct GetComponent(FakeStruct fake,string type)
+        public static FakeStruct GetComponent(FakeStruct fake, string type)
         {
             unsafe
             {

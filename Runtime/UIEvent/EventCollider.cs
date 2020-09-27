@@ -7,12 +7,18 @@ using UnityEngine;
 
 namespace huqiang.UIEvent
 {
+    public enum EventColliderType
+    {
+        Box,
+        Circle,
+        Polygon
+    }
     public interface EventCollider
     {
         void Initial(FakeStruct fake);
         bool InThere(UIElement script, UserEvent user, Vector2 dot);
     }
-    public class BoxEvent: EventCollider
+    public class UIBoxCollider : EventCollider
     {
         Vector2[] Box = new Vector2[4];
         public bool InThere(UIElement script, UserEvent user, Vector2 dot)
@@ -36,7 +42,7 @@ namespace huqiang.UIEvent
 
     }
 
-    public class CircleEvent : EventCollider
+    public class UICircleCollider : EventCollider
     {
         public float Radius;
         public float Ratio = 1;
@@ -66,12 +72,12 @@ namespace huqiang.UIEvent
         }
         public void Initial(FakeStruct fake)
         {
-            Radius = fake.GetFloat(0);
-            Ratio = fake.GetFloat(1);
+            Radius = fake.GetFloat(1);
+            Ratio = fake.GetFloat(2);
         }
     }
 
-    public class PolygonEvent : EventCollider
+    public class UIPolygonCollider : EventCollider
     {
         public Vector2[] Points;
         Vector2[] tmp;
@@ -96,7 +102,7 @@ namespace huqiang.UIEvent
             return huqiang.Physics2D.DotToPolygon(tmp, dot);
         }
         public void Initial(FakeStruct fake) {
-            Points = fake.buffer.GetArray<Vector2>(fake[0]);
+            Points = fake.buffer.GetArray<Vector2>(fake[1]);
         }
     }
 }

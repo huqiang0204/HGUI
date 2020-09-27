@@ -27,8 +27,7 @@ namespace huqiang.UIComposite
         {
             base.Initial(fake,element);
             palette = new Palette();
-            callBackR = element.RegEvent<UserEvent>();
-            callBackR.IsCircular = true;
+            callBackR = element.RegEvent<UserEvent>(new UICircleCollider());
             callBackR.Drag = callBackR.DragEnd = DragingR;
             callBackR.PointerDown = PointDownR;
             var mod = element.transform;

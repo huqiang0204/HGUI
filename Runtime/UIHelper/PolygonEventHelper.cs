@@ -1,4 +1,5 @@
 ﻿using huqiang.Data;
+using huqiang.UIEvent;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,8 +14,9 @@ public class PolygonEventHelper : UICompositeHelp
     {
         if (Points != null)
         {
-            FakeStruct fs = new FakeStruct(data, 1);
-            fs[0] = data.AddArray<Vector2>(Points);
+            FakeStruct fs = new FakeStruct(data, 2);
+            fs[0] = (int)EventColliderType.Polygon;
+            fs[1] = data.AddArray<Vector2>(Points);
             return fs;
         }
         return null;

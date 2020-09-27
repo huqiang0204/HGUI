@@ -107,33 +107,8 @@ namespace huqiang.UIEvent
                     ue.GlobalPosition = o;
                     ue.GlobalRotation = q;
                     bool inside = false;
-                    float w = (script.SizeDelta.x + ue.BoxAdjuvant.x) * s.x;
-                    float h = (script.SizeDelta.y + ue.BoxAdjuvant.y) * s.y;
-                    if (ue.IsCircular)
-                    {
-                        float x = action.CanPosition.x - o.x;
-                        float y = action.CanPosition.y - o.y;
-                        w *= 0.5f;
-                        if (x * x + y * y < w * w)
-                            inside = true;
-                    }
-                    else
-                    {
-                        float px = script.Pivot.x;
-                        float py = script.Pivot.y;
-                        float lx = -px * w;
-                        float rx = lx + w;
-                        float dy = -py * h;
-                        float ty = dy + h;
-
-                        var v = action.CanPosition;
-                        var Rectangular = ue.Rectangular;
-                        Rectangular[0] = q * new Vector3(lx, dy) + o;
-                        Rectangular[1] = q * new Vector3(lx, ty) + o;
-                        Rectangular[2] = q * new Vector3(rx, ty) + o;
-                        Rectangular[3] = q * new Vector3(rx, dy) + o;
-                        inside = huqiang.Physics2D.DotToPolygon(Rectangular, v);
-                    }
+                    if (ue.collider != null)
+                       inside = ue.collider.InThere(script, ue, action.CanPosition);
                     if (inside)
                     {
                         action.CurrentEntry.Add(ue);
@@ -278,7 +253,6 @@ namespace huqiang.UIEvent
         /// </summary>
         public bool Penetrate = false;
 
-        public bool IsCircular = false;
         public bool entry { get; protected set; }
         private int index;
         public bool AutoColor = true;
@@ -302,9 +276,10 @@ namespace huqiang.UIEvent
 
         UserAction FocusAction;
         public UIElement Context;
+        public EventCollider collider;
         public UserEvent()
         {
-            Rectangular = new Vector3[4];
+            //Rectangular = new Vector3[4];
         }
         void RefreshRateX()
         {
@@ -485,13 +460,39 @@ namespace huqiang.UIEvent
             if (Click != null)
                 Click(this,action);
         }
-        public void Initi(FakeStruct mod)
-        {
-            Initial(mod);
-        }
         internal virtual void Initial(FakeStruct mod)
         {
-            
+            if (mod == null)
+            {
+                collider = new UIBoxCollider ();
+                return; 
+            }
+            FakeStruct fs = null;
+            unsafe
+            {
+                 fs = mod.buffer.GetData(((TransfromData*)mod.ip)->ex) as FakeStruct;
+             }
+            if(fs==null)
+            {
+                collider = new UIBoxCollider ();
+            }
+            else
+            {
+                switch((EventColliderType)fs[0])
+                {
+                    case EventColliderType.Circle:
+                        collider = new UICircleCollider();
+                        collider.Initial(fs);
+                        break;
+                    case EventColliderType.Polygon:
+                        collider = new UIPolygonCollider();
+                        collider.Initial(fs);
+                        break;
+                    default:
+                        collider = new UIBoxCollider ();
+                        break;
+                }
+            }
         }
         public void RemoveFocus()
         {

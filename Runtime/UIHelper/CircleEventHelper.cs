@@ -1,4 +1,5 @@
 ﻿using huqiang.Data;
+using huqiang.UIEvent;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,9 +14,10 @@ public class CircleEventHelper : UICompositeHelp
     public float Ratio = 1;
     public override object ToBufferData(DataBuffer data)
     {
-        FakeStruct fs = new FakeStruct(data,2);
-        fs.SetFloat(0,Radius);
-        fs.SetFloat(1,Ratio);
+        FakeStruct fs = new FakeStruct(data,3);
+        fs[0] = (int)EventColliderType.Circle;
+        fs.SetFloat(1,Radius);
+        fs.SetFloat(2,Ratio);
         return fs;
     }
 }

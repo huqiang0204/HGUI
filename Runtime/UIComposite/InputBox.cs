@@ -155,20 +155,27 @@ namespace huqiang.UIComposite
             textColor = txt.m_color;
             unsafe
             {
-                var ex = mod.buffer.GetData(((TransfromData*)mod.ip)->ex) as FakeStruct;
-                if (ex != null)
+                if(mod!=null)
                 {
-                    TextInputData* tp = (TextInputData*)ex.ip;
-                    textColor = tp->inputColor;
-                    m_tipColor = tp->tipColor;
-                    PointColor = tp->pointColor;
-                    SelectionColor = tp->selectColor;
-                    CharacterLimit = tp->CharacterLimit;
-                    ReadOnly = tp->ReadyOnly;
-                    contentType = tp->contentType;
-                    lineType = tp->lineType;
-                    m_TipString = mod.buffer.GetData(tp->tipString) as string;
-                    m_InputString = mod.buffer.GetData(tp->inputString) as string;
+                    var ex = mod.buffer.GetData(((TransfromData*)mod.ip)->ex) as FakeStruct;
+                    if (ex != null)
+                    {
+                        TextInputData* tp = (TextInputData*)ex.ip;
+                        textColor = tp->inputColor;
+                        m_tipColor = tp->tipColor;
+                        PointColor = tp->pointColor;
+                        SelectionColor = tp->selectColor;
+                        CharacterLimit = tp->CharacterLimit;
+                        ReadOnly = tp->ReadyOnly;
+                        contentType = tp->contentType;
+                        lineType = tp->lineType;
+                        m_TipString = mod.buffer.GetData(tp->tipString) as string;
+                        m_InputString = mod.buffer.GetData(tp->inputString) as string;
+                    }
+                    else
+                    {
+                        m_InputString = txt.Text;
+                    }
                 }
                 else
                 {
@@ -177,6 +184,7 @@ namespace huqiang.UIComposite
             }
             FullString.FullString = m_InputString;
             InputEvent = txt.RegEvent<InputBoxEvent>();
+            InputEvent.Initial(null);
             InputEvent.input = this;
             Caret = txt.GetComponentInChildren<HImage>();
         }

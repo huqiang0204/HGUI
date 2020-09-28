@@ -46,11 +46,33 @@ namespace huqiang.UIEvent
     {
         public float Radius;
         public float Ratio = 1;
+        bool InArc(ref Vector2 a,ref Vector2 b,ref Vector2 c,ref Vector2 dot)
+        {
+            var p = MathH.GetCentre(a,b,c);
+            float ax = a.x - p.x;
+            float ay = a.y - p.y;
+            float dx = dot.x - p.x;
+            float dy = dot.y - p.y;
+
+            if (ax * ax + ay * ay >= dx * dx + dy * dy)
+            {
+                return huqiang.Physics2D.LineToLine(ref a, ref c, ref p, ref dot);
+            }
+            return false;
+        }
         public bool InThere(UIElement script, UserEvent user, Vector2 dot)
         {
+            Vector3 os = Vector3.zero;
+            float px = script.Pivot.x;
+            os.x = (0.5f - px) * script.m_sizeDelta.x;
+            float py = script.Pivot.y;
+            os.y = (0.5f - py) * script.m_sizeDelta.y;
+            var q = user.GlobalRotation;
+            
             var o = user.GlobalPosition;
+            Vector3 scale = user.GlobalScale;
             float w = Radius;
-            if(w==0)
+            if (w == 0)
             {
                 w = script.m_sizeDelta.x;
                 if (w > script.m_sizeDelta.y)
@@ -58,17 +80,60 @@ namespace huqiang.UIEvent
                 w *= 0.5f;
                 w *= Ratio;
             }
-            w *= user.GlobalScale.x;
-            Vector3 os = Vector3.zero;
-            float px = script.Pivot.x;
-            os.x = (0.5f - px) * script.m_sizeDelta.x;
-            float py = script.Pivot.y;
-            os.y = (0.5f - py) * script.m_sizeDelta.y;
-            os = user.GlobalRotation * os;
-            float x = dot.x - o.x - os.x ;
-            float y = dot.y - o.y - os.y ;
-            if (x * x + y * y < w * w)
-                return true;
+            if (scale.x != scale.y)
+            {
+                float h = w * scale.y;
+                w = w * scale.x;
+                float rx = w ;
+                float lx = -rx;
+                lx += os.x;
+                rx += os.x;
+                float ty = h;
+                float dy = -ty;
+                ty += os.y;
+                dy += os.y;
+                dot.x -= o.x;
+                dot.y -= o.y;
+                if (scale.x > scale.y)
+                {
+                    Vector2 a = new Vector2(lx, os.y);
+                    a = q * a;
+                    Vector2 b = new Vector2(os.x, ty);
+                    b = q * b;
+                    Vector2 c = new Vector2(rx, os.y);
+                    c = q * c;
+                    if (InArc(ref a, ref b, ref c, ref dot))
+                        return true;
+                    b.x = os.x;
+                    b.y = dy;
+                    b = q * b;
+                    return InArc(ref a, ref b, ref c, ref dot);
+                }
+                else
+                {
+                    Vector2 a = new Vector2(os.x, ty);
+                    a = q * a;
+                    Vector2 b = new Vector2(rx, os.y);
+                    b = q * b;
+                    Vector2 c = new Vector2(os.x, dy);
+                    c = q * c;
+                    if (InArc(ref a, ref b, ref c, ref dot))
+                        return true;
+                    b.x = lx;
+                    b.y = os.y;
+                    b = q * b;
+                    return InArc(ref a, ref b, ref c, ref dot);
+                }
+            }
+            else
+            {
+                os = q * os;
+                w *= scale.x;
+                float x = dot.x - o.x - os.x;
+                float y = dot.y - o.y - os.y;
+                if (x * x + y * y < w * w)
+                    return true;
+            }
             return false;
         }
         public void Initial(FakeStruct fake)

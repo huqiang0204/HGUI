@@ -307,12 +307,14 @@ namespace huqiang.UIComposite
                     str = new string('●', str.Length);
                 TextCom.Text = str;
                 ShowString = str;
+                InputEvent.ChangeText(str);
             }
             else
             {
                 TextCom.MainColor = m_tipColor;
                 TextCom.Text = m_TipString;
                 ShowString = m_TipString;
+                InputEvent.ChangeText("");
             }
         }
         public bool DeleteSelectString()

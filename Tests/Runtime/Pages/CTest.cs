@@ -15,9 +15,7 @@ public class CTest:UIPage
     //反射UI界面上的物体
     class View
     {
-        public HText A;
-        public HText B;
-        public InputBox Text;
+        public InputBox InputBox;
     }
     View view;
     public override void Initial(Transform parent, object dat = null)
@@ -28,8 +26,7 @@ public class CTest:UIPage
     }
     void InitialEvent()
     {
-        view.A.userEvent.Click = (o, e) => { view.Text.Replace(view.A, o,e); };
-        view.B.userEvent.Click = (o, e) => { view.Text.Replace(view.B,o, e); };
+        
     }
 
 }

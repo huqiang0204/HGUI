@@ -20,7 +20,7 @@ namespace huqiang.Core.HGUI
         public static BlockBuffer<HVertex> VertexBuffer = new BlockBuffer<HVertex>(32, 1024);
         public static BlockBuffer<TextVertex> PopulateBuffer = new BlockBuffer<TextVertex>(32, 1024);
         static Font defFont;
-        protected static char[] key_noMesh = new char[] { ' ' ,'\n', '\r' };
+        protected static char[] key_noMesh = new char[] { ' ' ,'\n' };//排除\r
         static List<int> bufferA = new List<int>();
         static List<int> bufferB = new List<int>();
         public static void DirtyAll()

@@ -33,7 +33,8 @@ namespace huqiang.UIEvent
             chars.Clear();
             Content.FullString = str;
             text.GetGenerationSettings(ref text.m_sizeDelta, ref HText.settings);
-          
+            HText.settings.richText = false;
+
             var g = HText.Generator;
             g.Populate(Content.FilterString, HText.settings);
             verts.AddRange(g.verts);

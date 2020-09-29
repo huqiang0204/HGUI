@@ -46,6 +46,7 @@ namespace huqiang.Core.HGUI
             Target = text;
             Content = str;
             text.GetGenerationSettings(ref text.m_sizeDelta,ref HText.settings);
+            HText.settings.richText = false;
             var g = HText.Generator;
             string fs = Content.FilterString;
             if (contentType == ContentType.Password)

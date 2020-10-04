@@ -181,6 +181,7 @@ namespace huqiang.Core.HGUI
                     Debug.Log("脚本重复更新");
                 }
             }
+            Collection(transform, -1, 0);
             for (int i = 0; i < top_txt; i++)
             {
                 texts[i].Populate(); 

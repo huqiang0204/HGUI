@@ -496,17 +496,18 @@ namespace huqiang.Core.HGUI
                     {
                         for (int j = 0; j < 4; j++)
                         {
+                            if (o >= v.Count)
+                                goto label;
                             hv[o].position = v[o].position;
                             hv[o].uv = v[o].uv0;
                             hv[o].color = v[o].color;
                             hv[o].Index = i;
                             o++;
                         }
-                        if (o >= v.Count)
-                            break;
                     }
                 }
             }
+        label:;
             vert.DataCount = o;
         }
         public virtual void Populate()

@@ -511,62 +511,63 @@ namespace huqiang.Core.HGUI
         }
         public virtual void Populate()
         {
-            if (!m_dirty)
-                return;
-            emojiString.FullString = m_text;
-            var str = emojiString.FilterString;
-            if (sizeFitter != ContentSizeFitter.None)
+            if (m_dirty | m_colorChanged)
             {
-                if (marginType != MarginType.None)
-                    Margin(this);
+                emojiString.FullString = m_text;
+                var str = emojiString.FilterString;
+                if (sizeFitter != ContentSizeFitter.None)
+                {
+                    if (marginType != MarginType.None)
+                        Margin(this);
+                    GetGenerationSettings(ref m_sizeDelta, ref settings);
+                    var gen = Generator;
+                    if (sizeFitter == ContentSizeFitter.Horizoantal)
+                    {
+                        m_sizeDelta.x = gen.GetPreferredWidth(str, settings);
+                    }
+                    else if (sizeFitter == ContentSizeFitter.Vertical)
+                    {
+                        m_sizeDelta.y = gen.GetPreferredHeight(str, settings);
+                    }
+                    else if (sizeFitter == ContentSizeFitter.Both)
+                    {
+                        float w = gen.GetPreferredWidth(str, settings);
+                        if (w < m_sizeDelta.x)
+                            m_sizeDelta.x = w;
+                        m_sizeDelta.y = gen.GetPreferredHeight(str, settings);
+                    }
+                    Dock(this);
+                }
                 GetGenerationSettings(ref m_sizeDelta, ref settings);
-                var gen = Generator;
-                if (sizeFitter == ContentSizeFitter.Horizoantal)
+                var g = Generator;
+                g.Populate(str, settings);
+                var v = g.verts;
+                int c = g.characterCountVisible * 4;
+                if (c == 0)
                 {
-                    m_sizeDelta.x = gen.GetPreferredWidth(str, settings);
+                    TmpVerts.DataCount = 0;
+                    trisInfo.DataCount = 0;
+                    trisInfo2.DataCount = 0;
+                    return;
                 }
-                else if (sizeFitter == ContentSizeFitter.Vertical)
+                else
+                if (c > TmpVerts.Size | TmpVerts.Size > c + 32)
                 {
-                    m_sizeDelta.y = gen.GetPreferredHeight(str, settings);
+                    TmpVerts.Release();
+                    TmpVerts = PopulateBuffer.RegNew(c);
                 }
-                else if (sizeFitter == ContentSizeFitter.Both)
+                if (m_richText)
                 {
-                    float w = gen.GetPreferredWidth(str, settings);
-                    if (w < m_sizeDelta.x)
-                        m_sizeDelta.x = w;
-                    m_sizeDelta.y = gen.GetPreferredHeight(str, settings);
+                    emojiString.FullString = RichTextHelper.DeleteLabel(m_text);
+                    str = emojiString.FilterString;
                 }
-                Dock(this);
+                GetTempVertex(v, ref TmpVerts, str);
+                m_dirty = false;
+                m_vertexChange = true;
+                fillColors[0] = true;
+                m_colorChanged = false;
+                MainTexture = Font.material.mainTexture;
             }
-            GetGenerationSettings(ref m_sizeDelta, ref settings);
-            var g = Generator;
-            g.Populate(str, settings);
-            var v = g.verts;
-            int c = g.characterCountVisible * 4;
-            if (c == 0)
-            {
-                TmpVerts.DataCount = 0;
-                trisInfo.DataCount = 0;
-                trisInfo2.DataCount = 0;
-                return;
-            }
-            else
-            if (c > TmpVerts.Size | TmpVerts.Size > c + 32)
-            {
-                TmpVerts.Release();
-                TmpVerts = PopulateBuffer.RegNew(c);
-            }
-            if (m_richText)
-            {
-                emojiString.FullString = RichTextHelper.DeleteLabel(m_text);
-                str = emojiString.FilterString;
-            }
-            GetTempVertex(v, ref TmpVerts, str);
-            m_dirty = false;
-            m_vertexChange = true;
-            fillColors[0] = true;
-            m_colorChanged = false;
-            MainTexture = Font.material.mainTexture;
         }
         public override void UpdateMesh()
         {
@@ -576,9 +577,9 @@ namespace huqiang.Core.HGUI
                 if (OutLine > 0)
                     CreateOutLine(this);
                 m_vertexChange = false;
+                m_colorChanged = false;
             }
         }
-       
         public void Reset()
         {
             STexture = UnityEngine.Resources.Load<Texture>("Emoji");

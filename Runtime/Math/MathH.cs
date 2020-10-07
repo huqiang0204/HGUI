@@ -148,6 +148,42 @@ namespace huqiang
             return o;
         }
         /// <summary>
+        /// <para>二维：已知圆上三点，求圆心坐标</para>
+        /// <para>三个点不在同一直线上</para>
+        /// </summary>
+        /// <param name="P1">点1</param>
+        /// <param name="P2">点2</param>
+        /// <param name="P3">点3</param>
+        /// <returns></returns>
+        public static Vector2 GetCentre(Vector2 P1, Vector2 P2, Vector2 P3)
+        {
+            float a13 = P1.x - P3.x;
+            float a13_ = P1.x + P3.x;
+            float b13 = P1.y - P3.y;
+            float b13_ = P1.y + P3.y;
+            float a12 = P1.x - P2.x;
+            float a12_ = P1.x + P2.x;
+            float b12 = P1.y - P2.y;
+            float b12_ = P1.y + P2.y;
+
+            float a12b12_2 = a12 * a12_ + b12 * b12_;
+            float a13b13_2 = a13 * a13_ + b13 * b13_;
+
+            float a13b12 = 2 * a13 * b12;
+            float a12b13 = 2 * a12 * b13;
+
+            if (a12b13 - a13b12 == 0) 
+                return new Vector2((P2.x + P1.x) / 2, (P2.y + P1.y) / 2);
+            float af = a12b13 - a13b12;
+            float bf = a13b12 - a12b13;
+            float az = b13 * a12b12_2 - b12 * a13b13_2;
+            float bz = a13 * a12b12_2 - a12 * a13b13_2;
+            float a = az / af;
+            float b = bz / bf;
+            return new Vector2(a, b);
+        }
+
+        /// <summary>
         /// 抛物线解析式，返回一般表达式 y=a*x*x+b*x+c的 a,b,c的值
         /// </summary>
         /// <param name="A"></param>

@@ -238,7 +238,10 @@ namespace huqiang
                         Int16 ot = (Int16)(time - Msgs[i].CreateTime);
                         if (ot < 0)
                             ot += 10000;
-                        delays[0] = ot;
+                        delays[delayEnd] = ot;
+                        delayEnd++;
+                        if (delayEnd >= 128)
+                            delayEnd = 0;
                         Msgs[i].data.Release();
                         Msgs.RemoveAt(i);
                         return;

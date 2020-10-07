@@ -155,20 +155,27 @@ namespace huqiang.UIComposite
             textColor = txt.m_color;
             unsafe
             {
-                var ex = mod.buffer.GetData(((TransfromData*)mod.ip)->ex) as FakeStruct;
-                if (ex != null)
+                if(mod!=null)
                 {
-                    TextInputData* tp = (TextInputData*)ex.ip;
-                    textColor = tp->inputColor;
-                    m_tipColor = tp->tipColor;
-                    PointColor = tp->pointColor;
-                    SelectionColor = tp->selectColor;
-                    CharacterLimit = tp->CharacterLimit;
-                    ReadOnly = tp->ReadyOnly;
-                    contentType = tp->contentType;
-                    lineType = tp->lineType;
-                    m_TipString = mod.buffer.GetData(tp->tipString) as string;
-                    m_InputString = mod.buffer.GetData(tp->inputString) as string;
+                    var ex = mod.buffer.GetData(((TransfromData*)mod.ip)->ex) as FakeStruct;
+                    if (ex != null)
+                    {
+                        TextInputData* tp = (TextInputData*)ex.ip;
+                        textColor = tp->inputColor;
+                        m_tipColor = tp->tipColor;
+                        PointColor = tp->pointColor;
+                        SelectionColor = tp->selectColor;
+                        CharacterLimit = tp->CharacterLimit;
+                        ReadOnly = tp->ReadyOnly;
+                        contentType = tp->contentType;
+                        lineType = tp->lineType;
+                        m_TipString = mod.buffer.GetData(tp->tipString) as string;
+                        m_InputString = mod.buffer.GetData(tp->inputString) as string;
+                    }
+                    else
+                    {
+                        m_InputString = txt.Text;
+                    }
                 }
                 else
                 {
@@ -177,11 +184,13 @@ namespace huqiang.UIComposite
             }
             FullString.FullString = m_InputString;
             InputEvent = txt.RegEvent<InputBoxEvent>();
+            InputEvent.Initial(null);
             InputEvent.input = this;
             Caret = txt.GetComponentInChildren<HImage>();
         }
         public void OnMouseDown(UserAction action, ref PressInfo press)
         {
+            TextOperation.contentType = m_ctpye;
             TextOperation.ChangeText(TextCom, FullString);
             SetShowText();
             TextOperation.SetPress(ref press);
@@ -195,6 +204,7 @@ namespace huqiang.UIComposite
             if (!ReadOnly)
             {
                 Editing = true;
+                TextOperation.contentType = m_ctpye;
                 if (!Keyboard.active)
                 {
                     bool pass = contentType == ContentType.Password ? true : false;
@@ -206,11 +216,10 @@ namespace huqiang.UIComposite
         public void OnLostFocus(UserAction action)
         {
             Editing = false;
-            TextCom.FullString = FullString.FullString;
+            TextCom.Text = FullString.FullString;
             if (ReplaceTarget != null)
             {
-                ReplaceTarget.Text = ShowString;
-                ReplaceTarget.FullString = FullString.FullString;
+                ReplaceTarget.Text = FullString.FullString;
                 Enity.gameObject.SetActive(false);
             }
             else SetShowText();
@@ -237,7 +246,7 @@ namespace huqiang.UIComposite
                     int len = CharacterLimit - str.Length;
                     if (len <= 0)
                         return "";
-                    es.Remove(fs.Length - len, len);
+                    es.Remove(len,fs.Length - len);
                 }
             }
             str = es.FullString;
@@ -248,7 +257,7 @@ namespace huqiang.UIComposite
                 if (ValidateChar(this, s, str[0]) == 0)
                     return "";
             InsertString(str);
-            return input;
+            return str;
         }
         void TouchInputChanged(string input)
         {
@@ -284,8 +293,8 @@ namespace huqiang.UIComposite
                 str = TextOperation.GetShowContent();//GetShowString();
                 TextCom.MainColor = textColor;
                 if (contentType == ContentType.Password)
-                    TextCom.Text = new string('*', str.Length);
-                else TextCom.Text = str;
+                    str = new string('●', str.Length);
+                TextCom.Text = str;
                 InputEvent.ChangeText(str);
                 ShowString = str;
             }
@@ -295,15 +304,17 @@ namespace huqiang.UIComposite
                     return;
                 TextCom.MainColor = textColor;
                 if (contentType == ContentType.Password)
-                    TextCom.Text = new string('*', str.Length);
-                else TextCom.Text = str;
+                    str = new string('●', str.Length);
+                TextCom.Text = str;
                 ShowString = str;
+                InputEvent.ChangeText(str);
             }
             else
             {
                 TextCom.MainColor = m_tipColor;
                 TextCom.Text = m_TipString;
                 ShowString = m_TipString;
+                InputEvent.ChangeText("");
             }
         }
         public bool DeleteSelectString()
@@ -338,7 +349,6 @@ namespace huqiang.UIComposite
             var es = new EmojiString(str);
             TextOperation.DeleteSelectString();
             TextOperation.InsertContent(es);
-            SetShowText();
         }
         public void PointerMoveLeft()
         {
@@ -405,6 +415,7 @@ namespace huqiang.UIComposite
                     if (Keyboard.InputChanged)
                     {
                         OnInputChanged(Keyboard.InputString);
+                        SetShowText();
                     }
                     else if (Keyboard.TempStringChanged)
                     {
@@ -642,9 +653,8 @@ namespace huqiang.UIComposite
             Enity.margin.down = 0;
             UIElement.Resize(Enity);
             HTextLoader.CopyTo(text,TextCom);
-            if (text.FullString == null)
-                FullString.FullString = text.Text;
-            else FullString.FullString = text.FullString;
+            FullString.FullString = text.Text;
+            TextOperation.contentType = m_ctpye;
             TextOperation.ChangeText(TextCom,FullString);
             action.AddFocus(InputEvent);
             Enity.gameObject.SetActive(true);

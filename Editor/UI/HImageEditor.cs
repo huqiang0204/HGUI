@@ -15,6 +15,7 @@ public class HImageEditor:UIElementEditor
     Sprite sprite;
     public override void OnEnable()
     {
+        base.OnEnable();
         HImage img = target as HImage;
         if (img != null)
         {

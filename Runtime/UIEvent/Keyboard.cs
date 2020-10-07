@@ -109,6 +109,7 @@ namespace huqiang.UIEvent
                     TempString = "";
                     InputString = IME.ResultString;
                     InputChanged = true;
+                    CompositionString = "";
                 }
                 else
                 {

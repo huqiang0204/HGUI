@@ -638,7 +638,7 @@ namespace huqiang.Core.HGUI
         public object DataContext;
         internal int PipelineIndex;
         public virtual Color32 MainColor { get; set; }
-        public T RegEvent<T>(FakeStruct fake = null) where T : UserEvent, new()
+        public T RegEvent<T>(FakeStruct fake) where T : UserEvent, new()
         {
             var t = userEvent as T;
             if (t != null)
@@ -650,7 +650,20 @@ namespace huqiang.Core.HGUI
             t.g_color = MainColor;
             return t;
         }
-
+        public T RegEvent<T>(EventCollider collider = null) where T : UserEvent, new()
+        {
+            var t = userEvent as T;
+            if (t != null)
+                return t;
+            t = new T();
+            t.Context = this;
+            if (collider == null)
+                t.collider = new UIBoxCollider();
+            else t.collider = collider;
+            userEvent = t;
+            t.g_color = MainColor;
+            return t;
+        }
         public Action<UIElement> SizeChanged;
         public void Initial(FakeStruct ex)
         {

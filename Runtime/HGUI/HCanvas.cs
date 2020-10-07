@@ -79,9 +79,28 @@ namespace huqiang.Core.HGUI
             if (!act)
                 return;
             PipeLine[index].parentIndex = parent;
-            PipeLine[index].localPosition = trans.localPosition;
-            PipeLine[index].localRotation = trans.localRotation;
-            PipeLine[index].localScale = trans.localScale;
+            var lp = PipeLine[index].localPosition = trans.localPosition;
+            var lr = PipeLine[index].localRotation = trans.localRotation;
+            var ls = PipeLine[index].localScale = trans.localScale;
+            if(parent>=0)
+            {
+                var ps = PipeLine[parent].Scale;
+                lp.x *= ps.x;
+                lp.y *= ps.y;
+                lp.z *= ps.z;
+                PipeLine[index].Position = PipeLine[parent].Position + PipeLine[parent].Rotation * lp;
+                PipeLine[index].Rotation = PipeLine[parent].Rotation * lr;
+                PipeLine[index].Scale = ps;
+                PipeLine[index].Scale.x *= ls.x;
+                PipeLine[index].Scale.y *= ls.y;
+                PipeLine[index].Scale.z *= ls.z;
+            }
+            else
+            {
+                PipeLine[index].Position = Vector3.zero;
+                PipeLine[index].Rotation = Quaternion.identity;
+                PipeLine[index].Scale = Vector3.one;
+            }
             PipeLine[index].trans = trans;
             var script = trans.GetComponent<UIElement>();
             PipeLine[index].script = script;
@@ -162,6 +181,7 @@ namespace huqiang.Core.HGUI
                     Debug.Log("脚本重复更新");
                 }
             }
+            Collection(transform, -1, 0);
             for (int i = 0; i < top_txt; i++)
             {
                 texts[i].Populate(); 

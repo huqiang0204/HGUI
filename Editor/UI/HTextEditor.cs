@@ -15,6 +15,7 @@ public class HTextEditor:UIElementEditor
     string str;
     public override void OnEnable()
     {
+        base.OnEnable();
         HText img = target as HText;
         if (img != null)
         {

@@ -19,7 +19,7 @@ namespace huqiang.Core.HGUI
             get
             {
                 if (shader == null)
-                    shader = Shader.Find("Custom/UIDef");//Custom/UIDef
+                    shader = Shader.Find("HGUI/UIDef");//Custom/UIDef
                 return shader;
             }
         }

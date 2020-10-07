@@ -12,7 +12,6 @@ namespace huqiang.Core.HGUI
         public Vector3 position;
         public Color32 color;
         public Vector2 uv;
-        public float charWidth;
         public int Index;
     }
     public class HText:HGraphics
@@ -21,7 +20,7 @@ namespace huqiang.Core.HGUI
         public static BlockBuffer<HVertex> VertexBuffer = new BlockBuffer<HVertex>(32, 1024);
         public static BlockBuffer<TextVertex> PopulateBuffer = new BlockBuffer<TextVertex>(32, 1024);
         static Font defFont;
-        static char[] key_noMesh = new char[] { ' ' ,'\n', '\r' };
+        protected static char[] key_noMesh = new char[] { ' ' ,'\n' };//排除\r
         static List<int> bufferA = new List<int>();
         static List<int> bufferB = new List<int>();
         public static void DirtyAll()
@@ -35,20 +34,6 @@ namespace huqiang.Core.HGUI
                 else ht.m_dirty = true;
             }
         }
-        unsafe static bool AddMesh(TextVertex* src, HVertex* tar, EmojiString emoji, EmojiInfo info)
-        {
-            tar->position = src->position;
-            tar->color = src->color;
-            tar->uv = src->uv;
-            tar->uv4.x = 1;
-            tar->uv4.y = 1;
-            tar->picture = 0;
-            if (src->Index == info.pos)
-            {
-                return true;
-            }
-            return false;
-        }
         static void AddTris(List<int> tris, int s)
         {
             tris.Add(s);
@@ -58,7 +43,7 @@ namespace huqiang.Core.HGUI
             tris.Add(s + 3);
             tris.Add(s);
         }
-        protected static void CreateEmojiMeshA(HText text)
+        protected static void CreateEmojiMesh(HText text)
         {
             if (text.TmpVerts.DataCount == 0)
             {
@@ -84,13 +69,13 @@ namespace huqiang.Core.HGUI
                 text.vertInfo.Release();
                 text.vertInfo = VertexBuffer.RegNew(c);
             }
-            text.vertInfo.DataCount = c;
             var emoji = text.emojiString;
             EmojiInfo info = null;
             if (emoji.emojis.Count > 0)
                 info = emoji.emojis[0];
             int index = 0;
             int e = c / 4;
+            int ac = 0;
             Color32 col = Color.white;
             unsafe
             {
@@ -99,25 +84,27 @@ namespace huqiang.Core.HGUI
                 for (int i = 0; i < e; i++)
                 {
                     int s = i * 4;
+                    int ss = ac;
+                    int ti = src[s].Index;
                     for (int j = 0; j < 4; j++)
                     {
-                        hv[s].position = src[s].position;
-                        hv[s].color = src[s].color;
-                        hv[s].uv = src[s].uv;
-                        hv[s].uv4.x = 1;
-                        hv[s].uv4.y = 1;
-                        hv[s].picture = 0;
+                        hv[ss].position = src[s].position;
+                        hv[ss].color = src[s].color;
+                        hv[ss].uv = src[s].uv;
+                        hv[ss].uv4.x = 1;
+                        hv[ss].uv4.y = 1;
+                        hv[ss].picture = 0;
                         s++;
+                        ss++;
                     }
-                    s = i * 4;
-                    if(info!=null)
+                    if (info != null)
                     {
-                        if (src[s].Index > info.pos)
+                        if (ti > info.pos)
                         {
                             info = null;
                             for (int j = index; j < emoji.emojis.Count; j++)
                             {
-                                if (emoji.emojis[j].pos >= src[s].Index)
+                                if (emoji.emojis[j].pos >= ti)
                                 {
                                     index = j;
                                     info = emoji.emojis[j];
@@ -125,43 +112,46 @@ namespace huqiang.Core.HGUI
                                 }
                             }
                         }
-                        if(info!=null)
+                        ss = ac;
+                        if (info != null)
                         {
-                            if (src[s].Index == info.pos)
+                            if (ti == info.pos)
                             {
-                                AddTris(bufferB, s);
-                                hv[s].uv = info.uv[0];
-                                hv[s].color = col;
-                                hv[s].picture = 1;
-                                s++;
-                                hv[s].uv = info.uv[1];
-                                hv[s].color = col;
-                                hv[s].picture = 1;
-                                s++;
-                                hv[s].uv = info.uv[2];
-                                hv[s].color = col;
-                                hv[s].picture = 1;
-                                s++;
-                                hv[s].uv = info.uv[3];
-                                hv[s].color = col;
-                                hv[s].picture = 1;
+                                AddTris(bufferB, ac);
+                                hv[ss].uv = info.uv[0];
+                                hv[ss].color = col;
+                                hv[ss].picture = 1;
+                                ss++;
+                                hv[ss].uv = info.uv[1];
+                                hv[ss].color = col;
+                                hv[ss].picture = 1;
+                                ss++;
+                                hv[ss].uv = info.uv[2];
+                                hv[ss].color = col;
+                                hv[ss].picture = 1;
+                                ss++;
+                                hv[ss].uv = info.uv[3];
+                                hv[ss].color = col;
+                                hv[ss].picture = 1;
                             }
                             else
                             {
-                                AddTris(bufferA, s);
+                                AddTris(bufferA, ac);
                             }
                         }
                         else
                         {
-                            AddTris(bufferA, s);
+                            AddTris(bufferA, ac);
                         }
                     }
                     else
                     {
-                        AddTris(bufferA, s);
+                        AddTris(bufferA, ac);
                     }
+                    ac += 4;
                 }
             }
+            text.vertInfo.DataCount = ac;
             ApplyTris(text);
         }
         static void ApplyTris(HText text)
@@ -201,173 +191,6 @@ namespace huqiang.Core.HGUI
             }
             else
             {
-                text.trisInfo2.DataCount = 0;
-            }
-        }
-        protected static void CreateEmojiMesh(HText text)
-        {
-            if (text.TmpVerts.DataCount == 0)
-            {
-                text.vertInfo.DataCount = 0;
-                text.trisInfo.DataCount = 0;
-                text.trisInfo2.DataCount = 0;
-                return; 
-            }
-            bufferA.Clear();
-            bufferB.Clear();
-            var emojis = text.emojiString.emojis;
-            var str = text.emojiString.FilterString;
-            var verts = text.TmpVerts;
-            int c = verts.DataCount;
-            text.tris = null;
-            if(text.vertInfo.Size==0)
-            {
-                text.vertInfo = VertexBuffer.RegNew(c);
-            }
-            else
-            if (text.vertInfo.Size < c| text.vertInfo.Size> c+32)
-            {
-                text.vertInfo.Release();
-                text.vertInfo = VertexBuffer.RegNew(c);
-            }
-            text.vertInfo.DataCount = c;
-            int e = c / 4;
-            unsafe
-            {
-                HVertex* hv= text.vertInfo.Addr;
-                TextVertex* v = verts.Addr;
-                for (int i = 0; i < c; i++)
-                {
-                    hv[i].position = v[i].position;
-                    hv[i].color = v[i].color;
-                    hv[i].uv = v[i].uv;
-                    hv[i].uv4.x = 1;
-                    hv[i].uv4.y = 1;
-                    hv[i].picture = 0;
-                }
-            }
-  
-            if(emojis.Count>0)
-            {
-                var info = emojis[0];
-                Color col = Color.white;
-                int p = 0;
-                int si = 0;
-                int len = str.Length;
-                bool cull = true;
-                if (text.m_hof == HorizontalWrapMode.Wrap & text.m_vof == VerticalWrapMode.Truncate)
-                    cull =false;
-                for (int i = 0; i < e; i++)
-                {
-                    int index = 0;
-                    bool yes = true;
-                    if (cull)
-                    {
-                        unsafe
-                        {
-                            index = verts.Addr[i * 4].Index;
-                        }
-                        for (int j = 0; j < key_noMesh.Length; j++)
-                        {
-                            if (key_noMesh[j] == str[index])
-                            {
-                                yes = false;
-                                break;
-                            }
-                        }
-                    }
-                    if (yes)
-                    {
-                        if (index == info.pos)
-                        {
-                            int o = p * 4;
-                            unsafe
-                            {
-                                HVertex* hv = text.vertInfo.Addr;
-                                hv[o].uv = info.uv[0];
-                                hv[o].color = col;
-                                hv[o].picture = 1;
-                                o++;
-                                hv[o].uv = info.uv[1];
-                                hv[o].color = col;
-                                hv[o].picture = 1;
-                                o++;
-                                hv[o].uv = info.uv[2];
-                                hv[o].color = col;
-                                hv[o].picture = 1;
-                                o++;
-                                hv[o].uv = info.uv[3];
-                                hv[o].color = col;
-                                hv[o].picture = 1;
-                            }
-                         
-                            si++;
-                            if (si < emojis.Count)
-                                info = emojis[si];
-                            int s = p * 4;
-                            bufferB.Add(s);
-                            bufferB.Add(s + 1);
-                            bufferB.Add(s + 2);
-                            bufferB.Add(s + 2);
-                            bufferB.Add(s + 3);
-                            bufferB.Add(s);
-                        }
-                        else
-                        {
-                            int s = p * 4;
-                            bufferA.Add(s);
-                            bufferA.Add(s + 1);
-                            bufferA.Add(s + 2);
-                            bufferA.Add(s + 2);
-                            bufferA.Add(s + 3);
-                            bufferA.Add(s);
-                        }
-                        p++;
-                        if (p >= e)
-                            break;
-                    }
-                }
-                if (text.trisInfo.Size > 0)
-                    text.trisInfo.Release();
-                int ic = bufferA.Count;
-                if(ic>0)
-                {
-                    text.trisInfo = trisBuffer.RegNew(ic);
-                    text.trisInfo.DataCount = ic;
-                    unsafe
-                    {
-                        int* ip = text.trisInfo.Addr;
-                        for (int i = 0; i < ic; i++)
-                            ip[i] = bufferA[i];
-                    }
-                }
-                else
-                {
-                    text.trisInfo.DataCount = 0;
-                }
-
-                ic = bufferB.Count;
-                if (ic > 0)
-                {
-                    if (text.trisInfo2.Size > 0)
-                        text.trisInfo2.Release();
-                    text.trisInfo2 = trisBuffer.RegNew(ic);
-                    text.trisInfo2.DataCount = ic;
-                    unsafe
-                    {
-                        int* ip = text.trisInfo2.Addr;
-                        for (int i = 0; i < ic; i++)
-                            ip[i] = bufferB[i];
-                    }
-                }
-                else
-                { 
-                    text.trisInfo2.DataCount = 0; 
-                }
-            }
-            else
-            {
-                CreateTri(c,ref text.trisInfo);
                 text.trisInfo2.DataCount = 0;
             }
         }
@@ -527,8 +350,6 @@ namespace huqiang.Core.HGUI
                 m_dirty = true;
             } }
         internal EmojiString emojiString = new EmojiString();
-        [NonSerialized]
-        public string FullString;
         
         [SerializeField]
         internal Font _font;
@@ -653,125 +474,113 @@ namespace huqiang.Core.HGUI
         }
 
         internal BlockInfo<TextVertex> TmpVerts;
-        public virtual void Populate()
+        protected void GetTempVertex(IList<UIVertex> v, ref BlockInfo<TextVertex> vert, string filterStr)
         {
-            if (!m_dirty)
-                return;
-            emojiString.FullString = m_text;
-            var str = emojiString.FilterString;
-            if (sizeFitter != ContentSizeFitter.None)
-            {
-                if (marginType != MarginType.None)
-                    Margin(this);
-                GetGenerationSettings(ref m_sizeDelta, ref settings);
-                var gen = Generator;
-                if (sizeFitter == ContentSizeFitter.Horizoantal)
-                {
-                    m_sizeDelta.x = gen.GetPreferredWidth(str, settings);
-                }
-                else if (sizeFitter == ContentSizeFitter.Vertical)
-                {
-                    m_sizeDelta.y = gen.GetPreferredHeight(str, settings);
-                }
-                else if (sizeFitter == ContentSizeFitter.Both)
-                {
-                    float w = gen.GetPreferredWidth(str, settings);
-                    if (w < m_sizeDelta.x)
-                        m_sizeDelta.x = w;
-                    m_sizeDelta.y = gen.GetPreferredHeight(str, settings);
-                }
-                Dock(this);
-            }
-            GetGenerationSettings(ref m_sizeDelta, ref settings);
-            var g = Generator;
-            g.Populate(str, settings);
-            var v = g.verts;
-            int c = g.characters.Count * 4;
-            if (c == 0)
-            {
-                TmpVerts.DataCount = 0;
-                trisInfo.DataCount = 0;
-                trisInfo2.DataCount = 0;
-                return;
-            }
-            else
-            if (c > TmpVerts.Size | TmpVerts.Size > c + 32)
-            {
-                TmpVerts.Release();
-                TmpVerts = PopulateBuffer.RegNew(c);
-            }
-
-            var chs = g.characters;
-            int cc = c / 4;
-            int s = 0;
+            int o = 0;
             unsafe
             {
-                TextVertex* hv = TmpVerts.Addr;
-                if (v.Count != c)
+                TextVertex* hv = vert.Addr;
+                for (int i = 0; i < filterStr.Length; i++)
                 {
-                    for (int i = 0; i < chs.Count; i++)
+                    var ch = filterStr[i];
+                    bool mesh = true;
+                    for (int j = 0; j < key_noMesh.Length; j++)
                     {
-                        int o = i * 4;
-                        if (chs[i].charWidth > 0)
+                        if (key_noMesh[j] == ch)
                         {
-                            for (int j = 0; j < 4; j++)
-                            {
-                                hv[o].position = v[s].position;
-                                hv[o].uv = v[s].uv0;
-                                hv[o].color = v[s].color;
-                                hv[o].Index = i;
-                                hv[o].charWidth = chs[i].charWidth;
-                                s++;
-                                o++;
-                            }
-                        }
-                        else
-                        {
-                            for (int j = 0; j < 4; j++)
-                            {
-                                hv[o].position = Vector3.zero;
-                                hv[o].uv = Vector2.zero;
-                                hv[o].Index = i;
-                                hv[o].charWidth = 0;
-                                o++;
-                            }
+                            mesh = false;
+                            break;
                         }
                     }
-                }
-                else
-                {
-                    for (int i = 0; i < chs.Count; i++)
+                    if (mesh)
                     {
                         for (int j = 0; j < 4; j++)
                         {
-                            hv[s].position = v[s].position;
-                            hv[s].uv = v[s].uv0;
-                            hv[s].color = v[s].color;
-                            hv[s].Index = i;
-                            hv[s].charWidth = chs[i].charWidth;
-                            s++;
+                            if (o >= v.Count)
+                                goto label;
+                            hv[o].position = v[o].position;
+                            hv[o].uv = v[o].uv0;
+                            hv[o].color = v[o].color;
+                            hv[o].Index = i;
+                            o++;
                         }
                     }
                 }
             }
-            TmpVerts.DataCount = c;
-            m_dirty = false;
-            m_vertexChange = true;
-            fillColors[0] = true;
-            m_colorChanged = false;
-            MainTexture = Font.material.mainTexture;
+        label:;
+            vert.DataCount = o;
+        }
+        public virtual void Populate()
+        {
+            if (m_dirty | m_colorChanged)
+            {
+                emojiString.FullString = m_text;
+                var str = emojiString.FilterString;
+                if (sizeFitter != ContentSizeFitter.None)
+                {
+                    if (marginType != MarginType.None)
+                        Margin(this);
+                    GetGenerationSettings(ref m_sizeDelta, ref settings);
+                    var gen = Generator;
+                    if (sizeFitter == ContentSizeFitter.Horizoantal)
+                    {
+                        m_sizeDelta.x = gen.GetPreferredWidth(str, settings);
+                    }
+                    else if (sizeFitter == ContentSizeFitter.Vertical)
+                    {
+                        m_sizeDelta.y = gen.GetPreferredHeight(str, settings);
+                    }
+                    else if (sizeFitter == ContentSizeFitter.Both)
+                    {
+                        float w = gen.GetPreferredWidth(str, settings);
+                        if (w < m_sizeDelta.x)
+                            m_sizeDelta.x = w;
+                        m_sizeDelta.y = gen.GetPreferredHeight(str, settings);
+                    }
+                    Dock(this);
+                }
+                GetGenerationSettings(ref m_sizeDelta, ref settings);
+                var g = Generator;
+                g.Populate(str, settings);
+                var v = g.verts;
+                int c = g.characterCountVisible * 4;
+                if (c == 0)
+                {
+                    TmpVerts.DataCount = 0;
+                    trisInfo.DataCount = 0;
+                    trisInfo2.DataCount = 0;
+                    return;
+                }
+                else
+                if (c > TmpVerts.Size | TmpVerts.Size > c + 32)
+                {
+                    TmpVerts.Release();
+                    TmpVerts = PopulateBuffer.RegNew(c);
+                }
+                if (m_richText)
+                {
+                    emojiString.FullString = RichTextHelper.DeleteLabel(m_text);
+                    str = emojiString.FilterString;
+                }
+                GetTempVertex(v, ref TmpVerts, str);
+                m_dirty = false;
+                m_vertexChange = true;
+                fillColors[0] = true;
+                m_colorChanged = false;
+                MainTexture = Font.material.mainTexture;
+            }
         }
         public override void UpdateMesh()
         {
             if (m_vertexChange)
             {
-                CreateEmojiMeshA(this);
+                CreateEmojiMesh(this);
                 if (OutLine > 0)
                     CreateOutLine(this);
                 m_vertexChange = false;
+                m_colorChanged = false;
             }
         }
-       
         public void Reset()
         {
             STexture = UnityEngine.Resources.Load<Texture>("Emoji");

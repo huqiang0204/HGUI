@@ -25,30 +25,22 @@ namespace huqiang.Core.HGUI
                 for (int i = 0; i < c; i++)
                 {
                     if(pipeLine[os].active)
-                        Batch(pipeLine, os, canvas, Vector3.zero, Vector3.one, Quaternion.identity, new Vector4(0, 0, 1, 1));
+                        Batch(pipeLine, os, canvas, new Vector4(0, 0, 1, 1));
                     os++;
                 }
                 canvas.MatCollector.End();
             }
         }
-        static void Batch(HGUIElement[] pipeLine, int index, HCanvas canvas, Vector3 pos, Vector3 scale, Quaternion quate,Vector4 clip)
+        static void Batch(HGUIElement[] pipeLine, int index, HCanvas canvas, Vector4 clip)
         {
             if (!pipeLine[index].active)
                 return;
-            HGUIElement root = pipeLine[index];
-            Vector3 p = quate * pipeLine[index].localPosition;
-            Vector3 o = Vector3.zero;
-            o.x = p.x * scale.x;
-            o.y = p.y * scale.y;
-            o.z = p.z * scale.z;
-            o += pos;
-            Vector3 s = pipeLine[index].localScale;
-            scale.x *= s.x;
-            scale.y *= s.y;
-            Quaternion q = quate * pipeLine[index].localRotation;
- 
+            Vector3 o = pipeLine[index].Position;
+            Vector3 scale = pipeLine[index].Scale;
+            Quaternion q = pipeLine[index].Rotation;
+
             bool mask = false;
-            var script = root.script;
+            var script = pipeLine[index].script;
             if (script != null)
             {
                 mask = script.Mask;
@@ -62,10 +54,10 @@ namespace huqiang.Core.HGUI
                     float rx = x + lx;
                     float dy = y * -py;
                     float ty = y + dy;
-                    lx *= s.x;
-                    rx *= s.x;
-                    dy *= s.y;
-                    ty *= s.y;
+                    lx *= scale.x;
+                    rx *= scale.x;
+                    dy *= scale.y;
+                    ty *= scale.y;
                     Vector4 v = new Vector4(o.x + lx, o.y + dy, o.x + rx, o.y + ty);
                     v.x += 10000;
                     v.x /= 20000;
@@ -87,8 +79,8 @@ namespace huqiang.Core.HGUI
                     int dc = graphics.vertInfo.DataCount;
                     if (dc>0)
                     {
-                        float px = (0.5f - script.Pivot.x) * script.SizeDelta.x;
-                        float py = (0.5f - script.Pivot.y) * script.SizeDelta.y;
+                        float px = (0.5f - script.Pivot.x) * script.m_sizeDelta.x;
+                        float py = (0.5f - script.Pivot.y) * script.m_sizeDelta.y;
                         Vector2 uv2 = Vector2.zero;
                         unsafe
                         {
@@ -99,9 +91,9 @@ namespace huqiang.Core.HGUI
                                 tp.z = 0;
                                 tp.x += px;
                                 tp.y += py;
+                                tp.x *= scale.x;
+                                tp.y *= scale.y;
                                 var t = q * tp;
-                                t.x *= scale.x;
-                                t.y *= scale.y;
                                 t += o;
                                 t.z = 0;
                                 uv2.x = (t.x + 10000) / 20000;
@@ -178,11 +170,11 @@ namespace huqiang.Core.HGUI
                 }
             }
         
-            int c = root.childCount;
-            int os = root.childOffset;
+            int c = pipeLine[index].childCount;
+            int os = pipeLine[index].childOffset;
             for (int i = 0; i < c; i++)
             {
-                Batch(pipeLine, os, canvas, o, scale, q, clip);
+                Batch(pipeLine, os, canvas,clip);
                 os++;
             }
         }

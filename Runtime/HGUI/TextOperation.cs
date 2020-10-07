@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace huqiang.Core.HGUI
@@ -21,8 +20,6 @@ namespace huqiang.Core.HGUI
         public int endIdx;
         public float topY;
         public float endY;
-        public int vertIndex;
-        public int visibleCount;
     }
     public class TextOperation
     {
@@ -40,6 +37,7 @@ namespace huqiang.Core.HGUI
         public static int ShowRow;//当前文本框可以显示的内容行数
         public static float ContentHeight;
         static float StartY;
+        public static ContentType contentType;
         public static void ChangeText(HText text, EmojiString str)
         {
             verts.Clear();
@@ -48,9 +46,17 @@ namespace huqiang.Core.HGUI
             Target = text;
             Content = str;
             text.GetGenerationSettings(ref text.m_sizeDelta,ref HText.settings);
+            HText.settings.richText = false;
             var g = HText.Generator;
             string fs = Content.FilterString;
-            ContentHeight = g.GetPreferredHeight(fs, HText.settings);
+            if (contentType == ContentType.Password)
+            {
+                ContentHeight = g.GetPreferredHeight(new string('●', fs.Length), HText.settings);
+            }
+            else
+            { 
+                ContentHeight = g.GetPreferredHeight(fs, HText.settings); 
+            }
             VisibleCount = g.characterCountVisible;
             if (g.lines.Count > 0)
             {
@@ -220,14 +226,21 @@ namespace huqiang.Core.HGUI
             }
             return true;
         }
-        static bool SetPressIndex(int index,ref PressInfo press)
+        static bool SetPressIndex(int index, ref PressInfo press)
         {
             if (index < 0)
                 index = 0;
             if (lines.Count == 0)
-                return false;
+            {
+                press.Index = 0;
+                press.Row = 0;
+                press.Offset = 0;
+                return false; 
+            }
             if (index == press.Index)
-                return false;
+            {
+                return false; 
+            }
             if (index >= chars.Count)
             {
                 index = chars.Count - 1;

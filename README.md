@@ -24,7 +24,7 @@ UDP，TCP，KCP，数据封包，线程池，等等
     "dependencies": {
     "com.huqiang.hguiframework": "https://gitee.com/huqiang0204/HGUI.git#1.0.9"
 	}
-3.  打包时注意事项，请确保ProjectSetting面板 Graphics中添加了Shader Custom/UIDef，否则移动端会报错
+3.  打包时注意事项，请确保ProjectSetting面板 Graphics中添加了Shader HGUI/UIDef，否则移动端会报错
 
 #### 使用说明
 

@@ -20,12 +20,13 @@ namespace huqiang.Core.HGUI
         public Vector2 uv4;
         public int picture;
     }
+    [DisallowMultipleComponent]
     public class HGraphics:UIElement
     {
         protected static BlockBuffer<int> trisBuffer = new BlockBuffer<int>(48, 1024);
         internal static Shader DefShader { get {
                 if(shader==null)
-                    shader = Shader.Find("Custom/UIDef");//Custom/UIDef
+                    shader = Shader.Find("HGUI/UIDef");//HGUI/UIDef
                 return shader;
             } }
         public static Shader shader;

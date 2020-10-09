@@ -184,18 +184,18 @@ namespace huqiang.UIComposite
             if(showAni>0)
             {
                 showTime += time;
-                if (showTime > 300)
+                if (showTime > 200)
                 {
-                    showTime = 300;
+                    showTime = 200;
                     showAni = 0;
                 }
-                float y = showTime / 300;
+                float y = showTime / 200;
                 y *= size.y;
                 m_scroll.Enity.SizeDelta = new Vector2(size.x, y);
             }else if(showAni<0)
             {
                 showTime += time;
-                if (showTime >= 300)
+                if (showTime >= 200)
                 {
                     showAni = 0;
                     m_scroll.Enity.gameObject.SetActive(false);
@@ -203,7 +203,7 @@ namespace huqiang.UIComposite
                 }
                 else
                 {
-                    float y = 1 - showTime / 300;
+                    float y = 1 - showTime / 200;
                     y *= size.y;
                     m_scroll.Enity.SizeDelta = new Vector2(size.x, y);
                 }

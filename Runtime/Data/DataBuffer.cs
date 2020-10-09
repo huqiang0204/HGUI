@@ -414,10 +414,10 @@ namespace huqiang.Data
             {
                 byte[] buf = fakeStruct.ToBytes();
                 Int32 len = buf.Length;
-                table.Write(len.ToBytes(), 0, 4);
-                table.Write(buf, 0, len);
+                table.Write(len.ToBytes(), 0, 4);//写入头的长度
+                table.Write(buf, 0, len);//写入头数据
             }
-            table.Write(max.ToBytes(), 0, 4);
+            table.Write(max.ToBytes(), 0, 4);//写入表的长度
             MemoryStream ms = new MemoryStream();
             Int32 offset = 0;
             for (int i = 0; i < max; i++)
@@ -441,7 +441,7 @@ namespace huqiang.Data
                 }
             }
             byte[] tmp = ms.ToArray();
-            table.Write(tmp, 0, tmp.Length);
+            table.Write(tmp, 0, tmp.Length);//合并表和托管类型数据
             tmp = table.ToArray();
             ms.Dispose();
             table.Dispose();

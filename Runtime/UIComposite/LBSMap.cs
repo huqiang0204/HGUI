@@ -245,5 +245,14 @@ namespace huqiang.UIComposite
                 item.Image.MainTexture = t2d;
             }
         }
+        public void Location()
+        {
+            int ox = 0;
+            int oy = 0;
+            LatLngToTileXY(latlng, cz, out cc, out cr, out ox, out oy);
+            offsetX = ox;
+            offsetY = oy;
+            UpdateData();
+        }
     }
 }

@@ -98,18 +98,20 @@ namespace huqiang.UIComposite
             HGUIManager.GameBuffer.RecycleChild(Enity.gameObject);
             ItemMod= HGUIManager.FindChild(BufferData, "Item");
             eventCall = script.RegEvent<UserEvent>();
-            //eventCall.Drag = (o, e, s) => { Scrolling(o, s); };
-            //eventCall.DragEnd = (o, e, s) => { Scrolling(o, s); };
+            eventCall.ForceEvent = true;
+            eventCall.Drag = (o, e, s) => { Scrolling(o, s); };
             eventCall.CutRect = true;
-            //Enity.SizeChanged = (o) =>
-            //{
-            //    Refresh(Position);
-            //};
+            Enity.SizeChanged = (o) =>
+            {
+                Refresh(Position);
+            };
             UpdateData();
         }
         void Scrolling(UserEvent back, Vector2 v)
         {
-            Order();
+            offsetX -= v.x;
+            offsetY += v.y;
+            UpdateData();
         }
         /// <summary>
         /// 
@@ -151,7 +153,7 @@ namespace huqiang.UIComposite
         public void Refresh(Vector2 pos)
         {
             Position = pos;
-            Order();
+       
         }
         /// <summary>
         /// 刷新到默认位置
@@ -231,21 +233,6 @@ namespace huqiang.UIComposite
                     GetTileMap(tile.x,tile.y,cz,UpdateTexture,item);
                     s++;
                 }
-        }
-        void UpdateUI()
-        {
-            Vector2 size = Enity.m_sizeDelta;
-            int c = (int)(size.x / 256);
-            c++;
-            int r = (int)(size.y / 256);
-            r++;
-            float sx = - c / 2;
-            sx *= 256;
-            sx -= offsetX;
-            float sy = r / 2;
-            sy *= 256;
-            sy += offsetY;
-            
         }
         void UpdateTexture(string file,string name, Item item)
         {

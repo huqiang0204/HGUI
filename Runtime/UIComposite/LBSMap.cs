@@ -14,7 +14,6 @@ namespace huqiang.UIComposite
 {
     public class LBSMap : Composite
     {
-        //百度坐标转墨卡托
         public struct LngLat
         {
             public double Longitude;
@@ -57,7 +56,7 @@ namespace huqiang.UIComposite
             eventCall.CutRect = true;
             Enity.SizeChanged = (o) =>
             {
-                Refresh(Position);
+                UpdateData();
             };
             UpdateData();
         }
@@ -100,22 +99,6 @@ namespace huqiang.UIComposite
             //for (; rowStart < rowEnd; rowStart++)
             //    UpdateRow(rowStart, colStart, colEnd, force);
         }
-        /// <summary>
-        /// 刷新到指定位置
-        /// </summary>
-        /// <param name="pos"></param>
-        public void Refresh(Vector2 pos)
-        {
-            Position = pos;
-
-        }
-        /// <summary>
-        /// 刷新到默认位置
-        /// </summary>
-        public void Refresh()
-        {
-            Order(true);
-        }
         LngLat latlng;
         public override void Update(float time)
         {
@@ -145,11 +128,12 @@ namespace huqiang.UIComposite
             //}
 #endif
         }
+        public int Level = 18;
         int cx = 49310;
         int cy = 10242;
-        public int Level = 18;
         float offsetX;
         float offsetY;
+        TilePos tilePos;
         public void UpdateData()
         {
             Vector2 size = Enity.m_sizeDelta;

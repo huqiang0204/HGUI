@@ -50,7 +50,7 @@ namespace huqiang.UIComposite
             base.Initial(fake, script);
             HGUIManager.GameBuffer.RecycleChild(Enity.gameObject);
             ItemMod = HGUIManager.FindChild(BufferData, "Item");
-            eventCall = script.RegEvent<UserEvent>();
+            eventCall = script.RegEvent<GestureEvent>();
             eventCall.ForceEvent = true;
             eventCall.Drag = (o, e, s) => { Scrolling(o, s); };
             eventCall.CutRect = true;
@@ -66,66 +66,29 @@ namespace huqiang.UIComposite
             offsetY += v.y;
             UpdateData();
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="size">视口尺寸</param>
-        /// <param name="pos">视口位置</param>
-        public void Order(bool force = false)
-        {
-            //float w = Size.x;
-            //float h = Size.y;
-            //float left = Position.x;
-            //float ls = left - ItemSize.x;
-            //float right = Position.x + w;
-            //float rs = right + ItemSize.x;
-            //float top = Position.y + h;//与unity坐标相反
-            //float ts = top + ItemSize.y;
-            //float down = Position.y;//与unity坐标相反
-            //float ds = down - ItemSize.y;
-            //RecycleOutside(left, right, down, top);
-            //int colStart = (int)(left / ItemSize.x);
-            //if (colStart < 0)
-            //    colStart = 0
-            //int colEnd = (int)(rs / ItemSize.x);
-            //if (colEnd > Column)
-            //    colEnd = Column;
-            //int rowStart = (int)(down / ItemSize.y);
-            //if (rowStart < 0)
-            //    rowStart = 0;
-            //int rowEnd = (int)(ts / ItemSize.y);
-            //if (rowEnd > Row)
-            //    rowEnd = Row;
-            //for (; rowStart < rowEnd; rowStart++)
-            //    UpdateRow(rowStart, colStart, colEnd, force);
-        }
         LngLat latlng;
         public override void Update(float time)
         {
-            //if (Input.location.isEnabledByUser)
-            //{
 #if !UNITY_EDITOR
-
             if (Input.location.status == LocationServiceStatus.Stopped)
             { 
                 Input.location.Start(10, 10); 
             }
             else if (Input.location.status == LocationServiceStatus.Initializing)
             {
-                Debug.Log("Initializing");
+                //Debug.Log("Initializing");
             }
             else
             if (Input.location.status == LocationServiceStatus.Running)
             {
                 latlng.Longitude = Input.location.lastData.longitude;
                 latlng.Latitude = Input.location.lastData.latitude;
-                Debug.Log("gps running");
+                //Debug.Log("gps running");
             }
             else if (Input.location.status == LocationServiceStatus.Failed)
             {
-                Debug.Log("Failed");
+                //Debug.Log("Failed");
             }
-            //}
 #endif
         }
         public int Level = 18;
@@ -199,8 +162,20 @@ namespace huqiang.UIComposite
                 item.Image.MainTexture = t2d;
             }
         }
+        public void Location()
+        {
+            BaiduMap.GPSToTile(latlng.Longitude, latlng.Latitude, Level, (o) => {
+                cx = o.x;
+                cy = o.y;
+                offsetX = o.ox;
+                offsetY = o.oy;
+                UpdateData();
+            });
+        }
         public void Location(double x, double y)
         {
+            latlng.Longitude = x;
+            latlng.Latitude = y;
             BaiduMap.GPSToTile(x, y, Level, (o) => {
                 cx = o.x;
                 cy = o.y;
@@ -208,6 +183,15 @@ namespace huqiang.UIComposite
                 offsetY = o.oy;
                 UpdateData();
             });
+        }
+        public void SetLevel(int level)
+        {
+            if (level < 3)
+                level = 3;
+            else if (level > 18)
+                level = 18;
+            Level = level;
+            Location();
         }
     }
 }

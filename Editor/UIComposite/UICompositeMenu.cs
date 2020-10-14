@@ -217,6 +217,7 @@ public static class UICompositeMenu
         var help = go.AddComponent<SliderHelper>();
         help.StartOffset.y = startOffset;
         help.EndOffset.y = endOffset;
+        help.direction = UISlider.Direction.Vertical;
         image.Sprite = EditorModelManager.FindSprite(icons, background);
         image.SprType = SpriteType.Sliced;
 

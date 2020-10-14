@@ -38,7 +38,13 @@ namespace Assets.Scripts
             };
             view.last.Click = (o, e) => { LoadPage<ScrollPage>(); };
             view.next.Click = (o, e) => { LoadPage<DockPage>(); };
+            view.MapScale.OnValueChanged = (o) => {
+                float r = (int)Mathf.Round(o.Percentage * 12) + 6;
+                float s = r / CurLevel;
+                view.lbsMap.Enity.transform.localScale = new Vector3(s,s,s);
+            };
             view.MapScale.ValueEndChange = (o) => {
+                view.lbsMap.Enity.transform.localScale = Vector3.one;
                 float r = (int)Mathf.Round(o.Percentage * 12);
                 int level = 6 + (int)r;
                 view.MapScale.Percentage = r / 12;

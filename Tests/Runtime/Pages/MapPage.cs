@@ -23,7 +23,7 @@ namespace Assets.Scripts
         {
             base.Initial(parent, dat);
             view = LoadUI<View>("baseUI", "map");//"baseUI"创建的bytes文件名,"page"为创建的页面名
-            view.Locate.Click = (o, e) => { view.lbsMap.Location(); };
+            view.Locate.Click = (o, e) => { view.lbsMap.Location(113.904228210449f,22.5839462280273f); };
             view.last.Click = (o, e) => { LoadPage<ScrollPage>(); };
             view.next.Click = (o, e) => { LoadPage<DockPage>(); };
         }

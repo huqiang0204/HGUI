@@ -48,7 +48,7 @@ namespace Assets.Scripts
             grid.BindingData = data;
             grid.SetItemUpdate<ItemView, string>(ItemUpdate);
             grid.Refresh();
-            view.last.Click = (o, e) => { LoadPage<TreeViewPage>(); };
+            view.last.Click = (o, e) => { LoadPage<MapPage>(); };
             view.next.Click = (o, e) => { LoadPage<TestUPage>(); };
             Beeline beeline = new Beeline();
             beeline.lineBase.Color = Color.red;

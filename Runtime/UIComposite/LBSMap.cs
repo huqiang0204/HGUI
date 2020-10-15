@@ -42,7 +42,7 @@ namespace huqiang.UIComposite
         /// <summary>
         /// 事件
         /// </summary>
-        public UserEvent eventCall;
+        public GestureEvent eventCall;
         FakeStruct ItemMod;
         List<Item> Items = new List<Item>();
         public override void Initial(FakeStruct fake, UIElement script)
@@ -58,6 +58,11 @@ namespace huqiang.UIComposite
             {
                 UpdateData();
             };
+            eventCall.TowFingerMove = Scale;
+        }
+        void Scale(GestureEvent gesture)
+        {
+            //gesture.CurScale
         }
         void Scrolling(UserEvent back, Vector2 v)
         {

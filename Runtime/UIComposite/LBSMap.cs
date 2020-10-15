@@ -30,7 +30,7 @@ namespace huqiang.UIComposite
         {
             public GameObject Game;
             public HImage Image;
-            public string Tile;
+            public string Name;
             public TileInfo Info;
         }
         public int Column = 1;
@@ -120,9 +120,9 @@ namespace huqiang.UIComposite
         {
             Vector2 size = Enity.m_sizeDelta;
             int c = (int)(size.x / 256);
-            c++;
+            c+=2;
             int r = (int)(size.y / 256);
-            r++;
+            r+=2;
             int all = c * r;//总计UI数量
             int ic = Items.Count;
             for (int i = ic; i < all; i++)
@@ -147,7 +147,7 @@ namespace huqiang.UIComposite
             TileInfo tile = new TileInfo();
             int sx = cx - c / 2;
             int sy = cy - r / 2;
-            float ox = -c / 2;
+            float ox = -c / 2 + 1;
             ox *= 256;
             ox -= offsetX;
             float oy = -r / 2;
@@ -160,19 +160,72 @@ namespace huqiang.UIComposite
                     tile.x = sx + i;
                     tile.y = sy + j;
                     tile.z = Level;
-                    string name = tile.x + "-" + tile.y + "-" + Level;
-                    var item = Items[s];
-                    item.Tile = name;
-                    item.Game.transform.localPosition = new Vector3(ox + i * 256, oy + j * 256, 0);
                     infos.Add(tile);
-                    BaiduMap.GetTileMap(tile.x, tile.y, Level, name, UpdateTexture, item);
-                    s++;
+                    //string name = tile.x + "-" + tile.y + "-" + Level;
+                    //var item = Items[s];
+                    //item.Name = name;
+                    //item.Game.transform.localPosition = new Vector3(ox + i * 256, oy + j * 256, 0);
+                    //BaiduMap.GetTileMap(tile.x, tile.y, Level, name, UpdateTexture, item);
+                    //s++;
                 }
+            UpdateItems(infos);
+        }
+        void UpdateItems(List<TileInfo> infos)
+        {
+            Vector2 size = Enity.m_sizeDelta;
+            int c = (int)(size.x / 256);
+            c+=2;
+            int r = (int)(size.y / 256);
+            r+=2;
+            int sx = cx - c / 2;
+            int sy = cy - r / 2;
+            float ox = -c / 2 + 1;
+            ox *= 256;
+            ox -= offsetX;
+            float oy = -r / 2;
+            oy *= 256;
+            oy += offsetY;
+            int ic = Items.Count;
+            List< Item> tmp = new List<Item>();
+            for (int i = ic - 1; i >= 0; i--)
+            {
+                var item = Items[i];
+                for (int j = 0; j < infos.Count; j++)
+                {
+                    if (infos[j].x == item.Info.x)
+                        if (infos[j].y == item.Info.y)
+                            if (infos[j].z == item.Info.z)
+                            {
+                                tmp.Add (item);
+                                int a = infos[j].x - sx;
+                                int b = infos[j].y - sy;
+                                item.Game.transform.localPosition = new Vector3(ox + a * 256, oy +b * 256, 0);
+                                Items.RemoveAt(i);
+                                infos.RemoveAt(j);
+                                break;
+                            }
+                }
+            }
+            ic = infos.Count;
+            for (int i = 0; i < ic; i++)
+            {
+                var tile = infos[i];
+                string name = tile.x + "-" + tile.y + "-" + Level;
+                var item = Items[i];
+                item.Info = tile;
+                item.Name = name;
+                int a = tile.x - sx;
+                int b = tile.y - sy;
+                item.Game.transform.localPosition = new Vector3(ox + a * 256, oy + b * 256, 0);
+                infos.Add(tile);
+                BaiduMap.GetTileMap(tile.x, tile.y, Level, name, UpdateTexture, item);
+            }
+            Items.AddRange(tmp);
         }
         void UpdateTexture(string file, string name, object obj)
         {
             var item = obj as Item;
-            if (item.Tile == name)
+            if (item.Name == name)
             {
                 Texture2D t2d = item.Image.MainTexture as Texture2D;
                 if (t2d == null)

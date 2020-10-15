@@ -222,7 +222,7 @@ namespace huqiang.UIComposite
             }
             Items.AddRange(tmp);
         }
-        void UpdateTexture(string file, string name, object obj)
+        void UpdateTexture(string file, string name, object obj, byte[] dat)
         {
             var item = obj as Item;
             if (item.Name == name)
@@ -230,7 +230,9 @@ namespace huqiang.UIComposite
                 Texture2D t2d = item.Image.MainTexture as Texture2D;
                 if (t2d == null)
                     t2d = new Texture2D(1, 1);
-                t2d.LoadImage(File.ReadAllBytes(file));
+                if (dat == null)
+                    t2d.LoadImage(File.ReadAllBytes(file));
+                else t2d.LoadImage(dat);
                 item.Image.MainTexture = t2d;
             }
         }

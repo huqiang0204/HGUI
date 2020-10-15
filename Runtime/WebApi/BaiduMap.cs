@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace huqiang.WebApi
 {
@@ -29,6 +30,62 @@ namespace huqiang.WebApi
     }
     public class BaiduMap
     {
+        class BindingInfo
+        {
+            public string url;
+            public string filePath;
+            public string name;
+            public object context;
+            public UnityWebRequest webRequest;
+            public Action<string, string, object,byte[]> CallBack;
+        }
+        static List<BindingInfo> lbi = new List<BindingInfo>();
+        static void DownloadAsync(string url, string filePath, string name, Action<string, string, object, byte[]> callBack, object context = null)
+        {
+            for(int i=0;i<lbi.Count;i++)
+            {
+                if (lbi[i].filePath == filePath)
+                    return;
+            }
+            var uwr = UnityWebRequest.Get(url);
+            var ao = uwr.SendWebRequest();
+            ao.completed += DownloadComplete;
+            BindingInfo info = new BindingInfo();
+            info.url = url;
+            info.filePath = filePath;
+            info.webRequest = uwr;
+            info.name = name;
+            info.context = context;
+            info.CallBack = callBack;
+            lbi.Add(info);
+        }
+        static void DownloadComplete(AsyncOperation o)
+        {
+            var uwr = o as UnityWebRequestAsyncOperation;
+            var web = uwr.webRequest;
+            BindingInfo info = null;
+            for(int i=0;i<lbi.Count;i++)
+            {
+                if(web==lbi[i].webRequest)
+                {
+                    info = lbi[i];
+                    lbi.RemoveAt(i);
+                    break;
+                }
+            }
+            if (o.isDone)
+            {
+                var dat = uwr.webRequest.downloadHandler.data;
+                if(info!=null)
+                {
+                    if (File.Exists(info.filePath))
+                        File.Delete(info.filePath);
+                    File.WriteAllBytes(info.filePath, dat);
+                    if (info.CallBack != null)
+                        info.CallBack(info.filePath,info.name,info.context, dat);
+                }
+            }
+        }
         public const int MinLevel = 3;
         public const int MaxLevel = 18;
         public static string AK = "MgRcqKAaBmaP3jIozTcTORIpuZ08oISA";
@@ -89,7 +146,7 @@ namespace huqiang.WebApi
                 }
             });
         }
-        public static void GetTileMap(int tileX, int tileY, int zoom, string name, Action<string, string, object> action, object context)
+        public static void GetTileMap(int tileX, int tileY, int zoom, string name, Action<string, string, object, byte[]> action, object context)
         {
             int z = zoom;
             string file = name;
@@ -102,20 +159,14 @@ namespace huqiang.WebApi
             string path = folder + "/" + file;
             if (File.Exists(path))
             {
-                action(path, file, context);
+                action(path, file, context,null);
                 return;
             }
             Index++;
             if (Index >= 10)
                 Index = 0;
             string http = string.Format("http://online{0}.map.bdimg.com/onlinelabel/?qt=tile&x={1}&y={2}&z={3}&ak={4}",Index, tileX, tileY, z,AK);
-            Http.HttpControl.DownloadAsync(http, path, null, (o) => {
-                if (o.Code == Http.ResultCode.OK)
-                {
-                    o.responseStream.Dispose();
-                    action(path, file, context);
-                }
-            });
+            DownloadAsync(http,path, file, action, context);
         }
     }
 }

@@ -58,11 +58,25 @@ namespace huqiang.UIComposite
             {
                 UpdateData();
             };
+            eventCall.TowFingerPressd = SetCenter;
             eventCall.TowFingerMove = Scale;
+            eventCall.TowFingerUp = ScaleEnd;
+        }
+        void SetCenter(GestureEvent gesture)
+        {
+            Vector3 pc = Vector3.Lerp(gesture.RawPos0, gesture.RawPos1, 0.5f);
+            var pos = gesture.GlobalPosition;
+            Vector3 cc = pc - pos;
         }
         void Scale(GestureEvent gesture)
         {
             //gesture.CurScale
+          
+        }
+        void ScaleEnd(GestureEvent gesture)
+        {
+            //gesture.CurScale
+
         }
         void Scrolling(UserEvent back, Vector2 v)
         {

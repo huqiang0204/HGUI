@@ -25,8 +25,8 @@ namespace huqiang.WebApi
     {
         public int x;
         public int y;
-        public int ox;
-        public int oy;
+        public float ox;
+        public float oy;
     }
     public class BaiduMap
     {
@@ -117,18 +117,30 @@ namespace huqiang.WebApi
         public static TilePos MercatoToTile(LanLat ll, int zoom)
         {
             int s = 1 <<(18 - zoom);
-            double mx = ll.x / s / 256;
-            int ix = (int)mx;
-            int ox = (int)((mx - ix) * 256);
-            double my = ll.y / s / 256;
-            int iy = (int)my;
-            int oy = (int)((my - iy) * 256);
+            double tx = ll.x / s;
+            double mx = tx / 256;
+            double rx = tx % 256;
+            double ty = ll.y / s;
+            double my =ty  / 256;
+            double ry = ty % 256;
             var ti = new TilePos();
-            ti.x = ix;
-            ti.y = iy;
-            ti.ox = ox;
-            ti.oy = oy;
+            ti.x = (int)mx;
+            ti.y = (int)my;
+            ti.ox = (float)rx;
+            ti.oy = (float)ry;
             return ti;
+        }
+        public static LanLat TileToMercato(ref TilePos tile, int zoom)
+        {
+            int s = 1 << (18 - zoom);
+            double x = tile.x * 256 + tile.ox;
+            x *= s;
+            double y = tile.y * 256 + tile.oy;
+            y *= s;
+            var ll = new LanLat();
+            ll.x = x;
+            ll.y = y;
+            return ll;
         }
         public static void GPSToTile(double x, double y,int zoom, Action<TilePos> action)
         {

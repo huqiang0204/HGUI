@@ -44,11 +44,22 @@ namespace huqiang.UIComposite
         /// </summary>
         public GestureEvent eventCall;
         FakeStruct ItemMod;
+        Transform Axis;
         List<Item> Items = new List<Item>();
+        /// <summary>
+        /// 获取图片的中心点
+        /// </summary>
+        Vector2 StartCenter;
+        /// <summary>
+        /// 两个手指缩放的中心点
+        /// </summary>
+        Vector2 ScaleCenter;
+        LanLat pressMercato;
         public override void Initial(FakeStruct fake, UIElement script)
         {
             base.Initial(fake, script);
-            HGUIManager.GameBuffer.RecycleChild(Enity.gameObject);
+            HGUIManager.GameBuffer.RecycleGameObject(Enity.transform.Find("Item").gameObject);
+            Axis = Enity.transform.Find("Axis");
             ItemMod = HGUIManager.FindChild(BufferData, "Item");
             eventCall = script.RegEvent<GestureEvent>();
             eventCall.ForceEvent = true;
@@ -67,6 +78,10 @@ namespace huqiang.UIComposite
             Vector3 pc = Vector3.Lerp(gesture.RawPos0, gesture.RawPos1, 0.5f);
             var pos = gesture.GlobalPosition;
             Vector3 cc = pc - pos;
+            var mact =  BaiduMap.TileToMercato(ref tilePos, Level);
+            mact.x += cc.x;
+            mact.y += cc.y;
+            pressMercato = mact;
         }
         void Scale(GestureEvent gesture)
         {
@@ -130,6 +145,31 @@ namespace huqiang.UIComposite
         }
         public int Level = 18;
         TilePos tilePos;
+        LanLat mercato;
+        void RsetTile(Vector2 offset, LanLat mct, List<TileInfo> infos)
+        {
+            Vector2 size = Enity.m_sizeDelta;
+            float ox = offset.x - size.x * -0.5f;
+            int sx = (int)(ox / 256);
+            float oy = size.y * 0.5f - offset.y;
+            int sy = (int)(oy / 256);
+            var tp = BaiduMap.MercatoToTile(mct, Level);
+            int tx = tp.x - sx;
+            int ty = tp.y - sy;
+            int c = (int)(size.x / 256);
+            c += 2;
+            int r = (int)(size.y / 256);
+            r += 2;
+            TileInfo tile = new TileInfo();
+            for (int i = 0; i < c; i++)
+                for (int j = 0; j < r; j++)
+                {
+                    tile.x = tx + i;
+                    tile.y = ty + j;
+                    tile.z = Level;
+                    infos.Add(tile);
+                }
+        }
         public void UpdateData()
         {
             Vector2 size = Enity.m_sizeDelta;
@@ -144,7 +184,7 @@ namespace huqiang.UIComposite
                 Item item = new Item();
                 var go = HGUIManager.GameBuffer.Clone(ItemMod);
                 var trans = go.transform;
-                trans.SetParent(Enity.transform);
+                trans.SetParent(Axis);
                 trans.localScale = Vector3.one;
                 trans.localRotation = Quaternion.identity;
                 item.Game = go;
@@ -240,7 +280,8 @@ namespace huqiang.UIComposite
         public void Location()
         {
             BaiduMap.GPSToTile(latlng.Longitude, latlng.Latitude, Level, (o) => {
-                tilePos = o;
+                mercato = o;
+                tilePos = BaiduMap.MercatoToTile(o, Level);
                 UpdateData();
             });
         }
@@ -249,7 +290,8 @@ namespace huqiang.UIComposite
             latlng.Longitude = x;
             latlng.Latitude = y;
             BaiduMap.GPSToTile(x, y, Level, (o) => {
-                tilePos = o;
+                mercato = o;
+                tilePos = BaiduMap.MercatoToTile(o, Level);
                 UpdateData();
             });
         }

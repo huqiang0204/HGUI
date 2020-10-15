@@ -142,7 +142,7 @@ namespace huqiang.WebApi
             ll.y = y;
             return ll;
         }
-        public static void GPSToTile(double x, double y,int zoom, Action<TilePos> action)
+        public static void GPSToTile(double x, double y,int zoom, Action<LanLat> action)
         {
             string url = string.Format("http://api.map.baidu.com/geoconv/v1/?coords={0},{1}&from=1&to=6&ak={2}", x, y,AK);
             Http.HttpControl.Get(url, (o) => {
@@ -153,9 +153,8 @@ namespace huqiang.WebApi
                     if (point.result != null)
                     {
                         var r = point.result[0];
-                        var t = MercatoToTile(r, zoom);
                         if (action != null)
-                            action(t);
+                            action(r);
                     }
                 }
             });

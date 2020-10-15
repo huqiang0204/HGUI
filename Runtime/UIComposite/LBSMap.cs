@@ -58,30 +58,29 @@ namespace huqiang.UIComposite
             {
                 UpdateData();
             };
-            UpdateData();
         }
         void Scrolling(UserEvent back, Vector2 v)
         {
-            offsetX -= v.x;
-            offsetY += v.y;
-            if(offsetX<0)
+            tilePos.ox -= v.x;
+            tilePos.oy += v.y;
+            if(tilePos.ox <0)
             {
-                cx--;
-                offsetX += 256;
-            }else if(offsetX>=256)
+                tilePos.x--;
+                tilePos.ox += 256;
+            }else if(tilePos.ox >=256)
             {
-                cx++;
-                offsetX -= 256;
+                tilePos.x++;
+                tilePos.ox -= 256;
             }
-            if (offsetY < 0)
+            if (tilePos.oy < 0)
             {
-                cy++;
-                offsetY += 256;
+                tilePos.y++;
+                tilePos.oy += 256;
             }
-            else if (offsetY >= 256)
+            else if (tilePos.oy >= 256)
             {
-                cy--;
-                offsetY -= 256;
+                tilePos.y--;
+                tilePos.oy -= 256;
             }
             UpdateData();
         }
@@ -111,10 +110,6 @@ namespace huqiang.UIComposite
 #endif
         }
         public int Level = 18;
-        int cx = 49310;
-        int cy = 10242;
-        float offsetX;
-        float offsetY;
         TilePos tilePos;
         public void UpdateData()
         {
@@ -145,15 +140,8 @@ namespace huqiang.UIComposite
             }
             List<TileInfo> infos = new List<TileInfo>();
             TileInfo tile = new TileInfo();
-            int sx = cx - c / 2;
-            int sy = cy - r / 2;
-            float ox = -c / 2 + 1;
-            ox *= 256;
-            ox -= offsetX;
-            float oy = -r / 2;
-            oy *= 256;
-            oy += offsetY;
-            int s = 0;
+            int sx = tilePos.x - c / 2;
+            int sy = tilePos.y - r / 2;
             for (int i = 0; i < c; i++)
                 for (int j = 0; j < r; j++)
                 {
@@ -161,12 +149,6 @@ namespace huqiang.UIComposite
                     tile.y = sy + j;
                     tile.z = Level;
                     infos.Add(tile);
-                    //string name = tile.x + "-" + tile.y + "-" + Level;
-                    //var item = Items[s];
-                    //item.Name = name;
-                    //item.Game.transform.localPosition = new Vector3(ox + i * 256, oy + j * 256, 0);
-                    //BaiduMap.GetTileMap(tile.x, tile.y, Level, name, UpdateTexture, item);
-                    //s++;
                 }
             UpdateItems(infos);
         }
@@ -177,14 +159,14 @@ namespace huqiang.UIComposite
             c+=2;
             int r = (int)(size.y / 256);
             r+=2;
-            int sx = cx - c / 2;
-            int sy = cy - r / 2;
+            int sx = tilePos.x - c / 2;
+            int sy = tilePos.y - r / 2;
             float ox = -c / 2 + 1;
             ox *= 256;
-            ox -= offsetX;
+            ox -= tilePos.ox;
             float oy = -r / 2;
             oy *= 256;
-            oy += offsetY;
+            oy += tilePos.oy;
             int ic = Items.Count;
             List< Item> tmp = new List<Item>();
             for (int i = ic - 1; i >= 0; i--)
@@ -239,10 +221,7 @@ namespace huqiang.UIComposite
         public void Location()
         {
             BaiduMap.GPSToTile(latlng.Longitude, latlng.Latitude, Level, (o) => {
-                cx = o.x;
-                cy = o.y;
-                offsetX = o.ox;
-                offsetY = o.oy;
+                tilePos = o;
                 UpdateData();
             });
         }
@@ -251,10 +230,7 @@ namespace huqiang.UIComposite
             latlng.Longitude = x;
             latlng.Latitude = y;
             BaiduMap.GPSToTile(x, y, Level, (o) => {
-                cx = o.x;
-                cy = o.y;
-                offsetX = o.ox;
-                offsetY = o.oy;
+                tilePos = o;
                 UpdateData();
             });
         }
@@ -264,8 +240,13 @@ namespace huqiang.UIComposite
                 level = 3;
             else if (level > 18)
                 level = 18;
-            Level = level;
-            Location();
+            if(Level!=level)
+            {
+                var ll = BaiduMap.TileToMercato(ref tilePos, Level);
+                Level = level;
+                tilePos = BaiduMap.MercatoToTile(ll,Level);
+                UpdateData();
+            }
         }
     }
 }

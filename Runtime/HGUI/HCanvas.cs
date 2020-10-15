@@ -10,25 +10,6 @@ namespace huqiang.Core.HGUI
 {
     public class HCanvas:UIElement
     {
-        //class TempBuffer
-        //{
-        //    public int Max;
-        //    public TempBuffer(int len = 4096)
-        //    {
-        //        Max = len;
-        //        PipeLine = new HGUIElement[len];
-        //        scripts = new UIElement[len];
-        //    }
-        //    public HGUIElement[] PipeLine;
-        //    public UIElement[] scripts;
-        //    public List<Vector3> vertex = new List<Vector3>();
-        //    public List<Vector2> uv = new List<Vector2>();
-        //    public List<Vector2> uv1 = new List<Vector2>();
-        //    public List<Vector2> uv2 = new List<Vector2>();
-        //    public List<Vector2> uv3 = new List<Vector2>();
-        //    public List<Vector2> uv4 = new List<Vector2>();
-        //    public List<Color32> colors = new List<Color32>();
-        //}
         //protected static ThreadMission thread = new ThreadMission("UI");
         public Camera camera;
         public Vector2 DesignSize = new Vector2(1920, 1080);
@@ -95,7 +76,7 @@ namespace huqiang.Core.HGUI
                 PipeLine[index].Scale.y *= ls.y;
                 PipeLine[index].Scale.z *= ls.z;
             }
-            else
+            else//HCanvas
             {
                 PipeLine[index].Position = Vector3.zero;
                 PipeLine[index].Rotation = Quaternion.identity;
@@ -321,6 +302,7 @@ namespace huqiang.Core.HGUI
                 transform.rotation = cam.transform.rotation;
             }
         }
+
 #region 鼠标和触屏事件
         /// <summary>
         /// 派发用户输入指令信息

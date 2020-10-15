@@ -25,6 +25,7 @@ namespace Assets.Scripts
             base.Initial(parent, dat);
             view = LoadUI<View>("baseUI", "map");//"baseUI"创建的bytes文件名,"page"为创建的页面名
             InitialEvent();
+            view.lbsMap.Location(112,22);
         }
         int CurLevel = 18;
         void InitialEvent()

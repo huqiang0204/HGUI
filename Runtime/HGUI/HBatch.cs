@@ -35,6 +35,7 @@ namespace huqiang.Core.HGUI
         {
             if (!pipeLine[index].active)
                 return;
+
             Vector3 o = pipeLine[index].Position;
             Vector3 scale = pipeLine[index].Scale;
             Quaternion q = pipeLine[index].Rotation;

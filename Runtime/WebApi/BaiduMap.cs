@@ -85,6 +85,8 @@ namespace huqiang.WebApi
                         info.CallBack(info.filePath,info.name,info.context, dat);
                 }
             }
+            if (info != null)
+                info.webRequest.Dispose();
         }
         public const int MinLevel = 3;
         public const int MaxLevel = 18;

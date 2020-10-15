@@ -64,6 +64,25 @@ namespace huqiang.UIComposite
         {
             offsetX -= v.x;
             offsetY += v.y;
+            if(offsetX<0)
+            {
+                cx--;
+                offsetX += 256;
+            }else if(offsetX>=256)
+            {
+                cx++;
+                offsetX -= 256;
+            }
+            if (offsetY < 0)
+            {
+                cy++;
+                offsetY += 256;
+            }
+            else if (offsetY >= 256)
+            {
+                cy--;
+                offsetY -= 256;
+            }
             UpdateData();
         }
         LngLat latlng;

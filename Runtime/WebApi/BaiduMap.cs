@@ -32,6 +32,7 @@ namespace huqiang.WebApi
         public const int MinLevel = 3;
         public const int MaxLevel = 18;
         public static string AK = "MgRcqKAaBmaP3jIozTcTORIpuZ08oISA";
+        static int Index = 0;
         public static void GPSToMercato(double x, double y, Action<LanLat> action)
         {
             string url = string.Format("http://api.map.baidu.com/geoconv/v1/?coords={0},{1}&from=1&to=6&ak={2}", x, y,AK);
@@ -104,7 +105,10 @@ namespace huqiang.WebApi
                 action(path, file, context);
                 return;
             }
-            string http = string.Format("http://online0.map.bdimg.com/onlinelabel/?qt=tile&x={0}&y={1}&z={2}&ak={3}", tileX, tileY, z,AK);
+            Index++;
+            if (Index >= 10)
+                Index = 0;
+            string http = string.Format("http://online{0}.map.bdimg.com/onlinelabel/?qt=tile&x={1}&y={2}&z={3}&ak={4}",Index, tileX, tileY, z,AK);
             Http.HttpControl.DownloadAsync(http, path, null, (o) => {
                 if (o.Code == Http.ResultCode.OK)
                 {

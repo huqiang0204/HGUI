@@ -45,6 +45,8 @@ namespace huqiang.UIComposite
         public GestureEvent eventCall;
         FakeStruct ItemMod;
         Transform Axis;
+        Transform Axis2;
+
         List<Item> Items = new List<Item>();
         /// <summary>
         /// 获取图片的中心点
@@ -55,11 +57,13 @@ namespace huqiang.UIComposite
         /// </summary>
         Vector2 ScaleCenter;
         LanLat pressMercato;
+        List<TileInfo> tileInfos = new List<TileInfo>();
         public override void Initial(FakeStruct fake, UIElement script)
         {
             base.Initial(fake, script);
             HGUIManager.GameBuffer.RecycleGameObject(Enity.transform.Find("Item").gameObject);
             Axis = Enity.transform.Find("Axis");
+            Axis2 = Axis.GetChild(0);
             ItemMod = HGUIManager.FindChild(BufferData, "Item");
             eventCall = script.RegEvent<GestureEvent>();
             eventCall.ForceEvent = true;
@@ -73,6 +77,7 @@ namespace huqiang.UIComposite
             eventCall.TowFingerMove = Scale;
             eventCall.TowFingerUp = ScaleEnd;
         }
+        int startLevel;
         void SetCenter(GestureEvent gesture)
         {
             Vector3 pc = Vector3.Lerp(gesture.RawPos0, gesture.RawPos1, 0.5f);
@@ -82,16 +87,33 @@ namespace huqiang.UIComposite
             mact.x += cc.x;
             mact.y += cc.y;
             pressMercato = mact;
+            Axis.localPosition = cc;
+            Axis2.localPosition = -cc;
+            ScaleCenter = cc;
+            startLevel = Level;
         }
         void Scale(GestureEvent gesture)
         {
-            //gesture.CurScale
-          
+            var cs = gesture.CurScale;
+            float m = cs - 0.5f;
+            float a = m / 1;
+            float r = cs % 1;
+            int lev = (int)a;
+            lev += startLevel;
+            if(lev!=Level)
+            {
+                Level = lev;
+                tileInfos.Clear();
+                ResetTile(ScaleCenter, pressMercato, tileInfos);
+                UpdateItems(tileInfos);
+            }
+            Axis.transform.localScale = new Vector3(r, r, r);
         }
         void ScaleEnd(GestureEvent gesture)
         {
             //gesture.CurScale
-
+            Axis.transform.localPosition = Vector3.zero;
+            Axis2.transform.localPosition = Vector3.zero;
         }
         void Scrolling(UserEvent back, Vector2 v)
         {
@@ -146,7 +168,7 @@ namespace huqiang.UIComposite
         public int Level = 18;
         TilePos tilePos;
         LanLat mercato;
-        void RsetTile(Vector2 offset, LanLat mct, List<TileInfo> infos)
+        void ResetTile(Vector2 offset, LanLat mct, List<TileInfo> infos)
         {
             Vector2 size = Enity.m_sizeDelta;
             float ox = offset.x - size.x * -0.5f;
@@ -184,7 +206,7 @@ namespace huqiang.UIComposite
                 Item item = new Item();
                 var go = HGUIManager.GameBuffer.Clone(ItemMod);
                 var trans = go.transform;
-                trans.SetParent(Axis);
+                trans.SetParent(Axis2);
                 trans.localScale = Vector3.one;
                 trans.localRotation = Quaternion.identity;
                 item.Game = go;
@@ -309,5 +331,6 @@ namespace huqiang.UIComposite
                 UpdateData();
             }
         }
+
     }
 }

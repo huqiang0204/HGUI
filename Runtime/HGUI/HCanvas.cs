@@ -511,6 +511,49 @@ namespace huqiang.Core.HGUI
             uv4.Clear();
             colors.Clear();
         }
+        public Vector2 ScreenToCanvasPos(Vector2 mPos)
+        {
+            if (renderMode == RenderMode.WorldSpace)
+            {
+                Vector3 a = new Vector3(-10000f, -10000f, 0);
+                Vector3 b = new Vector3(0, 10000f, 0);
+                Vector3 c = new Vector3(10000, -10000, 0);
+                var pos = transform.position;
+                var qt = transform.rotation;
+                a = qt * a + pos;
+                b = qt * b + pos;
+                c = qt * c + pos;//得到世界坐标的三角面
+                var cam = Camera.main;
+                var v = cam.ScreenToWorldPoint(mPos);
+                var f = cam.transform.forward;
+                Vector3 p = Vector3.zero;
+                if (huqiang.Physics.IntersectTriangle(ref v, ref f, ref a, ref b, ref c, ref p))
+                {
+                    var iq = Quaternion.Inverse(qt);
+                    p -= pos;
+                    p = iq * p;
+                    var ls = transform.localScale;
+                    p.x /= ls.x;
+                    p.y /= ls.y;
+                    return new Vector2(p.x, p.y);
+                }
+                return new Vector2(-100000, -100000);
+            }
+            else
+            {
+                float w = Screen.width;
+                w *= 0.5f;
+                float h = Screen.height;
+                h *= 0.5f;
+                var cPos = Vector2.zero;
+                cPos.x = mPos.x - w;
+                cPos.y = mPos.y - h;
+                float ps = PhysicalScale;
+                cPos.x /= ps;
+                cPos.y /= ps;
+                return cPos;
+            }
+        }
 #endregion
 #region 编辑器状态刷新网格
 #if UNITY_EDITOR

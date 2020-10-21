@@ -14,6 +14,7 @@ namespace huqiang.Core.HGUI
     {
         static int Max;
         static Shader shader;
+        public static int renderQueue = 3100;
         internal static Shader DefShader
         {
             get
@@ -46,6 +47,7 @@ namespace huqiang.Core.HGUI
                     materials[point] = mat;
                 }
             }
+            mat.renderQueue = renderQueue;
             point++;
             return mat;
         }

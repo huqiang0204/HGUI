@@ -34,12 +34,14 @@ namespace huqiang.Core.HGUI
         public UserAction[] inputs;
         public bool PauseEvent;
         public bool Pause;
+        public int renderQueue = 3100;
         protected virtual void Start()
         {
             MainCanvas = this;
             Font.textureRebuilt += FontTextureRebuilt;
             //Main = new QueueBuffer<TempBuffer>();
             //Sub = new QueueBuffer<TempBuffer>();
+            
         }
         bool ftr;
         void FontTextureRebuilt(Font font)
@@ -143,6 +145,7 @@ namespace huqiang.Core.HGUI
         {
             if (Pause)
                 return;
+            MaterialManager.renderQueue = renderQueue;
             LateFrame++;
             point = 1;
             max = 0;
@@ -216,6 +219,7 @@ namespace huqiang.Core.HGUI
                 renderer = GetComponent<MeshRenderer>();
             if (renderer != null)
                 renderer.materials = MatCollector.GenerateMaterial();   //这里会产生一次GC
+           
         }
         void ApplyToCamera()
         {
@@ -516,6 +520,7 @@ namespace huqiang.Core.HGUI
             {
                 return;
             }
+            MaterialManager.renderQueue = renderQueue;
             MainCanvas = this;
             point = 1;
             max = 0;
@@ -577,6 +582,7 @@ namespace huqiang.Core.HGUI
                 //这里会产生一次GC
                 mr.sharedMaterials = MatCollector.GenerateMaterial();
             }
+           
         }
 #endif
 #endregion

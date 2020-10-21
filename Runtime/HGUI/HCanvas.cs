@@ -15,7 +15,7 @@ namespace huqiang.Core.HGUI
         public Vector2 DesignSize = new Vector2(1920, 1080);
         [Range(0.1f, 3)]
         public float PhysicalScale = 1;
-        public float NearPlane = 0.01f;
+        public float NearPlane = 0f;
         public Vector2 A = new Vector2(4,0.9f);//贝塞尔曲线起点
         public Vector2 B = new Vector2(6,1f);
         public Vector2 C = new Vector2(8,1.2f);

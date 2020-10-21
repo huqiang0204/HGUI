@@ -47,6 +47,7 @@ namespace huqiang.Core.HGUI
                     materials[point] = mat;
                 }
             }
+
             mat.renderQueue = renderQueue;
             point++;
             return mat;

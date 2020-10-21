@@ -22,14 +22,13 @@
 				"CanUseSpriteAtlas" = "True"
 			}
 
-			Cull Off
-			Lighting Off
-			//ZWrite Off
-			ZTest Off //[unity_GUIZTestMode]
-			Blend SrcAlpha OneMinusSrcAlpha
-
 			Pass
 			{
+			Cull Off
+			Lighting Off
+			ZWrite Off
+			 //ZTest Off //[unity_GUIZTestMode]
+			 Blend SrcAlpha OneMinusSrcAlpha
 				Name "Default"
 			CGPROGRAM
 				#pragma vertex vert

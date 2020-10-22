@@ -14,6 +14,7 @@ namespace huqiang
     {
         public UInt16 MinID = 60000;
         public UInt16 MaxID = 64000;
+        static UInt16 Fragment = 1472;
         static int FragmentSize = (1472 - 8 - 15) - 12 * 4;//包头4字节,标志1字节,包尾4字节,数据头14字节,12个节点,每个节点4字节=1399
         byte[] buf = new byte[1490];
         public List<KcpEnvelopeData> datas = new List<KcpEnvelopeData>();

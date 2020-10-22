@@ -7,17 +7,22 @@ using System.Threading;
 
 namespace huqiang
 {
-    public struct SocMsg
+    public struct SocMsg:IDisposable
     {
         public BlockInfo<byte> dat;
         public KcpData link;
+
+        public void Dispose()
+        {
+            dat.Release();
+            link = null;
+        }
     }
 
     public class Kcp
     {
         public static int FragmentSize = (1472 - 8 - 15) - 12 * 4;//包头4字节,包尾4字节,数据头21字节,12个节点,每个节点4字节=1399
         public static int MsgTimeOut = 500;
-        const UInt16 Fragment = 1472;
         public static UInt16 MinID = 34000;
         public static UInt16 MaxID = 44000;
         public List<BlockBuffer<byte>> Buffer = new List<BlockBuffer<byte>>();
@@ -213,7 +218,7 @@ namespace huqiang
             {
                 var dat = q.Dequeue();
                 link.MsgId++;
-                if (link.MsgId > MaxID)
+                if (link.MsgId >= MaxID)
                     link.MsgId = MinID;
                 PackAll(link, dat.dat,dat.type,link.MsgId,time);
             }
@@ -313,7 +318,7 @@ namespace huqiang
             int s = 0;
             unsafe
             {
-                fixed (byte* bp = &tmpBuffer[0])
+                fixed(byte* bp=&tmpBuffer[0])
                 {
                     for (int i = 0; i < p; i++)
                     {
@@ -362,7 +367,7 @@ namespace huqiang
                         msg.MsgID = msgId;
                         msg.CurPart = (UInt16)p;
                         msg.CreateTime = time;
-                        SendMsg(link, ref msg, time);
+                        SendMsg(link,ref msg, time);
                         link.Msgs.Add(msg);
                     }
                 }
@@ -381,9 +386,7 @@ namespace huqiang
             }
             msg.SendTime = time;
             msg.SendCount++;
-            var soc = kcpListener.soc;
-            if (soc != null)
-                soc.SendTo(tmpBuffer, c, SocketFlags.None, link.endpPoint);
+            kcpListener.soc.SendTo(tmpBuffer,c,SocketFlags.None,link.endpPoint);
         }
         static int PackInt(byte[] src, int slen, byte[] tar)
         {
@@ -486,5 +489,117 @@ namespace huqiang
                     len += Buffer[i].PEMemory;
                 return len;
             } }
+        unsafe static byte[] PackInt(byte* src, int slen)
+        {
+            int p = slen / 124;
+            int r = slen % 124;
+            if (r > 0)
+                p++;
+            int len = p * 4 + slen;
+            byte[] tar = new byte[len + 8];
+            tar[0] = 255;
+            tar[1] = 255;
+            tar[2] = 255;
+            tar[3] = 255;
+            int o = len + 4;
+            tar[o] = 255;
+            o++;
+            tar[o] = 255;
+            o++;
+            tar[o] = 255;
+            o++;
+            tar[o] = 254;
+            int s = 0;
+            int t = 4;
+            for (int j = 0; j < p; j++)
+            {
+                int a = 0;
+                int st = t;
+                t += 4;
+                for (int i = 0; i < 31; i++)
+                {
+                    byte b = src[s];
+                    if (b > 127)
+                    {
+                        a |= 1 << i;
+                        b -= 128;
+                    }
+                    tar[t] = b;
+                    t++; s++;
+                    if (s >= slen)
+                        break;
+                    tar[t] = src[s];
+                    t++; s++;
+                    if (s >= slen)
+                        break;
+                    tar[t] = src[s];
+                    t++; s++;
+                    if (s >= slen)
+                        break;
+                    tar[t] = src[s];
+                    t++; s++;
+                    if (s >= slen)
+                        break;
+                }
+                tar[st] = (byte)a;
+                a >>= 8;
+                tar[st + 1] = (byte)a;
+                a >>= 8;
+                tar[st + 2] = (byte)a;
+                a >>= 8;
+                tar[st + 3] = (byte)a;
+            }
+            return tar;
+        }
+        public static byte[][] Pack(byte[] dat, byte type, UInt16 msgId, Int16 time)
+        {
+            int len = dat.Length;
+            int p = len / FragmentSize;
+            int r = len % FragmentSize;
+            int all = p;//总计分卷数量
+            if (r > 0)
+                all++;
+            byte[][] tmp = new byte[all][];
+            int s = 0;
+            unsafe
+            {
+                byte* buf = stackalloc byte[1490];
+                for (int i = 0; i < p; i++)
+                {
+                    KcpHead* head = (KcpHead*)buf;
+                    head->Type = type;
+                    head->MsgID = msgId;
+                    head->CurPart = (UInt16)i;
+                    head->AllPart = (UInt16)all;
+                    head->PartLen = (UInt16)FragmentSize;
+                    head->Lenth = (UInt32)len;
+                    byte* dp = buf + KcpHead.Size;
+                    for (int j = 0; j < FragmentSize; j++)
+                    {
+                        dp[j] = dat[s];
+                        s++;
+                    }
+                    tmp[i] = PackInt(buf, FragmentSize + KcpHead.Size);
+                }
+                if (r > 0)
+                {
+                    KcpHead* head = (KcpHead*)buf;
+                    head->Type = type;
+                    head->MsgID = msgId;
+                    head->CurPart = (UInt16)p;
+                    head->AllPart = (UInt16)all;
+                    head->PartLen = (UInt16)r;
+                    head->Lenth = (UInt32)len;
+                    byte* dp = buf + KcpHead.Size;
+                    for (int j = 0; j < r; j++)
+                    {
+                        dp[j] = dat[s];
+                        s++;
+                    }
+                    tmp[p] = PackInt(buf, r + KcpHead.Size);
+                }
+            }
+            return tmp;
+        }
     }
 }

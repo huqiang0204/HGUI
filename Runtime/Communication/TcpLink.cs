@@ -53,9 +53,9 @@ namespace huqiang
                         }
                         else return -1;
             }
-            catch //(Exception ex)
+            catch (Exception ex)
             {
-                //ServerLog.Error(ex.StackTrace);
+                System.Diagnostics.Debug.WriteLine(ex.StackTrace);
                 return -1;
             }
             return 0;
@@ -74,9 +74,9 @@ namespace huqiang
                         }
                         else return -1;
             }
-            catch //(Exception ex)
+            catch (Exception ex)
             {
-                //ServerLog.Error(ex.StackTrace);
+                System.Diagnostics.Debug.WriteLine(ex.StackTrace);
                 return -1;
             }
             return 0;
@@ -91,7 +91,7 @@ namespace huqiang
                 lock (Link)
                     Link.Close();
         }
-        public override void Dispose()
+        public virtual void Dispose()
         {
             if (Link != null)
                 lock (Link)
@@ -113,13 +113,13 @@ namespace huqiang
                             var dat = list[i];
                             Dispatch(dat.data, dat.type);
                         }
-                    }catch //(Exception ex)
+                    }catch (Exception ex)
                     {
-                        //System.Diagnostics.Debug.WriteLine(ex);
+                        System.Diagnostics.Debug.WriteLine(ex);
                     }
                 }
             }
-            catch //(Exception ex)
+            catch (Exception ex)
             {
             }
         }

@@ -56,7 +56,7 @@ namespace Assets.Scripts
             beeline.Start.x = -100;
             beeline.End.x = 100;
             beeline.End.y = 100;
-
+          
             ArcLine arc = new ArcLine();
             arc.Closed = true;
             arc.lineBase.Color = Color.green;

@@ -45,9 +45,9 @@ namespace huqiang
                                 mis.action(mis.data);
                     }
                 }
-                catch //(Exception ex)
+                catch (Exception ex)
                 {
-                    //ServerLog.Error(ex.StackTrace);
+                    System.Diagnostics.Debug.WriteLine(ex.StackTrace);
                 }
                 long t = DateTime.Now.Ticks;
                 t -= now;

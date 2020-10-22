@@ -20,7 +20,7 @@ namespace huqiang
         public virtual void Recive(long now)
         {
         }
-        public virtual void AddMsg(byte[][] dat, long now,UInt16 msgID)
+        public virtual void AddMsg(MsgInfo2[] msgs)
         {
         }
         internal virtual void FreeMemory()

@@ -36,9 +36,9 @@ namespace huqiang
             {
                 soc.Bind(endPoint);
             }
-            catch //(Exception ex)
+            catch (Exception ex)
             {
-                //ServerLog.Error(ex.StackTrace);
+                System.Diagnostics.Debug.WriteLine(ex.StackTrace);
             }
             soc.Listen(0);
             soc.ReceiveTimeout = 1000;
@@ -76,9 +76,9 @@ namespace huqiang
                     {
                         Heartbeat();
                     }
-                    catch //(Exception ex)
+                    catch (Exception ex)
                     {
-                        //ServerLog.Error(ex.StackTrace);
+                        System.Diagnostics.Debug.WriteLine(ex.StackTrace);
                     }
                 };
             }
@@ -105,9 +105,9 @@ namespace huqiang
                     var client = soc.Accept();
                     CreateLink(client);
                 }
-                catch //(Exception ex)
+                catch (Exception ex)
                 {
-                    //ServerLog.Error(ex.StackTrace);
+                    System.Diagnostics.Debug.WriteLine(ex.StackTrace);
                 }
             }
         }

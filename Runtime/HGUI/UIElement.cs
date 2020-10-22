@@ -36,8 +36,7 @@ namespace huqiang.Core.HGUI
         DesignedDockPanel, 
         DragContent,
         DataGrid,
-        InputBox,
-        Map
+        InputBox
     }
     public class UIElement:MonoBehaviour
     {
@@ -739,9 +738,6 @@ namespace huqiang.Core.HGUI
                     break;
                 case CompositeType.InputBox:
                     new InputBox().Initial(ex,script);
-                    break;
-                case CompositeType.Map:
-                    new LBSMap().Initial(ex,script);
                     break;
             }
         }

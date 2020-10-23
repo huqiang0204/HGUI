@@ -197,12 +197,14 @@ namespace huqiang.UIComposite
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR
             if (!ReadOnly)
                 Editing = true;
+            Input.imeCompositionMode = IMECompositionMode.On;
 #endif
         }
         public void OnClick(UserAction action)
         {
             if (!ReadOnly)
             {
+                Input.imeCompositionMode = IMECompositionMode.On;
                 Editing = true;
                 TextOperation.contentType = m_ctpye;
                 if (!Keyboard.active)
@@ -225,6 +227,7 @@ namespace huqiang.UIComposite
             else SetShowText();
             if (OnDone != null)
                 OnDone(this);
+            Input.imeCompositionMode = IMECompositionMode.Auto;
         }
         public void OnDrag(UserAction action, ref PressInfo press)
         {
@@ -657,6 +660,7 @@ namespace huqiang.UIComposite
             TextOperation.contentType = m_ctpye;
             TextOperation.ChangeText(TextCom,FullString);
             action.AddFocus(InputEvent);
+            Input.imeCompositionMode = IMECompositionMode.On;
             Enity.gameObject.SetActive(true);
             text.Text = "";
             Editing = true;

@@ -13,6 +13,8 @@ public class MainScript : HCanvas
     // Start is called before the first frame update
     protected override void Start()
     {
+        KcpDataControll.Instance.Connection("192.168.0.134", 8899);
+        KcpDataControll.Instance.OpenLog();
         base.Start();
         App.Initial(transform);
         HGUIManager.LoadModels(baseUI.bytes, "baseUI");
@@ -24,8 +26,6 @@ public class MainScript : HCanvas
         //    UIPage.LoadPage<ChatPage>();
         //};
         UIPage.LoadPage<StartPage>();
-        KcpDataControll.Instance.Connection("192.168.0.134", 8899);
-        KcpDataControll.Instance.OpenLog();
     }
 
     protected override void Update()

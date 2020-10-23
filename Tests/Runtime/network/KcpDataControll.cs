@@ -123,13 +123,14 @@ namespace Assets.Net
         }
         void Log(string condtion, string stack, LogType type)
         {
-            for(int i=0;i<logs.Count;i++)
+            for (int i = 0; i < logs.Count; i++)
             {
-                if (logs[i].stackTrace == stack)
-                {
-                    logs[i].count++;
-                    return; 
-                }
+                if (logs[i].condition == condtion)
+                    if (logs[i].stackTrace == stack)
+                    {
+                        logs[i].count++;
+                        return;
+                    }
             }
             LogData log = new LogData();
             log.count = 1;

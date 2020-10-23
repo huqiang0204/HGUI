@@ -42,6 +42,7 @@ UDP，TCP，KCP，数据封包，线程池，等等
 8.  或者你没有AssetBundle，可以直接加载页面UIPage.LoadPage<StartPage>();
 9.  UI管理方面有自己的回收池，切换界面使用UIPage.LoadPage即可
 10. 视频教程地址https://space.bilibili.com/19050274/video 不定期更新
+11. 函数文档https://huqiang0204.gitee.io/home
 
 #### 参与贡献
 

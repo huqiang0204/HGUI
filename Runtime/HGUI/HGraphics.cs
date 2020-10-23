@@ -20,6 +20,7 @@ namespace huqiang.Core.HGUI
         public Vector2 uv4;
         public int picture;
     }
+    [DisallowMultipleComponent]
     public class HGraphics:UIElement
     {
         protected static BlockBuffer<int> trisBuffer = new BlockBuffer<int>(48, 1024);

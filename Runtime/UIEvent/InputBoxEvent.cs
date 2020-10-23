@@ -23,7 +23,7 @@ namespace huqiang.UIEvent
         protected float overTime = 0;
         internal override void Initial(FakeStruct mod)
         {
-            base.Initial(mod);
+            AutoColor = false;
             text = Context as HText;
         }
         public void ChangeText(string str)
@@ -33,7 +33,8 @@ namespace huqiang.UIEvent
             chars.Clear();
             Content.FullString = str;
             text.GetGenerationSettings(ref text.m_sizeDelta, ref HText.settings);
-          
+            HText.settings.richText = false;
+
             var g = HText.Generator;
             g.Populate(Content.FilterString, HText.settings);
             verts.AddRange(g.verts);
@@ -279,13 +280,13 @@ namespace huqiang.UIEvent
                 p = chars[index].cursorPos.x;
             }
             float right = p + 1;
-            float down = lines[row].endY;
+            float down = lines[row].endY - text.m_fontSize*0.55f;
             var gl = UIElement.GetGlobaInfo(text.transform, false);
             float rx = gl.Scale.x * right;
             float rd = gl.Scale.y * down;
             gl.Postion.x += rx;
             gl.Postion.y += rd;
-            gl.Postion /= HCanvas.MainCanvas.PhysicalScale;
+            gl.Postion *= HCanvas.MainCanvas.PhysicalScale;
             gl.Postion.x += Screen.width / 2;
             gl.Postion.y += Screen.height / 2;
             Keyboard.CursorPos = new Vector2(gl.Postion.x, Screen.height - gl.Postion.y);

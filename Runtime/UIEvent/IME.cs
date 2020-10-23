@@ -150,6 +150,8 @@ namespace huqiang
         static IntPtr hIMC= IntPtr.Zero;
         public static void Update()
         {
+            if (hIMC == IntPtr.Zero)
+                hIMC = ImmGetContext(mainWindowHandle);
             CompStringChanged = false;
             ResultString = "";
             InputDone = false;
@@ -252,10 +254,12 @@ namespace huqiang
             }
             return CallNextHookEx(_hookID, nCode, wParam, lParam);
         }
+        static IME iME;
         public static void Initial()
         {
              var pro = Process.GetCurrentProcess();
-             mainWindowHandle = new IME().GetMainWindowHandle(pro.Id);
+             iME = new IME();
+             mainWindowHandle = iME.GetMainWindowHandle(pro.Id);
              hIMC = ImmGetContext(mainWindowHandle);
             //using (ProcessModule curModule = pro.MainModule)
             //{
@@ -269,4 +273,4 @@ namespace huqiang
         }
     }
 #endif
-}
+        }

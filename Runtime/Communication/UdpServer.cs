@@ -163,9 +163,9 @@ namespace huqiang
                         }
                     }
                 }
-                catch //(Exception ex)
+                catch (Exception ex)
                 {
-                    //ServerLog.Error(ex.StackTrace);
+                    System.Diagnostics.Debug.WriteLine(ex.StackTrace);
                 }
             }
         }

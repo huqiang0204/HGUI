@@ -7,6 +7,8 @@ namespace huqiang
 {
     public class KcpServer<T> : KcpListener where T : KcpLink, new()
     {
+        public static UInt16 MinID = 60000;
+        public static UInt16 MaxID = 64000;
         static Random random = new Random();
         public static int SingleCount = 2048;
         public KcpThread<T>[] linkBuff;
@@ -159,18 +161,28 @@ namespace huqiang
         UInt16 bid = 60000;
         public override void Broadcast(byte[] dat, byte type)
         {
-            var tmp = Envelope.PackAll(dat, type, bid, 1472);
-            long now = DateTime.Now.Ticks;
+            long now = DateTime.Now.Ticks / 10000;
+            long r = now % 10000;
+            Int16 time = (Int16)r;
+            var tmp = Kcp.Pack(dat, type, bid, time);
+            MsgInfo2[] msg = new MsgInfo2[tmp.Length];
+            for(int i=0;i<msg.Length;i++)
+            {
+                msg[i].CurPart =(ushort) i;
+                msg[i].data = tmp[i];
+                msg[i].CreateTime = time;
+                msg[i].MsgID = bid;
+            }
             for (int i = 0; i < tCount; i++)
             {
-                linkBuff[i].AddMsg(tmp, now, bid);
+                linkBuff[i].AddMsg(msg);
             }
             bid++;
-            if (bid > 64000)
-                bid = 60000;
+            if (bid >= MaxID)
+                bid = MinID;
         }
         bool heart;
-
+  
         long last;
         public override void SendAll()
         {
@@ -178,7 +190,7 @@ namespace huqiang
             long r = now % 10000;
             Int16 time = (Int16)r;
             kcp.UnPack(time);
-            if (heart)
+            if(heart)
             {
                 long c = now / 1000;
                 bool n = c > last ? true : false;
@@ -214,6 +226,5 @@ namespace huqiang
                 linkBuff[i].DeleteTimeOutLink(this, now);
             }
         }
-
     }
 }

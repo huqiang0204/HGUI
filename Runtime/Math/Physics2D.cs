@@ -1283,6 +1283,48 @@ namespace huqiang
             return false;
         }
         /// <summary>
+        /// 求两条线段是否相交点
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <param name="c"></param>
+        /// <param name="d"></param>
+        /// <returns></returns>
+        public static bool LineToLine(ref Vector2 a, ref Vector2 b, ref Vector2 c, ref Vector2 d)
+        {
+            float ax = b.x - a.x;
+            float ay = b.y - a.y;
+            float cx = d.x - c.x;
+            float cy = d.y - c.y;
+            //(V1.y*V2.x-V1.x*V2.y)
+            float y = ay * cx - ax * cy;
+            if (y == 0)
+                return false;
+            //((B.y-A.y)*V2.x+(A.x-B.x)*V2.y)
+            float x = (c.y - a.y) * cx + (a.x - c.x) * cy;
+            float r = x / y;
+            if (r >= 0 & r <= 1)
+            {
+                if (cx == 0)
+                {
+                    //x2=(A.y+x1*V1.y-B.y)/V2.y
+                    y = (a.y - c.y + r * ay) / cy;
+                }
+                else
+                {
+                    //x2=(A.x+x1*V1.x-B.x)/V2.x
+                    y = (a.x - c.x + r * ax) / cx;
+                }
+                //location.x=A.x+x1*V1.x
+                //location.y=A.x+x1*V1.y
+                if (y >= 0 & y <= 1)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        /// <summary>
         /// 求两条线段是否相交点,并得出相交点
         /// </summary>
         /// <param name="a"></param>

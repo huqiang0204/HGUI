@@ -131,7 +131,6 @@ public static class UICompositeMenu
         son.localRotation = Quaternion.identity;
         var txt = go.GetComponent<HText>();
         txt.SizeDelta = new Vector2(380,90);
-        txt.eventType = huqiang.Core.HGUI.EventType.TextInput;
        
         txt.marginType = MarginType.Margin;
         txt.margin = new Margin(5,5,5,5);
@@ -218,6 +217,7 @@ public static class UICompositeMenu
         var help = go.AddComponent<SliderHelper>();
         help.StartOffset.y = startOffset;
         help.EndOffset.y = endOffset;
+        help.direction = UISlider.Direction.Vertical;
         image.Sprite = EditorModelManager.FindSprite(icons, background);
         image.SprType = SpriteType.Sliced;
 

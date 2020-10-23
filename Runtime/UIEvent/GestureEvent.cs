@@ -131,13 +131,13 @@ namespace huqiang.UIEvent
         long PressTime3;
         long PressTime4;
         long PressTime5;
-        Vector2 RawPos0;
-        Vector2 RawPos1;
+        public Vector2 RawPos0;
+        public Vector2 RawPos1;
         Vector2 RawPos2;
         Vector2 RawPos3;
         Vector2 RawPos4;
-        Vector2 LastPos0;
-        Vector2 LastPos1;
+        public Vector2 LastPos0;
+        public Vector2 LastPos1;
         Vector2 LastPos2;
         Vector2 LastPos3;
         Vector2 LastPos4;

@@ -10,31 +10,12 @@ namespace huqiang.Core.HGUI
 {
     public class HCanvas:UIElement
     {
-        //class TempBuffer
-        //{
-        //    public int Max;
-        //    public TempBuffer(int len = 4096)
-        //    {
-        //        Max = len;
-        //        PipeLine = new HGUIElement[len];
-        //        scripts = new UIElement[len];
-        //    }
-        //    public HGUIElement[] PipeLine;
-        //    public UIElement[] scripts;
-        //    public List<Vector3> vertex = new List<Vector3>();
-        //    public List<Vector2> uv = new List<Vector2>();
-        //    public List<Vector2> uv1 = new List<Vector2>();
-        //    public List<Vector2> uv2 = new List<Vector2>();
-        //    public List<Vector2> uv3 = new List<Vector2>();
-        //    public List<Vector2> uv4 = new List<Vector2>();
-        //    public List<Color32> colors = new List<Color32>();
-        //}
         //protected static ThreadMission thread = new ThreadMission("UI");
         public Camera camera;
         public Vector2 DesignSize = new Vector2(1920, 1080);
         [Range(0.1f, 3)]
         public float PhysicalScale = 1;
-        public float NearPlane = 0.01f;
+        public float NearPlane = 0f;
         public Vector2 A = new Vector2(4,0.9f);//贝塞尔曲线起点
         public Vector2 B = new Vector2(6,1f);
         public Vector2 C = new Vector2(8,1.2f);
@@ -53,12 +34,14 @@ namespace huqiang.Core.HGUI
         public UserAction[] inputs;
         public bool PauseEvent;
         public bool Pause;
+        public int renderQueue = 3100;
         protected virtual void Start()
         {
             MainCanvas = this;
             Font.textureRebuilt += FontTextureRebuilt;
             //Main = new QueueBuffer<TempBuffer>();
             //Sub = new QueueBuffer<TempBuffer>();
+            
         }
         bool ftr;
         void FontTextureRebuilt(Font font)
@@ -79,9 +62,28 @@ namespace huqiang.Core.HGUI
             if (!act)
                 return;
             PipeLine[index].parentIndex = parent;
-            PipeLine[index].localPosition = trans.localPosition;
-            PipeLine[index].localRotation = trans.localRotation;
-            PipeLine[index].localScale = trans.localScale;
+            var lp = PipeLine[index].localPosition = trans.localPosition;
+            var lr = PipeLine[index].localRotation = trans.localRotation;
+            var ls = PipeLine[index].localScale = trans.localScale;
+            if(parent>=0)
+            {
+                var ps = PipeLine[parent].Scale;
+                lp.x *= ps.x;
+                lp.y *= ps.y;
+                lp.z *= ps.z;
+                PipeLine[index].Position = PipeLine[parent].Position + PipeLine[parent].Rotation * lp;
+                PipeLine[index].Rotation = PipeLine[parent].Rotation * lr;
+                PipeLine[index].Scale = ps;
+                PipeLine[index].Scale.x *= ls.x;
+                PipeLine[index].Scale.y *= ls.y;
+                PipeLine[index].Scale.z *= ls.z;
+            }
+            else//HCanvas
+            {
+                PipeLine[index].Position = Vector3.zero;
+                PipeLine[index].Rotation = Quaternion.identity;
+                PipeLine[index].Scale = Vector3.one;
+            }
             PipeLine[index].trans = trans;
             var script = trans.GetComponent<UIElement>();
             PipeLine[index].script = script;
@@ -143,6 +145,7 @@ namespace huqiang.Core.HGUI
         {
             if (Pause)
                 return;
+            MaterialManager.renderQueue = renderQueue;
             LateFrame++;
             point = 1;
             max = 0;
@@ -162,6 +165,7 @@ namespace huqiang.Core.HGUI
                     Debug.Log("脚本重复更新");
                 }
             }
+            Collection(transform, -1, 0);
             for (int i = 0; i < top_txt; i++)
             {
                 texts[i].Populate(); 
@@ -215,6 +219,7 @@ namespace huqiang.Core.HGUI
                 renderer = GetComponent<MeshRenderer>();
             if (renderer != null)
                 renderer.materials = MatCollector.GenerateMaterial();   //这里会产生一次GC
+           
         }
         void ApplyToCamera()
         {
@@ -301,6 +306,7 @@ namespace huqiang.Core.HGUI
                 transform.rotation = cam.transform.rotation;
             }
         }
+
 #region 鼠标和触屏事件
         /// <summary>
         /// 派发用户输入指令信息
@@ -505,6 +511,49 @@ namespace huqiang.Core.HGUI
             uv4.Clear();
             colors.Clear();
         }
+        public Vector2 ScreenToCanvasPos(Vector2 mPos)
+        {
+            if (renderMode == RenderMode.WorldSpace)
+            {
+                Vector3 a = new Vector3(-10000f, -10000f, 0);
+                Vector3 b = new Vector3(0, 10000f, 0);
+                Vector3 c = new Vector3(10000, -10000, 0);
+                var pos = transform.position;
+                var qt = transform.rotation;
+                a = qt * a + pos;
+                b = qt * b + pos;
+                c = qt * c + pos;//得到世界坐标的三角面
+                var cam = Camera.main;
+                var v = cam.ScreenToWorldPoint(mPos);
+                var f = cam.transform.forward;
+                Vector3 p = Vector3.zero;
+                if (huqiang.Physics.IntersectTriangle(ref v, ref f, ref a, ref b, ref c, ref p))
+                {
+                    var iq = Quaternion.Inverse(qt);
+                    p -= pos;
+                    p = iq * p;
+                    var ls = transform.localScale;
+                    p.x /= ls.x;
+                    p.y /= ls.y;
+                    return new Vector2(p.x, p.y);
+                }
+                return new Vector2(-100000, -100000);
+            }
+            else
+            {
+                float w = Screen.width;
+                w *= 0.5f;
+                float h = Screen.height;
+                h *= 0.5f;
+                var cPos = Vector2.zero;
+                cPos.x = mPos.x - w;
+                cPos.y = mPos.y - h;
+                float ps = PhysicalScale;
+                cPos.x /= ps;
+                cPos.y /= ps;
+                return cPos;
+            }
+        }
 #endregion
 #region 编辑器状态刷新网格
 #if UNITY_EDITOR
@@ -514,6 +563,7 @@ namespace huqiang.Core.HGUI
             {
                 return;
             }
+            MaterialManager.renderQueue = renderQueue;
             MainCanvas = this;
             point = 1;
             max = 0;
@@ -575,6 +625,7 @@ namespace huqiang.Core.HGUI
                 //这里会产生一次GC
                 mr.sharedMaterials = MatCollector.GenerateMaterial();
             }
+           
         }
 #endif
 #endregion

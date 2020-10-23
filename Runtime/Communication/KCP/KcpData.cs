@@ -60,17 +60,27 @@ namespace huqiang
         public Int16 Time;//2
         public static unsafe int Size = sizeof(KcpHead);
     }
-    public struct BlockData
+    public struct BlockData:IDisposable
     {
         public byte type;
         public BlockInfo<byte> dat;
+
+        public void Dispose()
+        {
+            dat.Release();
+        }
     }
-    internal struct ByteData
+    internal struct ByteData:IDisposable
     {
         public byte type;
         public byte[] dat;
+
+        public void Dispose()
+        {
+            dat = null;
+        }
     }
-    internal struct MsgInfo
+    internal struct MsgInfo:IDisposable
     {
         /// <summary>
         /// 此消息的id
@@ -96,11 +106,48 @@ namespace huqiang
         /// 数据
         /// </summary>
         public BlockInfo<byte> data;
+
+        public void Dispose()
+        {
+            data.Release();
+        }
+    }
+    public struct MsgInfo2:IDisposable
+    {
+        /// <summary>
+        /// 此消息的id
+        /// </summary>
+        public UInt16 MsgID;//2
+        /// <summary>
+        /// 此消息的某个分卷
+        /// </summary>
+        public UInt16 CurPart;//2
+        /// <summary>
+        /// 创建的时间
+        /// </summary>
+        public Int16 CreateTime;
+        /// <summary>
+        /// 上一次发送的时间
+        /// </summary>
+        public Int16 SendTime;
+        /// <summary>
+        /// 发送的次数
+        /// </summary>
+        public int SendCount;
+        /// <summary>
+        /// 数据
+        /// </summary>
+        public byte[] data;
+
+        public void Dispose()
+        {
+            data = null;
+        }
     }
     public class KcpData:NetworkLink
     {
         public long RecvTime;
-        static int FragmentSize = (1472 - 8 - 15) - 12 * 4;//包头4字节,包尾4字节,数据头21字节,12个节点,每个节点4字节=1399
+        public static int FragmentSize = (1472 - 8 - 15) - 12 * 4;//包头4字节,包尾4字节,数据头21字节,12个节点,每个节点4字节=1399
         unsafe static bool SetChecked(Int32* checks, int part)
         {
             int c = part / 32;
@@ -143,18 +190,42 @@ namespace huqiang
             public BlockInfo<byte> buff;
             public long time;
             public BlockInfo<int> states;
+            public bool done;//保留一定时效
         }
         MsgCache[] caches = new MsgCache[128];
         int delayStart;
         int delayEnd;
         Int16[] delays = new Int16[128];//时延统计
         int max = 0;
-        protected QueueBufferS<BlockData> recvQueue = new QueueBufferS<BlockData>(128);
-        internal QueueBufferS<ByteData> sendQueue = new QueueBufferS<ByteData>(128);
-        internal List<MsgInfo> Msgs = new List<MsgInfo>();
+        /// <summary>
+        /// 接收到缓存数据
+        /// </summary>
         public byte[] RecvBuffer = new byte[32768];
+        /// <summary>
+        /// 接收到的解包数据
+        /// </summary>
+        protected QueueBufferS<BlockData> recvQueue = new QueueBufferS<BlockData>(128);
+        /// <summary>
+        /// 需要发送的原始数据
+        /// </summary>
+        internal QueueBufferS<ByteData> sendQueue = new QueueBufferS<ByteData>(128);
+        /// <summary>
+        /// 需要发送的封包数据
+        /// </summary>
+        internal List<MsgInfo> Msgs = new List<MsgInfo>();
+        /// <summary>
+        /// 需要发送的广播数据
+        /// </summary>
+        internal DisorderlyQueueS<MsgInfo2> Msgs2 = new DisorderlyQueueS<MsgInfo2>(256);
         public int Remain = 0;
         public UInt16 MsgId = 34000;
+        /// <summary>
+        /// 添加一个接收到的消息分卷
+        /// </summary>
+        /// <param name="dat"></param>
+        /// <param name="len"></param>
+        /// <param name="kcp"></param>
+        /// <param name="time"></param>
         public void AddMsgPart(byte[] dat, int len, Kcp kcp, Int16 time)
         {
             byte type = dat[0];
@@ -229,7 +300,7 @@ namespace huqiang
         }
         void Success(ref KcpReturn head,Int16 time)
         {
-            for (int i = 0; i < Msgs.Count; i++)
+            for (int i = Msgs.Count - 1; i >= 0; i--)
             {
                 if (head.MsgID == Msgs[i].MsgID)
                 {
@@ -244,6 +315,25 @@ namespace huqiang
                             delayEnd = 0;
                         Msgs[i].data.Release();
                         Msgs.RemoveAt(i);
+                        return;
+                    }
+                }
+            }
+            for (int i = Msgs2.Count - 1; i >= 0; i--)
+            {
+                var t = Msgs2[i];
+                if (head.MsgID == t.MsgID)
+                {
+                    if (head.CurPart == t.CurPart)
+                    {
+                        Int16 ot = (Int16)(time - t.CreateTime);
+                        if (ot < 0)
+                            ot += 10000;
+                        delays[delayEnd] = ot;
+                        delayEnd++;
+                        if (delayEnd >= 128)
+                            delayEnd = 0;
+                        Msgs2.RemoveAt(i);
                         return;
                     }
                 }
@@ -326,6 +416,10 @@ namespace huqiang
         {
             _connect = false;
             return true;
+        }
+        public override void AddMsg(MsgInfo2[] msgs)
+        {
+            Msgs2.AddRange(msgs);
         }
     }
 }

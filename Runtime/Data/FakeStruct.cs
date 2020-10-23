@@ -142,7 +142,9 @@ namespace huqiang.Data
                 return null;
             int o = index * 4;
             Int32* a = (Int32*)(ip + o);
-            return buffer.GetData(*a) as T;
+            if (*a >= 0)
+                return buffer.GetData(*a) as T;
+            return null;
         }
         public unsafe object GetData(int index)
         {
@@ -153,6 +155,36 @@ namespace huqiang.Data
             int o = index * 4;
             Int32* a = (Int32*)(ip + o);
             return buffer.GetData(*a);
+        }
+        public void AddArray<T>(int index, T[] obj) where T : unmanaged
+        {
+            if (index < 0)
+                return;
+            if (index >= element)
+                return;
+            unsafe
+            {
+                int o = index * 4;
+                Int32* a = (Int32*)(ip + o);
+                buffer.RemoveData(*a);
+                *a = buffer.AddArray<T>(obj);
+            }
+        }
+        public T[] GetArray<T>(int index) where T : unmanaged
+        {
+            if (index < 0)
+                return null;
+            if (index >= element)
+                return null;
+            unsafe
+            {
+                int o = index * 4;
+                Int32* a = (Int32*)(ip + o);
+                index = *a;
+                if (index >= 0)
+                    return buffer.GetArray<T>(*a);
+            }
+            return null;
         }
         public unsafe void SetData(int* addr, object dat)
         {
@@ -316,6 +348,16 @@ namespace huqiang.Data
             }
             return false;
         }
+        public bool WriteArray<T>(T[] value)where T:unmanaged
+        {
+            if (offset < element)
+            {
+                AddArray<T>(offset, value);
+                offset++;
+                return true;
+            }
+            return false;
+        }
         public int ReadInt()
         {
             if (offset < element)
@@ -361,6 +403,16 @@ namespace huqiang.Data
             if (offset < element)
             {
                 var value = GetData<T>(offset);
+                offset++;
+                return value;
+            }
+            return null;
+        }
+        public T[] ReadArray<T>() where T : unmanaged
+        {
+            if (offset < element)
+            {
+                var value = GetArray<T>(offset);
                 offset++;
                 return value;
             }

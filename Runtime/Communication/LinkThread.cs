@@ -72,14 +72,14 @@ namespace huqiang
                         soc.SendTo(data[j], l.endpPoint);
             }
         }
-        public void AddMsg(byte[][] dat, long now,UInt16 msgID)
+        public void AddMsg(MsgInfo2[] msgs)
         {
             for (int i = 0; i < top; i++)
             {
                 var l = buffer[i];
                 if (l != null)
                 {
-                    l.AddMsg(dat, now,msgID);
+                    l.AddMsg(msgs);
                 }
             }
         }
@@ -136,9 +136,9 @@ namespace huqiang
                                 mis.action(mis.data);
                     }
                 }
-                catch //(Exception ex)
+                catch (Exception ex)
                 {
-                    //ServerLog.Error(ex.StackTrace);
+                    System.Diagnostics.Debug.WriteLine(ex.StackTrace);
                 }
                 long t = DateTime.Now.Ticks;
                 t -= now;

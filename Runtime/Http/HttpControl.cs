@@ -29,6 +29,7 @@ namespace huqiang.Http
         public ResultCode Code;
         public long Length ;
         public MethodType Type;
+        public byte[] Data;
         public float Percentage { get {
                if(Type==MethodType.Get)
                 {
@@ -193,6 +194,28 @@ namespace huqiang.Http
             {
                 Debug.Log(ex.StackTrace);
             }
+            if (client != null)
+                client.Dispose();
+        }
+        public static async void Get(string url, Action<HttpResult> done, object context = null)
+        {
+            HttpClient client = new HttpClient();
+            HttpResult hr = new HttpResult();
+            try
+            {
+                var task = await client.GetByteArrayAsync(url);
+                hr.Context = context;
+                hr.Type = MethodType.Get;
+                hr.Data = task;
+                hr.Code = ResultCode.OK;
+            }
+            catch (Exception ex)
+            {
+                hr.Code = ResultCode.FailedDownload;
+                Debug.Log(ex.StackTrace);
+            }
+            if (done != null)
+                done(hr);
             if (client != null)
                 client.Dispose();
         }

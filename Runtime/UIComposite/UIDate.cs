@@ -161,15 +161,16 @@ namespace huqiang.UIComposite
                 float h = txt.SizeDelta.y;
                 float y = mod.localPosition.y;
                 float angle = y / h * 15f;
+      
+                mod.localRotation = Quaternion.Euler(angle, 0, 0);
+                var v = MathH.Tan2(90 - angle);
+                mod.localPosition =new Vector3(0, v.y * 100,0);
                 float r = y / hy;
                 if (r < 0)
                     r = -r;
                 r = 1 - r;
                 if (r < 0)
                     r = 0;
-                mod.localRotation = Quaternion.Euler(angle, 0, 0);
-                var v = MathH.Tan2(90 - angle);
-                mod.localPosition =new Vector3(0, v.y * 100,0);
                 var col = txt.MainColor;
                 col.a = (byte)(r*255);
                 txt.MainColor = col;

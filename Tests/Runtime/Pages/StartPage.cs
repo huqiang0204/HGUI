@@ -48,7 +48,7 @@ namespace Assets.Scripts
             grid.BindingData = data;
             grid.SetItemUpdate<ItemView, string>(ItemUpdate);
             grid.Refresh();
-            view.last.Click = (o, e) => { LoadPage<TreeViewPage>(); };
+            view.last.Click = (o, e) => { LoadPage<DataGridPage>(); };
             view.next.Click = (o, e) => { LoadPage<TestUPage>(); };
             Beeline beeline = new Beeline();
             beeline.lineBase.Color = Color.red;
@@ -56,7 +56,7 @@ namespace Assets.Scripts
             beeline.Start.x = -100;
             beeline.End.x = 100;
             beeline.End.y = 100;
-
+          
             ArcLine arc = new ArcLine();
             arc.Closed = true;
             arc.lineBase.Color = Color.green;

@@ -227,6 +227,21 @@ namespace huqiang.Data
             int os = *(Int32*)(ip + o);
             return buffer.GetData(os) as T;
         }
+        public unsafe void AddArray<T>(int index, int offset, T[] dat) where T : unmanaged
+        {
+            int o = (index * m_size + offset) * 4;
+            Int32* a = (Int32*)(ip + o);
+            buffer.RemoveData(*a);
+            *a = buffer.AddArray<T>(dat);
+        }
+        public unsafe T[] GetArray<T>(int index, int offset) where T : unmanaged
+        {
+            int o = (index * m_size + offset) * 4;
+            int os = *(Int32*)(ip + o);
+            if (os >= 0)
+                return buffer.GetArray<T>(os);
+            return null;
+        }
 
         #region //提高容错率,做了范围鉴定,需要速度可以使用上面的函数
         int row;
@@ -295,6 +310,16 @@ namespace huqiang.Data
             }
             return false;
         }
+        public bool WriteArray<T>(T[] value) where T : unmanaged
+        {
+            if (offset < m_size)
+            {
+                AddArray<T>(row, offset, value);
+                offset++;
+                return true;
+            }
+            return false;
+        }
         public int ReadInt()
         {
             if (offset < Length)
@@ -340,6 +365,16 @@ namespace huqiang.Data
             if (offset < Length)
             {
                 var value = GetData<T>(row, offset);
+                offset++;
+                return value;
+            }
+            return null;
+        }
+        public T[] ReadArray<T>() where T : unmanaged
+        {
+            if (offset < Length)
+            {
+                var value = GetArray<T>(row, offset);
                 offset++;
                 return value;
             }

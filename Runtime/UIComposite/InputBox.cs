@@ -155,20 +155,27 @@ namespace huqiang.UIComposite
             textColor = txt.m_color;
             unsafe
             {
-                var ex = mod.buffer.GetData(((TransfromData*)mod.ip)->ex) as FakeStruct;
-                if (ex != null)
+                if(mod!=null)
                 {
-                    TextInputData* tp = (TextInputData*)ex.ip;
-                    textColor = tp->inputColor;
-                    m_tipColor = tp->tipColor;
-                    PointColor = tp->pointColor;
-                    SelectionColor = tp->selectColor;
-                    CharacterLimit = tp->CharacterLimit;
-                    ReadOnly = tp->ReadyOnly;
-                    contentType = tp->contentType;
-                    lineType = tp->lineType;
-                    m_TipString = mod.buffer.GetData(tp->tipString) as string;
-                    m_InputString = mod.buffer.GetData(tp->inputString) as string;
+                    var ex = mod.buffer.GetData(((TransfromData*)mod.ip)->ex) as FakeStruct;
+                    if (ex != null)
+                    {
+                        TextInputData* tp = (TextInputData*)ex.ip;
+                        textColor = tp->inputColor;
+                        m_tipColor = tp->tipColor;
+                        PointColor = tp->pointColor;
+                        SelectionColor = tp->selectColor;
+                        CharacterLimit = tp->CharacterLimit;
+                        ReadOnly = tp->ReadyOnly;
+                        contentType = tp->contentType;
+                        lineType = tp->lineType;
+                        m_TipString = mod.buffer.GetData(tp->tipString) as string;
+                        m_InputString = mod.buffer.GetData(tp->inputString) as string;
+                    }
+                    else
+                    {
+                        m_InputString = txt.Text;
+                    }
                 }
                 else
                 {
@@ -177,6 +184,7 @@ namespace huqiang.UIComposite
             }
             FullString.FullString = m_InputString;
             InputEvent = txt.RegEvent<InputBoxEvent>();
+            InputEvent.Initial(null);
             InputEvent.input = this;
             Caret = txt.GetComponentInChildren<HImage>();
         }
@@ -189,12 +197,14 @@ namespace huqiang.UIComposite
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR
             if (!ReadOnly)
                 Editing = true;
+            Input.imeCompositionMode = IMECompositionMode.On;
 #endif
         }
         public void OnClick(UserAction action)
         {
             if (!ReadOnly)
             {
+                Input.imeCompositionMode = IMECompositionMode.On;
                 Editing = true;
                 TextOperation.contentType = m_ctpye;
                 if (!Keyboard.active)
@@ -217,6 +227,7 @@ namespace huqiang.UIComposite
             else SetShowText();
             if (OnDone != null)
                 OnDone(this);
+            Input.imeCompositionMode = IMECompositionMode.Auto;
         }
         public void OnDrag(UserAction action, ref PressInfo press)
         {
@@ -299,12 +310,14 @@ namespace huqiang.UIComposite
                     str = new string('●', str.Length);
                 TextCom.Text = str;
                 ShowString = str;
+                InputEvent.ChangeText(str);
             }
             else
             {
                 TextCom.MainColor = m_tipColor;
                 TextCom.Text = m_TipString;
                 ShowString = m_TipString;
+                InputEvent.ChangeText("");
             }
         }
         public bool DeleteSelectString()
@@ -647,6 +660,7 @@ namespace huqiang.UIComposite
             TextOperation.contentType = m_ctpye;
             TextOperation.ChangeText(TextCom,FullString);
             action.AddFocus(InputEvent);
+            Input.imeCompositionMode = IMECompositionMode.On;
             Enity.gameObject.SetActive(true);
             text.Text = "";
             Editing = true;

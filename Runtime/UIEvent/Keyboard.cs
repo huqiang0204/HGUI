@@ -37,7 +37,6 @@ namespace huqiang.UIEvent
         public static bool InputChanged;
         static TouchScreenKeyboard m_touch;
         public static bool _touch = false;
-        public static IMECompositionMode iME;
         public static string systemCopyBuffer;
         public static Vector2 CursorPos;
         public static void InfoCollection()
@@ -50,16 +49,16 @@ namespace huqiang.UIEvent
             if (keys == null)
             {
                 if (Application.platform == RuntimePlatform.Android |
-                Application.platform == RuntimePlatform.IPhonePlayer |
-                Application.platform == RuntimePlatform.WSAPlayerARM |
-                Application.platform == RuntimePlatform.WSAPlayerX64 |
-                Application.platform == RuntimePlatform.WSAPlayerX86)
+                Application.platform == RuntimePlatform.IPhonePlayer 
+                | Application.platform == RuntimePlatform.WSAPlayerARM 
+                | Application.platform == RuntimePlatform.WSAPlayerX64 
+                | Application.platform == RuntimePlatform.WSAPlayerX86
+                )
                     _touch = true;
                 keys = Enum.GetValues(typeof(KeyCode)) as KeyCode[];
                 KeyPress = new List<KeyCode>();
                 KeyUps = new List<KeyCode>();
                 KeyDowns = new List<KeyCode>();
-                Input.imeCompositionMode = IMECompositionMode.On;
             }
             KeyPress.Clear();
             KeyUps.Clear();
@@ -124,9 +123,7 @@ namespace huqiang.UIEvent
                 else InputChanged = false;
                 InputString = Input.inputString;
 #endif
-
             }
-            iME = Input.imeCompositionMode;
         }
         public static void OnInput(string str, TouchScreenKeyboardType type,bool multiLine,bool passward,int limit)
         {

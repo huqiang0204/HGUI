@@ -46,6 +46,7 @@ namespace huqiang.Core.HGUI
             Target = text;
             Content = str;
             text.GetGenerationSettings(ref text.m_sizeDelta,ref HText.settings);
+            HText.settings.richText = false;
             var g = HText.Generator;
             string fs = Content.FilterString;
             if (contentType == ContentType.Password)
@@ -225,14 +226,21 @@ namespace huqiang.Core.HGUI
             }
             return true;
         }
-        static bool SetPressIndex(int index,ref PressInfo press)
+        static bool SetPressIndex(int index, ref PressInfo press)
         {
             if (index < 0)
                 index = 0;
             if (lines.Count == 0)
-                return false;
+            {
+                press.Index = 0;
+                press.Row = 0;
+                press.Offset = 0;
+                return false; 
+            }
             if (index == press.Index)
-                return false;
+            {
+                return false; 
+            }
             if (index >= chars.Count)
             {
                 index = chars.Count - 1;

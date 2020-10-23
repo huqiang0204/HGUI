@@ -6,8 +6,15 @@ using UnityEngine;
 
 namespace huqiang.UIEvent
 {
+    public enum EntityType
+    {
+        Default,
+        Circle,
+
+    }
     public class UserEvent
     {
+    
         internal int Frame;
         public static long ClickTime = 1800000;
         public static float ClickArea = 400;
@@ -15,7 +22,6 @@ namespace huqiang.UIEvent
         {
             HGUIElement root = pipeLine[0];
             float s = HCanvas.MainCanvas.PhysicalScale;
-            Vector3 a= new Vector3(s,s,s);
             if (root.script != null)
             {
                  int c = root.childCount;
@@ -23,7 +29,7 @@ namespace huqiang.UIEvent
                 {
                     try
                     {
-                        if (DispatchEvent(pipeLine, i, Vector3.zero, a, Quaternion.identity, action))
+                        if (DispatchEvent(pipeLine, i, action))
                             return;
                     }
                     catch (Exception ex)
@@ -43,20 +49,15 @@ namespace huqiang.UIEvent
         /// <param name="quate">父级旋转</param>
         /// <param name="action">用户操作指令</param>
         /// <returns></returns>
-        static bool DispatchEvent(HGUIElement[] pipeLine, int index,Vector3 pos,Vector3 scale,Quaternion quate, UserAction action)
+        static bool DispatchEvent(HGUIElement[] pipeLine, int index,UserAction action)
         {
             if (!pipeLine[index].active)
                 return false;
-            Vector3 p = quate * pipeLine[index].localPosition;
-            Vector3 o = Vector3.zero;
-            o.x = p.x * scale.x;
-            o.y = p.y * scale.y;
-            o.z = p.z * scale.z;
-            o += pos;
-            Vector3 s = pipeLine[index].localScale;
-            Quaternion q = quate * pipeLine[index].localRotation;
-            s.x *= scale.x;
-            s.y *= scale.y;
+            int pi = pipeLine[index].parentIndex;
+            Vector3 o = pipeLine[index].Position;
+            Vector3 scale = pipeLine[index].Scale;
+            Quaternion q = pipeLine[index].Rotation;
+
             var script = pipeLine[index].script;
             if (script != null)
             {
@@ -70,7 +71,7 @@ namespace huqiang.UIEvent
                         for (int i = 0; i < c; i++)
                         {
                             os--;
-                            if (DispatchEvent(pipeLine, os, o, s, q, action))
+                            if (DispatchEvent(pipeLine, os,action))
                             {
                                 return true;
                             }
@@ -86,7 +87,7 @@ namespace huqiang.UIEvent
                         for (int i = 0; i < c; i++)
                         {
                             os--;
-                            if (DispatchEvent(pipeLine, os, o, s, q, action))
+                            if (DispatchEvent(pipeLine, os, action))
                             {
                                 return true;
                             }
@@ -95,38 +96,13 @@ namespace huqiang.UIEvent
                 }
                 else
                 {
-                    ue.pgs = scale;
-                    ue.GlobalScale = s;
+                    ue.pgs = pipeLine[pi].Scale;
+                    ue.GlobalScale = scale;
                     ue.GlobalPosition = o;
                     ue.GlobalRotation = q;
                     bool inside = false;
-                    float w = (script.SizeDelta.x + ue.BoxAdjuvant.x) * s.x;
-                    float h = (script.SizeDelta.y + ue.BoxAdjuvant.y) * s.y;
-                    if (ue.IsCircular)
-                    {
-                        float x = action.CanPosition.x - o.x;
-                        float y = action.CanPosition.y - o.y;
-                        w *= 0.5f;
-                        if (x * x + y * y < w * w)
-                            inside = true;
-                    }
-                    else
-                    {
-                        float px = script.Pivot.x;
-                        float py = script.Pivot.y;
-                        float lx = -px * w;
-                        float rx = lx + w;
-                        float dy = -py * h;
-                        float ty = dy + h;
-
-                        var v = action.CanPosition;
-                        var Rectangular = ue.Rectangular;
-                        Rectangular[0] = q * new Vector3(lx, dy) + o;
-                        Rectangular[1] = q * new Vector3(lx, ty) + o;
-                        Rectangular[2] = q * new Vector3(rx, ty) + o;
-                        Rectangular[3] = q * new Vector3(rx, dy) + o;
-                        inside = huqiang.Physics2D.DotToPolygon(Rectangular, v);
-                    }
+                    if (ue.collider != null)
+                       inside = ue.collider.InThere(script, ue, action.CanPosition);
                     if (inside)
                     {
                         action.CurrentEntry.Add(ue);
@@ -137,7 +113,7 @@ namespace huqiang.UIEvent
                             for (int i = 0; i < c; i++)
                             {
                                 os--;
-                                if (DispatchEvent(pipeLine, os, o, s, q, action))
+                                if (DispatchEvent(pipeLine, os, action))
                                 {
                                     if (ue.ForceEvent)
                                     {
@@ -173,7 +149,7 @@ namespace huqiang.UIEvent
                             for (int i = 0; i < c; i++)
                             {
                                 os--;
-                                if (DispatchEvent(pipeLine, os, o, s, q, action))
+                                if (DispatchEvent(pipeLine, os, action))
                                 {
                                     return true;
                                 }
@@ -191,7 +167,7 @@ namespace huqiang.UIEvent
                     for (int i = 0; i < c; i++)
                     {
                         os--;
-                        if (DispatchEvent(pipeLine, os, o, s, q, action))
+                        if (DispatchEvent(pipeLine, os, action))
                         {
                             return true;
                         }
@@ -271,7 +247,6 @@ namespace huqiang.UIEvent
         /// </summary>
         public bool Penetrate = false;
 
-        public bool IsCircular = false;
         public bool entry { get; protected set; }
         private int index;
         public bool AutoColor = true;
@@ -295,9 +270,10 @@ namespace huqiang.UIEvent
 
         UserAction FocusAction;
         public UIElement Context;
+        public EventCollider collider;
         public UserEvent()
         {
-            Rectangular = new Vector3[4];
+            //Rectangular = new Vector3[4];
         }
         void RefreshRateX()
         {
@@ -385,7 +361,6 @@ namespace huqiang.UIEvent
                 }
             }
         }
-
         protected virtual void OnMouseMove(UserAction action)
         {
             if (!entry)
@@ -479,13 +454,39 @@ namespace huqiang.UIEvent
             if (Click != null)
                 Click(this,action);
         }
-        public void Initi(FakeStruct mod)
-        {
-            Initial(mod);
-        }
         internal virtual void Initial(FakeStruct mod)
         {
-            
+            if (mod == null)
+            {
+                collider = new UIBoxCollider ();
+                return; 
+            }
+            FakeStruct fs = null;
+            unsafe
+            {
+                 fs = mod.buffer.GetData(((TransfromData*)mod.ip)->ex) as FakeStruct;
+             }
+            if(fs==null)
+            {
+                collider = new UIBoxCollider ();
+            }
+            else
+            {
+                switch((EventColliderType)fs[0])
+                {
+                    case EventColliderType.Circle:
+                        collider = new UICircleCollider();
+                        collider.Initial(fs);
+                        break;
+                    case EventColliderType.Polygon:
+                        collider = new UIPolygonCollider();
+                        collider.Initial(fs);
+                        break;
+                    default:
+                        collider = new UIBoxCollider ();
+                        break;
+                }
+            }
         }
         public void RemoveFocus()
         {
@@ -548,6 +549,18 @@ namespace huqiang.UIEvent
             if (endy)
                 if (back.ScrollEndY != null)
                     back.ScrollEndY(back);
+        }
+        public Vector3 GetOffset()
+        {
+            Vector3 os = Vector3.zero;
+            var size =Context.m_sizeDelta;
+            var pivot = Context.Pivot;
+            os.x = (0.5f - pivot.x) * size.x;
+            os.y = (0.5f - pivot.y) * size.y;
+            os.x *= GlobalScale.x;
+            os.y *= GlobalScale.y;
+            os = GlobalRotation * os;
+            return os;
         }
     }
 }

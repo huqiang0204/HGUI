@@ -64,9 +64,9 @@ namespace huqiang
                         Dispatch(buffer,len, end as IPEndPoint);
                     }
                 }
-                catch //(Exception ex)
+                catch (Exception ex)
                 {
-                    //ServerLog.Error(ex.StackTrace);
+                    System.Diagnostics.Debug.WriteLine(ex.StackTrace);
                 }
             }
         }

@@ -169,6 +169,9 @@ namespace huqiang.UIEvent
             y *= 0.5f;
             CanPosition.x = Position.x - x;
             CanPosition.y = Position.y - y;
+            float ps = HCanvas.MainCanvas.PhysicalScale;
+            CanPosition.x /= ps;
+            CanPosition.y /= ps;
 
             FramePos[Frame].x = Position.x;
             FramePos[Frame].y = Position.y;
@@ -221,12 +224,16 @@ namespace huqiang.UIEvent
                 IsMoved = true;
             }
             Position.y = y;
-            x = Screen.width;
-            x *= 0.5f;
-            y = Screen.height;
-            y *= 0.5f;
-            CanPosition.x = Position.x - x;
-            CanPosition.y = Position.y - y;
+            //x = Screen.width;
+            //x *= 0.5f;
+            //y = Screen.height;
+            //y *= 0.5f;
+            //CanPosition.x = Position.x - x;
+            //CanPosition.y = Position.y - y;
+            //float ps = HCanvas.MainCanvas.PhysicalScale;
+            //CanPosition.x /= ps;
+            //CanPosition.y /= ps;
+            CanPosition = HCanvas.MainCanvas.ScreenToCanvasPos(Position);
             FramePos[Frame].x = Position.x;
             FramePos[Frame].y = Position.y;
             FramePos[Frame].z = TimeSlice;

@@ -41,21 +41,44 @@ namespace huqiang
         Total,//整体发送,分包头包尾，效率低，不适合大数据
         All//分卷发送,分包头包尾，效率低
     }
+    /// <summary>
+    /// 封包
+    /// </summary>
     public class EnvelopeData
     {
+        /// <summary>
+        /// 数据
+        /// </summary>
         public byte[] data;
+        /// <summary>
+        /// 类型
+        /// </summary>
         public byte type;
     }
-
+    /// <summary>
+    /// 封包分卷
+    /// </summary>
     public class EnvelopePart
     {
+        /// <summary>
+        /// 封包头
+        /// </summary>
         public EnvelopeHead head;
+        /// <summary>
+        /// 数据段
+        /// </summary>
         public byte[] data;
     }
 
     public class Envelope
     {
         const UInt16 EnvelopeHeadSize = 14;
+        /// <summary>
+        /// 读取封包头信息
+        /// </summary>
+        /// <param name="buff">数据缓存</param>
+        /// <param name="index">读取位置</param>
+        /// <returns></returns>
         public static unsafe EnvelopeHead ReadHead(byte[] buff, int index)
         {
             fixed (byte* b = &buff[index])
@@ -63,6 +86,12 @@ namespace huqiang
                 return *(EnvelopeHead*)b;
             }
         }
+        /// <summary>
+        /// 写入封包头
+        /// </summary>
+        /// <param name="buff">数据缓存</param>
+        /// <param name="index">写入位置</param>
+        /// <param name="head">封包头</param>
         public static unsafe void WriteHead(byte[] buff, int index, EnvelopeHead head)
         {
             fixed (byte* b = &buff[index])
@@ -539,6 +568,13 @@ namespace huqiang
             }
             return tmp;
         }
+        /// <summary>
+        /// 以包头加包尾和封包信息头的方式对数据进行打包
+        /// </summary>
+        /// <param name="type">数据类型</param>
+        /// <param name="msgId">消息id</param>
+        /// <param name="partID">风卷id</param>
+        /// <returns></returns>
         public static byte[] PackAll(byte type, UInt16 msgId, UInt16 partID)
         {
             unsafe
@@ -551,6 +587,15 @@ namespace huqiang
                 return PackInt(buf, 14);
             }
         }
+        /// <summary>
+        /// 对数据进行打包
+        /// </summary>
+        /// <param name="dat">数据</param>
+        /// <param name="tag">数据类型</param>
+        /// <param name="type">打包方式</param>
+        /// <param name="msgID">消息id</param>
+        /// <param name="fs">分卷长度</param>
+        /// <returns></returns>
         public static byte[][] Pack(byte[] dat, byte tag, PackType type, UInt16 msgID,UInt16 fs)
         {
             switch (type)
@@ -564,6 +609,12 @@ namespace huqiang
             }
             return null;
         }
+        /// <summary>
+        /// 进行比特位状态设置
+        /// </summary>
+        /// <param name="checks">状态缓存</param>
+        /// <param name="part">分卷id</param>
+        /// <returns></returns>
         public static bool SetChecked(Int32[] checks, int part)
         {
             if (checks == null)
@@ -578,6 +629,14 @@ namespace huqiang
             checks[c] = v;
             return true;
         }
+        /// <summary>
+        /// 将数组的内容复制到另一个数组中
+        /// </summary>
+        /// <param name="buff">目标缓存</param>
+        /// <param name="src">数据源</param>
+        /// <param name="start">目标开始位置</param>
+        /// <param name="head">数据源封包头</param>
+        /// <param name="FragmentSize">封包片段大小</param>
         public static void CopyToBuff(byte[] buff, byte[] src, int start, EnvelopeHead head, int FragmentSize)
         {
             if (buff != null)

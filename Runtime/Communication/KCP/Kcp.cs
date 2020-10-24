@@ -7,24 +7,52 @@ using System.Threading;
 
 namespace huqiang
 {
+    /// <summary>
+    /// 来自Socket的消息
+    /// </summary>
     public struct SocMsg:IDisposable
     {
+        /// <summary>
+        /// 数据的指针地址
+        /// </summary>
         public BlockInfo<byte> dat;
+        /// <summary>
+        /// 用户连接
+        /// </summary>
         public KcpData link;
-
+        /// <summary>
+        /// 释放指针数据
+        /// </summary>
         public void Dispose()
         {
             dat.Release();
             link = null;
         }
     }
-
+    /// <summary>
+    /// KCP数据管理
+    /// </summary>
     public class Kcp
     {
-        public static int FragmentSize = (1472 - 8 - 15) - 12 * 4;//包头4字节,包尾4字节,数据头21字节,12个节点,每个节点4字节=1399
+        /// <summary>
+        /// 数据片段尺寸,包头4字节,包尾4字节,数据头21字节,12个节点,每个节点4字节=1399
+        /// </summary>
+        public static int FragmentSize = (1472 - 8 - 15) - 12 * 4;
+        /// <summary>
+        /// 数据超时时间,单位毫秒，默认值为500,超时没有接收到对方的回执则重新发送
+        /// </summary>
         public static int MsgTimeOut = 500;
+        /// <summary>
+        /// 消息的频段最小id
+        /// </summary>
         public static UInt16 MinID = 34000;
+        /// <summary>
+        /// 消息的频段最大id
+        /// </summary>
         public static UInt16 MaxID = 44000;
+        /// <summary>
+        /// 块级缓冲区
+        /// </summary>
         public List<BlockBuffer<byte>> Buffer = new List<BlockBuffer<byte>>();
         byte[] tmpBuffer = new byte[1500];
         byte[] tmp2 = new byte[1500];

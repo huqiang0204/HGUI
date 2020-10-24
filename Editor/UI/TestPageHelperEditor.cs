@@ -22,6 +22,7 @@ public class TestPageHelperEditor : Editor
         if (GUILayout.Button("Create"))
         {
             Create(ele.AssetName+".bytes", ele.dicpath, ele.gameObject);
+            AssetDatabase.Refresh();
         }
         if (GUILayout.Button("Clone"))
         {

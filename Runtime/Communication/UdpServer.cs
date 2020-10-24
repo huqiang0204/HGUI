@@ -6,35 +6,70 @@ using System.Threading;
 
 namespace huqiang
 {
+    /// <summary>
+    /// udp连接
+    /// </summary>
     public class UdpLink
     {
+        /// <summary>
+        /// 用户id
+        /// </summary>
         public Int32 id;
+        /// <summary>
+        /// 用户ip
+        /// </summary>
         public Int32 ip;
+        /// <summary>
+        /// 用户端口
+        /// </summary>
         public Int32 port;
+        /// <summary>
+        /// 用户id
+        /// </summary>
         public string uniId;
+        /// <summary>
+        /// 用户远程地址
+        /// </summary>
         public IPEndPoint endpPoint;
+        /// <summary>
+        /// udp数据封包器
+        /// </summary>
         public UdpEnvelope envelope;
+        /// <summary>
+        /// 连接时间
+        /// </summary>
         public long time;
     }
+    /// <summary>
+    /// udp服务器
+    /// </summary>
     public class UdpServer
     {
         Socket soc;
         Thread thread;
         int remotePort;
         Queue<SocData> queue;
+        /// <summary>
+        /// 是否使用封包功能,默认开启
+        /// </summary>
         public bool Packaging = true;
         bool running;
         bool auto;
+        /// <summary>
+        /// 封包类型
+        /// </summary>
         PackType packType = PackType.All;
         UInt16 id = 10000;
         static UInt16 MinID=11000;
         static UInt16 MaxID = 21000;
+ 
         /// <summary>
-        /// UdpServer构造
+        /// 构造函数
         /// </summary>
-        /// <param name="port"></param>
-        /// <param name="remote"></param>
-        /// <param name="subThread"></param>
+        /// <param name="port">端口</param>
+        /// <param name="remote">远程端口</param>
+        /// <param name="subThread">开启子线程分发</param>
+        /// <param name="type">封包类型</param>
         public UdpServer(int port, int remote, bool subThread = true, PackType type = PackType.Total)
         {
             queue = new Queue<SocData>();
@@ -55,6 +90,12 @@ namespace huqiang
                 thread.Start();
             }
         }
+        /// <summary>
+        /// 发送一条消息
+        /// </summary>
+        /// <param name="dat">数据</param>
+        /// <param name="ip">远程地址</param>
+        /// <param name="tag">数据类型</param>
         public void Send(byte[] dat, IPEndPoint ip, byte tag)
         {
             switch (packType)
@@ -84,6 +125,11 @@ namespace huqiang
                     break;
             }
         }
+        /// <summary>
+        /// 广播消息
+        /// </summary>
+        /// <param name="dat">数据</param>
+        /// <param name="tag">数据类型</param>
         public void SendAll(byte[] dat, byte tag)
         {
             switch (packType)
@@ -187,7 +233,13 @@ namespace huqiang
             }
 
         }
+        /// <summary>
+        /// 如果只能主线程派发则使用此委托
+        /// </summary>
         public Action<byte[], byte, UdpLink> MainDispatch;
+        /// <summary>
+        /// 派发接收到的消息
+        /// </summary>
         public void Dispatch()
         {
             if (queue != null)
@@ -204,11 +256,17 @@ namespace huqiang
             }
             ClearUnusedLink();
         }
+        /// <summary>
+        /// 关Socket和线程
+        /// </summary>
         public void Close()
         {
             soc.Close();
             running = false;
         }
+        /// <summary>
+        /// 所有Udp连接
+        /// </summary>
         public List<UdpLink> links;
         //设置用户的udp对象用于发送消息
         UdpLink FindEnvelope(IPEndPoint ep)

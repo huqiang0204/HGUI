@@ -18,9 +18,18 @@ namespace huqiang
         TcpEnvelope envelope;
         Thread thread;
         private Socket client = null;
+        /// <summary>
+        /// 连接状态
+        /// </summary>
         public bool isConnection { get { if (client == null) return false; return client.Connected; } }
         IPEndPoint iep;
         Queue<SocData> queue;
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="bs">缓冲区大小</param>
+        /// <param name="type">封包类型</param>
+        /// <param name="es">封包缓冲区大小</param>
         public TcpSocket(int bs = 262144,PackType type = PackType.Part,int es = 262144)
         {
             buffer = new byte[bs];
@@ -203,6 +212,11 @@ namespace huqiang
             //}
         }
         IPEndPoint localBind;
+        /// <summary>
+        /// 连接到远程服务器
+        /// </summary>
+        /// <param name="remote">远程服务器地址</param>
+        /// <param name="bind">本机地址</param>
         public void ConnectServer(IPEndPoint remote, IPEndPoint bind = null)
         {
             if (thread != null)
@@ -267,14 +281,30 @@ namespace huqiang
             return true;
         }
         bool close;
+        /// <summary>
+        /// 关闭服务
+        /// </summary>
         public void Close()
         {
             close = true;
         }
+        /// <summary>
+        /// 当连接成功时,调用此委托
+        /// </summary>
         public Action Connected;
+        /// <summary>
+        /// 连接失败时调用此委托
+        /// </summary>
         public Action<string> ConnectFaild;
+        /// <summary>
+        /// 是否需要封包
+        /// </summary>
         public bool Packaging;
         bool redic;
+        /// <summary>
+        /// 重定向
+        /// </summary>
+        /// <param name="iPEnd">重定向IP地址</param>
         public void Redirect(IPEndPoint iPEnd)
         {
             if(iep!=null)

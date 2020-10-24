@@ -8,9 +8,19 @@ using System.Threading;
 
 namespace huqiang
 {
+    /// <summary>
+    /// tcp监听服务器
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class TcpServer<T>  where T : TcpLink, new()
     {
+        /// <summary>
+        /// 每个线程的最大用户连接数
+        /// </summary>
         public static int SingleCount = 2048;
+        /// <summary>
+        /// 线程缓存
+        /// </summary>
         public LinkThread<T>[] linkBuff;
         Socket soc;
         /// <summary>
@@ -22,6 +32,13 @@ namespace huqiang
         PackType packType;
         IPEndPoint endPoint;
         int tCount;
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="ip">服务器ip地址</param>
+        /// <param name="port">服务器端口</param>
+        /// <param name="type">数据封包类型</param>
+        /// <param name="thread">线程数量</param>
         public TcpServer(string ip, int port,PackType type = PackType.Part, int thread = 8)
         {
             tCount = thread;
@@ -60,6 +77,9 @@ namespace huqiang
                 linkBuff[0].soc = soc;
             }
         }
+        /// <summary>
+        /// 启动服务
+        /// </summary>
         public void Start()
         {
             if(server==null)
@@ -85,6 +105,9 @@ namespace huqiang
         }
         ThreadTimer threadTimer;
         byte[] nil = { 0 };
+        /// <summary>
+        /// 资源释放
+        /// </summary>
         public void Dispose()
         {
             soc.Disconnect(true);
@@ -144,7 +167,12 @@ namespace huqiang
                 }
             }
         }
-
+        /// <summary>
+        /// 查询某个用户连接
+        /// </summary>
+        /// <param name="ip">ip地址</param>
+        /// <param name="port">端口</param>
+        /// <returns></returns>
         public T FindLink(int ip, int port)
         {
             for (int i = 0; i < tCount; i++)
@@ -173,6 +201,11 @@ namespace huqiang
             link.buffIndex = s;
             linkBuff[s].Add(link);
         }
+        /// <summary>
+        /// 查询某个用户连接
+        /// </summary>
+        /// <param name="id">用户id</param>
+        /// <returns></returns>
         public T FindLink(Int64 id)
         {
             for (int i = 0; i < tCount; i++)

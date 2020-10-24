@@ -15,6 +15,13 @@ namespace huqiang
         TcpEnvelope envelope=new TcpEnvelope();
         internal Socket Link;
         byte[] buff;
+        /// <summary>
+        /// 设置Socket
+        /// </summary>
+        /// <param name="soc">Socket</param>
+        /// <param name="end">远程ip地址</param>
+        /// <param name="pack">封包类型</param>
+        /// <param name="buffsize">数据缓冲区大小</param>
         public void SetSocket(Socket soc,IPEndPoint end,PackType pack=PackType.Part,int buffsize=4096)
         {
             Link = soc;
@@ -30,12 +37,22 @@ namespace huqiang
             }
             port = end.Port;
         }
+        /// <summary>
+        /// 设置封包类型
+        /// </summary>
+        /// <param name="pack">封包类型</param>
         public void SetPackType(PackType pack)
         {
             envelope.type = pack;
         }
         //玩家登录ip
         public IPAddress addr;
+        /// <summary>
+        /// 发送一条消息
+        /// </summary>
+        /// <param name="data">数据</param>
+        /// <param name="type">数据类型</param>
+        /// <returns></returns>
         public int Send(byte[] data,byte type = EnvelopeType.Mate)
         {
             try
@@ -60,6 +77,11 @@ namespace huqiang
             }
             return 0;
         }
+        /// <summary>
+        /// 发送一组数据
+        /// </summary>
+        /// <param name="data">数据</param>
+        /// <returns></returns>
         public int Send(byte[][] data)
         {
             try
@@ -81,6 +103,11 @@ namespace huqiang
             }
             return 0;
         }
+        /// <summary>
+        /// 发送一条字符串数据
+        /// </summary>
+        /// <param name="data">数据</param>
+        /// <returns></returns>
         public int Send(string data)
         {
             return Send(Encoding.UTF8.GetBytes(data));
@@ -91,12 +118,19 @@ namespace huqiang
                 lock (Link)
                     Link.Close();
         }
-        public virtual void Dispose()
+        /// <summary>
+        /// 释放资源
+        /// </summary>
+        public override void Dispose()
         {
             if (Link != null)
                 lock (Link)
                     Link.Close();
         }
+        /// <summary>
+        /// 处理接收到的消息
+        /// </summary>
+        /// <param name="time">当前时间</param>
         public override void Recive(long time)
         {
             try
@@ -123,6 +157,11 @@ namespace huqiang
             {
             }
         }
+        /// <summary>
+        /// 派发解析好的数据
+        /// </summary>
+        /// <param name="dat">数据</param>
+        /// <param name="tag">数据类型</param>
         public virtual void Dispatch( byte[] dat, byte tag)
         {
         }

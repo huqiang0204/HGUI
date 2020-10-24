@@ -4,26 +4,62 @@ using System.Text;
 
 namespace huqiang
 {
+
     public struct EnvelopeItem
     {
+        /// <summary>
+        /// 封包头
+        /// </summary>
         public EnvelopeHead head;
+        /// <summary>
+        /// 分卷
+        /// </summary>
         public UInt32 part;
+        /// <summary>
+        /// 总计接收到的消息长度
+        /// </summary>
         public UInt32 rcvLen;
+        /// <summary>
+        /// 消息缓存
+        /// </summary>
         public byte[] buff;
+        /// <summary>
+        /// 接收到的消息时间,用来做超时处理
+        /// </summary>
         public long time;
+        /// <summary>
+        /// 消息分卷状态
+        /// </summary>
         public Int32[] checks;
-        public bool done;//保留一定时效
+        /// <summary>
+        /// 保留一定时效
+        /// </summary>
+        public bool done;
     }
     public class TcpEnvelope
     {
+        /// <summary>
+        /// 消息的最小id
+        /// </summary>
         public  static UInt16 MinID = 22000;
+        /// <summary>
+        /// 消息的最大id
+        /// </summary>
         public static UInt16 MaxID = 32000;
-
+        /// <summary>
+        /// 封包类型
+        /// </summary>
         public PackType type = PackType.All;
+        /// <summary>
+        /// 封包缓存
+        /// </summary>
         protected EnvelopeItem[] pool = new EnvelopeItem[128];
         protected int remain = 0;
         protected byte[] buffer;
         protected UInt16 id = 22000;
+        /// <summary>
+        /// 封包分卷长度
+        /// </summary>
         protected UInt16 Fragment = 1460;
         /// <summary>
         /// Solution Slices Segment
@@ -37,6 +73,12 @@ namespace huqiang
         {
             buffer = new byte[buffLen];
         }
+        /// <summary>
+        /// 数据封包
+        /// </summary>
+        /// <param name="dat">数据</param>
+        /// <param name="tag">数据类型</param>
+        /// <returns></returns>
         public virtual byte[][] Pack(byte[] dat, byte tag)
         {
             var all = Envelope.Pack(dat, tag, type, id,Fragment);
@@ -45,6 +87,12 @@ namespace huqiang
                 id = MinID;
             return all;
         }
+        /// <summary>
+        /// 数据解包
+        /// </summary>
+        /// <param name="dat">缓存</param>
+        /// <param name="len">数据长度</param>
+        /// <returns></returns>
         public virtual List<EnvelopeData> Unpack(byte[] dat, int len)
         {
             try
@@ -68,6 +116,12 @@ namespace huqiang
                 return null;
             }
         }
+        /// <summary>
+        /// 分析合并数据分卷
+        /// </summary>
+        /// <param name="list">数据分卷列表</param>
+        /// <param name="fs">封包分卷长度</param>
+        /// <returns></returns>
         protected List<EnvelopeData> OrganizeSubVolume(List<EnvelopePart> list, int fs)
         {
             if (list != null)
@@ -128,6 +182,9 @@ namespace huqiang
             }
             return null;
         }
+        /// <summary>
+        /// 清除超时的消息
+        /// </summary>
         protected void ClearTimeout()
         {
             var now = DateTime.Now.Ticks;
@@ -138,6 +195,9 @@ namespace huqiang
                         pool[i].head.MsgID = 0;
             }
         }
+        /// <summary>
+        /// 清除所有消息
+        /// </summary>
         public virtual void Clear()
         {
             remain = 0;

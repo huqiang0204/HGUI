@@ -58,7 +58,15 @@ namespace huqiang
         byte[] tmp2 = new byte[1500];
         static QueueBufferS<SocMsg> queue = new QueueBufferS<SocMsg>(4096);
         BlockBuffer<byte> recvBuffer  = new BlockBuffer<byte>(1500, 1024);
+        /// <summary>
+        /// 状态缓存
+        /// </summary>
         public BlockBuffer<int> statesBuffer;
+        /// <summary>
+        /// 申请内存地址
+        /// </summary>
+        /// <param name="len">内存块大小</param>
+        /// <returns>内存指针</returns>
         internal BlockInfo<byte> MemoryRequest(int len)
         {
             int c = len / 1500;
@@ -82,11 +90,22 @@ namespace huqiang
             return block;
         }
         KcpListener kcpListener;
+        /// <summary>
+        /// 运行,并为每个线程分配状态缓存
+        /// </summary>
+        /// <param name="listener">kcp监听器</param>
+        /// <param name="threadCount">线程数</param>
         public void Run(KcpListener listener,int threadCount)
         {
             kcpListener = listener;
             statesBuffer = new BlockBuffer<int>(8, 2048 * threadCount);
         }
+        /// <summary>
+        /// 接收消息
+        /// </summary>
+        /// <param name="buf">缓存</param>
+        /// <param name="len">数据长度</param>
+        /// <param name="link">用户连接</param>
         public void ReciveMsg(byte[] buf, int len,KcpData link)
         {
             var tmp = recvBuffer.RegNew(len);
@@ -102,6 +121,10 @@ namespace huqiang
             msg.dat = tmp;
             queue.Enqueue(msg);
         }
+        /// <summary>
+        /// 解压消息
+        /// </summary>
+        /// <param name="time">当前时间</param>
         internal void UnPack(Int16 time)
         {
             int c = queue.Count;
@@ -238,6 +261,13 @@ namespace huqiang
             }
             return tl;
         }
+
+        /// <summary>
+        /// 发送用户消息
+        /// </summary>
+        /// <param name="link">用户连接</param>
+        /// <param name="time">当前时间,用于统计时延</param>
+        /// <returns></returns>
         public int SendMsg(KcpData link,Int16 time)
         {
             var q = link.sendQueue;
@@ -477,6 +507,11 @@ namespace huqiang
             }
             return len + 8;
         }
+        /// <summary>
+        /// 成功发送的消息回执,剔除掉缓存中的消息备份
+        /// </summary>
+        /// <param name="head">消息头</param>
+        /// <param name="link">用户连接</param>
         public void Success(ref KcpHead head,KcpData link)
         {
             unsafe
@@ -493,6 +528,9 @@ namespace huqiang
             int c = PackInt(tmp2, KcpReturn.Size, tmpBuffer);
             kcpListener.soc.SendTo(tmpBuffer, c, SocketFlags.None, link.endpPoint);
         }
+        /// <summary>
+        /// 非托管内存的使用状态
+        /// </summary>
         public int UsageMemory { get {
                 int len = recvBuffer.UsageMemory;
                 if (statesBuffer != null)
@@ -501,6 +539,9 @@ namespace huqiang
                     len += Buffer[i].UsageMemory;
                 return len;
             } }
+        /// <summary>
+        /// 总计申请的非托管内存
+        /// </summary>
         public int AllMemory { get {
                 int len = recvBuffer.AllMemory;
                 if (statesBuffer != null)
@@ -509,6 +550,9 @@ namespace huqiang
                     len += Buffer[i].AllMemory;
                 return len;
             } }
+        /// <summary>
+        /// pe头占用的非托管内存
+        /// </summary>
         public int PEMemory { get {
                 int len = recvBuffer.PEMemory;
                 if (statesBuffer != null)
@@ -579,6 +623,14 @@ namespace huqiang
             }
             return tar;
         }
+        /// <summary>
+        /// 数据封包
+        /// </summary>
+        /// <param name="dat">数据</param>
+        /// <param name="type">数据类型</param>
+        /// <param name="msgId">消息id</param>
+        /// <param name="time">发送时间</param>
+        /// <returns></returns>
         public static byte[][] Pack(byte[] dat, byte type, UInt16 msgId, Int16 time)
         {
             int len = dat.Length;

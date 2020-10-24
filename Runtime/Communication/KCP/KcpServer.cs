@@ -5,6 +5,13 @@ using System.Text;
 
 namespace huqiang
 {
+    /// <summary>
+    /// kcp服务,kcp一个单独的线程用于接收消息
+    /// 一个单独得定线程发送消息
+    /// 一个单独的线程解析kcp数据包,然后推到每个连接的缓存中
+    /// 连接更新线程有多个,检查和处理每个连接中的缓存数据
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class KcpServer<T> : KcpListener where T : KcpLink, new()
     {
         public static UInt16 MinID = 60000;

@@ -339,6 +339,9 @@ namespace huqiang
                 }
             }
         }
+        /// <summary>
+        /// 数据平均时延
+        /// </summary>
         public int Delay
         {
             get
@@ -385,14 +388,19 @@ namespace huqiang
                 caches[index].rcvLen++;
             }
         }
-        public override void Recive(long now)
-        {
-            int c = recvQueue.Count;
-            for(int i=0;i<c;i++)
-            {
-                recvQueue.Dequeue().dat.Release();
-            }
-        }
+        //public override void Recive(long now)
+        //{
+        //    int c = recvQueue.Count;
+        //    for (int i = 0; i < c; i++)
+        //    {
+        //        recvQueue.Dequeue().dat.Release();
+        //    }
+        //}
+        /// <summary>
+        /// 发送一个消息
+        /// </summary>
+        /// <param name="type">数据类型</param>
+        /// <param name="dat">数据</param>
         public void Send(byte type, byte[] dat)
         {
             ByteData data = new ByteData();
@@ -400,6 +408,9 @@ namespace huqiang
             data.dat = dat;
             sendQueue.Enqueue(data);
         }
+        /// <summary>
+        /// 释放所占用的非托管内存
+        /// </summary>
         internal override void FreeMemory()
         {
             int c = recvQueue.Count;
@@ -417,6 +428,10 @@ namespace huqiang
             _connect = false;
             return true;
         }
+        /// <summary>
+        /// 添加一个公用消息
+        /// </summary>
+        /// <param name="msgs">消息</param>
         public override void AddMsg(MsgInfo2[] msgs)
         {
             Msgs2.AddRange(msgs);

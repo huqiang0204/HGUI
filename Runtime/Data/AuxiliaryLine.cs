@@ -66,10 +66,10 @@ namespace huqiang.Data
         /// <summary>
         /// 将网格线的顶点填充到ui的顶点
         /// </summary>
-        /// <param name="vectors"></param>
-        /// <param name="vert"></param>
-        /// <param name="tris"></param>
-        /// <param name="color"></param>
+        /// <param name="vectors">顶点</param>
+        /// <param name="vert">UI顶点</param>
+        /// <param name="tris">三角形</param>
+        /// <param name="color">颜色</param>
         public static void GetLineVert(Vector3[] vectors, List<UIVertex> vert, List<int> tris, Color color)
         {
             int Start = vert.Count;
@@ -92,6 +92,9 @@ namespace huqiang.Data
                 tris.Add(index + 2);
             }
         }
+        /// <summary>
+        /// 盒子线框的三角形
+        /// </summary>
         public static int[] BoxLine = new int[] { 0,1,1,2,2,3,3,0,4,5,5,6,6,7,7,4,0,4,1,5,2,6,3,7};
         /// <summary>
         /// 将世界坐标的顶点投射到屏幕坐标

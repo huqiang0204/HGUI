@@ -16,11 +16,22 @@ namespace huqiang.Data
         EmailAddress,
         Custom
     }
+    /// <summary>
+    /// 字符操作
+    /// </summary>
     public class CharOperation
     {
         static readonly char[] Separators = { ' ', '.', ',', '\t', '\r', '\n' };
         const string EmailCharacters = "!#$%&'*+-/=?^_`{|}~";
         const string Num = "0123456789";
+        /// <summary>
+        /// 字符串校验
+        /// </summary>
+        /// <param name="validat">校验类型</param>
+        /// <param name="text">输入字符串</param>
+        /// <param name="pos">字符位置</param>
+        /// <param name="ch">插入字符</param>
+        /// <returns></returns>
         public static char Validate(CharacterValidation validat, string text, int pos, char ch)
         {
             if (validat == CharacterValidation.None)
@@ -151,6 +162,13 @@ namespace huqiang.Data
             }
             return (char)0;
         }
+        /// <summary>
+        /// 字符串校验
+        /// </summary>
+        /// <param name="validat">校验类型</param>
+        /// <param name="text">输入字符串</param>
+        /// <param name="count">限制长度</param>
+        /// <returns></returns>
         public static string Validate(CharacterValidation validat, string text, int count)
         {
             if (count > 0)
@@ -169,6 +187,11 @@ namespace huqiang.Data
             }
             return text;
         }
+        /// <summary>
+        /// 校验整数
+        /// </summary>
+        /// <param name="str">输入字符串</param>
+        /// <returns></returns>
         public static string ValidateInteger(string str)
         {
             int len = str.Length;
@@ -189,6 +212,11 @@ namespace huqiang.Data
                 return "";
             return str.Substring(0,len);
         }
+        /// <summary>
+        /// 校验小数
+        /// </summary>
+        /// <param name="str">输入字符串</param>
+        /// <returns></returns>
         public static string ValidateDecimal(string str)
         {
             bool point = false;
@@ -213,6 +241,11 @@ namespace huqiang.Data
                 return "";
             return str.Substring(0, len);
         }
+        /// <summary>
+        /// 校验字母数组组合
+        /// </summary>
+        /// <param name="str">输入字符串</param>
+        /// <returns></returns>
         public static string ValidateAlphanumeric(string str)
         {
             int len = str.Length;
@@ -232,6 +265,11 @@ namespace huqiang.Data
                 return "";
             return str.Substring(0, len);
         }
+        /// <summary>
+        /// 校验邮件地址
+        /// </summary>
+        /// <param name="str">输入字符串</param>
+        /// <returns></returns>
         public static string ValidateEmailAddress(string str)
         {
             int len = str.Length;
@@ -282,6 +320,12 @@ namespace huqiang.Data
                 return "";
             return str.Substring(0, len);
         }
+        /// <summary>
+        /// 将字符串做整数矫正
+        /// </summary>
+        /// <param name="str">输入字符串</param>
+        /// <param name="len">整数长度</param>
+        /// <returns></returns>
         public static string GetInt(string str, int len)
         {
             if (str == "" | str == null)
@@ -333,24 +377,50 @@ namespace huqiang.Data
             }
             return new string(buf, 0, num);
         }
+        /// <summary>
+        /// 将字符串做整数矫正
+        /// </summary>
+        /// <param name="str">输入字符串</param>
+        /// <returns></returns>
         public static string GetInt(string str)
         {
             return GetInt(str,11);
         }
+        /// <summary>
+        /// 将字符串做无符号整数矫正
+        /// </summary>
+        /// <param name="str">输入字符串</param>
+        /// <returns></returns>
         public static string GetUInt(string str)
         {
             str = GetInt(str,11);
             return str.Replace("-","");
         }
+        /// <summary>
+        /// 将字符串做长整数矫正
+        /// </summary>
+        /// <param name="str">输入字符串</param>
+        /// <returns></returns>
         public static string Getlong(string str)
         {
             return GetInt(str,22);
         }
+        /// <summary>
+        /// 将字符串做无符号长整数矫正
+        /// </summary>
+        /// <param name="str">输入字符串</param>
+        /// <returns></returns>
         public static string GetUlong(string str)
         {
             str = GetInt(str, 22);
             return str.Replace("-", "");
         }
+        /// <summary>
+        /// 将字符串做浮点数矫正
+        /// </summary>
+        /// <param name="str">输入字符串</param>
+        /// <param name="len">浮点长度</param>
+        /// <returns></returns>
         public static string GetFloat(string str, int len)
         {
             if (str == "" | str == null)
@@ -430,14 +500,30 @@ namespace huqiang.Data
                     num--;
             return new string(buf, 0, num);
         }
+        /// <summary>
+        /// 将字符串做浮点数矫正
+        /// </summary>
+        /// <param name="str">输入字符串</param>
+        /// <returns></returns>
         public static string GetFloat(string str)
         {
             return GetFloat(str,8);
         }
+        /// <summary>
+        /// 将字符串做双浮点数矫正
+        /// </summary>
+        /// <param name="str">输入字符串</param>
+        /// <returns></returns>
         public static string GetDouble(string str)
         {
             return GetFloat(str,17);
         }
+        /// <summary>
+        /// 将字符串做整数数组数矫正
+        /// </summary>
+        /// <param name="str">输入字符串</param>
+        /// <param name="len">整数长度</param>
+        /// <returns></returns>
         public static string GetIntArray(string str,int len)
         {
             StringBuilder sb = new StringBuilder();
@@ -452,14 +538,30 @@ namespace huqiang.Data
             }
             return sb.ToString();
         }
+        /// <summary>
+        /// 将字符串做整数数组矫正
+        /// </summary>
+        /// <param name="str">输入字符串</param>
+        /// <returns></returns>
         public static string GetIntArray(string str)
         {
             return GetIntArray(str,11);
         }
+        /// <summary>
+        /// 将字符串做长整数数组数矫正
+        /// </summary>
+        /// <param name="str">输入字符串</param>
+        /// <returns></returns>
         public static string GetLongArray(string str)
         {
             return GetIntArray(str,22);
         }
+        /// <summary>
+        /// 将字符串做浮点数数组矫正
+        /// </summary>
+        /// <param name="str">输入字符串</param>
+        /// <param name="len">整数长度</param>
+        /// <returns></returns>
         public static string GetFloatArray(string str,int len)
         {
             StringBuilder sb = new StringBuilder();
@@ -474,10 +576,20 @@ namespace huqiang.Data
             }
             return sb.ToString();
         }
+        /// <summary>
+        /// 将字符串做浮点数组数矫正
+        /// </summary>
+        /// <param name="str">输入字符串</param>
+        /// <returns></returns>
         public static string GetFloatArray(string str)
         {
             return GetFloatArray(str,8);
         }
+        /// <summary>
+        /// 将字符串做双浮点数组数矫正
+        /// </summary>
+        /// <param name="str">输入字符串</param>
+        /// <returns></returns>
         public static string GetDoubleArray(string str)
         {
             return GetFloatArray(str, 17);

@@ -3,6 +3,10 @@
 
 namespace huqiang.Data
 {
+    /// <summary>
+    /// 泛型容器
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class Container<T> where T : class
     {
         int top = 0;

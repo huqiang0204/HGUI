@@ -6,8 +6,20 @@ namespace huqiang.Data
 {
     public struct Box
     {
+        /// <summary>
+        /// 中心点
+        /// </summary>
         public Vector3 center;
+        /// <summary>
+        /// 尺寸
+        /// </summary>
         public Vector3 size;
+        /// <summary>
+        /// 两个盒子是否相撞
+        /// </summary>
+        /// <param name="abox"></param>
+        /// <param name="bbox"></param>
+        /// <returns></returns>
         public static bool Contains(ref Box abox, ref Box bbox)
         {
             float x = bbox.size.x * 0.5f;
@@ -39,6 +51,11 @@ namespace huqiang.Data
 
             return true;
         }
+        /// <summary>
+        /// 获取模型顶点的盒子
+        /// </summary>
+        /// <param name="vert"></param>
+        /// <returns></returns>
         public static Box GetCenter(Vector3[] vert)
         {
             if (vert == null)
@@ -98,7 +115,11 @@ namespace huqiang.Data
             }
             return GetCenter(vectors.ToArray());
         }
-
+        /// <summary>
+        /// 重新定位中心位置
+        /// </summary>
+        /// <param name="vert"></param>
+        /// <param name="location"></param>
         public static void ReLocation(Vector3[] vert, ref Vector3 location)
         {
             var box = GetCenter(vert);

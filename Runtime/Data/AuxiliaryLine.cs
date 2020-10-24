@@ -6,8 +6,18 @@ using UnityEngine;
 
 namespace huqiang.Data
 {
+    /// <summary>
+    /// 辅助线
+    /// </summary>
     public class AuxiliaryLine
     {
+        /// <summary>
+        /// 创建一条线的网格
+        /// </summary>
+        /// <param name="start">起点</param>
+        /// <param name="end">终点</param>
+        /// <param name="lineWidth">线宽</param>
+        /// <returns></returns>
         public static Vector3[] CreateLine(Vector3 start, Vector3 end, float lineWidth = 1)
         {
             Vector3[] tmp = new Vector3[4];
@@ -35,6 +45,13 @@ namespace huqiang.Data
             vert[index].x = end.x + ny;
             vert[index].y = end.y - nx;
         }
+        /// <summary>
+        /// 创建网格线
+        /// </summary>
+        /// <param name="vert">顶点</param>
+        /// <param name="lines">线的索引</param>
+        /// <param name="lineWidth">线宽</param>
+        /// <returns></returns>
         public static Vector3[] CreateLine(Vector3[] vert, int[] lines, float lineWidth = 1)
         {
             int a = lines.Length / 2;
@@ -46,6 +63,13 @@ namespace huqiang.Data
             }
             return tmp;
         }
+        /// <summary>
+        /// 将网格线的顶点填充到ui的顶点
+        /// </summary>
+        /// <param name="vectors"></param>
+        /// <param name="vert"></param>
+        /// <param name="tris"></param>
+        /// <param name="color"></param>
         public static void GetLineVert(Vector3[] vectors, List<UIVertex> vert, List<int> tris, Color color)
         {
             int Start = vert.Count;

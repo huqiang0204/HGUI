@@ -6,13 +6,23 @@ using System.Text;
 
 namespace huqiang.Data
 {
+    /// <summary>
+    /// 块级内存
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public struct BlockInfo<T> where T : unmanaged
     {
+        /// <summary>
+        /// 有效数据长度
+        /// </summary>
         public int DataCount;
         int Index;
         int Length;
         int bufID;
         int os;
+        /// <summary>
+        /// 非托管内存地址
+        /// </summary>
         public unsafe T* Addr
         {
             get
@@ -23,8 +33,21 @@ namespace huqiang.Data
                 return (T*)0;
             }
         }
+        /// <summary>
+        /// 主缓存的偏移地址
+        /// </summary>
         public int Offset { get => Index; }
+        /// <summary>
+        /// 缓存大小
+        /// </summary>
         public int Size { get => Length; }
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="addr">主缓存索引</param>
+        /// <param name="index">缓存索引</param>
+        /// <param name="len">缓存块长度</param>
+        /// <param name="area">块级大小</param>
         public BlockInfo(int addr, int index, int len, int area)
         {
             bufID = addr;
@@ -33,6 +56,9 @@ namespace huqiang.Data
             DataCount = 0;
             os = index * area;
         }
+        /// <summary>
+        /// 内存释放
+        /// </summary>
         public void Release()
         {
             if (Length == 0)
@@ -42,6 +68,9 @@ namespace huqiang.Data
                 add.Release(Index, Length);
             Length = 0;
         }
+        /// <summary>
+        /// 内存填0
+        /// </summary>
         public void Zero()
         {
             var add = BlockBuffer.buffers[bufID];
@@ -50,6 +79,9 @@ namespace huqiang.Data
                 add.Zero(Index, Length);
             }
         }
+        /// <summary>
+        /// 清除数据
+        /// </summary>
         public void Clear()
         {
             Length = 0;
@@ -57,14 +89,27 @@ namespace huqiang.Data
     }
     public class BlockBuffer
     {
+        /// <summary>
+        /// 块级主缓存集合
+        /// </summary>
         internal static BlockBuffer[] buffers = new BlockBuffer[1024];
         public int eSize { get; protected set; }
         protected IntPtr ptr;
         protected int pe;
         public IntPtr Addr => ptr + pe;
+        /// <summary>
+        /// 释放内存
+        /// </summary>
+        /// <param name="offset">偏移位置</param>
+        /// <param name="size">尺寸</param>
         public virtual void Release(int offset, int size)
         {
         }
+        /// <summary>
+        /// 内存填0
+        /// </summary>
+        /// <param name="offset">偏移位置</param>
+        /// <param name="size">尺寸</param>
         public virtual void Zero(int offset, int size)
         {
 
@@ -78,13 +123,27 @@ namespace huqiang.Data
 
         int usage;
         int ID;
+        /// <summary>
+        /// 所有非托管内存
+        /// </summary>
         public int AllMemory { get => allLength; }
+        /// <summary>
+        /// 当前使用的非托管内存
+        /// </summary>
         public int UsageMemory { get => usage * blockSize * eSize; }
+        /// <summary>
+        /// pe信息占用的非托管内存
+        /// </summary>
         public int PEMemory { get => pe; }
         /// <summary>
         /// 剩余容量
         /// </summary>
         public int RemainBlock { get => pe - usage; }
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="block">每个块的大小</param>
+        /// <param name="len">缓存总长度</param>
         public unsafe BlockBuffer(int block = 32, int len = 32)
         {
             eSize = sizeof(T);
@@ -110,6 +169,11 @@ namespace huqiang.Data
                 }
             }
         }
+        /// <summary>
+        /// 注册一个非托管内存
+        /// </summary>
+        /// <param name="len">数据长度</param>
+        /// <returns></returns>
         public unsafe BlockInfo<T> RegNew(int len)
         {
             byte* bp = (byte*)ptr;
@@ -141,6 +205,11 @@ namespace huqiang.Data
             usage += block;
             return new BlockInfo<T>(ID, index, len, blockSize * eSize);
         }
+        /// <summary>
+        /// 释放内存
+        /// </summary>
+        /// <param name="offset">偏移位置</param>
+        /// <param name="size">尺寸</param>
         public unsafe override void Release(int offset, int size)
         {
             int block = size / blockSize;
@@ -152,6 +221,11 @@ namespace huqiang.Data
             }
             usage -= block;
         }
+        /// <summary>
+        /// 数据填0
+        /// </summary>
+        /// <param name="offset">偏移位置</param>
+        /// <param name="size">尺寸</param>
         public override void Zero(int offset, int size)
         {
             int area = blockSize * eSize;
@@ -168,6 +242,12 @@ namespace huqiang.Data
                 }
             }
         }
+        /// <summary>
+        /// 注册一个非托管内存
+        /// </summary>
+        /// <param name="blockInfo">接收的数据引用</param>
+        /// <param name="len">数据长度</param>
+        /// <returns></returns>
         public unsafe bool RegNew(ref BlockInfo<T> blockInfo, int len)
         {
             byte* bp = (byte*)ptr;
@@ -231,6 +311,9 @@ namespace huqiang.Data
             dataLength = dl;
             allLength = al;
         }
+        /// <summary>
+        /// 释放所有内存资源
+        /// </summary>
         public void Dispose()
         {
             Marshal.FreeHGlobal(ptr);

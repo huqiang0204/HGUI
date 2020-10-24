@@ -388,14 +388,18 @@ namespace huqiang
                 caches[index].rcvLen++;
             }
         }
-        //public override void Recive(long now)
-        //{
-        //    int c = recvQueue.Count;
-        //    for (int i = 0; i < c; i++)
-        //    {
-        //        recvQueue.Dequeue().dat.Release();
-        //    }
-        //}
+        /// <summary>
+        /// 处理接收缓存中的消息,如果未被重写,则未释放消息内存
+        /// </summary>
+        /// <param name="now"></param>
+        public override void Recive(long now)
+        {
+            int c = recvQueue.Count;
+            for (int i = 0; i < c; i++)
+            {
+                recvQueue.Dequeue().dat.Release();//释放指针内存
+            }
+        }
         /// <summary>
         /// 发送一个消息
         /// </summary>

@@ -7,6 +7,10 @@ using System.Threading;
 
 namespace huqiang
 {
+    /// <summary>
+    /// 管理kcp连接的线程
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class KcpThread<T> : ThreadBuffer<T> where T : KcpData, new()
     {
         class Mission
@@ -21,6 +25,10 @@ namespace huqiang
         /// </summary>
         Thread thread;
         QueueBuffer<Mission> queue = new QueueBuffer<Mission>();
+        /// <summary>
+        /// kcp线程用户管理类
+        /// </summary>
+        /// <param name="size">缓存大小,可容纳的最大用户数</param>
         public KcpThread(int size = 2048) : base(size)
         {
             running = true;
@@ -56,6 +64,11 @@ namespace huqiang
                     Thread.Sleep(1);
             }
         }
+        /// <summary>
+        /// 添加其它线程委托的任务
+        /// </summary>
+        /// <param name="action"></param>
+        /// <param name="obj"></param>
         public void AddMission(Action<object> action, object obj)
         {
             Mission mis = new Mission();
@@ -63,6 +76,11 @@ namespace huqiang
             mis.data = obj;
             queue.Enqueue(mis);
         }
+        /// <summary>
+        /// 发送缓存中的消息
+        /// </summary>
+        /// <param name="kcp">kcp封包器</param>
+        /// <param name="time">时间</param>
         public void SendAll(Kcp kcp, Int16 time)
         {
             for (int i = 0; i < top; i++)
@@ -74,6 +92,13 @@ namespace huqiang
                 }
             }
         }
+        /// <summary>
+        /// 发送缓存中的消息,如果没有则发送一条外部消息,防止超时
+        /// </summary>
+        /// <param name="soc">socket服务</param>
+        /// <param name="kcp">kcp封包器</param>
+        /// <param name="time">时间</param>
+        /// <param name="heart">心跳包</param>
         public void SendAll(Socket soc, Kcp kcp, Int16 time, byte[] heart)
         {
             for (int i = 0; i < top; i++)

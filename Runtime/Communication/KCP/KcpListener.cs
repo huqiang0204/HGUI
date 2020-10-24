@@ -7,21 +7,49 @@ using System.Threading;
 
 namespace huqiang
 {
+    /// <summary>
+    /// KCP监听器
+    /// </summary>
     public class KcpListener
     {
+        /// <summary>
+        /// 心跳包
+        /// </summary>
         public static byte[] Heart = new byte[] { 255, 255, 255, 255, 0, 255, 255, 255, 254 };
+        /// <summary>
+        /// 连接超时时间
+        /// </summary>
         public static long TimeOut = 50000000;//5*1000*10000
+        /// <summary>
+        /// 实例
+        /// </summary>
         public static KcpListener Instance;
+
         public Socket soc;
+        /// <summary>
+        /// 处理接收到的消息的线程
+        /// </summary>
         public Thread recvThread;
+        /// <summary>
+        /// 处理将要发送的消息的线程
+        /// </summary>
         public Thread sendThread;
+        /// <summary>
+        /// 运行状态
+        /// </summary>
         protected bool running;
         int _port;
+        /// <summary>
+        /// 服务器端口
+        /// </summary>
         public int Port { get { return _port; } }
         public KcpListener(int port = 0)
         {
             _port = port;
         }
+        /// <summary>
+        /// 启动监听服务
+        /// </summary>
         public void Start()
         {
             IPEndPoint ip = new IPEndPoint(IPAddress.Any, _port);
@@ -83,11 +111,14 @@ namespace huqiang
             }
         }
         /// <summary>
-        /// sendThread
+        /// 发送所有线程缓存中的消息
         /// </summary>
         public virtual void SendAll()
         {
         }
+        /// <summary>
+        /// 释放资源
+        /// </summary>
         public virtual void Dispose()
         {
             running = false;
@@ -95,7 +126,7 @@ namespace huqiang
             soc.Close();
         }
         /// <summary>
-        /// recvThread
+        /// 处理监听到的消息
         /// </summary>
         /// <param name="dat"></param>
         /// <param name="len"></param>
@@ -103,18 +134,32 @@ namespace huqiang
         public virtual void Dispatch(byte[] dat,int len, IPEndPoint endPoint)
         {
         }
+        /// <summary>
+        /// 向某个地址发送原始消息
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="ip"></param>
         public void Send(byte[] data, IPEndPoint ip)
         {
             soc.SendTo(data,  ip);
         }
+        /// <summary>
+        /// 移除某个用户连接
+        /// </summary>
+        /// <param name="link"></param>
         public virtual void RemoveLink(NetworkLink link)
         {
         }
+        /// <summary>
+        /// 广播消息
+        /// </summary>
+        /// <param name="dat"></param>
+        /// <param name="type"></param>
         public virtual void Broadcast(byte[] dat,byte type)
         {
         }
         /// <summary>
-        /// recvThread 
+        /// 管理用户连接
         /// </summary>
         protected virtual void ManageLinks()
         {

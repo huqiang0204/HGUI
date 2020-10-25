@@ -1,5 +1,4 @@
 ﻿using huqiang;
-using huqiang.Communication;
 using huqiang.Core.HGUI;
 using huqiang.Data;
 using huqiang.UIEvent;

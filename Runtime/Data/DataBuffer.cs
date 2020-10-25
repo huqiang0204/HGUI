@@ -32,7 +32,9 @@ namespace huqiang.Data
         public const short Long = 12;
         public const short Double = 13;
     }
-    //C#的这些类型不能被继承：System.ValueType, System.Enum, System.Delegate, System.Array, etc.
+    /// <summary>
+    /// C#的这些类型不能被继承：System.ValueType, System.Enum, System.Delegate, System.Array, etc.
+    /// </summary>
     public class DataBuffer
     {
         static Int32 GetType(object obj)
@@ -93,12 +95,17 @@ namespace huqiang.Data
         /// 添加一个引用类型的数据
         /// </summary>
         /// <param name="obj"></param>
-        /// <param name="size">FakeStructArray 成员大小</param>
         /// <returns></returns>
         public int AddData(object obj)
         {
             return AddData(obj, GetType(obj));
         }
+        /// <summary>
+        ///  添加一个引用类型的数据
+        /// </summary>
+        /// <param name="obj">数据对象</param>
+        /// <param name="type">数据类型</param>
+        /// <returns></returns>
         internal int AddData(object obj, Int32 type)
         {
             if (obj is string[])
@@ -154,10 +161,20 @@ namespace huqiang.Data
             }
             return min;
         }
+        /// <summary>
+        /// 提取一个对象
+        /// </summary>
+        /// <param name="index">对象索引</param>
+        /// <returns></returns>
         public object GetData(int index)
         {
             return buff[index].obj;
         }
+        /// <summary>
+        /// 提取对象索引器
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
         public object this[int index]
         {
             get {
@@ -166,6 +183,10 @@ namespace huqiang.Data
                     return buff[index].obj;
             }
         }
+        /// <summary>
+        /// 移除某个对象,引用计数减一,当引用计数归0时,真正移除
+        /// </summary>
+        /// <param name="index"></param>
         public void RemoveData(int index)
         {
             if (index < 1)
@@ -399,10 +420,19 @@ namespace huqiang.Data
                 return Encoding.UTF8.GetBytes(str);
             }
         }
+        /// <summary>
+        /// 将对象数据转换成byte[]并取出
+        /// </summary>
+        /// <param name="index">对象索引</param>
+        /// <returns></returns>
         public byte[] GetBytes(int index)
         {
             return GetBytes(buff[index].obj);
         }
+        /// <summary>
+        /// 将整个DataBuffer中的数据转换成byte[]
+        /// </summary>
+        /// <returns></returns>
         public byte[] ToBytes()
         {
             MemoryStream table = new MemoryStream();
@@ -447,6 +477,12 @@ namespace huqiang.Data
             table.Dispose();
             return tmp;
         }
+        /// <summary>
+        /// 添加一个数组对象,此对象元素类型必须为非托管结构体
+        /// </summary>
+        /// <typeparam name="T">非托管结构体</typeparam>
+        /// <param name="obj">对象</param>
+        /// <returns></returns>
         public int AddArray<T>(T[] obj) where T : unmanaged
         {
             if(obj is byte[])
@@ -454,6 +490,12 @@ namespace huqiang.Data
             var dat = obj.ToBytes<T>();
             return AddData(dat,DataType.ByteArray);
         }
+        /// <summary>
+        /// 获取一个数组对象,此对象元素类型必须为非托管结构体
+        /// </summary>
+        /// <typeparam name="T">非托管结构体</typeparam>
+        /// <param name="index">对象索引</param>
+        /// <returns></returns>
         public T[] GetArray<T>(int index) where T : unmanaged
         {
             var buf = buff[index].obj as byte[];

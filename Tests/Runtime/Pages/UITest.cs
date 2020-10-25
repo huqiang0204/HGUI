@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using huqiang;
 using Assets.Scripts;
-using huqiang.Communication;
 using huqiang.UIModel;
 using huqiang.Core.HGUI;
 

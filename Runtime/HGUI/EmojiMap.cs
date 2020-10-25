@@ -20,6 +20,9 @@ namespace huqiang.Core.HGUI
         public string chr;
         public Vector2[] uv;
     }
+    /// <summary>
+    /// 表情符图
+    /// </summary>
     public partial class EmojiMap
     {
         class CharInfo
@@ -27,6 +30,13 @@ namespace huqiang.Core.HGUI
             public int len;
             public char[] dat;
             public CharUV[] uVs;
+            /// <summary>
+            /// 查询表情符是否存在
+            /// </summary>
+            /// <param name="vs"></param>
+            /// <param name="index"></param>
+            /// <param name="uv"></param>
+            /// <returns></returns>
             public bool Find(char[] vs,int index, Vector2[] uv)
             {
                 if (dat == null)
@@ -63,6 +73,10 @@ namespace huqiang.Core.HGUI
         {
             Initial(huqiang.Resources.Assets.EmojiInfo);
         }
+        /// <summary>
+        /// 初始化表情符信息
+        /// </summary>
+        /// <param name="data"></param>
         public static void Initial(byte[] data)
         {
             var db = new DataBuffer(data);
@@ -81,6 +95,13 @@ namespace huqiang.Core.HGUI
                 }
             }
         }
+        /// <summary>
+        /// 查询表情符,失败返回0,成功返回字符串长度
+        /// </summary>
+        /// <param name="buff">字符串缓存</param>
+        /// <param name="index">起始位置</param>
+        /// <param name="uv">查询到的uv数据</param>
+        /// <returns></returns>
         public static int FindEmoji(char[] buff, int index,  Vector2[] uv)
         {
             if (index >= buff.Length)
@@ -98,6 +119,14 @@ namespace huqiang.Core.HGUI
             }
             return 0;
         }
+        /// <summary>
+        /// 查询表情符,失败返回0,成功返回字符串长度
+        /// </summary>
+        /// <param name="buff">字符串缓存</param>
+        /// <param name="index">起始位置</param>
+        /// <param name="end">结束位置</param>
+        /// <param name="uv">查询到的uv数据</param>
+        /// <returns></returns>
         public static int FindEmoji(char[] buff, int index, int end, Vector2[] uv)
         {
             if (index >= end)

@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace huqiang.Core.HGUI
 {
+    /// <summary>
+    /// 自定义文字
+    /// </summary>
     public class CustomText
     {
         struct UVRect
@@ -35,6 +38,10 @@ namespace huqiang.Core.HGUI
             Left, Center
         }
         public Alignment alignment;
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="t2d">包含字符精灵的纹理</param>
         public CustomText(Texture t2d)
         {
             texture = t2d;
@@ -48,6 +55,11 @@ namespace huqiang.Core.HGUI
         List<int> tri;
         public Texture texture { get; private set; }
         Dictionary<char, UVRect> buffer;
+        /// <summary>
+        /// 添加字符图
+        /// </summary>
+        /// <param name="key">字符</param>
+        /// <param name="rect">精灵矩形</param>
         public void AddCharMap(char key, Rect rect)
         {
             float x0 = rect.x / width;
@@ -67,6 +79,11 @@ namespace huqiang.Core.HGUI
             uv.Scale.y = rect.height / NormalSize;
             buffer.Add(key, uv);
         }
+        /// <summary>
+        /// 添加字符图
+        /// </summary>
+        /// <param name="key">字符</param>
+        /// <param name="sprite">精灵</param>
         public void AddCharMap(char key, Sprite sprite)
         {
             var rect = sprite.rect;
@@ -83,7 +100,13 @@ namespace huqiang.Core.HGUI
         public float NormalSize = 24;
         public float FontSize = 24;
         public Vector2 SizeDelta = new Vector2(160, 40);
+        /// <summary>
+        /// 文字
+        /// </summary>
         public string text;
+        /// <summary>
+        /// 刷新顶点
+        /// </summary>
         public void Refresh()
         {
             if (FontSize <= 0)
@@ -150,6 +173,10 @@ namespace huqiang.Core.HGUI
                 }
             }
         }
+        /// <summary>
+        /// 应用到HImage中
+        /// </summary>
+        /// <param name="image">实例目标</param>
         public void Apply(HImage image)
         {
             if (image == null)

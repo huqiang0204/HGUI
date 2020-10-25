@@ -254,7 +254,7 @@ public class GifDecoder
         public List<Texture2D> texture2Ds;
     }
     /// <summary>
-    /// 
+    /// 异步解码gif图片
     /// </summary>
     /// <param name="dat"></param>
     /// <param name="tag"></param>

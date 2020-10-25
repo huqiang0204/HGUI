@@ -11,6 +11,9 @@ using UnityEngine;
 
 namespace huqiang.Data
 {
+    /// <summary>
+    /// 类型信息
+    /// </summary>
     public abstract class TypeInfo
     {
         public int Index;
@@ -27,29 +30,67 @@ namespace huqiang.Data
             return false;
         }
     }
+    /// <summary>
+    /// unity 组件比较器
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class ComponentInfo<T> : TypeInfo where T : Component 
     {
+        /// <summary>
+        /// 构造函数,初始化类型信息
+        /// </summary>
         public ComponentInfo()
         {
             type = typeof(T);
             name = type.Name;
         }
+        /// <summary>
+        /// 比较实例化对象
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public override bool Compare(object obj)
         {
             return obj is T;
         }
     }
+    /// <summary>
+    /// 反射模型
+    /// </summary>
     public class ReflectionModel
     {
+        /// <summary>
+        /// 类名
+        /// </summary>
         public string name;
+        /// <summary>
+        /// 字段信息
+        /// </summary>
         public FieldInfo field;
         public Type FieldType;
+        /// <summary>
+        /// 反射值
+        /// </summary>
         public object Value;
     }
+    /// <summary>
+    /// 
+    /// </summary>
     public class TempReflection
     {
+        /// <summary>
+        /// 数组的顶部指针
+        /// </summary>
         public int Top;
+        /// <summary>
+        /// 对象的所有字段反射模型
+        /// </summary>
         public ReflectionModel[] All;
+        /// <summary>
+        /// 将类型中的所有公开字段转换成临时反射类
+        /// </summary>
+        /// <param name="type">类型</param>
+        /// <returns></returns>
         public static TempReflection ObjectFields(Type type)
         {
             var fs = type.GetFields();
@@ -67,6 +108,11 @@ namespace huqiang.Data
             temp.All = reflections;
             return temp;
         }
+        /// <summary>
+        /// 将对象中的所有公开字段转换成临时反射类
+        /// </summary>
+        /// <param name="obj">对象实例</param>
+        /// <returns></returns>
         public static TempReflection ObjectFields(object obj)
         {
             return ObjectFields(obj.GetType());
@@ -74,8 +120,11 @@ namespace huqiang.Data
     }
     public class GameobjectBuffer
     {
-       
         Transform CycleBuffer;
+        /// <summary>
+        /// 构造函数,设置回收对象的父物体
+        /// </summary>
+        /// <param name="buffer">父对象</param>
         public GameobjectBuffer(Transform buffer)
         {
             CycleBuffer = buffer;
@@ -108,7 +157,7 @@ namespace huqiang.Data
         /// <summary>
         /// 获取组件的索引
         /// </summary>
-        /// <param name="com"></param>
+        /// <param name="com">组件实例</param>
         /// <returns></returns>
         public Int32 GetTypeIndex(Component com)
         {
@@ -121,6 +170,11 @@ namespace huqiang.Data
             }
             return 0;
         }
+        /// <summary>
+        /// 获取组件索引
+        /// </summary>
+        /// <param name="name">组件名称</param>
+        /// <returns></returns>
         public Int32 GetTypeIndex(string name)
         {
             for (int i = 0; i < point; i++)
@@ -132,6 +186,11 @@ namespace huqiang.Data
             }
             return 0;
         }
+        /// <summary>
+        /// 获取组件索引
+        /// </summary>
+        /// <typeparam name="T">组件类型</typeparam>
+        /// <returns></returns>
         public Int32 GetTypeIndex<T>()
         {
             var t = typeof(T);
@@ -241,6 +300,10 @@ namespace huqiang.Data
             else
                 GameObject.Destroy(game);
         }
+        /// <summary>
+        /// 回收对象的子物体
+        /// </summary>
+        /// <param name="game"></param>
         public void RecycleChild(GameObject game)
         {
             if (game == null)
@@ -252,6 +315,11 @@ namespace huqiang.Data
                 RecycleGameObject(trans.GetChild(i).gameObject);
             }
         }
+        /// <summary>
+        /// 回收除开相应名称意外的对象的子物体
+        /// </summary>
+        /// <param name="game">游戏对象</param>
+        /// <param name="keep">要保留子对象的名称数组</param>
         public void RecycleChild(GameObject game, string[] keep)
         {
             if (game == null)
@@ -265,6 +333,11 @@ namespace huqiang.Data
                     RecycleGameObject(trans.GetChild(i).gameObject);
             }
         }
+        /// <summary>
+        /// 查询组件的数据载入器
+        /// </summary>
+        /// <param name="com">组件实例</param>
+        /// <returns></returns>
         public DataLoader FindDataLoader(Component com)
         {
             for(int i=0;i<types.Length;i++)
@@ -274,6 +347,11 @@ namespace huqiang.Data
             }
             return null;
         }
+        /// <summary>
+        /// 获取数据载入器
+        /// </summary>
+        /// <param name="Index">索引id</param>
+        /// <returns></returns>
         public DataLoader GetDataLoader(int Index)
         {
             return types[Index].loader;
@@ -316,6 +394,12 @@ namespace huqiang.Data
             types[0].loader.LoadToObject(fake,go.transform,null);
             return go;
         }
+        /// <summary>
+        /// 克隆某个游戏对象
+        /// </summary>
+        /// <param name="fake">假结构体数据</param>
+        /// <param name="initializer">初始化器</param>
+        /// <returns></returns>
         public GameObject Clone(FakeStruct fake, Initializer initializer)
         {
             if (fake == null)

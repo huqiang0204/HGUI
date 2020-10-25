@@ -4,21 +4,45 @@ using System.Text;
 
 namespace huqiang.Data
 {
+    /// <summary>
+    /// 普通键值对
+    /// </summary>
     public class KeyValue
     {
         public string key;
         public string value;
     }
+    /// <summary>
+    /// ini数组数据
+    /// </summary>
     public class IniMate
     {
         public string index;
         public List<KeyValue> values = new List<KeyValue>();
     }
+
+    /// <summary>
+    /// ini节点
+    /// </summary>
     public class INISection
     {
+        /// <summary>
+        /// 节点名称
+        /// </summary>
         public string Name;
+        /// <summary>
+        /// 键值对数据集合
+        /// </summary>
         public List<KeyValue> Values = new List<KeyValue>();
+        /// <summary>
+        /// 数组数据集合
+        /// </summary>
         public List<IniMate> Mates = new List<IniMate>();
+        /// <summary>
+        /// 添加一组数据
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
         public void Add(string key, string value)
         {
             var ss = key.Split('\\');
@@ -40,7 +64,12 @@ namespace huqiang.Data
                 Values.Add(kv);
             }
         }
-        //添加数组的值
+        /// <summary>
+        /// 添加数组的值
+        /// </summary>
+        /// <param name="index">元素索引</param>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
         public void Add(string index,string key, string value)
         {
             IniMate mate = null;
@@ -76,6 +105,11 @@ namespace huqiang.Data
                 mate.values.Add(kv);
             }
         }
+        /// <summary>
+        /// 获取值
+        /// </summary>
+        /// <param name="key">键</param>
+        /// <returns></returns>
         public string GetValue(string key)
         {
             for (int i = 0; i < Values.Count; i++)

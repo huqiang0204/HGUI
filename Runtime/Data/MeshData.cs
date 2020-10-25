@@ -28,12 +28,24 @@ namespace huqiang.Data
         public const Int32 Materials = 7;
         public const Int32 SubTriangles = 8;
     }
+    /// <summary>
+    /// 网格数据,将unitymesh中的网格数据转换成二进制存储或者读取
+    /// </summary>
     public class MeshData
     {
+        /// <summary>
+        /// 默认颜色值
+        /// </summary>
         public static Color DefColor = new Color(0.5f, 0.5f, 0.5f, 1);
         public static byte[] Zreo = new byte[4];
         public MeshData[] child;
+        /// <summary>
+        /// 子网格数量
+        /// </summary>
         public int subMeshCount;
+        /// <summary>
+        /// 游戏对象名称
+        /// </summary>
         public string name;
         public Vector3[] vertex;
         public Vector2[] uv;
@@ -48,6 +60,10 @@ namespace huqiang.Data
             coordinate.quat.w = 1;
             coordinate.color = DefColor;
         }
+        /// <summary>
+        /// 从二进制数据中读取网格信息
+        /// </summary>
+        /// <param name="data">数据</param>
         public MeshData(byte[] data)
         {
             coordinate.scale = Vector3.one;
@@ -59,6 +75,10 @@ namespace huqiang.Data
                     LoadFromBytes(bp);
             }
         }
+        /// <summary>
+        /// 从二进制数据中读取网格信息
+        /// </summary>
+        /// <param name="bp">数据指针</param>
         public unsafe byte* LoadFromBytes(byte* bp)
         {
             int seg = *(Int32*)bp;
@@ -263,6 +283,10 @@ namespace huqiang.Data
                 seg++;
             return seg;
         }
+        /// <summary>
+        /// 将网格数据写入流
+        /// </summary>
+        /// <param name="stream"></param>
         public void WriteToStream(Stream stream)
         {
             Int32 seg = GetSegment();
@@ -302,6 +326,10 @@ namespace huqiang.Data
             if (subtris != null)
                 WriteSubTri(stream,subtris);
         }
+        /// <summary>
+        /// 将网格数据写入文件
+        /// </summary>
+        /// <param name="path"></param>
         public void WriteToFile(string path)
         {
             if (File.Exists(path))
@@ -408,6 +436,11 @@ namespace huqiang.Data
         }
 
         public GameObject AssociatedObject;
+        /// <summary>
+        /// 创建实例对象
+        /// </summary>
+        /// <param name="action">对象初始化时的回调函数</param>
+        /// <returns></returns>
         public GameObject CreateGameObject(Action<MeshData,GameObject> action = null)
         {
             GameObject game = new GameObject(name);
@@ -451,6 +484,9 @@ namespace huqiang.Data
                 }
             return game;
         }
+        /// <summary>
+        /// 当网格没有法线时,使用此函数计算法线
+        /// </summary>
         public void CreateNormal()
         {
             if (vertex != null)
@@ -468,6 +504,12 @@ namespace huqiang.Data
                     }
                 }
         }
+        /// <summary>
+        /// 将实例对象的网格数据转出
+        /// </summary>
+        /// <param name="game"></param>
+        /// <param name="action"></param>
+        /// <returns></returns>
         public static MeshData LoadFromGameObject(Transform game, Action<MeshData, GameObject> action=null)
         {
             var mesh = new MeshData();
@@ -513,6 +555,11 @@ namespace huqiang.Data
                 action(mesh,mesh.AssociatedObject);
             return mesh;
         }
+        /// <summary>
+        /// 查询与实例相关的网格数据
+        /// </summary>
+        /// <param name="game"></param>
+        /// <returns></returns>
         public MeshData FindAssociatedMesh(GameObject game)
         {
             if (game == AssociatedObject)

@@ -64,6 +64,9 @@ namespace huqiang.Data
             }
             return null;
         }
+        /// <summary>
+        /// 本次所有交换操作完毕
+        /// </summary>
         public void Done()
         {
             var t = A;
@@ -73,6 +76,9 @@ namespace huqiang.Data
             maxA = maxB;
             maxB = l;
         }
+        /// <summary>
+        /// 清除所有数据
+        /// </summary>
         public void Clear()
         {
             for (int i = 0; i < length; i++)
@@ -83,7 +89,15 @@ namespace huqiang.Data
             maxA = 0;
             maxB = 0;
         }
+        /// <summary>
+        /// 源数组的长度
+        /// </summary>
         public int Length { get { return maxA; } }
+        /// <summary>
+        /// 索引器
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
         public T this[int index]
         {
             get

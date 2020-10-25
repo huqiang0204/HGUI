@@ -7,6 +7,9 @@ using UnityEngine;
 
 namespace huqiang.Data
 {
+    /// <summary>
+    /// 本地配置管理,未完善,建议使用自带的playerprefs
+    /// </summary>
     public class LocalSetting
     {
         static INIReader ini;

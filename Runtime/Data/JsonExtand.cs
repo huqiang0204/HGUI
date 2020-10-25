@@ -5,8 +5,16 @@ using UnityEngine;
 
 namespace huqiang.Data
 {
+    /// <summary>
+    /// 用于解决unity自带json无法直接序列化数组对象的问题
+    /// </summary>
     public class JsonExtand
     {
+        /// <summary>
+        /// 将数组对象转换成json串
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
         public static string ToJson(object[] array)
         {
             StringBuilder sb = new StringBuilder();
@@ -21,6 +29,12 @@ namespace huqiang.Data
             sb.Append(']');
             return sb.ToString();
         }
+        /// <summary>
+        /// 将json串转换成数组对象
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="jsonArray"></param>
+        /// <returns></returns>
         public static T[] FromJson<T>(string jsonArray) where T : class, new()
         {
             string str = "{\"d\":" + jsonArray + "}";

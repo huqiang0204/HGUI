@@ -7,6 +7,9 @@ using UnityEngine;
 
 namespace huqiang.Data
 {
+    /// <summary>
+    /// 日志记录器
+    /// </summary>
     public class RecordManager
     {
         static string persistentDataPath = Application.persistentDataPath;
@@ -64,6 +67,13 @@ namespace huqiang.Data
             fs.Write(tmp, 0, 8);
             fs.Write(buff, 0, buff.Length);
         }
+        /// <summary>
+        /// 写入记录
+        /// </summary>
+        /// <param name="type">类型</param>
+        /// <param name="name">名称</param>
+        /// <param name="data">数据</param>
+        /// <param name="tag">标记</param>
         public static void WriteRecord(string type, string name, string data, int tag)
         {
             if (type == null | type == ""| name == null | name == "")
@@ -71,6 +81,9 @@ namespace huqiang.Data
             var fs= FindRecord(type,name);
             WriteRecord(fs,tag,data);
         }
+        /// <summary>
+        /// 释放所有文件流
+        /// </summary>
         public static void ReleaseAll()
         {
             if (records != null)
@@ -80,6 +93,11 @@ namespace huqiang.Data
                 records.Clear();
             }
         }
+        /// <summary>
+        /// 释放某个文件流记录
+        /// </summary>
+        /// <param name="type">类型</param>
+        /// <param name="name">名称</param>
         public static void ReleaseRecord(string type,string name)
         {
             if (records != null)
@@ -120,6 +138,12 @@ namespace huqiang.Data
             }
             return tmp;
         }
+        /// <summary>
+        /// 读取记录
+        /// </summary>
+        /// <param name="type">类型</param>
+        /// <param name="name">名称</param>
+        /// <returns></returns>
         public static List<Record> ReadRecord(string type, string name)
         {
             var fs = FindRecord(type,name);
@@ -132,6 +156,11 @@ namespace huqiang.Data
             }
             else return null;
         }
+        /// <summary>
+        /// 删除日志记录的文件
+        /// </summary>
+        /// <param name="type">类型</param>
+        /// <param name="name">名称</param>
         public static void DeleteRecord(string type,string name)
         {
             if (records != null)
@@ -151,6 +180,10 @@ namespace huqiang.Data
             if (File.Exists(path))
                 File.Delete(path);
         }
+        /// <summary>
+        /// 删除某个类型的日志记录
+        /// </summary>
+        /// <param name="type">类型</param>
         public static void DeleteRecords(string type)
         {
             if (records != null)

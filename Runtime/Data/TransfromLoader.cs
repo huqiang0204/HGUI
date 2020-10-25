@@ -8,13 +8,28 @@ namespace huqiang.Data
 {
     public unsafe struct TransfromData
     {
+        /// <summary>
+        /// 对象类型, 所有组件的位或值
+        /// </summary>
         public Int64 type;
         public Vector3 localEulerAngles;
         public Vector3 localPosition;
         public Vector3 localScale;
+        /// <summary>
+        /// UI元素尺寸
+        /// </summary>
         public Vector2 size;
+        /// <summary>
+        /// 轴心
+        /// </summary>
         public Vector2 pivot;
+        /// <summary>
+        /// 名称
+        /// </summary>
         public Int32 name;
+        /// <summary>
+        /// 标记
+        /// </summary>
         public Int32 tag;
         /// <summary>
         /// int32数组,高16位为索引,低16位为类型
@@ -25,12 +40,21 @@ namespace huqiang.Data
         /// </summary>
         public Int32 child;
         public int layer;
+        /// <summary>
+        /// 附加信息,用于存储helper中写入的数据
+        /// </summary>
         public Int32 ex;
         public static int Size = sizeof(TransfromData);
         public static int ElementSize = Size / 4;
     }
     public class TransfromLoader : DataLoader
     {
+        /// <summary>
+        /// 从假结构体中找到该类型的数据
+        /// </summary>
+        /// <param name="fake">Tranfrom的假结构体</param>
+        /// <param name="type">数据类型</param>
+        /// <returns></returns>
         public static FakeStruct GetComponent(FakeStruct fake, string type)
         {
             unsafe
@@ -54,6 +78,12 @@ namespace huqiang.Data
             }
             return null;
         }
+        /// <summary>
+        /// 将假结构体中的数据载入到组件实体中
+        /// </summary>
+        /// <param name="fake">假结构体数据</param>
+        /// <param name="com">unity组件</param>
+        /// <param name="initializer">初始化器,用于反射</param>
         public unsafe override void LoadToObject(FakeStruct fake, Component com,Initializer initializer)
         {
             var transfrom = (TransfromData*)fake.ip;
@@ -103,6 +133,12 @@ namespace huqiang.Data
             if (initializer != null)
                 initializer.Initialiezd(fake,trans);
         }
+        /// <summary>
+        ///  将到组件实体中的数据载入假结构体中
+        /// </summary>
+        /// <param name="com">unity组件</param>
+        /// <param name="buffer">数据缓存器</param>
+        /// <returns></returns>
         public unsafe override FakeStruct LoadFromObject(Component com,DataBuffer buffer)
         {
             var trans =  com as Transform;

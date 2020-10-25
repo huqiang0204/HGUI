@@ -3,24 +3,44 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace huqiang.Data
 {
     public unsafe struct SpriteDataS
     {
+        /// <summary>
+        /// 精灵名称
+        /// </summary>
         public Int32 name;
+        /// <summary>
+        /// 纹理名称
+        /// </summary>
         public Vector2 txtSize;
+        /// <summary>
+        /// 精灵矩形
+        /// </summary>
         public Rect rect;
+        /// <summary>
+        /// 精灵轴心
+        /// </summary>
         public Vector2 pivot;
         public Vector2 uv0;
         public Vector2 uv1;
         public Vector2 uv2;
         public Vector2 uv3;
+        /// <summary>
+        /// 此结构体尺寸
+        /// </summary>
         public static int Size = sizeof(SpriteDataS);
+        /// <summary>
+        /// 此结构体元素个数
+        /// </summary>
         public static int ElementSize = Size / 4;
     }
+    /// <summary>
+    /// 精灵数据
+    /// </summary>
     public class SpriteData
     {
         class SpriteCategory
@@ -29,6 +49,10 @@ namespace huqiang.Data
             public List<Sprite> sprites = new List<Sprite>();
         }
         List<SpriteCategory> lsc = new List<SpriteCategory>();
+        /// <summary>
+        /// 添加精灵
+        /// </summary>
+        /// <param name="sprite">精灵</param>
         public void AddSprite(Sprite sprite)
         {
             if (sprite == null)
@@ -93,6 +117,11 @@ namespace huqiang.Data
             }
             return array;
         }
+        /// <summary>
+        /// 保存精灵信息为二进制数据
+        /// </summary>
+        /// <param name="name">数据包名</param>
+        /// <param name="path">文件路径</param>
         public void Save(string name,string path)
         {
             DataBuffer buffer = new DataBuffer(4096);
@@ -102,11 +131,18 @@ namespace huqiang.Data
             byte[] dat = buffer.ToBytes();
             File.WriteAllBytes(path,dat);
         }
+        /// <summary>
+        /// 清除缓存
+        /// </summary>
         public void Clear()
         {
             lsc.Clear();
         }
         FakeStruct fakeStruct;
+        /// <summary>
+        /// 载入精灵数据包
+        /// </summary>
+        /// <param name="data">数据</param>
         public void LoadSpriteData(byte[] data)
         {
             fakeStruct = new DataBuffer(data).fakeStruct;

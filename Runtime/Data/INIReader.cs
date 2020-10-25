@@ -5,10 +5,21 @@ using System.Text;
 
 namespace huqiang.Data
 {
+    /// <summary>
+    /// ini配置文件读取器
+    /// </summary>
     public class INIReader
     {
+        /// <summary>
+        /// 所有节点
+        /// </summary>
         public List<INISection> sections = new List<INISection>();
         public string Name;
+        /// <summary>
+        /// 查询节点
+        /// </summary>
+        /// <param name="sec">节点名称</param>
+        /// <returns></returns>
         public INISection FindSection(string sec)
         {
             for (int i = 0; i < sections.Count; i++)
@@ -16,6 +27,12 @@ namespace huqiang.Data
                     return sections[i];
             return null;
         }
+        /// <summary>
+        /// 序列化节点
+        /// </summary>
+        /// <typeparam name="T">类型</typeparam>
+        /// <param name="section"></param>
+        /// <returns></returns>
         public T Serializal<T>(string section) where T : class, new()
         {
             var ini = FindSection(section);
@@ -27,6 +44,12 @@ namespace huqiang.Data
             }
             return null;
         }
+        /// <summary>
+        /// 序列化节点
+        /// </summary>
+        /// <param name="typ">类型</param>
+        /// <param name="t">实例</param>
+        /// <param name="sec">节点</param>
         public void Serializal(Type typ, object t, INISection sec)
         {
             var fs = typ.GetFields();
@@ -73,6 +96,10 @@ namespace huqiang.Data
                 }
             }
         }
+        /// <summary>
+        /// 从文件中载入数据
+        /// </summary>
+        /// <param name="path">文件路径</param>
         public void LoadFromFile(string path)
         {
             sections.Clear();
@@ -85,6 +112,10 @@ namespace huqiang.Data
                 LoadData(ss);
             }
         }
+        /// <summary>
+        /// 载入数据
+        /// </summary>
+        /// <param name="bytes">数据</param>
         public void LoadData(byte[] bytes)
         {
             sections.Clear();
@@ -96,6 +127,10 @@ namespace huqiang.Data
                 LoadData(ss);
             }
         }
+        /// <summary>
+        /// 载入数据
+        /// </summary>
+        /// <param name="ss">字符串数组</param>
         public void LoadData(string[] ss)
         {
             INISection sec = null;
@@ -136,6 +171,11 @@ namespace huqiang.Data
                 }
             }
         }
+        /// <summary>
+        /// 移除某个节点
+        /// </summary>
+        /// <param name="name">节点名称</param>
+        /// <returns></returns>
         public bool RemoveSection(string name)
         {
             for(int i=0;i<sections.Count;i++)
@@ -146,10 +186,18 @@ namespace huqiang.Data
                 }
             return false;
         }
+        /// <summary>
+        /// 添加节点
+        /// </summary>
+        /// <param name="section"></param>
         public void AddSection(INISection section)
         {
             sections.Add(section);
         }
+        /// <summary>
+        /// 将所有数据转换为字符串
+        /// </summary>
+        /// <returns></returns>
         public string GetString()
         {
             StringBuilder sb = new StringBuilder();
@@ -196,6 +244,10 @@ namespace huqiang.Data
             }
             return sb.ToString();
         }
+        /// <summary>
+        /// 将所有数据写入文件
+        /// </summary>
+        /// <param name="path">文件路径</param>
         public void WriteToFile(string path)
         {
             if (File.Exists(path))

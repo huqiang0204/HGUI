@@ -9,11 +9,19 @@ namespace huqiang.Core.HGUI
         public int Start;
         public int Length;
     }
+    /// <summary>
+    /// HGUI图像合批处理
+    /// </summary>
     internal class HBatch
     {
         static int[] TriBuffer = new int[65536];
         static int[] IDBuffer = new int[32];
         static ArrayInfo[] Arrays= new ArrayInfo[32];
+        /// <summary>
+        /// 合批处理
+        /// </summary>
+        /// <param name="canvas">画布实例</param>
+        /// <param name="pipeLine">UI流水线</param>
         public static void Batch(HCanvas canvas, HGUIElement[] pipeLine)
         {
             HGUIElement root = pipeLine[0];
@@ -179,6 +187,15 @@ namespace huqiang.Core.HGUI
                 os++;
             }
         }
+        /// <summary>
+        /// 添加阴影
+        /// </summary>
+        /// <param name="graphics"></param>
+        /// <param name="canvas"></param>
+        /// <param name="q"></param>
+        /// <param name="scale"></param>
+        /// <param name="o"></param>
+        /// <param name="clip"></param>
         static void AddShadow(HGraphics graphics,HCanvas canvas, ref Quaternion q,ref Vector3 scale,ref Vector3 o, ref Vector4 clip)
         {
             var vs = canvas.vertex;
@@ -275,6 +292,12 @@ namespace huqiang.Core.HGUI
                 }
             }
         }
+        /// <summary>
+        /// 添加UV
+        /// </summary>
+        /// <param name="canvas"></param>
+        /// <param name="tid"></param>
+        /// <param name="vertCount"></param>
         static void AddUV1(HCanvas canvas, int tid, int vertCount)
         {
 
@@ -357,6 +380,12 @@ namespace huqiang.Core.HGUI
             }
                 
         }
+        /// <summary>
+        /// 矩形遮罩
+        /// </summary>
+        /// <param name="v0"></param>
+        /// <param name="v1"></param>
+        /// <returns></returns>
         static Vector4 CutRect(Vector4 v0,Vector4 v1)
         {
             if (v0.x < v1.x)

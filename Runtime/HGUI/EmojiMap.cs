@@ -148,6 +148,12 @@ namespace huqiang.Core.HGUI
             return 0;
         }
         public const char emSpace = '@';//'\u2001';☀@
+        /// <summary>
+        /// 检查字符串中的表情符,并替换位@符号
+        /// </summary>
+        /// <param name="str">源字符串</param>
+        /// <param name="list">所包含表情符列表</param>
+        /// <returns>替换后的额字符串</returns>
         public static string CheckEmoji(string str, List<EmojiInfo> list)
         {
             if (str == ""|str==null)
@@ -201,6 +207,12 @@ namespace huqiang.Core.HGUI
             }
             return sb.ToString();
         }
+        /// <summary>
+        /// 将表情符和字符串合并
+        /// </summary>
+        /// <param name="str">字符串</param>
+        /// <param name="list">所包含表情符列表</param>
+        /// <returns></returns>
         public static string EmojiToFullString(string str, List<EmojiInfo> list)
         {
             StringBuilder sb = new StringBuilder();

@@ -5,6 +5,9 @@ using System.Text;
 
 namespace huqiang.Core.HGUI
 {
+    /// <summary>
+    /// 带表情符的字符串
+    /// </summary>
     public class EmojiString
     {
         string m_str = "";
@@ -41,6 +44,9 @@ namespace huqiang.Core.HGUI
                     builder.Append(m_str);
                 }
             } }
+        /// <summary>
+        /// 过滤表情符后字符串长度
+        /// </summary>
         public int Length { get { return m_str.Length; } }
         public EmojiString()
         {
@@ -51,6 +57,12 @@ namespace huqiang.Core.HGUI
             builder.Append(m_str);
             f_str = str;
         }
+        /// <summary>
+        /// 移除某个字符
+        /// </summary>
+        /// <param name="index">字符索引</param>
+        /// <param name="count">字符数量</param>
+        /// <returns></returns>
         public bool Remove(int index, int count = 1)
         {
             if (index + count > builder.Length)
@@ -70,6 +82,12 @@ namespace huqiang.Core.HGUI
             f_str = EmojiMap.EmojiToFullString(m_str, emojis);
             return true;
         }
+        /// <summary>
+        /// 切割字符串
+        /// </summary>
+        /// <param name="index">字符索引</param>
+        /// <param name="count">字符数量</param>
+        /// <returns></returns>
         public String SubString(int index, int count = 1)
         {
             if (count < 1)
@@ -100,6 +118,11 @@ namespace huqiang.Core.HGUI
             }
             return tmp.ToString();
         }
+        /// <summary>
+        /// 插入字符
+        /// </summary>
+        /// <param name="index">字符索引</param>
+        /// <param name="emoji">字符数量</param>
         public void Insert(int index, EmojiString emoji)
         {
             if (index > m_str.Length)

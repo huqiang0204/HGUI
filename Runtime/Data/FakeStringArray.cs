@@ -6,6 +6,9 @@ using System.Text;
 
 namespace huqiang.Data
 {
+    /// <summary>
+    /// 假字符串数组,用来将字符串数组转换到byte[]
+    /// </summary>
     public class FakeStringArray : ToBytes
     {
         int len;
@@ -18,6 +21,10 @@ namespace huqiang.Data
             buf = new string[size];
             len = size;
         }
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="dat">字符串数组</param>
         public FakeStringArray(string[] dat)
         {
             buf = dat;
@@ -34,6 +41,12 @@ namespace huqiang.Data
                 return buf[index];
             }
         }
+        /// <summary>
+        /// 构造函数,将指针地址数据取出转化为字符串数组
+        /// </summary>
+        /// <param name="data">数据缓存</param>
+        /// <param name="point">内存地址</param>
+        /// <param name="len">数组长度</param>
         public unsafe FakeStringArray(DataBuffer data, Int32* point, int len)
         {
             buf = new string[len];
@@ -51,6 +64,10 @@ namespace huqiang.Data
                 }
             }
         }
+        /// <summary>
+        /// 用来将字符串数组转换到byte[]
+        /// </summary>
+        /// <returns></returns>
         public byte[] ToBytes()
         {
             if (buf == null)

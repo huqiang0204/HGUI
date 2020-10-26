@@ -18,6 +18,9 @@ namespace huqiang.Core.HGUI
         public bool Http;
         public string Content;
     }
+    /// <summary>
+    /// 富文本帮助器
+    /// </summary>
     public class RichTextHelper
     {
         struct LableInfo
@@ -51,6 +54,11 @@ namespace huqiang.Core.HGUI
         #endregion
         static StringBuilder tmp;
         static List<LableInfo> lables;
+        /// <summary>
+        /// 删除富文本中的标签
+        /// </summary>
+        /// <param name="str">富文本</param>
+        /// <returns></returns>
         public static string DeleteLabel(string str)
         {
             if (tmp == null)

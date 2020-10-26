@@ -95,19 +95,23 @@ namespace huqiang.WebApi
         public static void GPSToMercato(double x, double y, Action<LanLat> action)
         {
             string url = string.Format("http://api.map.baidu.com/geoconv/v1/?coords={0},{1}&from=1&to=6&ak={2}", x, y,AK);
-            Http.HttpControl.Get(url, (o) => {
-                string str = Encoding.UTF8.GetString(o.Data);
-                var point = JsonUtility.FromJson<BaiDuTrans>(str);
-                if (point.status == 0)
+            UnityWebRequest.Get(url).SendWebRequest().completed+= (o) => {
+                UnityWebRequestAsyncOperation ua = o as UnityWebRequestAsyncOperation;
+                if(ua.webRequest.responseCode==200)
                 {
-                    if (point.result != null)
+                    string str = Encoding.UTF8.GetString(ua.webRequest.downloadHandler.data);
+                    var point = JsonUtility.FromJson<BaiDuTrans>(str);
+                    if (point.status == 0)
                     {
-                        var r = point.result[0];
-                        if (action != null)
-                            action(r);
+                        if (point.result != null)
+                        {
+                            var r = point.result[0];
+                            if (action != null)
+                                action(r);
+                        }
                     }
                 }
-            });
+            };
         }
         /// <summary>
         /// 
@@ -145,19 +149,24 @@ namespace huqiang.WebApi
         public static void GPSToTile(double x, double y,int zoom, Action<LanLat> action)
         {
             string url = string.Format("http://api.map.baidu.com/geoconv/v1/?coords={0},{1}&from=1&to=6&ak={2}", x, y,AK);
-            Http.HttpControl.Get(url, (o) => {
-                string str = Encoding.UTF8.GetString(o.Data);
-                var point = JsonUtility.FromJson<BaiDuTrans>(str);
-                if (point.status == 0)
+
+            UnityWebRequest.Get(url).SendWebRequest().completed += (o) => {
+                UnityWebRequestAsyncOperation ua = o as UnityWebRequestAsyncOperation;
+                if (ua.webRequest.responseCode == 200)
                 {
-                    if (point.result != null)
+                    string str = Encoding.UTF8.GetString(ua.webRequest.downloadHandler.data);
+                    var point = JsonUtility.FromJson<BaiDuTrans>(str);
+                    if (point.status == 0)
                     {
-                        var r = point.result[0];
-                        if (action != null)
-                            action(r);
+                        if (point.result != null)
+                        {
+                            var r = point.result[0];
+                            if (action != null)
+                                action(r);
+                        }
                     }
                 }
-            });
+            };
         }
         public static void GetTileMap(int tileX, int tileY, int zoom, string name, Action<string, string, object, byte[]> action, object context)
         {

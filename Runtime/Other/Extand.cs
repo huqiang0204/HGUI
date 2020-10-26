@@ -12,6 +12,11 @@ namespace huqiang
     {
         static byte[] Zreo = new byte[4];
         static string hex = "0123456789abcdef";
+        /// <summary>
+        /// 16进制文本转颜色值
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static Color32 HexToColor(this string value)
         {
             if (value == null)
@@ -31,11 +36,21 @@ namespace huqiang
             }
             return new Color32(tmp[0], tmp[2], tmp[4], tmp[6]);
         }
+        /// <summary>
+        /// 整数转颜色值
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public unsafe static Color32 ToColor(this Int32 value)
         {
             byte* b = (byte*)&value;
             return new Color32(*(b + 3), *(b + 2), *(b + 1), *b);
         }
+        /// <summary>
+        /// 短整数转bytes[]
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public unsafe static byte[] ToBytes(this Int16 value)
         {
             byte[] buff = new byte[2];
@@ -43,6 +58,11 @@ namespace huqiang
                 *(Int16*)bp = value;
             return buff;
         }
+        /// <summary>
+        /// 整数转byte[]
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public unsafe static byte[] ToBytes(this Int32 value)
         {
             byte[] buff = new byte[4];
@@ -50,6 +70,11 @@ namespace huqiang
                 *(Int32*)bp = value;
             return buff;
         }
+        /// <summary>
+        /// 浮点数转byte[]
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public unsafe static byte[] ToBytes(this Single value)
         {
             byte[] buff = new byte[4];
@@ -57,6 +82,11 @@ namespace huqiang
                 *(Single*)bp = value;
             return buff;
         }
+        /// <summary>
+        /// 长整数转byte[]
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public unsafe static byte[] ToBytes(this Int64 value)
         {
             byte[] buff = new byte[8];
@@ -64,6 +94,11 @@ namespace huqiang
                 *(Int64*)bp = value;
             return buff;
         }
+        /// <summary>
+        /// 双浮点转byte[]
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public unsafe static byte[] ToBytes(this Double value)
         {
             byte[] buff = new byte[8];
@@ -71,6 +106,11 @@ namespace huqiang
                 *(Double*)bp = value;
             return buff;
         }
+        /// <summary>
+        /// 无符号整数转颜色
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static Color32 ToColor(this UInt32 value)
         {
             unsafe
@@ -79,6 +119,11 @@ namespace huqiang
                 return new Color32(*(b + 3), *(b + 2), *(b + 1), *b);
             }
         }
+        /// <summary>
+        /// 将字符串写入流
+        /// </summary>
+        /// <param name="stream">流</param>
+        /// <param name="str">字符串</param>
         public static void WriteString(this Stream stream, string str)
         {
             if (str == null)
@@ -96,21 +141,40 @@ namespace huqiang
                 stream.Write(buf, 0, buf.Length);
             }
         }
+        /// <summary>
+        /// 将内存指针中的数据写入流
+        /// </summary>
+        /// <param name="stream">流</param>
+        /// <param name="p">内存地址</param>
+        /// <param name="size">数据长度</param>
         public unsafe static void Write(this Stream stream, byte* p, int size)
         {
             for (int i = 0; i < size; i++)
             { stream.WriteByte(*p); p++; }
         }
+        /// <summary>
+        /// 从byte[]中读取短整数
+        /// </summary>
+        /// <param name="buff"></param>
+        /// <param name="offset">偏移位置</param>
+        /// <returns></returns>
         public unsafe static Int32 ReadInt16(this byte[] buff, Int32 offset)
         {
             fixed (byte* bp = &buff[0])
                 return *(Int16*)(bp + offset);
         }
+        /// <summary>
+        /// 从byte[]中读取整数
+        /// </summary>
+        /// <param name="buff"></param>
+        /// <param name="offset">偏移位置</param>
+        /// <returns></returns>
         public unsafe static Int32 ReadInt32(this byte[] buff, Int32 offset)
         {
             fixed (byte* bp = &buff[0])
                 return *(Int32*)(bp + offset);
         }
+
         public unsafe static void Read(this byte[] buff, void* p, int offset, int size)
         {
             byte* bp = (byte*)p;
@@ -121,6 +185,12 @@ namespace huqiang
                 offset++;
             }
         }
+        /// <summary>
+        /// 二维向量向前移动
+        /// </summary>
+        /// <param name="v">向量</param>
+        /// <param name="len">移动距离</param>
+        /// <returns></returns>
         public static Vector2 Move(this Vector2 v, float len)
         {
             if (v.x == 0 & v.y == 0)
@@ -129,6 +199,12 @@ namespace huqiang
             float r = Mathf.Sqrt(len * len / sx);
             return new Vector2(v.x * r, v.y * r);
         }
+        /// <summary>
+        /// 二维向量旋转
+        /// </summary>
+        /// <param name="v">向量</param>
+        /// <param name="angle">旋转角度</param>
+        /// <returns></returns>
         public static Vector2 Rotate(this Vector2 v, float angle)
         {
             var a = MathH.atan(v.x,v.y);
@@ -138,6 +214,12 @@ namespace huqiang
                 a += 360;
             return MathH.Tan2(a);
         }
+        /// <summary>
+        /// 三维向量移动
+        /// </summary>
+        /// <param name="v">向量</param>
+        /// <param name="len">长度</param>
+        /// <returns></returns>
         public static Vector3 Move(this Vector3 v, float len)
         {
             if (v.x == 0 & v.y == 0 & v.z == 0)
@@ -238,6 +320,12 @@ namespace huqiang
             }
             return buf;
         }
+        /// <summary>
+        /// 从内存地址中读取一个非托管结构体
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="ip">目标内存地址</param>
+        /// <param name="src">源内存地址</param>
         public unsafe static void ReadFrom<T>(this IntPtr ip,byte* src) where T : unmanaged
         {
             byte* tp = (byte*)ip;
@@ -249,6 +337,12 @@ namespace huqiang
                 src++;
             }
         }
+        /// <summary>
+        /// 将一个非托管结构体中的数据写入到内存
+        /// </summary>
+        /// <typeparam name="T">结构体类型</typeparam>
+        /// <param name="ip">源内存地址</param>
+        /// <param name="tar">目标内存地址</param>
         public unsafe static void WriteTo<T>(this IntPtr ip, byte* tar) where T : unmanaged
         {
             int size = sizeof(T);

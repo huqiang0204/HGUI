@@ -7,6 +7,9 @@ using UnityEngine;
 
 namespace huqiang.Core.Line
 {
+    /// <summary>
+    /// 曲线
+    /// </summary>
     public struct ArcLine
     {
         public LineBase lineBase;

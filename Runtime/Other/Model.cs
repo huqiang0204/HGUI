@@ -5,6 +5,9 @@ using System.Reflection;
 
 namespace huqiang
 {
+    /// <summary>
+    /// 模型网格创建器
+    /// </summary>
     public class Model
     {
         public struct ConeData
@@ -87,6 +90,11 @@ namespace huqiang
                 0,3,4,3,7,4,
                 1,0,4,4,5,1,
                 3,2,7,7,2,6};
+        /// <summary>
+        /// 创建一个cube
+        /// </summary>
+        /// <param name="size">尺寸</param>
+        /// <returns></returns>
         public static ConeData CreateCube(Vector3 size)
         {
             float rx = size.x * 0.5f;

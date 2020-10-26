@@ -102,7 +102,7 @@ namespace huqiang.Data
                     case MeshDataType.Name:
                         c = *(Int32*)bp;
                         bp += 4;
-                        name = Encoding.UTF8.GetString(Tool.GetByteArray(bp, c));
+                        name = Encoding.UTF8.GetString(bp, c);
                         bp += c;
                         break;
                     case MeshDataType.Vertices:
@@ -135,7 +135,7 @@ namespace huqiang.Data
                     case MeshDataType.Materials:
                         c = *(Int32*)bp;
                         bp += 4;
-                        materials = Encoding.UTF8.GetString(Tool.GetByteArray(bp, c));
+                        materials = Encoding.UTF8.GetString(bp, c);
                         bp += c;
                         break;
                     case MeshDataType.SubTriangles:

@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace huqiang.Core.Line
 {
+    /// <summary>
+    /// 直线
+    /// </summary>
     public struct Beeline
     {
         public LineBase lineBase;

@@ -7,6 +7,9 @@ using UnityEngine;
 
 namespace huqiang
 {
+    /// <summary>
+    /// 坐标信息
+    /// </summary>
     public class Coordinates
     {
         public Vector3 Postion;
@@ -112,7 +115,11 @@ namespace huqiang
 
             return bytes;
         }
-
+        /// <summary>
+        /// 从数据中载入纹理
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         public static Texture2D LoadImage(byte[] data)
         {
             try
@@ -153,48 +160,6 @@ namespace huqiang
             RenderTexture.ReleaseTemporary(renderTex);
             return readableText;
         }
-        public static byte[] FloatToByte(float[] data)
-        {
-            unsafe
-            {
-                int len = data.Length;
-                byte[] temp = new byte[len * 4];
-                fixed (byte* pb = &temp[0])
-                fixed (float* pf = &data[0])
-                {
-                    float* pa = (float*)pb;
-                    float* pc = pf;
-                    for (int i = 0; i < len; i++)
-                    {
-                        *pa = *pc;
-                        pa++;
-                        pc++;
-                    }
-                    return temp;
-                }
-            }
-        }
-        public static float[] ByteToFloat(byte[] data)
-        {
-            unsafe
-            {
-                int len = data.Length / 4;
-                float[] temp = new float[len];
-                fixed (byte* pb = &data[0])
-                fixed (float* pf = &temp[0])
-                {
-                    float* pa = (float*)pb;
-                    float* pc = pf;
-                    for (int i = 0; i < len; i++)
-                    {
-                        *pc = *pa;
-                        pa++;
-                        pc++;
-                    }
-                    return temp;
-                }
-            }
-        }
         public static void FloatToByte(float[] data, byte[] buff, int start)
         {
             unsafe
@@ -232,122 +197,6 @@ namespace huqiang
                     }
                 }
             }
-        }
-        /// <summary>
-        /// 获取tranfrom的全局信息
-        /// </summary>
-        /// <param name="rect"></param>
-        /// <param name="Includeroot"></param>
-        /// <returns></returns>
-        public static Coordinates GetGlobaInfo(Transform rect, bool Includeroot = true)
-        {
-            Transform[] buff = new Transform[32];
-            buff[0] = rect;
-            var parent = rect.parent;
-            int max = 1;
-            if (parent != null)
-                for (; max < 32; max++)
-                {
-                    buff[max] = parent;
-                    parent = parent.parent;
-                    if (parent == null)
-                        break;
-                }
-            Vector3 pos, scale;
-            Quaternion quate;
-            if (Includeroot)
-            {
-                var p = buff[max];
-                pos = p.localPosition;
-                scale = p.localScale;
-                quate = p.localRotation;
-                max--;
-            }
-            else
-            {
-                pos = Vector3.zero;
-                scale = Vector3.one;
-                quate = Quaternion.identity;
-                max--;
-            }
-            for (; max >= 0; max--)
-            {
-                var rt = buff[max];
-                Vector3 p = rt.localPosition;
-                Vector3 o = Vector3.zero;
-                o.x = p.x * scale.x;
-                o.y = p.y * scale.y;
-                o.z = p.z * scale.z;
-                pos += o;
-                quate *= rt.localRotation;
-                Vector3 s = rt.localScale;
-                scale.x *= s.x;
-                scale.y *= s.y;
-            }
-            Coordinates coord = new Coordinates();
-            coord.Postion = pos;
-            coord.quaternion = quate;
-            coord.Scale = scale;
-            return coord;
-        }
-        public unsafe static byte[] GetByteArray(byte* p,int len)
-        {
-            byte[] buff = new byte[len];
-            for (int i = 0; i < len; i++)
-            { buff[i] = *p; p++; }
-            return buff;
-        }
-        public unsafe static void WitreToStruct(void* tar, void* src, int size)
-        {
-            Int32* t = (Int32*)tar;
-            Int32* p = (Int32*)src;
-            for (int i = 0; i < size; i++)
-            {
-                *t = *p;
-                t++;
-                p++;
-            }
-        }
-        public unsafe static void WitreToStructArray(void* tar, void* src, int array, int size)
-        {
-            Int32* t = (Int32*)tar;
-            Int32* p = (Int32*)src;
-            for (int i = 0; i < array * size; i++)
-            {
-                *t = *p;
-                t++;
-                p++;
-            }
-        }
-        public static void WritePolygonToFile(Vector3[] list, string filename, string vName)
-        {
-            StringBuilder sb = new StringBuilder();
-            sb.Append("Vector3[] ");
-            sb.Append(vName);
-            sb.Append("=new Vector3[]{");
-            bool multi = false;
-            for (int i = 0; i < list.Length; i++)
-            {
-                if (multi)
-                    sb.Append(",");
-                var v = list[i];
-                sb.Append("new Vector3(");
-                sb.Append(v.x);
-                sb.Append("f,");
-                sb.Append(v.y);
-                sb.Append("f,");
-                sb.Append(v.z);
-                sb.Append("f)");
-                multi = true;
-            }
-            sb.Append("};");
-            byte[] buf = Encoding.UTF8.GetBytes(sb.ToString());
-            string path = Application.dataPath + "\\" + filename + ".txt";
-            if (File.Exists(path))
-                File.Delete(path);
-            var fs = File.Create(path);
-            fs.Write(buf, 0, buf.Length);
-            fs.Dispose();
         }
         public static string ReadObject(string str, ref int start)
         {
@@ -411,52 +260,52 @@ namespace huqiang
             }
             return new string(result);
         }
-        public static Vector2[] CalculUV(Rect sr, float w, float h)
-        {
-            float x = sr.x;
-            float rx = sr.width + x;
-            float y = sr.y;
-            float ty = sr.height + y;
-            x /= w;
-            rx /= w;
-            y /= h;
-            ty /= h;
-            Vector2[] uv = new Vector2[4];
-            uv[0].x = x;
-            uv[0].y = ty;
-            uv[1].x = rx;
-            uv[1].y = ty;
-            uv[2].x = rx;
-            uv[2].y = y;
-            uv[3].x = x;
-            uv[3].y = y;
-            return uv;
-        }
-        public static Vector2[][] CalculUVS(SpriteRectInfo[] sprites)
-        {
-            Vector2[][] uvs = new Vector2[sprites.Length][];
-            for(int i=0;i<sprites.Length;i++)
-            {
-                float x = sprites[i].rect.x;
-                float rx = sprites[i].rect.width + x;
-                float y = sprites[i].rect.y;
-                float ty = sprites[i].rect.height + y;
-                x /= sprites[i].txtSize.x;
-                rx /= sprites[i].txtSize.x;
-                y /= sprites[i].txtSize.y;
-                ty /= sprites[i].txtSize.y;
-                Vector2[] uv = new Vector2[4];
-                uv[0].x = x;
-                uv[0].y = y;
-                uv[1].x = x;
-                uv[1].y = ty;
-                uv[2].x = rx;
-                uv[2].y = ty;
-                uv[3].x = rx;
-                uv[3].y = y;
-                uvs[i] = uv;
-            }
-            return uvs;
-        }
+        //public static Vector2[] CalculUV(Rect sr, float w, float h)
+        //{
+        //    float x = sr.x;
+        //    float rx = sr.width + x;
+        //    float y = sr.y;
+        //    float ty = sr.height + y;
+        //    x /= w;
+        //    rx /= w;
+        //    y /= h;
+        //    ty /= h;
+        //    Vector2[] uv = new Vector2[4];
+        //    uv[0].x = x;
+        //    uv[0].y = ty;
+        //    uv[1].x = rx;
+        //    uv[1].y = ty;
+        //    uv[2].x = rx;
+        //    uv[2].y = y;
+        //    uv[3].x = x;
+        //    uv[3].y = y;
+        //    return uv;
+        //}
+        //public static Vector2[][] CalculUVS(SpriteRectInfo[] sprites)
+        //{
+        //    Vector2[][] uvs = new Vector2[sprites.Length][];
+        //    for(int i=0;i<sprites.Length;i++)
+        //    {
+        //        float x = sprites[i].rect.x;
+        //        float rx = sprites[i].rect.width + x;
+        //        float y = sprites[i].rect.y;
+        //        float ty = sprites[i].rect.height + y;
+        //        x /= sprites[i].txtSize.x;
+        //        rx /= sprites[i].txtSize.x;
+        //        y /= sprites[i].txtSize.y;
+        //        ty /= sprites[i].txtSize.y;
+        //        Vector2[] uv = new Vector2[4];
+        //        uv[0].x = x;
+        //        uv[0].y = y;
+        //        uv[1].x = x;
+        //        uv[1].y = ty;
+        //        uv[2].x = rx;
+        //        uv[2].y = ty;
+        //        uv[3].x = rx;
+        //        uv[3].y = y;
+        //        uvs[i] = uv;
+        //    }
+        //    return uvs;
+        //}
     }
 }

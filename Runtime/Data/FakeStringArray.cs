@@ -58,7 +58,7 @@ namespace huqiang.Data
                 {
                     byte* bp = (byte*)point;
                     if (data.AddressDetection(bp, c))
-                        buf[i] = Encoding.UTF8.GetString(Tool.GetByteArray(bp, c));
+                        buf[i] = Encoding.UTF8.GetString(bp, c);
                     bp += c;
                     point = (Int32*)bp;
                 }

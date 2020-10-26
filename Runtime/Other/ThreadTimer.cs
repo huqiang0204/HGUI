@@ -6,6 +6,9 @@ using System.Threading;
 
 namespace huqiang
 {
+    /// <summary>
+    /// 线程计时器
+    /// </summary>
     public class ThreadTimer
     {
         bool run = false;
@@ -15,9 +18,16 @@ namespace huqiang
          Thread thread;
 #endif
         AutoResetEvent auto;
+        /// <summary>
+        /// 更新委托
+        /// </summary>
         public Action<ThreadTimer,Int32> Tick;
         Int32 m_inter;
         public Int32 Interal { set { if (value < 1) value = 1;m_inter = value; } }
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="inter">更新间隔,单位毫秒</param>
         public ThreadTimer(Int32 inter = 16)
         {
             Interal = inter;
@@ -46,6 +56,9 @@ namespace huqiang
                 }
             }
         }
+        /// <summary>
+        /// 释放线程
+        /// </summary>
         public void Dispose()
         {
             run = false;

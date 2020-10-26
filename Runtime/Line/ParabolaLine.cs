@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace huqiang.Core.Line
 {
+    /// <summary>
+    /// 抛物线
+    /// </summary>
     public struct ParabolaLine
     {
         public LineBase lineBase;

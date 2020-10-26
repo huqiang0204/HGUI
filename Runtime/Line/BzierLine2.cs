@@ -7,6 +7,9 @@ using UnityEngine;
 
 namespace huqiang.Core.Line
 {
+    /// <summary>
+    /// 二阶贝塞尔曲线
+    /// </summary>
     public struct BzierLine2
     {
         public LineBase lineBase;

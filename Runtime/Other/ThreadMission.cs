@@ -6,6 +6,9 @@ using UnityEngine;
 
 namespace huqiang
 {
+    /// <summary>
+    /// 线程任务管理器
+    /// </summary>
     public class ThreadMission
     {
         class Mission
@@ -27,6 +30,10 @@ namespace huqiang
         AutoResetEvent are;
         bool run;
         bool subFree,mainFree;
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="tag">标志</param>
         public ThreadMission(string tag)
         {
             Tag = tag;
@@ -104,6 +111,12 @@ namespace huqiang
             }
             are.Dispose();
         }
+        /// <summary>
+        /// 添加一个其它线程的任务
+        /// </summary>
+        /// <param name="action">委托任务</param>
+        /// <param name="dat">联系上下文</param>
+        /// <param name="wait">执行完毕后的回调</param>
         public void AddSubMission(Action<object> action, object dat,Action<object> wait = null)
         {
             Mission mission = new Mission();
@@ -113,6 +126,12 @@ namespace huqiang
             mission.Id = Thread.CurrentThread.ManagedThreadId;
             SubMission.Enqueue(mission);
         }
+        /// <summary>
+        /// 其它线程向本线程添加任务
+        /// </summary>
+        /// <param name="action">委托任务</param>
+        /// <param name="dat">联系上下文</param>
+        /// <param name="wait">执行完毕后的回调</param>
         public void AddMainMission(Action<object> action, object dat, Action<object> wait = null)
         {
             Mission mission = new Mission();
@@ -121,12 +140,22 @@ namespace huqiang
             mission.waitAction = wait;
             MainMission.Enqueue(mission);
         }
+        /// <summary>
+        /// 释放资源
+        /// </summary>
         public void Dispose()
         {
             run = false;
             threads.Remove(this);
         }
         static List<ThreadMission>threads = new List<ThreadMission>();
+        /// <summary>
+        /// 添加一个委托任务
+        /// </summary>
+        /// <param name="action">委托任务</param>
+        /// <param name="dat">联系上下文</param>
+        /// <param name="tag">目标线程标志</param>
+        /// <param name="wait">执行完毕后的回调</param>
         public static void AddMission(Action<object> action, object dat, string tag = null, Action<object> wait = null)
         {
             if (threads == null)
@@ -145,6 +174,12 @@ namespace huqiang
             mis.AddSubMission(action, dat, wait);
             threads.Add(mis);
         }
+        /// <summary>
+        /// 给主线程添加一个任务
+        /// </summary>
+        /// <param name="action">委托任务</param>
+        /// <param name="dat">联系上下文</param>
+        /// <param name="wait">执行完毕后的回调</param>
         public static void InvokeToMain(Action<object> action, object dat, Action<object> wait=null)
         {
             var id = Thread.CurrentThread.ManagedThreadId;
@@ -174,6 +209,9 @@ namespace huqiang
                 }
             }
         }
+        /// <summary>
+        /// 执行主线程任务
+        /// </summary>
         public static void ExtcuteMain()
         {
             for (int i = 0; i < threads.Count; i++)
@@ -200,12 +238,18 @@ namespace huqiang
                 }
             }
         }
+        /// <summary>
+        /// 释放所有线程
+        /// </summary>
         public static void DisposeAll()
         {
             for (int i = 0; i < threads.Count; i++)
                 threads[i].Dispose();
             threads.Clear();
         }
+        /// <summary>
+        /// 释放没有任务的线程
+        /// </summary>
         public static void DisposeFree()
         {
             int c = threads.Count-1;
@@ -220,10 +264,18 @@ namespace huqiang
                 }
         }
         static int MainID;
+        /// <summary>
+        /// 设置主线程id
+        /// </summary>
         public static void SetMianId()
         {
             MainID = Thread.CurrentThread.ManagedThreadId;
         }
+        /// <summary>
+        /// 通过标志查询线程
+        /// </summary>
+        /// <param name="name">标志名</param>
+        /// <returns></returns>
         public static ThreadMission FindMission(string name)
         {
             for (int i = 0; i < threads.Count; i++)
@@ -231,6 +283,11 @@ namespace huqiang
                     return threads[i];
             return null;
         }
+        /// <summary>
+        /// 创建一个线程
+        /// </summary>
+        /// <param name="tag">标志名</param>
+        /// <returns></returns>
         public static ThreadMission CreateMission(string tag)
         {
             for(int i=0;i<threads.Count;i++)

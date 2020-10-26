@@ -47,7 +47,9 @@ namespace huqiang
         public int reservedInt = 0;
         public int flagsEx = 0;
     }
-
+    /// <summary>
+    /// 文件选取器,使用win32 api,适用于win平台
+    /// </summary>
     public class OpenFileDialog
     {
         FileDlg pth;
@@ -75,7 +77,9 @@ namespace huqiang
             return WinAPI.GetOpenFileName(pth);
         }
     }
-
+    /// <summary>
+    /// 文件存储选取器,使用win32 api,适用于win平台
+    /// </summary>
     public class SaveFileDialog
     {
         FileDlg pth;

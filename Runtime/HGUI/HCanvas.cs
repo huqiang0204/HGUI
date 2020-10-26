@@ -168,14 +168,16 @@ namespace huqiang.Core.HGUI
             CheckSize();
             ThreadMission.ExtcuteMain();
         }
+        float ScreenWidth = 1920;
+        float ScreenHeight = 1080;
         void CheckSize()
         {
             float w = m_sizeDelta.x;
             float h = m_sizeDelta.y;
-            if (Scale.ScreenWidth != w | Scale.ScreenHeight != h)
+            if (ScreenWidth != w | ScreenHeight != h)
             {
-                Scale.ScreenWidth = w;
-                Scale.ScreenHeight = h;
+                ScreenWidth = w;
+                ScreenHeight = h;
                 if (UIPage.CurrentPage != null)
                     UIPage.CurrentPage.ReSize();
                 if (UIMenu.CurrentMenu != null)

@@ -4,6 +4,9 @@ using System.Reflection;
 
 namespace huqiang.Other
 {
+    /// <summary>
+    /// 调色板
+    /// </summary>
     public class Palette
     {
         static Texture2D ht2d;
@@ -147,6 +150,11 @@ namespace huqiang.Other
                     t2d.Apply();
                 }, this);
         }
+        /// <summary>
+        /// 获取一个HSV色的调色板
+        /// </summary>
+        /// <param name="H"></param>
+        /// <param name="buffer"></param>
         public static void HSVTemplate(float H,Color[] buffer)
         {
             int len = buffer.Length;

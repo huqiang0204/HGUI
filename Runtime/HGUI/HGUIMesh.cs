@@ -8,6 +8,9 @@ using UnityEngine;
 
 namespace huqiang.Core.HGUI
 {
+    /// <summary>
+    /// HImage的网格处理类
+    /// </summary>
     public class HGUIMesh
     {
         public static BlockBuffer<HVertex> blockBuffer = new BlockBuffer<HVertex>(4, 2048);
@@ -24,6 +27,10 @@ namespace huqiang.Core.HGUI
             0, 4, 5, 0, 5, 1, 1, 5, 6, 1, 6, 2, 2, 6, 7, 2, 7, 3,
             4, 8, 9, 4, 9, 5,5,9,10,5,10,6, 6, 10, 11, 6, 11, 7,
             8, 12, 13, 8, 13, 9, 9, 13, 14, 9, 14, 10, 10, 14, 15, 10, 15, 11 };
+        /// <summary>
+        /// 创建网格
+        /// </summary>
+        /// <param name="image">实例对象</param>
         public static void CreateMesh(HImage image)
         {
             if (image.s_id == 0)

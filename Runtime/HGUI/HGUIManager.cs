@@ -8,14 +8,30 @@ using UnityEngine;
 
 namespace huqiang.Core.HGUI
 {
+    /// <summary>
+    /// 预制体资源
+    /// </summary>
     public class PrefabAsset
     {
+        /// <summary>
+        /// 资源名称
+        /// </summary>
         public string name;
+        /// <summary>
+        /// 模型数据
+        /// </summary>
         public FakeStruct models;
     }
     public class HGUIManager
     {
+        /// <summary>
+        /// 游戏对象缓存
+        /// </summary>
         public static GameobjectBuffer GameBuffer;
+        /// <summary>
+        /// 初始化UI组件,包含有:Transform,HImage,TextBox,HText,HLine,UIElement
+        /// </summary>
+        /// <param name="buff">回收站的父物体</param>
         public static void Initial(Transform buff)
         {
             GameBuffer = new GameobjectBuffer(buff);
@@ -38,10 +54,19 @@ namespace huqiang.Core.HGUI
             db.fakeStruct = GameBuffer.GetDataLoader(0).LoadFromObject(uiRoot, db);
             File.WriteAllBytes(path, db.ToBytes());
         }
+        /// <summary>
+        /// 所有预制体资源列表
+        /// </summary>
         public static List<PrefabAsset> prefabAssets = new List<PrefabAsset>();
-        public unsafe static PrefabAsset LoadModels(byte[] buff, string name)
+        /// <summary>
+        /// 载入一个预制体资源
+        /// </summary>
+        /// <param name="dat">资源数据</param>
+        /// <param name="name">资源名</param>
+        /// <returns></returns>
+        public unsafe static PrefabAsset LoadModels(byte[] dat, string name)
         {
-            DataBuffer db = new DataBuffer(buff);
+            DataBuffer db = new DataBuffer(dat);
             var asset = new PrefabAsset();
             asset.models = db.fakeStruct;
             asset.name = name;
@@ -76,6 +101,12 @@ namespace huqiang.Core.HGUI
                 }
             return null;
         }
+        /// <summary>
+        /// 查询一个模型
+        /// </summary>
+        /// <param name="assetName">资源包名</param>
+        /// <param name="childName">模型名称</param>
+        /// <returns></returns>
         public static unsafe FakeStruct FindModel(string assetName,string childName)
         {
             for (int i = 0; i < prefabAssets.Count; i++)
@@ -109,6 +140,11 @@ namespace huqiang.Core.HGUI
             }
             return null;
         }
+        /// <summary>
+        /// 获取资源包下的所有子模型
+        /// </summary>
+        /// <param name="asset"></param>
+        /// <returns></returns>
         public static FakeStruct[] GetAllChild(string asset)
         {
             for (int i = 0; i < prefabAssets.Count; i++)

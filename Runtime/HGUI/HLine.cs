@@ -7,12 +7,19 @@ using UnityEngine;
 
 namespace huqiang.Core.HGUI
 {
+    /// <summary>
+    /// 画线UI,支持直线,弧线,贝塞尔曲线,二阶贝塞尔曲线
+    /// </summary>
     public class HLine:HGraphics
     {
         List<Beeline> beelines;
         List<ArcLine> arcLines;
         List<BzierLine> bzierLines;
         List<BzierLine2> bzierLines2;
+        /// <summary>
+        /// 添加一条直线
+        /// </summary>
+        /// <param name="line"></param>
         public void AddLine(ref Beeline line)
         {
             if (beelines == null)
@@ -20,6 +27,10 @@ namespace huqiang.Core.HGUI
             beelines.Add(line);
             m_dirty = true;
         }
+        /// <summary>
+        /// 添加一条弧线
+        /// </summary>
+        /// <param name="line"></param>
         public void AddLine(ref ArcLine line)
         {
             if (arcLines == null)
@@ -29,6 +40,10 @@ namespace huqiang.Core.HGUI
             arcLines.Add(line);
             m_dirty = true;
         }
+        /// <summary>
+        /// 添加一条贝塞尔曲线
+        /// </summary>
+        /// <param name="line"></param>
         public void AddLine(ref BzierLine line)
         {
             if (bzierLines == null)
@@ -38,6 +53,10 @@ namespace huqiang.Core.HGUI
             bzierLines.Add(line);
             m_dirty = true;
         }
+        /// <summary>
+        /// 添加一条二阶贝塞尔曲线
+        /// </summary>
+        /// <param name="line"></param>
         public void AddLine(ref BzierLine2 line)
         {
             if (bzierLines2 == null)
@@ -51,6 +70,9 @@ namespace huqiang.Core.HGUI
         {
 
         }
+        /// <summary>
+        /// 清除所有线段
+        /// </summary>
         public override void Clear()
         {
             if (beelines != null)
@@ -98,6 +120,9 @@ namespace huqiang.Core.HGUI
             }
             return c;
         }
+        /// <summary>
+        /// 更新所有线段网格
+        /// </summary>
         public override void UpdateMesh()
         {
             if(m_dirty)

@@ -17,12 +17,24 @@ namespace huqiang.Core.HGUI
     public class HText:HGraphics
     {
         static List<HText> TextBuffer = new List<HText>();
+        /// <summary>
+        /// 顶点缓存
+        /// </summary>
         public static BlockBuffer<HVertex> VertexBuffer = new BlockBuffer<HVertex>(32, 1024);
+        /// <summary>
+        /// 临时顶点缓存
+        /// </summary>
         public static BlockBuffer<TextVertex> PopulateBuffer = new BlockBuffer<TextVertex>(32, 1024);
         static Font defFont;
+        /// <summary>
+        /// 不会产生网格的字符
+        /// </summary>
         protected static char[] key_noMesh = new char[] { ' ' ,'\n' };//排除\r
         static List<int> bufferA = new List<int>();
         static List<int> bufferB = new List<int>();
+        /// <summary>
+        /// 将所有文本设置为被污染
+        /// </summary>
         public static void DirtyAll()
         {
             int c = TextBuffer.Count;
@@ -43,6 +55,10 @@ namespace huqiang.Core.HGUI
             tris.Add(s + 3);
             tris.Add(s);
         }
+        /// <summary>
+        /// 创建带有表情符的网格
+        /// </summary>
+        /// <param name="text"></param>
         protected static void CreateEmojiMesh(HText text)
         {
             if (text.TmpVerts.DataCount == 0)
@@ -226,6 +242,10 @@ namespace huqiang.Core.HGUI
             }
        
         }
+        /// <summary>
+        /// 创建出线
+        /// </summary>
+        /// <param name="text">文本实体</param>
         protected static void CreateOutLine(HText text)
         {
             int c = text.vertInfo.DataCount;
@@ -320,6 +340,9 @@ namespace huqiang.Core.HGUI
             }
            
         }
+        /// <summary>
+        /// 默认字体
+        /// </summary>
         public static Font DefaultFont
         {
             get
@@ -451,6 +474,11 @@ namespace huqiang.Core.HGUI
         /// </summary>
         public float OutLine;
         public static TextGenerationSettings settings;
+        /// <summary>
+        /// 配置文本生成器的参数
+        /// </summary>
+        /// <param name="size">参考尺寸</param>
+        /// <param name="sett">参数载体</param>
         public void GetGenerationSettings(ref Vector2 size, ref TextGenerationSettings sett)
         {
             var font = Font;
@@ -474,6 +502,12 @@ namespace huqiang.Core.HGUI
         }
 
         internal BlockInfo<TextVertex> TmpVerts;
+        /// <summary>
+        /// 获取临时顶点
+        /// </summary>
+        /// <param name="v"></param>
+        /// <param name="vert">临时顶点</param>
+        /// <param name="filterStr">过滤表情符后的字符串</param>
         protected void GetTempVertex(IList<UIVertex> v, ref BlockInfo<TextVertex> vert, string filterStr)
         {
             int o = 0;
@@ -510,6 +544,9 @@ namespace huqiang.Core.HGUI
         label:;
             vert.DataCount = o;
         }
+        /// <summary>
+        /// 文本计算
+        /// </summary>
         public virtual void Populate()
         {
             if (m_dirty | m_colorChanged)
@@ -570,6 +607,9 @@ namespace huqiang.Core.HGUI
                 MainTexture = Font.material.mainTexture;
             }
         }
+        /// <summary>
+        /// 更新网格
+        /// </summary>
         public override void UpdateMesh()
         {
             if (m_vertexChange)
@@ -592,6 +632,11 @@ namespace huqiang.Core.HGUI
                 }
 #endif
         }
+        /// <summary>
+        /// 获取文字预设高度
+        /// </summary>
+        /// <param name="size"></param>
+        /// <param name="str"></param>
         public void GetPreferredHeight(ref Vector2 size, string str)
         {
             GetGenerationSettings(ref size, ref settings);
@@ -599,6 +644,11 @@ namespace huqiang.Core.HGUI
             float h = gen.GetPreferredHeight(new EmojiString(str).FilterString, settings);
             size.y = h;
         }
+        /// <summary>
+        /// 获取文字预设宽度
+        /// </summary>
+        /// <param name="size"></param>
+        /// <param name="str"></param>
         public void GetPreferredWidth(ref Vector2 size, string str)
         {
             GetGenerationSettings(ref size, ref settings);
@@ -606,6 +656,11 @@ namespace huqiang.Core.HGUI
             float w = gen.GetPreferredWidth(new EmojiString(str).FilterString, settings);
             size.x = w;
         }
+        /// <summary>
+        /// 获取文字预设尺寸
+        /// </summary>
+        /// <param name="size"></param>
+        /// <param name="str"></param>
         public void GetPreferredSize(ref Vector2 size, string str)
         {
             GetGenerationSettings(ref size, ref settings);
@@ -624,6 +679,9 @@ namespace huqiang.Core.HGUI
             TextBuffer.Remove(this);
             TmpVerts.Release();
         }
+        /// <summary>
+        /// UI尺寸本改变,设置污染
+        /// </summary>
         public override void ReSized()
         {
             base.ReSized();

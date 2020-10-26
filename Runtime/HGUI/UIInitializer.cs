@@ -7,28 +7,48 @@ using UnityEngine;
 
 namespace huqiang.Core.HGUI
 {
+    /// <summary>
+    /// ui初始化器
+    /// </summary>
     public class UIInitializer:Initializer
     {
         TempReflection reflections;
         object target;
         int feildLenth;
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="obj">对象实例</param>
         public UIInitializer(object obj)
         {
             target = obj;
             reflections = TempReflection.ObjectFields(obj);
             feildLenth = reflections.Top;
         }
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="temp">对象反射信息</param>
         public UIInitializer(TempReflection temp)
         {
             reflections = temp;
             feildLenth = temp.Top;
             target = null;
         }
+        /// <summary>
+        /// 设置一个新的目标实例
+        /// </summary>
+        /// <param name="obj">对象实例</param>
         public override void Reset(object obj)
         {
             target = obj;
             reflections.Top = feildLenth;
         }
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <param name="fake">模型数据</param>
+        /// <param name="com">组件实体</param>
         public override void Initialiezd(FakeStruct fake, Component com)
         {
             if (reflections == null)
@@ -83,6 +103,9 @@ namespace huqiang.Core.HGUI
                 }
             }
         }
+        /// <summary>
+        /// 初始化完毕
+        /// </summary>
         public override void Done()
         {
             if (target == null)
@@ -91,6 +114,11 @@ namespace huqiang.Core.HGUI
             for (int i = 0; i < all.Length; i++)
                 all[i].field.SetValue(target, all[i].Value);
         }
+        /// <summary>
+        /// 反射实体到目标载体
+        /// </summary>
+        /// <param name="obj">载体实例对象</param>
+        /// <param name="com">ui组件实例</param>
         public void ReflectionEnity(object obj, Transform com)
         {
             target = obj;
@@ -133,6 +161,10 @@ namespace huqiang.Core.HGUI
             for (int i = 0; i < c; i++)
                 ReflectionEnity(com.GetChild(i));
         }
+        /// <summary>
+        /// 更换使用语言,将配置文件中的语言反射到UI组件上
+        /// </summary>
+        /// <param name="section"></param>
         public void ChangeLanguage(INISection section)
         {
             if (reflections == null)

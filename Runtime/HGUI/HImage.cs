@@ -110,9 +110,11 @@ namespace huqiang.Core.HGUI
                 m_fillMethod = value;
                 m_vertexChange = true;
             } }
+        /// <summary>
+        /// 逆时针填充
+        /// </summary>
         [SerializeField]
         internal bool m_fillClockwise;
-        public bool FillClockwise { get; set; }
         [SerializeField]
         [HideInInspector]
         internal int m_fillOrigin;
@@ -120,9 +122,13 @@ namespace huqiang.Core.HGUI
                 m_fillOrigin = value;
                 m_vertexChange = true;
             } }
+  
         [SerializeField]
         [HideInInspector]
         internal float m_fillAmount = 1;
+        /// <summary>
+        /// 填充比例
+        /// </summary>
         public float FillAmount {
             get => m_fillAmount;
             set {
@@ -154,6 +160,9 @@ namespace huqiang.Core.HGUI
                     m_vertexChange = true;
                 m_pixelsPerUnit = value;
             } }
+        /// <summary>
+        /// 使用纹理尺寸
+        /// </summary>
         public void SetNativeSize()
         {
             if(m_sprite!=null)
@@ -171,6 +180,9 @@ namespace huqiang.Core.HGUI
                 m_dirty = false;
             }
         }
+        /// <summary>
+        /// 更新网格
+        /// </summary>
         public override void UpdateMesh()
         {
             if(m_vertexChange)

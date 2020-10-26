@@ -8,31 +8,70 @@ using UnityEngine;
 
 namespace huqiang.Core.HGUI
 {
+    /// <summary>
+    /// ui画布
+    /// </summary>
     public class HCanvas:UIElement
     {
         //protected static ThreadMission thread = new ThreadMission("UI");
+        /// <summary>
+        /// 目标相机,如果为空则使用主相机
+        /// </summary>
         public Camera camera;
+        /// <summary>
+        /// 默认设计尺寸
+        /// </summary>
         public Vector2 DesignSize = new Vector2(1920, 1080);
+        /// <summary>
+        /// 物理尺寸缩放,主要用于ppi
+        /// </summary>
         [Range(0.1f, 3)]
         public float PhysicalScale = 1;
+        /// <summary>
+        /// 距离相机镜头的距离
+        /// </summary>
         public float NearPlane = 0f;
+        /// <summary>
+        /// 物理尺寸缩放的贝塞尔曲线,x=英寸,y=比例
+        /// </summary>
         public Vector2 A = new Vector2(4,0.9f);//贝塞尔曲线起点
         public Vector2 B = new Vector2(6,1f);
         public Vector2 C = new Vector2(8,1.2f);
         public Vector2 D = new Vector2(10,1.3f);//贝塞尔曲线终点
         public RenderMode renderMode;
+        /// <summary>
+        /// 主画布实例
+        /// </summary>
         public static HCanvas MainCanvas;
         //public bool SubBatch;//是否开启子线程合批处理,开启后画面会延迟一帧
         //LoopBuffer<HGUIElement[]> loopBuffer = new LoopBuffer<HGUIElement[]>(3);
         //QueueBuffer<TempBuffer> Main,Sub;
+        /// <summary>
+        /// UI元素流水线缓存
+        /// </summary>
         HGUIElement[] PipeLine = new HGUIElement[4096];
+        /// <summary>
+        /// ui元素脚本缓存
+        /// </summary>
         UIElement[] scripts = new UIElement[4096];
+        /// <summary>
+        /// 文本元素缓存
+        /// </summary>
         HText[] texts = new HText[2048];
         int point = 0;
         int max;
         int top_txt=0;
+        /// <summary>
+        /// 用户输入事件
+        /// </summary>
         public UserAction[] inputs;
+        /// <summary>
+        /// 暂停用户事件
+        /// </summary>
         public bool PauseEvent;
+        /// <summary>
+        /// 暂停所有更新
+        /// </summary>
         public bool Pause;
         public int renderQueue = 3100;
         protected virtual void Start()
@@ -111,7 +150,9 @@ namespace huqiang.Core.HGUI
                 s++;
             }
         }
-  
+        /// <summary>
+        /// 更新内容包含:UI动画,UI页面更新,UI通知页更新,用户事件采集,键盘信息采集,事件派发,屏幕尺寸监测,执行分线程的委托任务
+        /// </summary>
         protected virtual void Update()
         {
             if (Pause)
@@ -141,6 +182,9 @@ namespace huqiang.Core.HGUI
                     UIMenu.CurrentMenu.ReSize();
             }
         }
+        /// <summary>
+        /// 更新内容包含:UI流水线采集,UI MainUpdate函数执行,UI Populate函数执行,文本更新,合批处理,应用网格,投递到相机
+        /// </summary>
         private void LateUpdate()
         {
             if (Pause)
@@ -442,6 +486,10 @@ namespace huqiang.Core.HGUI
                 for (int i = 0; i < inputs.Length; i++)
                     inputs[i].Clear();
         }
+        /// <summary>
+        /// 当窗口失去焦点时停止所有更新用来节省cpu性能
+        /// </summary>
+        /// <param name="focus"></param>
         public void OnApplicationFocus(bool focus)
         {
             Pause = !focus;
@@ -511,6 +559,11 @@ namespace huqiang.Core.HGUI
             uv4.Clear();
             colors.Clear();
         }
+        /// <summary>
+        /// 将屏幕坐标转换为画布坐标
+        /// </summary>
+        /// <param name="mPos">屏幕坐标</param>
+        /// <returns></returns>
         public Vector2 ScreenToCanvasPos(Vector2 mPos)
         {
             if (renderMode == RenderMode.WorldSpace)

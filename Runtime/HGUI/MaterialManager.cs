@@ -15,6 +15,9 @@ namespace huqiang.Core.HGUI
         static int Max;
         static Shader shader;
         public static int renderQueue = 3100;
+        /// <summary>
+        /// 默认着色器
+        /// </summary>
         internal static Shader DefShader
         {
             get
@@ -30,6 +33,10 @@ namespace huqiang.Core.HGUI
         {
             point = 0;
         }
+        /// <summary>
+        /// 获取下一个材质球,如果没有则重新创建
+        /// </summary>
+        /// <returns></returns>
         internal static Material GetNextMaterial()
         {
             Material mat;

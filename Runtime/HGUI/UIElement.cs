@@ -38,8 +38,14 @@ namespace huqiang.Core.HGUI
         DataGrid,
         InputBox
     }
+    /// <summary>
+    /// UI基本元素组件
+    /// </summary>
     public class UIElement:MonoBehaviour
     {
+        /// <summary>
+        /// 最后更新的帧数,防止同一帧内重复更新
+        /// </summary>
         internal int LateFrame;
         #region static method
         static Transform[] buff = new Transform[64];
@@ -583,17 +589,50 @@ namespace huqiang.Core.HGUI
         [SerializeField]
         internal Vector2 m_sizeDelta = new Vector2(100,100);
         public virtual Vector2 SizeDelta { get => m_sizeDelta; set => m_sizeDelta = value; }
+        /// <summary>
+        /// 轴心
+        /// </summary>
         public Vector2 Pivot = new Vector2(0.5f, 0.5f);
         //public Vector2 DesignSize;
+        /// <summary>
+        /// 缩放类型
+        /// </summary>
         public ScaleType scaleType;
+        /// <summary>
+        /// 停靠类型
+        /// </summary>
         public AnchorType anchorType;
+        /// <summary>
+        /// 停靠的点类型
+        /// </summary>
         public AnchorPointType anchorPointType;
+        /// <summary>
+        /// 停靠的偏移位置
+        /// </summary>
         public Vector2 anchorOffset;
+        /// <summary>
+        /// 相对与父物体的剔除尺寸的类型
+        /// </summary>
         public MarginType marginType;
+        /// <summary>
+        /// 父物体类型
+        /// </summary>
         public ParentType parentType;
+        /// <summary>
+        /// 相对与父物体的剔除尺寸
+        /// </summary>
         public Margin margin;
+        /// <summary>
+        /// 用户事件类型
+        /// </summary>
         public EventType eventType;
+        /// <summary>
+        /// 复合型UI类型
+        /// </summary>
         public CompositeType compositeType;
+        /// <summary>
+        /// 主线脚本更新
+        /// </summary>
         public virtual void MainUpdate()
         {
             if (userEvent != null)
@@ -621,23 +660,55 @@ namespace huqiang.Core.HGUI
                 }
             }
         }
+        /// <summary>
+        /// 分线程脚本更新
+        /// </summary>
         public virtual void SubUpdate()
         {
 
         }
+        /// <summary>
+        /// 重新计算尺寸
+        /// </summary>
         public virtual void ReSized()
         {
             if (SizeChanged != null)
                 SizeChanged(this);
         }
-
+        /// <summary>
+        /// 是否开启遮罩
+        /// </summary>
         public bool Mask;
+        /// <summary>
+        /// 用户事件
+        /// </summary>
         public UserEvent userEvent;
+        /// <summary>
+        /// 复合ui组件实体
+        /// </summary>
         public Composite composite;
+        /// <summary>
+        /// 数据模型
+        /// </summary>
         public FakeStruct mod;
+        /// <summary>
+        /// 联系上下文
+        /// </summary>
         public object DataContext;
+        /// <summary>
+        /// 在流水线中的位置
+        /// </summary>
         internal int PipelineIndex;
+        /// <summary>
+        /// 主颜色
+        /// </summary>
         public virtual Color32 MainColor { get; set; }
+        /// <summary>
+        /// 注册用户事件
+        /// </summary>
+        /// <typeparam name="T">事件类型</typeparam>
+        /// <param name="fake">数据模型,可空</param>
+        /// <returns></returns>
         public T RegEvent<T>(FakeStruct fake) where T : UserEvent, new()
         {
             var t = userEvent as T;
@@ -650,6 +721,12 @@ namespace huqiang.Core.HGUI
             t.g_color = MainColor;
             return t;
         }
+        /// <summary>
+        /// 注册事件
+        /// </summary>
+        /// <typeparam name="T">类型</typeparam>
+        /// <param name="collider">事件检测碰撞器,可空</param>
+        /// <returns></returns>
         public T RegEvent<T>(EventCollider collider = null) where T : UserEvent, new()
         {
             var t = userEvent as T;
@@ -664,7 +741,14 @@ namespace huqiang.Core.HGUI
             t.g_color = MainColor;
             return t;
         }
+        /// <summary>
+        /// 当UI尺寸被改变时,执行此委托
+        /// </summary>
         public Action<UIElement> SizeChanged;
+        /// <summary>
+        /// 初始化数据
+        /// </summary>
+        /// <param name="ex">数据模型</param>
         public void Initial(FakeStruct ex)
         {
             switch(eventType)
@@ -676,6 +760,11 @@ namespace huqiang.Core.HGUI
             }
             CreateUIComposite(this,ex);
         }
+        /// <summary>
+        /// 创建复合型UI实体
+        /// </summary>
+        /// <param name="script">ui元素实体</param>
+        /// <param name="ex">数据模型</param>
         public static void CreateUIComposite(UIElement script,FakeStruct ex)
         {
             switch(script.compositeType)
@@ -741,6 +830,9 @@ namespace huqiang.Core.HGUI
                     break;
             }
         }
+        /// <summary>
+        /// 清除资源
+        /// </summary>
         public virtual void Clear()
         {
         }

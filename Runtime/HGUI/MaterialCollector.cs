@@ -16,19 +16,38 @@ namespace huqiang.Core.HGUI
         public Material material;
         public int ID;
     }
+    /// <summary>
+    /// 材质球收集器
+    /// </summary>
     internal class MaterialCollector
     {
+        /// <summary>
+        /// 纹理信息缓存
+        /// </summary>
         public TextureInfo[] textures;
+        /// <summary>
+        /// 材质球缓存
+        /// </summary>
         public MaterialInfo[] materials;
         int[] table;
         int max = -1;
+        /// <summary>
+        /// 子三角形列表
+        /// </summary>
         internal List<int[]> submesh = new List<int[]>();
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="length">缓存大小</param>
         public MaterialCollector(int length = 1024)
         {
             materials = new MaterialInfo[length];
             table = new int[length];
             textures = new TextureInfo[length * 4];
         }
+        /// <summary>
+        /// 开始新一轮的收集
+        /// </summary>
         public void Start()
         {
             for (int i = 0; i < table.Length; i++)
@@ -111,6 +130,14 @@ namespace huqiang.Core.HGUI
             textures[o].fillcolor = fillcolor;
             return false;
         }
+        /// <summary>
+        /// 组合材质球
+        /// </summary>
+        /// <param name="graphics"></param>
+        /// <param name="tris"></param>
+        /// <param name="len"></param>
+        /// <param name="offset"></param>
+        /// <param name="clip"></param>
         public void CombinationMaterial(HGraphics graphics, int[] tris, int len, ref int offset, ref Vector4 clip)
         {
             int id = graphics.MatID;
@@ -145,6 +172,15 @@ namespace huqiang.Core.HGUI
                 CombinationMaterial(graphics.Material, id, ref clip);
             }
         }
+        /// <summary>
+        /// 组合材质球
+        /// </summary>
+        /// <param name="graphics"></param>
+        /// <param name="trisArray"></param>
+        /// <param name="address"></param>
+        /// <param name="offsets"></param>
+        /// <param name="len"></param>
+        /// <param name="clip"></param>
         public void CombinationMaterial(HGraphics graphics, int[] trisArray,ArrayInfo[] address, int[] offsets, int len, ref Vector4 clip)
         {
             int id = graphics.MatID;
@@ -205,12 +241,17 @@ namespace huqiang.Core.HGUI
             }
         }
         List<int> tmpMesh = new List<int>();
-        
+        /// <summary>
+        /// 子网格闭合
+        /// </summary>
         public void CompeleteSub()
         {
             submesh.Add(tmpMesh.ToArray());
             tmpMesh.Clear();
         }
+        /// <summary>
+        /// 此轮收集完毕
+        /// </summary>
         public void End()
         {
             if (tmpMesh.Count > 0)
@@ -221,7 +262,7 @@ namespace huqiang.Core.HGUI
         static string[] tc = new string[] { "_MainTex" , "_STex","_TTex" , "_FTex" };
         public int Length { get => max + 1; }
         /// <summary>
-        /// 这里会产生一次GC
+        /// 生成材质球数组, 这里会产生一次GC
         /// </summary>
         /// <returns></returns>
         public Material[] GenerateMaterial()

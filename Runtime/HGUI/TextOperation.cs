@@ -21,6 +21,9 @@ namespace huqiang.Core.HGUI
         public float topY;
         public float endY;
     }
+    /// <summary>
+    /// 文本操作类
+    /// </summary>
     public class TextOperation
     {
         public static HText Target;
@@ -145,6 +148,10 @@ namespace huqiang.Core.HGUI
             press.Offset = col;
             press.Index = start + col;
         }
+        /// <summary>
+        /// 展示内容向上移动
+        /// </summary>
+        /// <returns></returns>
         public static bool ContentMoveUp()
         {
             if (ShowStart > 0)
@@ -154,6 +161,10 @@ namespace huqiang.Core.HGUI
             }
             return false;
         }
+        /// <summary>
+        /// 展示内容向下移动
+        /// </summary>
+        /// <returns></returns>
         public static bool ContentMoveDown()
         {
             if(ShowStart + ShowRow < lines.Count)
@@ -163,6 +174,10 @@ namespace huqiang.Core.HGUI
             }
             return false;
         }
+        /// <summary>
+        /// 获取当前可以展示的文本内容
+        /// </summary>
+        /// <returns></returns>
         public static string GetShowContent()
         {
             int s = lines[ShowStart].startCharIdx;
@@ -182,6 +197,9 @@ namespace huqiang.Core.HGUI
             }
             return str;
         }
+        /// <summary>
+        /// 全选
+        /// </summary>
         public static void SelectAll()
         {
             StartPress.Index = 0;
@@ -191,6 +209,10 @@ namespace huqiang.Core.HGUI
             EndPress.Index = chars.Count - 1;
             EndPress.Offset = EndPress.Index - lines[EndPress.Row].startCharIdx;
         }
+        /// <summary>
+        /// 获取选中的文本
+        /// </summary>
+        /// <returns></returns>
         public static string GetSelectString()
         {
             if (EndPress.Index == StartPress.Index)
@@ -199,6 +221,10 @@ namespace huqiang.Core.HGUI
                 return Content.SubString(EndPress.Index, StartPress.Index - EndPress.Index);
             else return Content.SubString(StartPress.Index,EndPress.Index-StartPress.Index);
         }
+        /// <summary>
+        /// 删除选中的文本
+        /// </summary>
+        /// <returns></returns>
         public static bool DeleteSelectString()
         {
             if (StartPress.Index == EndPress.Index)
@@ -226,6 +252,12 @@ namespace huqiang.Core.HGUI
             }
             return true;
         }
+        /// <summary>
+        /// 设置光标位置
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="press"></param>
+        /// <returns></returns>
         static bool SetPressIndex(int index, ref PressInfo press)
         {
             if (index < 0)
@@ -263,6 +295,12 @@ namespace huqiang.Core.HGUI
             }
             return true;
         }
+        /// <summary>
+        /// 设置光标位置
+        /// </summary>
+        /// <param name="index">光标位置</param>
+        /// <param name="LineChanged">是否改变的行号</param>
+        /// <returns>是否改变成功</returns>
         public static bool SetPressIndex(int index,ref bool LineChanged)
         {
             if(SetPressIndex(index,ref StartPress))
@@ -283,14 +321,27 @@ namespace huqiang.Core.HGUI
             }
             return false;
         }
+        /// <summary>
+        /// 设置光标开始的位置
+        /// </summary>
+        /// <param name="index">光标位置</param>
         public static void SetStartPressIndex(int index)
         {
             SetPressIndex(index, ref StartPress);
         }
+        /// <summary>
+        /// 设置光标结束的位置
+        /// </summary>
+        /// <param name="index">光标位置</param>
         public static void SetEndPressIndex(int index)
         {
             SetPressIndex(index, ref EndPress);
         }
+        /// <summary>
+        /// 光标向上移动
+        /// </summary>
+        /// <param name="LineChanged">是否改变了行号</param>
+        /// <returns>是否移动成功</returns>
         public static bool PointerMoveUp(ref bool LineChanged)
         {
             if(StartPress.Row>0)
@@ -310,6 +361,11 @@ namespace huqiang.Core.HGUI
             }
             return false;
         }
+        /// <summary>
+        /// 光标向下移动
+        /// </summary>
+        /// <param name="LineChanged">是否改变了行号</param>
+        /// <returns>是否移动成功</returns>
         public static bool PointerMoveDown(ref bool LineChanged)
         {
             if (StartPress.Row < lines.Count - 1)
@@ -329,6 +385,11 @@ namespace huqiang.Core.HGUI
             }
             return false;
         }
+        /// <summary>
+        /// 光标向左移动
+        /// </summary>
+        /// <param name="LineChanged">是否改变了行号</param>
+        /// <returns>是否移动成功</returns>
         public static bool PointerMoveLeft(ref bool LineChanged)
         {
             if (StartPress.Index > 0)
@@ -348,6 +409,11 @@ namespace huqiang.Core.HGUI
             }
             return false;
         }
+        /// <summary>
+        /// 光标向右移动
+        /// </summary>
+        /// <param name="LineChanged">是否改变了行号</param>
+        /// <returns>是否移动成功</returns>
         public static bool PointerMoveRight(ref bool LineChanged)
         {
             if (StartPress.Index < chars.Count - 1)
@@ -367,6 +433,10 @@ namespace huqiang.Core.HGUI
             }
             return false;
         }
+        /// <summary>
+        /// 删除光标后面的一个字符
+        /// </summary>
+        /// <returns>是否删除成功</returns>
         public static bool DeleteLast()
         {
             if (DeleteSelectString())
@@ -388,6 +458,10 @@ namespace huqiang.Core.HGUI
             }
             return false;
         }
+        /// <summary>
+        /// 删除光标前面的一个字符
+        /// </summary>
+        /// <returns>是否删除成功</returns>
         public static bool DeleteNext()
         {
             if (DeleteSelectString())
@@ -409,6 +483,10 @@ namespace huqiang.Core.HGUI
             }
             return false;
         }
+        /// <summary>
+        /// 插入字符串
+        /// </summary>
+        /// <param name="con">表情符字符串</param>
         public static void InsertContent(EmojiString con)
         {
             Content.Insert(StartPress.Index,con);
@@ -417,124 +495,128 @@ namespace huqiang.Core.HGUI
             bool b = false;
             SetPressIndex(index, ref b);
         }
-        public static void GetSelectArea(List<int> tri, List<HVertex> vert, Color32 aColor, Color32 pColor)
-        {
-            if (EndPress.Index == StartPress.Index)
-            {
-                if (StartPress.Row < ShowStart)
-                    return;
-                if (StartPress.Row > ShowStart + ShowRow)
-                    return;
-                float oy = StartY - (lines[0].topY - lines[ShowStart].topY);
-                float top = lines[StartPress.Row].topY - oy;
-                float down = lines[StartPress.Row].endY - oy;
-                int index = StartPress.Index;
-                float p;
-                if (StartPress.Index > lines[StartPress.Row].endIdx)
-                {
-                    index--;
-                    if (index < 0)
-                        index = 0;
-                    p = chars[index].cursorPos.x+ chars[index].charWidth;
-                }
-                else
-                {
-                    p = chars[index].cursorPos.x;
-                }
-                float left = p - 1;
-                float right = p + 1;
-                var v = new HVertex();
-                v.position.x = left;
-                v.position.y = down;
-                v.color = pColor;
-                vert.Add(v);
-                v.position.x = right;
-                v.position.y = down;
-                v.color = pColor;
-                vert.Add(v);
-                v.position.x = left;
-                v.position.y = top;
-                v.color = pColor;
-                vert.Add(v);
-                v.position.x = right;
-                v.position.y = top;
-                v.color = pColor;
-                vert.Add(v);
-                tri.Add(0);
-                tri.Add(2);
-                tri.Add( 3);
-                tri.Add(0);
-                tri.Add(3);
-                tri.Add(1);
-                return; 
-            }
-            if (EndPress.Index < StartPress.Index)
-                GetSelectArea( tri, vert, ref aColor, ref EndPress, ref StartPress);
-            else GetSelectArea(tri, vert, ref aColor, ref StartPress, ref EndPress);
-        }
-        static void GetSelectArea(List<int> tri, List<HVertex> vert, ref Color32 color, ref PressInfo start, ref PressInfo end)
-        {
-            int ss = ShowStart;
-            int sr = start.Row;
-            int er = end.Row;
-            if (ss > er)
-                return;
-            if (sr > ss + ShowRow)
-                return;
-            float oy = StartY - (lines[0].topY - lines[ShowStart].topY);
-            int st = 0;
-            for (int i = 0; i < ShowRow; i++)
-            {
-                if (ss >= lines.Count)
-                    break;
-                LineInfo info = lines[ss];
-                int ls = info.startCharIdx;
-                if (ls > end.Index)
-                    break;
-                int le = lines[ss].endIdx;
-                ss++;
-                if (le <= start.Index)
-                    continue;
-                int si = start.Index;
-                int ei = end.Index;
-                float left;
-                if (si < ls)
-                    left = chars[ls].cursorPos.x;
-                else left = chars[si].cursorPos.x;
-                float right;
-                if (ei > le)
-                    right = chars[le].cursorPos.x + chars[le].charWidth;
-                else right = chars[ei].cursorPos.x;
-                float top = info.topY - oy;
-                float down = info.endY - oy;
+        //public static void GetSelectArea(List<int> tri, List<HVertex> vert, Color32 aColor, Color32 pColor)
+        //{
+        //    if (EndPress.Index == StartPress.Index)
+        //    {
+        //        if (StartPress.Row < ShowStart)
+        //            return;
+        //        if (StartPress.Row > ShowStart + ShowRow)
+        //            return;
+        //        float oy = StartY - (lines[0].topY - lines[ShowStart].topY);
+        //        float top = lines[StartPress.Row].topY - oy;
+        //        float down = lines[StartPress.Row].endY - oy;
+        //        int index = StartPress.Index;
+        //        float p;
+        //        if (StartPress.Index > lines[StartPress.Row].endIdx)
+        //        {
+        //            index--;
+        //            if (index < 0)
+        //                index = 0;
+        //            p = chars[index].cursorPos.x+ chars[index].charWidth;
+        //        }
+        //        else
+        //        {
+        //            p = chars[index].cursorPos.x;
+        //        }
+        //        float left = p - 1;
+        //        float right = p + 1;
+        //        var v = new HVertex();
+        //        v.position.x = left;
+        //        v.position.y = down;
+        //        v.color = pColor;
+        //        vert.Add(v);
+        //        v.position.x = right;
+        //        v.position.y = down;
+        //        v.color = pColor;
+        //        vert.Add(v);
+        //        v.position.x = left;
+        //        v.position.y = top;
+        //        v.color = pColor;
+        //        vert.Add(v);
+        //        v.position.x = right;
+        //        v.position.y = top;
+        //        v.color = pColor;
+        //        vert.Add(v);
+        //        tri.Add(0);
+        //        tri.Add(2);
+        //        tri.Add( 3);
+        //        tri.Add(0);
+        //        tri.Add(3);
+        //        tri.Add(1);
+        //        return; 
+        //    }
+        //    if (EndPress.Index < StartPress.Index)
+        //        GetSelectArea( tri, vert, ref aColor, ref EndPress, ref StartPress);
+        //    else GetSelectArea(tri, vert, ref aColor, ref StartPress, ref EndPress);
+        //}
+        //static void GetSelectArea(List<int> tri, List<HVertex> vert, ref Color32 color, ref PressInfo start, ref PressInfo end)
+        //{
+        //    int ss = ShowStart;
+        //    int sr = start.Row;
+        //    int er = end.Row;
+        //    if (ss > er)
+        //        return;
+        //    if (sr > ss + ShowRow)
+        //        return;
+        //    float oy = StartY - (lines[0].topY - lines[ShowStart].topY);
+        //    int st = 0;
+        //    for (int i = 0; i < ShowRow; i++)
+        //    {
+        //        if (ss >= lines.Count)
+        //            break;
+        //        LineInfo info = lines[ss];
+        //        int ls = info.startCharIdx;
+        //        if (ls > end.Index)
+        //            break;
+        //        int le = lines[ss].endIdx;
+        //        ss++;
+        //        if (le <= start.Index)
+        //            continue;
+        //        int si = start.Index;
+        //        int ei = end.Index;
+        //        float left;
+        //        if (si < ls)
+        //            left = chars[ls].cursorPos.x;
+        //        else left = chars[si].cursorPos.x;
+        //        float right;
+        //        if (ei > le)
+        //            right = chars[le].cursorPos.x + chars[le].charWidth;
+        //        else right = chars[ei].cursorPos.x;
+        //        float top = info.topY - oy;
+        //        float down = info.endY - oy;
 
-                var v = new HVertex();
-                v.position.x = left;
-                v.position.y = down;
-                v.color = color;
-                vert.Add(v);
-                v.position.x = right;
-                v.position.y = down;
-                v.color = color;
-                vert.Add(v);
-                v.position.x = left;
-                v.position.y = top;
-                v.color = color;
-                vert.Add(v);
-                v.position.x = right;
-                v.position.y = top;
-                v.color = color;
-                vert.Add(v);
-                tri.Add(st);
-                tri.Add(st + 2);
-                tri.Add(st + 3);
-                tri.Add(st);
-                tri.Add(st + 3);
-                tri.Add(st + 1);
-                st += 4;
-            }
-        }
+        //        var v = new HVertex();
+        //        v.position.x = left;
+        //        v.position.y = down;
+        //        v.color = color;
+        //        vert.Add(v);
+        //        v.position.x = right;
+        //        v.position.y = down;
+        //        v.color = color;
+        //        vert.Add(v);
+        //        v.position.x = left;
+        //        v.position.y = top;
+        //        v.color = color;
+        //        vert.Add(v);
+        //        v.position.x = right;
+        //        v.position.y = top;
+        //        v.color = color;
+        //        vert.Add(v);
+        //        tri.Add(st);
+        //        tri.Add(st + 2);
+        //        tri.Add(st + 3);
+        //        tri.Add(st);
+        //        tri.Add(st + 3);
+        //        tri.Add(st + 1);
+        //        st += 4;
+        //    }
+        //}
         public static int Style { get => StartPress.Index == EndPress.Index ? 1 : 2; }
+        /// <summary>
+        /// 设置显示内容开始行号
+        /// </summary>
+        /// <param name="start">行号</param>
         public static void SetShowStart(int start)
         {
             ShowStart = start;
@@ -543,6 +625,10 @@ namespace huqiang.Core.HGUI
             if (ShowStart < 0)
                 ShowStart = 0;
         }
+        /// <summary>
+        /// 设置按压信息
+        /// </summary>
+        /// <param name="press"></param>
         public static void SetPress(ref PressInfo press)
         {
             int row = press.Row + ShowStart;
@@ -553,6 +639,10 @@ namespace huqiang.Core.HGUI
             StartPress.Offset = press.Offset;
             EndPress = StartPress;
         }
+        /// <summary>
+        /// 设置开始按压信息
+        /// </summary>
+        /// <param name="press"></param>
         public static void SetStartPress(ref PressInfo press)
         {
             int row = press.Row + ShowStart;
@@ -560,6 +650,10 @@ namespace huqiang.Core.HGUI
             StartPress.Row = row;
             StartPress.Offset = press.Offset;
         }
+        /// <summary>
+        /// 设置结束按压信息
+        /// </summary>
+        /// <param name="press"></param>
         public static void SetEndPress(ref PressInfo press)
         {
             int row = press.Row + ShowStart;
@@ -567,6 +661,10 @@ namespace huqiang.Core.HGUI
             EndPress.Row = row;
             EndPress.Offset = press.Offset;
         }
+        /// <summary>
+        /// 获取开始按压信息
+        /// </summary>
+        /// <returns></returns>
         public static PressInfo GetStartPress()
         {
             PressInfo p = new PressInfo();
@@ -579,6 +677,10 @@ namespace huqiang.Core.HGUI
                 p.Index += Keyboard.CompositionString.Length;
             return p;
         }
+        /// <summary>
+        /// 获取结束按压信息
+        /// </summary>
+        /// <returns></returns>
         public static PressInfo GetEndPress()
         {
             PressInfo p = new PressInfo();

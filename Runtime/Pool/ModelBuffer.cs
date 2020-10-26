@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace huqiang.Pool
 {
+    /// <summary>
+    /// 模型缓存
+    /// </summary>
     public class ModelBuffer
     {
         Type[] types;
@@ -12,6 +15,13 @@ namespace huqiang.Pool
         public int Index;
         public Int64 type;
         Container<InstanceContext> container;
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="type">对象类型, 所有组件的位或值</param>
+        /// <param name="buffersize">缓存大小</param>
+        /// <param name="typ">组件的类型信息</param>
+        /// <param name="contain">联系上下文缓存</param>
         public ModelBuffer(Int64 type, int buffersize, Type[] typ, Container<InstanceContext> contain)
         {
             if (buffersize > 0)

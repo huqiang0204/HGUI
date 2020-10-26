@@ -92,6 +92,12 @@ namespace huqiang.WebApi
         public const int MaxLevel = 18;
         public static string AK = "MgRcqKAaBmaP3jIozTcTORIpuZ08oISA";
         static int Index = 0;
+        /// <summary>
+        /// GPS坐标转墨卡坐标
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="action"></param>
         public static void GPSToMercato(double x, double y, Action<LanLat> action)
         {
             string url = string.Format("http://api.map.baidu.com/geoconv/v1/?coords={0},{1}&from=1&to=6&ak={2}", x, y,AK);
@@ -114,7 +120,7 @@ namespace huqiang.WebApi
             };
         }
         /// <summary>
-        /// 
+        /// 墨卡坐标转瓦片坐标
         /// </summary>
         /// <param name="ll"></param>
         /// <param name="zoom">3-18</param>
@@ -134,6 +140,12 @@ namespace huqiang.WebApi
             ti.oy = (float)ry;
             return ti;
         }
+        /// <summary>
+        /// 瓦片坐标转墨卡坐标
+        /// </summary>
+        /// <param name="tile"></param>
+        /// <param name="zoom"></param>
+        /// <returns></returns>
         public static LanLat TileToMercato(ref TilePos tile, int zoom)
         {
             int s = 1 << (18 - zoom);
@@ -146,6 +158,13 @@ namespace huqiang.WebApi
             ll.y = y;
             return ll;
         }
+        /// <summary>
+        /// GPS坐标转瓦片坐标
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="zoom"></param>
+        /// <param name="action"></param>
         public static void GPSToTile(double x, double y,int zoom, Action<LanLat> action)
         {
             string url = string.Format("http://api.map.baidu.com/geoconv/v1/?coords={0},{1}&from=1&to=6&ak={2}", x, y,AK);
@@ -168,6 +187,15 @@ namespace huqiang.WebApi
                 }
             };
         }
+        /// <summary>
+        /// 获取瓦片图片
+        /// </summary>
+        /// <param name="tileX"></param>
+        /// <param name="tileY"></param>
+        /// <param name="zoom"></param>
+        /// <param name="name"></param>
+        /// <param name="action"></param>
+        /// <param name="context"></param>
         public static void GetTileMap(int tileX, int tileY, int zoom, string name, Action<string, string, object, byte[]> action, object context)
         {
             int z = zoom;

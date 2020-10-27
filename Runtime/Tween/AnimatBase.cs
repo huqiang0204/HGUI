@@ -16,20 +16,41 @@ namespace huqiang
         /// 总计时长
         /// </summary>
         protected float m_time;
+        /// <summary>
+        /// 延迟启动时间
+        /// </summary>
         public float Delay { get; set; }
+        /// <summary>
+        /// 总计时长
+        /// </summary>
         public float Time { get { return m_time; } set { m_time = value; } }
+        /// <summary>
+        /// 是否循环
+        /// </summary>
         public bool Loop;
         /// <summary>
         /// 播放累计时长
         /// </summary>
         protected float c_time;
+        /// <summary>
+        /// 播放状态
+        /// </summary>
         protected bool playing = false;
+        /// <summary>
+        /// 播放完毕自动隐藏
+        /// </summary>
         public bool AutoHide = false;
+        /// <summary>
+        /// 开始播放
+        /// </summary>
         public virtual void Play()
         {
             playing = true;
             c_time = 0;
         }
+        /// <summary>
+        /// 暂停播放
+        /// </summary>
         public virtual void Pause()
         {
             playing = false;

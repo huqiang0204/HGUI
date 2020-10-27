@@ -19,8 +19,18 @@ namespace huqiang
     /// </summary>
     public class Timer : AnimatBase, AnimatInterface
     {
+        /// <summary>
+        /// 启动时的委托
+        /// </summary>
         public Action<Timer> PlayStart;
+        /// <summary>
+        /// 结束时的委托
+        /// </summary>
         public Action<Timer> PlayOver;
+        /// <summary>
+        /// 每帧更新
+        /// </summary>
+        /// <param name="timeslice"></param>
         public void Update(float timeslice)
         {
             if (playing)
@@ -52,14 +62,14 @@ namespace huqiang
             }
         }
         /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
         public Timer()
         {
             AnimationManage.Manage.AddAnimat(this);
         }
         /// <summary>
-        /// 
+        /// 释放资源
         /// </summary>
         public void Dispose()
         {

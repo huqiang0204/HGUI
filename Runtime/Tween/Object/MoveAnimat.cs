@@ -6,18 +6,44 @@ using UnityEngine;
 
 namespace huqiang
 {
+    /// <summary>
+    /// 位移动画
+    /// </summary>
     public class MoveAnimat : AnimatBase, AnimatInterface
     {
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="t">目标对象实例</param>
         public MoveAnimat(Transform t)
         {
             Target = t;
             AnimationManage.Manage.AddAnimat(this);
         }
+        /// <summary>
+        /// 目标对象实例
+        /// </summary>
         public Transform Target;
+        /// <summary>
+        /// 开始位置
+        /// </summary>
         public Vector3 StartPosition;
+        /// <summary>
+        /// 结束位置
+        /// </summary>
         public Vector3 EndPosition;
+        /// <summary>
+        /// 动画启动时的委托
+        /// </summary>
         public Action<MoveAnimat> PlayStart;
+        /// <summary>
+        /// 动画结束时的委托
+        /// </summary>
         public Action<MoveAnimat> PlayOver;
+        /// <summary>
+        /// 帧更新
+        /// </summary>
+        /// <param name="timeslice"></param>
         public void Update(float timeslice)
         {
             if (playing)
@@ -55,6 +81,9 @@ namespace huqiang
                 }
             }
         }
+        /// <summary>
+        /// 释放资源
+        /// </summary>
         public void Dispose()
         {
             if (AutoHide)

@@ -13,11 +13,28 @@ namespace huqiang.UIEvent
         Circle,
         Polygon
     }
+    /// <summary>
+    /// 事件碰撞器
+    /// </summary>
     public interface EventCollider
     {
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <param name="fake">数据缓存</param>
         void Initial(FakeStruct fake);
+        /// <summary>
+        /// 检测点是否在碰撞器里面
+        /// </summary>
+        /// <param name="script">ui对象实例</param>
+        /// <param name="user">用户时间</param>
+        /// <param name="dot">检测点</param>
+        /// <returns>返回真,则点在碰撞器里面</returns>
         bool InThere(UIElement script, UserEvent user, Vector2 dot);
     }
+    /// <summary>
+    /// 矩形碰撞器
+    /// </summary>
     public class UIBoxCollider : EventCollider
     {
         Vector2[] Box = new Vector2[4];
@@ -41,7 +58,9 @@ namespace huqiang.UIEvent
         public void Initial(FakeStruct fake) { }
 
     }
-
+    /// <summary>
+    /// 圆形碰撞器
+    /// </summary>
     public class UICircleCollider : EventCollider
     {
         public float Radius;
@@ -142,9 +161,14 @@ namespace huqiang.UIEvent
             Ratio = fake.GetFloat(2);
         }
     }
-
+    /// <summary>
+    /// 多边形碰撞器
+    /// </summary>
     public class UIPolygonCollider : EventCollider
     {
+        /// <summary>
+        /// 多边形所有顶点
+        /// </summary>
         public Vector2[] Points;
         Vector2[] tmp;
         public bool InThere(UIElement script, UserEvent user, Vector2 dot)

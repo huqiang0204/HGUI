@@ -7,6 +7,9 @@ using UnityEngine;
 
 namespace huqiang
 {
+    /// <summary>
+    /// AssetBundle进度动画
+    /// </summary>
     public class Progress : AnimatInterface
     {
         public Progress()

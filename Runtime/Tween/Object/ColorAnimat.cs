@@ -7,9 +7,19 @@ using UnityEngine;
 
 namespace huqiang
 {
+    /// <summary>
+    /// 颜色过渡动画
+    /// </summary>
     public class ColorAnimat : AnimatBase, AnimatInterface
     {
+        /// <summary>
+        /// 目标图形
+        /// </summary>
         public HGraphics Target { get; private set; }
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="img">图形实例对象</param>
         public ColorAnimat(HGraphics img)
         {
             Target = img;
@@ -20,10 +30,18 @@ namespace huqiang
             playing = true;
         }
         public Action<ColorAnimat> PlayOver;
-        public float Interval = 100;
-        public bool autoHide;
+        /// <summary>
+        /// 开始颜色值
+        /// </summary>
         public Color StartColor;
+        /// <summary>
+        /// 目标颜色值
+        /// </summary>
         public Color EndColor;
+        /// <summary>
+        /// 状态更新
+        /// </summary>
+        /// <param name="time">帧时间</param>
         public void Update(float time)
         {
             if (playing)
@@ -59,6 +77,9 @@ namespace huqiang
                 }
             }
         }
+        /// <summary>
+        /// 释放资源
+        /// </summary>
         public void Dispose()
         {
             AnimationManage.Manage.ReleaseAnimat(this);

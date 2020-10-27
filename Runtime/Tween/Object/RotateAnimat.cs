@@ -6,18 +6,44 @@ using UnityEngine;
 
 namespace huqiang
 {
+    /// <summary>
+    /// 旋转动画
+    /// </summary>
     public class RotateAnimat : AnimatBase, AnimatInterface
     {
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="t">目标对象</param>
         public RotateAnimat(Transform t)
         {
             Target = t;
             AnimationManage.Manage.AddAnimat(this);
         }
+        /// <summary>
+        /// 目标对象
+        /// </summary>
         public Transform Target;
+        /// <summary>
+        /// 开始角度
+        /// </summary>
         public Vector3 StartAngle;
+        /// <summary>
+        /// 结束角度
+        /// </summary>
         public Vector3 EndAngle;
+        /// <summary>
+        /// 启动时的委托函数
+        /// </summary>
         public Action<RotateAnimat> PlayStart;
+        /// <summary>
+        /// 播放完毕时的委托函数
+        /// </summary>
         public Action<RotateAnimat> PlayOver;
+        /// <summary>
+        /// 帧更新
+        /// </summary>
+        /// <param name="timeslice">时间片</param>
         public void Update(float timeslice)
         {
             if (playing)
@@ -55,6 +81,9 @@ namespace huqiang
                 }
             }
         }
+        /// <summary>
+        /// 释放资源
+        /// </summary>
         public void Dispose()
         {
             if (AutoHide)

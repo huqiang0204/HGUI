@@ -6,6 +6,9 @@ using UnityEngine;
 
 namespace huqiang.UIEvent
 {
+    /// <summary>
+    /// 手势事件
+    /// </summary>
     public class GestureEvent : UserEvent
     {
         internal static void Dispatch(UserAction[] actions)
@@ -47,16 +50,37 @@ namespace huqiang.UIEvent
         }
         static List<GestureEvent> events;
         List<UserAction> lastActions;
+        /// <summary>
+        /// 当前帧所有输入事件
+        /// </summary>
         public List<UserAction> actions;
         int Fingers;
         int pressCount;
         int downCount;
         int upCount;
+        /// <summary>
+        /// 当前缩放尺寸
+        /// </summary>
         public float CurScale { get; private set; }
+        /// <summary>
+        /// 当前帧与上一帧的缩放尺寸
+        /// </summary>
         public float DeltaScale { get; private set; }
+        /// <summary>
+        /// 双指的直线距离
+        /// </summary>
         public float DirPix { get; private set; }
+        /// <summary>
+        /// 双指的当前帧距离
+        /// </summary>
         public float DeltaPix { get; private set; }
+        /// <summary>
+        /// 双指的角度
+        /// </summary>
         public float DirAngle { get; private set; }
+        /// <summary>
+        /// 双指的当前帧角度
+        /// </summary>
         public float DeltaAngle { get; private set; }
 
         void Analysis()
@@ -131,12 +155,24 @@ namespace huqiang.UIEvent
         long PressTime3;
         long PressTime4;
         long PressTime5;
+        /// <summary>
+        /// 触控1的开始位置
+        /// </summary>
         public Vector2 RawPos0;
+        /// <summary>
+        /// 触控2的开始位置
+        /// </summary>
         public Vector2 RawPos1;
         Vector2 RawPos2;
         Vector2 RawPos3;
         Vector2 RawPos4;
+        /// <summary>
+        /// 触控1的上一帧位置
+        /// </summary>
         public Vector2 LastPos0;
+        /// <summary>
+        /// 触控2的上一帧位置
+        /// </summary>
         public Vector2 LastPos1;
         Vector2 LastPos2;
         Vector2 LastPos3;
@@ -309,21 +345,69 @@ namespace huqiang.UIEvent
                     break;
             }
         }
+        /// <summary>
+        /// 双指按压
+        /// </summary>
         public Action<GestureEvent> TowFingerPressd;
+        /// <summary>
+        /// 三指按压
+        /// </summary>
         public Action<GestureEvent> ThreeFingerPressd;
+        /// <summary>
+        /// 四指按压
+        /// </summary>
         public Action<GestureEvent> FourFingerPressd;
+        /// <summary>
+        /// 五指按压
+        /// </summary>
         public Action<GestureEvent> FiveFingerPressd;
+        /// <summary>
+        /// 双指移动
+        /// </summary>
         public Action<GestureEvent> TowFingerMove;
+        /// <summary>
+        /// 三指移动
+        /// </summary>
         public Action<GestureEvent> ThreeFingerMove;
+        /// <summary>
+        /// 四指移动
+        /// </summary>
         public Action<GestureEvent> FourFingerMove;
+        /// <summary>
+        /// 五指移动
+        /// </summary>
         public Action<GestureEvent> FiveFingerMove;
+        /// <summary>
+        /// 双指弹起
+        /// </summary>
         public Action<GestureEvent> TowFingerUp;
+        /// <summary>
+        /// 三指弹起
+        /// </summary>
         public Action<GestureEvent> ThreeFingerUp;
+        /// <summary>
+        /// 四指弹起
+        /// </summary>
         public Action<GestureEvent> FourFingerUp;
+        /// <summary>
+        /// 五指弹起
+        /// </summary>
         public Action<GestureEvent> FiveFingerUp;
+        /// <summary>
+        /// 双指单击
+        /// </summary>
         public Action<GestureEvent> TowFingerClick;
+        /// <summary>
+        /// 三指单击
+        /// </summary>
         public Action<GestureEvent> ThreeFingerClick;
+        /// <summary>
+        /// 四指单击
+        /// </summary>
         public Action<GestureEvent> FourFingerClick;
+        /// <summary>
+        /// 五指单击
+        /// </summary>
         public Action<GestureEvent> FiveFingerClick;
     }
 }

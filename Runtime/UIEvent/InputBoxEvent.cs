@@ -10,6 +10,9 @@ using UnityEngine;
 
 namespace huqiang.UIEvent
 {
+    /// <summary>
+    /// 输入框事件
+    /// </summary>
     public class InputBoxEvent:UserEvent
     {
         public InputBox input;

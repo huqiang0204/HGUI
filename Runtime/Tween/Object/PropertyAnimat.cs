@@ -7,29 +7,57 @@ using System.Text;
 namespace huqiang
 {
     /// <summary>
-    /// 属性动画，用于更新某个类的某个属性的动画
+    /// 属性动画，用于更新某个类的某个属性的动画,使用反射,不推荐使用
     /// </summary>
     public class PropertyFloat
     {
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="cla">目标对象</param>
+        /// <param name="PropertyName">属性名称</param>
         public PropertyFloat(object cla, string PropertyName)
         {
             Target = cla;
             info = cla.GetType().GetProperty(PropertyName);
         }
+        /// <summary>
+        /// 开始值
+        /// </summary>
         public float StartValue;
+        /// <summary>
+        /// 结束值
+        /// </summary>
         public float EndValue;
         float delay;
+        /// <summary>
+        /// 延迟开始
+        /// </summary>
         public float Delay;
+        /// <summary>
+        /// 总计时间
+        /// </summary>
         public float Time;
         float SurplusTime;
+        /// <summary>
+        /// 目标对象
+        /// </summary>
         internal object Target;
         PropertyInfo info;
+        /// <summary>
+        /// 重置状态
+        /// </summary>
         internal void Reset()
         {
             SurplusTime = Time;
             delay = Delay;
             info.SetValue(Target, 0, null);
         }
+        /// <summary>
+        /// 帧更新
+        /// </summary>
+        /// <param name="t">目标属性</param>
+        /// <param name="timeslice">时间片</param>
         internal static void Update(PropertyFloat t, float timeslice)
         {
             if (t.delay > 0)
@@ -63,19 +91,37 @@ namespace huqiang
     public class PropertyAnimat : AnimatBase, AnimatInterface
     {
         List<PropertyFloat> lpf;
+        /// <summary>
+        /// 启动时的委托函数
+        /// </summary>
         public Action<PropertyAnimat> PlayStart;
+        /// <summary>
+        /// 播放完毕时的委托函数
+        /// </summary>
         public Action<PropertyAnimat> PlayOver;
+        /// <summary>
+        /// 添加属性更新委托
+        /// </summary>
+        /// <param name="pf"></param>
         public void AddDelegate(PropertyFloat pf)
         {
             if (lpf == null)
                 lpf = new List<PropertyFloat>();
             lpf.Add(pf);
         }
+        /// <summary>
+        /// 移除属性更新委托
+        /// </summary>
+        /// <param name="pf"></param>
         public void RemoveDelegate(PropertyFloat pf)
         {
             if (lpf != null)
                 lpf.Remove(pf);
         }
+        /// <summary>
+        /// 帧更新
+        /// </summary>
+        /// <param name="timeslice">时间片</param>
         public void Update(float timeslice)
         {
             if (playing)
@@ -116,6 +162,9 @@ namespace huqiang
                 }
             }
         }
+        /// <summary>
+        /// 开始播放
+        /// </summary>
         public override void Play()
         {
             c_time = m_time;
@@ -128,6 +177,9 @@ namespace huqiang
         {
             AnimationManage.Manage.AddAnimat(this);
         }
+        /// <summary>
+        /// 释放资源
+        /// </summary>
         public void Dispose()
         {
             AnimationManage.Manage.ReleaseAnimat(this);

@@ -194,9 +194,21 @@ namespace huqiang.UIEvent
         Vector2 maxVelocity;
         Vector2 sDistance;
         Vector2 mVelocity;
+        /// <summary>
+        /// 父物体的全局缩放
+        /// </summary>
         protected Vector3 pgs = Vector3.one;
+        /// <summary>
+        /// 全局缩放
+        /// </summary>
         public Vector3 GlobalScale = Vector3.one;
+        /// <summary>
+        /// 全局坐标
+        /// </summary>
         public Vector3 GlobalPosition;
+        /// <summary>
+        /// 全局旋转
+        /// </summary>
         public Quaternion GlobalRotation;
         public float ScrollDistanceX
         {
@@ -230,16 +242,42 @@ namespace huqiang.UIEvent
         }
         public float DecayRateX = 0.998f;
         public float DecayRateY = 0.998f;
+        /// <summary>
+        /// 按压时的初始位置
+        /// </summary>
         public Vector2 RawPosition { get; protected set; }
         Vector2 LastPosition;
+        /// <summary>
+        /// 鼠标悬停时间,单位毫秒
+        /// </summary>
         public int HoverTime { get; protected set; }
+        /// <summary>
+        /// 按压时间
+        /// </summary>
         public long PressTime { get; internal set; }
+        /// <summary>
+        /// 初次进入的时间
+        /// </summary>
         public long EntryTime { get; protected set; }
+        /// <summary>
+        /// 静止不动时间
+        /// </summary>
         public long StayTime { get; protected set; }
+        /// <summary>
+        /// 按压状态
+        /// </summary>
         public bool Pressed { get; internal set; }
-        public Vector3[] Rectangular { get; private set; }
+        /// <summary>
+        /// 用户拖拽造成的速率X
+        /// </summary>
         public float VelocityX { get { return mVelocity.x; } set { maxVelocity.x = mVelocity.x = value; RefreshRateX(); } }
+        /// <summary>
+        /// 用户拖拽造成的速率Y
+        /// </summary>
         public float VelocityY { get { return mVelocity.y; } set { maxVelocity.y = mVelocity.y = value; RefreshRateY(); } }
+        /// <summary>
+        /// 禁止此用户事件
+        /// </summary>
         public bool forbid;
         /// <summary>
         /// 开启此项,范围外不会把事件传给子组件
@@ -253,30 +291,85 @@ namespace huqiang.UIEvent
         /// 允许事件穿透
         /// </summary>
         public bool Penetrate = false;
-
+        /// <summary>
+        /// 鼠标或触摸是否在UI里面
+        /// </summary>
         public bool entry { get; protected set; }
         private int index;
+        /// <summary>
+        /// 自动调色
+        /// </summary>
         public bool AutoColor = true;
         internal Color g_color = Color.white;
+        /// <summary>
+        /// 联系上下文
+        /// </summary>
         public object DataContext;
-
+        /// <summary>
+        /// 光标按下
+        /// </summary>
         public Action<UserEvent, UserAction> PointerDown;
+        /// <summary>
+        /// 光标弹起
+        /// </summary>
         public Action<UserEvent, UserAction> PointerUp;
+        /// <summary>
+        /// 光标单击
+        /// </summary>
         public Action<UserEvent, UserAction> Click;
+        /// <summary>
+        /// 光标进入ui区域
+        /// </summary>
         public Action<UserEvent, UserAction> PointerEntry;
+        /// <summary>
+        /// 光标移动
+        /// </summary>
         public Action<UserEvent, UserAction> PointerMove;
+        /// <summary>
+        /// 光标离开此UI区域
+        /// </summary>
         public Action<UserEvent, UserAction> PointerLeave;
+        /// <summary>
+        /// 光标悬停
+        /// </summary>
         public Action<UserEvent, UserAction> PointerHover;
+        /// <summary>
+        /// 滚轮滚动
+        /// </summary>
         public Action<UserEvent, UserAction> MouseWheel;
+        /// <summary>
+        /// 光标拖拽
+        /// </summary>
         public Action<UserEvent, UserAction, Vector2> Drag;
+        /// <summary>
+        /// 光标拖拽完毕
+        /// </summary>
         public Action<UserEvent, UserAction, Vector2> DragEnd;
+        /// <summary>
+        /// 拖拽后造成的持续滚动
+        /// </summary>
         public Action<UserEvent, Vector2> Scrolling;
+        /// <summary>
+        /// 当X轴滚动完毕
+        /// </summary>
         public Action<UserEvent> ScrollEndX;
+        /// <summary>
+        /// Y轴滚动完毕
+        /// </summary>
         public Action<UserEvent> ScrollEndY;
+        /// <summary>
+        /// 失去焦点
+        /// </summary>
         public Action<UserEvent, UserAction> LostFocus;
 
         UserAction FocusAction;
+        /// <summary>
+        /// 绑定的UI元素
+        /// </summary>
         public UIElement Context;
+        /// <summary>
+        /// 碰撞器
+        /// </summary>
         public EventCollider collider;
         public UserEvent()
         {
@@ -300,6 +393,11 @@ namespace huqiang.UIEvent
             else
                 sDistance.y = (float)MathH.PowDistance(DecayRateY, maxVelocity.y, 1000000);
         }
+        /// <summary>
+        /// 屏幕坐标转换到局部坐标
+        /// </summary>
+        /// <param name="v">屏幕坐标</param>
+        /// <returns></returns>
         public Vector3 ScreenToLocal(Vector3 v)
         {
             v -= GlobalPosition;

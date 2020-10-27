@@ -181,12 +181,24 @@ namespace huqiang.UIComposite
         /// </summary>
         public ScrollType scrollType = ScrollType.BounceBack;
         public static readonly Vector2 Center = new Vector2(0.5f, 0.5f);
-        public Vector2 Size;//scrollView的尺寸
-        public Vector2 ActualSize { get; protected set; }//相当于Content的尺寸
+        /// <summary>
+        /// 滚动框的尺寸
+        /// </summary>
+        public Vector2 Size;
+        /// <summary>
+        /// 内容的实际尺寸
+        /// </summary>
+        public Vector2 ActualSize { get; protected set; }
+        /// <summary>
+        /// 项目尺寸
+        /// </summary>
         public Vector2 ItemSize = new Vector2(1,1);
         public int SelectIndex = -1;
         FakeStruct modData;
         protected FakeStruct ItemElement;
+        /// <summary>
+        /// 项目模板
+        /// </summary>
         public FakeStruct ItemMod
         {
             set
@@ -247,6 +259,9 @@ namespace huqiang.UIComposite
             }
         }
         int m_len;
+        /// <summary>
+        /// 数据长度
+        /// </summary>
         public int DataLength
         {
             set { m_len = value; }
@@ -261,6 +276,11 @@ namespace huqiang.UIComposite
                 return m_len;
             }
         }
+        /// <summary>
+        /// 获取数据
+        /// </summary>
+        /// <param name="index">数据索引</param>
+        /// <returns></returns>
         public object GetData(int index)
         {
             if (index < 0)
@@ -279,19 +299,50 @@ namespace huqiang.UIComposite
             }
             return null;
         }
+        /// <summary>
+        /// 项目其实偏移位置
+        /// </summary>
         public Vector2 ItemOffset = Vector2.zero;
+        /// <summary>
+        /// 最小尺寸
+        /// </summary>
         public Vector2 MinBox;
+        /// <summary>
+        /// 最大缓存
+        /// </summary>
         protected int max_count;
+        /// <summary>
+        /// UI项目列表
+        /// </summary>
         public List<ScrollItem> Items=new List<ScrollItem>();
+        /// <summary>
+        /// UI项目缓存列表
+        /// </summary>
         List<ScrollItem> Buffer=new List<ScrollItem>();
+        /// <summary>
+        ///  UI项目回收列表
+        /// </summary>
         List<ScrollItem> Recycler = new List<ScrollItem>();
         /// <summary>
         /// 当某个ui超出Mask边界，被回收时调用
         /// </summary>
         public Action<ScrollItem> ItemRecycle;
+        /// <summary>
+        /// 主体对象
+        /// </summary>
         public Transform Main;
+        /// <summary>
+        /// 滑块条
+        /// </summary>
         protected UISlider m_slider;
+        /// <summary>
+        /// 滑块条
+        /// </summary>
         public virtual UISlider Slider { get; set; }
+        /// <summary>
+        /// 设置项目模型
+        /// </summary>
+        /// <param name="name">模型名称</param>
         public void SetItemMod(string name)
         {
             if (BufferData == null)
@@ -313,6 +364,11 @@ namespace huqiang.UIComposite
             }
             ItemMod = mod;
         }
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <param name="mod">模型数据</param>
+        /// <param name="script">主体元素</param>
         public override void Initial(FakeStruct mod, UIElement script)
         {
             base.Initial(mod,script);
@@ -330,6 +386,11 @@ namespace huqiang.UIComposite
             SetItemMod("Item");
             HGUIManager.GameBuffer.RecycleChild(script.gameObject, new string[] { "Slider" });
         }
+        /// <summary>
+        /// 刷新显示UI
+        /// </summary>
+        /// <param name="x">位置x</param>
+        /// <param name="y">位置y</param>
         public virtual void Refresh(float x = 0, float y = 0)
         {
         }
@@ -339,6 +400,10 @@ namespace huqiang.UIComposite
             int y = (int)(Size.y / ItemSize.y) + 2;
             max_count = x * y;
         }
+        /// <summary>
+        /// 创建项目实例
+        /// </summary>
+        /// <returns></returns>
         protected ScrollItem CreateItem()
         {
             if (Recycler.Count> 0)
@@ -383,6 +448,13 @@ namespace huqiang.UIComposite
             return a;
         }
         Constructor creator;
+        /// <summary>
+        /// 设置项目跟新函数
+        /// </summary>
+        /// <typeparam name="T">UI模板</typeparam>
+        /// <typeparam name="U">数据模板</typeparam>
+        /// <param name="action">项目更新回调</param>
+        /// <param name="reflect">使用反射</param>
         public void SetItemUpdate<T,U>(Action<T,U, int> action,bool reflect = true)where T:class,new()
         {
             Clear();
@@ -402,9 +474,17 @@ namespace huqiang.UIComposite
             creator = constructor;
             creator.create = true;
         }
+        /// <summary>
+        /// UI排序
+        /// </summary>
+        /// <param name="os"></param>
+        /// <param name="force"></param>
         public virtual void Order(float os, bool force = false)
         {
         }
+        /// <summary>
+        /// 清除UI资源
+        /// </summary>
         public void Clear()
         {
             for (int i = 0; i < Items.Count; i++)
@@ -414,6 +494,9 @@ namespace huqiang.UIComposite
             Items.Clear();
             Recycler.Clear();
         }
+        /// <summary>
+        /// 压入缓存
+        /// </summary>
         protected void PushItems()
         {
             for (int i = 0; i < Items.Count; i++)
@@ -421,6 +504,11 @@ namespace huqiang.UIComposite
             Buffer.AddRange(Items);
             Items.Clear();
         }
+        /// <summary>
+        /// 从缓存中提取
+        /// </summary>
+        /// <param name="index">索引</param>
+        /// <returns></returns>
         protected ScrollItem PopItem(int index)
         {
             for(int i=0;i<Buffer.Count;i++)
@@ -436,6 +524,11 @@ namespace huqiang.UIComposite
             var it = CreateItem();
             return it;
         }
+        /// <summary>
+        /// 回收边界内的项目
+        /// </summary>
+        /// <param name="down">上边界</param>
+        /// <param name="top">下边界</param>
         protected void RecycleInside(int down, int top)
         {
             int c = Items.Count - 1;
@@ -451,10 +544,10 @@ namespace huqiang.UIComposite
             }
         }
         /// <summary>
-        /// 回收范围外的条目
+        /// 回收超出边界的项目
         /// </summary>
-        /// <param name="down"></param>
-        /// <param name="top"></param>
+        /// <param name="down">上边界</param>
+        /// <param name="top">下边界</param>
         protected void RecycleOutside(int down, int top)
         {
             int c = Items.Count - 1;
@@ -469,6 +562,9 @@ namespace huqiang.UIComposite
                 }
             }
         }
+        /// <summary>
+        /// 回收缓存中剩余的项目
+        /// </summary>
         protected void RecycleRemain()
         {
             for (int i = 0; i < Buffer.Count; i++)
@@ -476,6 +572,10 @@ namespace huqiang.UIComposite
             Recycler.AddRange(Buffer);
             Buffer.Clear();
         }
+        /// <summary>
+        /// 回收一个项目
+        /// </summary>
+        /// <param name="it"></param>
         protected void RecycleItem(ScrollItem it)
         {
             it.target.gameObject.SetActive(false);
@@ -483,6 +583,14 @@ namespace huqiang.UIComposite
             if (ItemRecycle != null)
                 ItemRecycle(it);
         }
+        /// <summary>
+        /// 固定滚动,撞到边界立马停止
+        /// </summary>
+        /// <param name="eventCall">用户事件</param>
+        /// <param name="v">参考移动量</param>
+        /// <param name="x">限定移动量x</param>
+        /// <param name="y">限定移动量y</param>
+        /// <returns></returns>
         protected Vector2 ScrollNone(UserEvent eventCall,ref Vector2 v,ref float x,ref float y)
         {
             Vector2 v2 = Vector2.zero;
@@ -524,6 +632,14 @@ namespace huqiang.UIComposite
             }
             return v2;
         }
+        /// <summary>
+        /// 无限滚动
+        /// </summary>
+        /// <param name="eventCall">用户事件</param>
+        /// <param name="v">参考移动量</param>
+        /// <param name="x">修正移动量x</param>
+        /// <param name="y">修正移动量y</param>
+        /// <returns></returns>
         protected Vector2 ScrollLoop(UserEvent eventCall, ref Vector2 v, ref float x, ref float y)
         {
             x -= v.x;
@@ -536,6 +652,14 @@ namespace huqiang.UIComposite
             else y %= ActualSize.y;
             return v;
         }
+        /// <summary>
+        /// 回弹滚动,撞到边界会有减速回弹效果
+        /// </summary>
+        /// <param name="eventCall">用户事件</param>
+        /// <param name="v">参考移动量</param>
+        /// <param name="x">衰减移动量x</param>
+        /// <param name="y">衰减移动量y</param>
+        /// <returns></returns>
         protected Vector2 BounceBack(UserEvent eventCall, ref Vector2 v, ref float x, ref float y)
         {
             if (eventCall.Pressed)
@@ -632,6 +756,12 @@ namespace huqiang.UIComposite
             }
             return v;
         }
+        /// <summary>
+        /// 更新项目
+        /// </summary>
+        /// <param name="obj">UI实例</param>
+        /// <param name="dat">数据实例</param>
+        /// <param name="index">数据索引</param>
         protected void ItemUpdate(object obj,object dat, int index)
         {
             if (creator != null)

@@ -15,8 +15,14 @@ namespace huqiang.UIEvent
     /// </summary>
     public class InputBoxEvent:UserEvent
     {
+        /// <summary>
+        /// 输入框复合组件实例
+        /// </summary>
         public InputBox input;
         HText text;
+        /// <summary>
+        /// 输入字符串
+        /// </summary>
         public string InputString;
         EmojiString Content=new EmojiString();
         List<UIVertex> verts = new List<UIVertex>();
@@ -24,11 +30,19 @@ namespace huqiang.UIEvent
         List<UICharInfo> chars = new List<UICharInfo>();
         protected float overDistance = 500;
         protected float overTime = 0;
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <param name="mod">数据缓存</param>
         internal override void Initial(FakeStruct mod)
         {
             AutoColor = false;
             text = Context as HText;
         }
+        /// <summary>
+        /// 替换字符串
+        /// </summary>
+        /// <param name="str">字符串</param>
         public void ChangeText(string str)
         {
             verts.Clear();
@@ -147,6 +161,11 @@ namespace huqiang.UIEvent
             }
             base.OnMouseWheel(action);
         }
+        /// <summary>
+        /// 检测当前光标按在哪两个字符中间了
+        /// </summary>
+        /// <param name="action"></param>
+        /// <param name="press"></param>
         public void CheckPointer(UserAction action, ref PressInfo press)
         {
             if(lines.Count>0)
@@ -190,6 +209,13 @@ namespace huqiang.UIEvent
                 press.Index = start + col;
             }
         }
+        /// <summary>
+        /// 获取光标的显示网格
+        /// </summary>
+        /// <param name="tri">三角形列表</param>
+        /// <param name="vert">顶点列表</param>
+        /// <param name="color">填充颜色</param>
+        /// <param name="start">按压信息</param>
         public void GetPointer(List<int> tri, List<HVertex> vert, ref Color32 color, ref PressInfo start)
         {
             if (start.Row < 0)
@@ -250,6 +276,10 @@ namespace huqiang.UIEvent
             tri.Add(3);
             tri.Add(1);
         }
+        /// <summary>
+        /// 设置输入法显示位置,win平台
+        /// </summary>
+        /// <param name="start">光标按压位置</param>
         public void SetCursorPos(ref PressInfo start)
         {
             if (start.Row < 0)
@@ -294,6 +324,14 @@ namespace huqiang.UIEvent
             gl.Postion.y += Screen.height / 2;
             Keyboard.CursorPos = new Vector2(gl.Postion.x, Screen.height - gl.Postion.y);
         }
+        /// <summary>
+        /// 获取选中区域的网格
+        /// </summary>
+        /// <param name="tri">三角形列表</param>
+        /// <param name="vert">顶点列表</param>
+        /// <param name="color">填充颜色</param>
+        /// <param name="start">开始按压位置信息</param>
+        /// <param name="end">结束按压位置信息</param>
         public void GetSelectArea(List<int> tri, List<HVertex> vert, ref Color32 color, ref PressInfo start, ref PressInfo end)
         {
             int sr = start.Row;

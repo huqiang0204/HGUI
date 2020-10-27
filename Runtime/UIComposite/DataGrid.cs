@@ -38,11 +38,32 @@ namespace huqiang.UIComposite
         /// 宽度
         /// </summary>
         public float width = 80;
+        /// <summary>
+        /// 标题
+        /// </summary>
         public string Head;
+        /// <summary>
+        /// ui布局模型
+        /// </summary>
         public FakeStruct mod;
+        /// <summary>
+        /// 此列绑定的数据列表
+        /// </summary>
         public List<DataGridItemContext> datas = new List<DataGridItemContext>();
+        /// <summary>
+        /// 此列的UI模型初始化创建器
+        /// </summary>
         public ModelConstructor itemCreator;
+        /// <summary>
+        /// 此列的重复回收利用缓存
+        /// </summary>
         public QueueBuffer<DataGridItem> buf=new QueueBuffer<DataGridItem>(128);
+        /// <summary>
+        /// 设置此列的Item更新模板和回调函数
+        /// </summary>
+        /// <typeparam name="T">UI反射模板</typeparam>
+        /// <typeparam name="U">数据模板</typeparam>
+        /// <param name="action">回调函数</param>
         public void SetItemUpdate<T, U>(Action<T, U> action)
             where T : DataGridItem, new() where U : DataGridItemContext, new()
         {
@@ -50,6 +71,10 @@ namespace huqiang.UIComposite
             m.Invoke = action;
             itemCreator = m;
         }
+        /// <summary>
+        /// 创建一个实例,如果回收缓存中有就从缓存中提取
+        /// </summary>
+        /// <returns></returns>
         public DataGridItem CreateEnity()
         {
             DataGridItem it = buf.Dequeue();
@@ -63,35 +88,78 @@ namespace huqiang.UIComposite
             return t;
         }
     }
+    /// <summary>
+    /// 模型构造器
+    /// </summary>
     public class ModelConstructor
     {
+        /// <summary>
+        /// UI初始化器
+        /// </summary>
         public UIInitializer initializer;
+        /// <summary>
+        /// 创建一个UI实体
+        /// </summary>
+        /// <returns></returns>
         public virtual object Create() { return null; }
+        /// <summary>
+        /// 更新项目
+        /// </summary>
+        /// <param name="obj">UI实体</param>
+        /// <param name="dat">数据实体</param>
         public virtual void Update(object obj, object dat) { }
     }
- 
+    /// <summary>
+    /// 模型中间件
+    /// </summary>
+    /// <typeparam name="T">UI模型</typeparam>
+    /// <typeparam name="U">数据模型</typeparam>
     public class ModelMiddleware<T, U> : ModelConstructor where T :class, new() where U : class, new()
     {
+        /// <summary>
+        /// 构造函数
+        /// </summary>
         public ModelMiddleware()
         {
             initializer = new UIInitializer(TempReflection.ObjectFields(typeof(T)));
         }
+        /// <summary>
+        /// 创建UI实例
+        /// </summary>
+        /// <returns></returns>
         public override object Create()
         {
             var t = new T();
             initializer.Reset(t);
             return t;
         }
+        /// <summary>
+        /// 项目更新委托
+        /// </summary>
         public Action<T, U> Invoke;
+        /// <summary>
+        /// 项目更新
+        /// </summary>
+        /// <param name="obj">ui实例</param>
+        /// <param name="dat">数据实例</param>
         public override void Update(object obj, object dat)
         {
             if (Invoke != null)
                 Invoke(obj as T, dat as U);
         }
     }
+    /// <summary>
+    /// 网格数据滚动框
+    /// </summary>
     public class DataGrid:Composite
     {
+        /// <summary>
+        /// 拖动列宽度时,光标显示的Icon
+        /// </summary>
         public static Texture2D CursorX;
+        /// <summary>
+        /// 拖动行高时,光标显示的Icon,暂未开发
+        /// </summary>
         public static Texture2D CursorY;
         /// <summary>
         /// 当前滚动的位置
@@ -113,6 +181,9 @@ namespace huqiang.UIComposite
         float lineWidth;
         float lineHigh;
         List<DataGridColumn> columns = new List<DataGridColumn>();
+        /// <summary>
+        /// 所有列
+        /// </summary>
         public List<DataGridColumn> BindingData { get => columns; }
         SwapBuffer<DataGridHead, DataGridColumn> HeadSwap;
         QueueBuffer<DataGridHead> headQueue;
@@ -122,7 +193,13 @@ namespace huqiang.UIComposite
         //List<HImage> lines;
         List<HImage> temp;
         public UserEvent eventCall;
+        /// <summary>
+        /// 当用户改变列宽时调用此委托
+        /// </summary>
         public Action<DataGrid,DataGridColumn> ColumnResized;
+        /// <summary>
+        /// 构造函数
+        /// </summary>
         public DataGrid()
         {
             HeadSwap = new SwapBuffer<DataGridHead, DataGridColumn>(128);
@@ -134,6 +211,11 @@ namespace huqiang.UIComposite
             dragSwap = new SwapBuffer<UserEvent, DataGridHead>(128);
             temp = new List<HImage>();
         }
+        /// <summary>
+        /// 初始化布局
+        /// </summary>
+        /// <param name="mod">数据模型</param>
+        /// <param name="element">UI元素主体</param>
         public override void Initial(FakeStruct mod, UIElement element)
         {
             base.Initial(mod, element);
@@ -178,6 +260,9 @@ namespace huqiang.UIComposite
             LimitY(back, v.y);
             Refresh();
         }
+        /// <summary>
+        /// 初始化设置和绑定数据后调用此函数,刷新显示内容
+        /// </summary>
         public void Refresh()
         {
             float x = 0;
@@ -458,6 +543,10 @@ namespace huqiang.UIComposite
                 }
             }
         }
+        /// <summary>
+        /// 添加列
+        /// </summary>
+        /// <param name="column">列数据实体</param>
         public void AddColumn(DataGridColumn column)
         {
             int c = 0;
@@ -489,6 +578,10 @@ namespace huqiang.UIComposite
                 column.mod = ItemMod;
             columns.Add(column);
         }
+        /// <summary>
+        /// 移除列
+        /// </summary>
+        /// <param name="index">列索引</param>
         public void RemoveColumn(int index)
         {
             if (index < 0)
@@ -496,6 +589,9 @@ namespace huqiang.UIComposite
             if (index < columns.Count)
                 columns.RemoveAt(index);
         }
+        /// <summary>
+        /// 清除所有数据
+        /// </summary>
         public void ClearData()
         {
             for (int i = 0; i < columns.Count; i++)
@@ -503,6 +599,9 @@ namespace huqiang.UIComposite
                 columns[i].datas.Clear();
             }
         }
+        /// <summary>
+        /// 清除所有列
+        /// </summary>
         public void ClearColumn()
         {
             columns.Clear();
@@ -515,6 +614,10 @@ namespace huqiang.UIComposite
             HGUIManager.GameBuffer.RecycleChild(Heads.gameObject);
             HGUIManager.GameBuffer.RecycleChild(Drags.gameObject);
         }
+        /// <summary>
+        /// 添加一行
+        /// </summary>
+        /// <param name="content">数据</param>
         public void AddRow(params DataGridItemContext[] content )
         {
             if(content==null)
@@ -531,6 +634,10 @@ namespace huqiang.UIComposite
                     columns[i].datas.Add(null);
             }
         }
+        /// <summary>
+        /// 移除一行数据
+        /// </summary>
+        /// <param name="index">行索引</param>
         public void RemoveRow(int index)
         {
             if (index < 0)
@@ -547,6 +654,12 @@ namespace huqiang.UIComposite
         }
         ModelConstructor headCreator;
         ModelConstructor itemCreator;
+        /// <summary>
+        /// 设置标头更新函数回调
+        /// </summary>
+        /// <typeparam name="T">UI模型</typeparam>
+        /// <typeparam name="U">数据模型</typeparam>
+        /// <param name="action">更新回调</param>
         public void SetHeadUpdate<T, U>(Action<T, U> action)
      where T : DataGridHead, new() where U : DataGridColumn, new()
         {
@@ -554,6 +667,12 @@ namespace huqiang.UIComposite
             m.Invoke = action;
             headCreator = m;
         }
+        /// <summary>
+        /// 设置列数据项更新函数
+        /// </summary>
+        /// <typeparam name="T">UI模型</typeparam>
+        /// <typeparam name="U">数据模型</typeparam>
+        /// <param name="action">更新回调</param>
         public void SetItemUpdate<T, U>(Action<T, U> action)
             where T : DataGridItem, new() where U : DataGridItemContext, new()
         {
@@ -575,6 +694,11 @@ namespace huqiang.UIComposite
                 else item.Text.Text = null;
             }
         }
+        /// <summary>
+        /// X轴向的滚动限制
+        /// </summary>
+        /// <param name="callBack">用户事件</param>
+        /// <param name="x">移动距离</param>
         protected void LimitX(UserEvent callBack, float x)
         {
             var size = Enity.m_sizeDelta;
@@ -600,6 +724,11 @@ namespace huqiang.UIComposite
             }
             m_pointX += x;
         }
+        /// <summary>
+        /// Y轴向的滚动限制
+        /// </summary>
+        /// <param name="callBack">用户事件</param>
+        /// <param name="y">移动距离</param>
         protected void LimitY(UserEvent callBack, float y)
         {
             var size = Enity.m_sizeDelta;

@@ -655,6 +655,10 @@ namespace huqiang.UIEvent
                 if (back.ScrollEndY != null)
                     back.ScrollEndY(back);
         }
+        /// <summary>
+        /// 获取与UI坐标表的相对位置
+        /// </summary>
+        /// <returns></returns>
         public Vector3 GetOffset()
         {
             Vector3 os = Vector3.zero;

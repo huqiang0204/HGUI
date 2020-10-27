@@ -7,8 +7,14 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
+/// <summary>
+/// 圆形事件区域帮助类
+/// </summary>
 public class CircleEventHelper : UICompositeHelp
 {
+    /// <summary>
+    /// 半径
+    /// </summary>
     public float Radius;
     [Range(0,10)]
     public float Ratio = 1;

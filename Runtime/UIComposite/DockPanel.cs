@@ -7,18 +7,40 @@ using huqiang.Data;
 
 namespace huqiang.UIComposite
 {
+    /// <summary>
+    /// 停靠面板的线
+    /// </summary>
     public class DockPanelLine
     {
+        /// <summary>
+        /// 拖动纵向线时,光标显示的Icon
+        /// </summary>
         public static Texture2D CursorX;
+        /// <summary>
+        /// 拖动横向线时,光标显示的Icon
+        /// </summary>
         public static Texture2D CursorY;
+        /// <summary>
+        /// 目标面板
+        /// </summary>
         public DockPanel layout;
         UserEvent callBack;
         public UIElement Enity;
+        /// <summary>
+        /// 线的方向
+        /// </summary>
         public Direction direction { get; private set; }
         /// <summary>
         /// 需要绘制线
         /// </summary>
         public bool realLine { get; private set; }
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="lay">目标面板</param>
+        /// <param name="mod">线模型</param>
+        /// <param name="dir">方向</param>
+        /// <param name="real">是否需要绘制显示</param>
         public DockPanelLine(DockPanel lay,UIElement mod,Direction dir,bool real=true)
         {
             realLine= real;
@@ -165,7 +187,13 @@ namespace huqiang.UIComposite
         public List<DockpanelArea> Down = new List<DockpanelArea>();
         DockPanelLine LineStart;//起点相邻的线
         DockPanelLine LineEnd;//终点相邻的线
-        List<DockPanelLine> AdjacentLines = new List<DockPanelLine>();//所有与之相邻的线
+        /// <summary>
+        /// 所有与之相邻的线
+        /// </summary>
+        List<DockPanelLine> AdjacentLines = new List<DockPanelLine>();
+        /// <summary>
+        /// 当临边的线改动时会牵动此线的尺寸改变
+        /// </summary>
         public void SizeChanged()
         {
             if(LineStart!=null&LineEnd!=null)
@@ -210,6 +238,10 @@ namespace huqiang.UIComposite
                     Down[i].SizeChanged();
             }
         }
+        /// <summary>
+        /// 设置起点相关的线
+        /// </summary>
+        /// <param name="line"></param>
         public void SetLineStart(DockPanelLine line)
         {
             if (LineStart != null)
@@ -217,6 +249,10 @@ namespace huqiang.UIComposite
             LineStart = line;
             LineStart.AdjacentLines.Add(this);
         }
+        /// <summary>
+        /// 设置终点相关的线
+        /// </summary>
+        /// <param name="line"></param>
         public void SetLineEnd(DockPanelLine line)
         {
             if (LineEnd != null)
@@ -224,6 +260,9 @@ namespace huqiang.UIComposite
             LineEnd = line;
             LineEnd.AdjacentLines.Add(this);
         }
+        /// <summary>
+        /// 释放资源
+        /// </summary>
         public void Dispose()
         {
             if (LineStart != null)
@@ -242,6 +281,10 @@ namespace huqiang.UIComposite
             LineStart = null;
             LineEnd = null;
         }
+        /// <summary>
+        /// 向左合并
+        /// </summary>
+        /// <param name="line">目标线</param>
         public void MergeLeft(DockPanelLine line)
         {
             line.Release();
@@ -261,6 +304,10 @@ namespace huqiang.UIComposite
                 l.SetLineEnd(this);
             }
         }
+        /// <summary>
+        /// 向右合并
+        /// </summary>
+        /// <param name="line">目标线</param>
         public void MergeRight(DockPanelLine line)
         {
             line.Release();
@@ -280,6 +327,10 @@ namespace huqiang.UIComposite
                 l.SetLineStart(this);
             }
         }
+        /// <summary>
+        /// 向上合并
+        /// </summary>
+        /// <param name="line">目标线</param>
         public void MergeTop(DockPanelLine line)
         {
             line.Release();
@@ -299,6 +350,10 @@ namespace huqiang.UIComposite
                 l.SetLineStart(this);
             }
         }
+        /// <summary>
+        /// 向下合并
+        /// </summary>
+        /// <param name="line">目标线</param>
         public void MergeDown(DockPanelLine line)
         {
             line.Release();
@@ -318,6 +373,11 @@ namespace huqiang.UIComposite
                 l.SetLineEnd(this);
             }
         }
+        /// <summary>
+        /// 存储布局数据
+        /// </summary>
+        /// <param name="fake"></param>
+        /// <param name="index"></param>
         public void SaveToDataBuffer(FakeStructArray fake,int index)
         {
             fake[index,0] = (int)direction;
@@ -350,6 +410,11 @@ namespace huqiang.UIComposite
             }
             return null;
         }
+        /// <summary>
+        /// 从布局数据中载入
+        /// </summary>
+        /// <param name="fake">数据缓存</param>
+        /// <param name="index">索引</param>
         public void LoadFromBuffer(FakeStructArray fake, int index)
         {
             direction =(Direction)fake[index,0];
@@ -378,14 +443,27 @@ namespace huqiang.UIComposite
             }
         }
     }
+    /// <summary>
+    /// 停靠面板区域
+    /// </summary>
     public class DockpanelArea
     {
         public enum Dock
         {
             Left, Top, Right, Down
         }
+        /// <summary>
+        /// 区域模型
+        /// </summary>
         public UIElement model;
+        /// <summary>
+        /// 停靠面板主体
+        /// </summary>
         public DockPanel layout;
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="lay">停靠面板主体</param>
         public DockpanelArea(DockPanel lay)
         {
             layout = lay;
@@ -413,6 +491,10 @@ namespace huqiang.UIComposite
         /// 底部相邻的线
         /// </summary>
         internal DockPanelLine Down;
+        /// <summary>
+        /// 设置左边的线
+        /// </summary>
+        /// <param name="line"></param>
         public void SetLeftLine(DockPanelLine line)
         {
             if (Left != null)
@@ -420,6 +502,10 @@ namespace huqiang.UIComposite
             Left = line;
             line.Right.Add(this);
         }
+        /// <summary>
+        /// 设置右边的线
+        /// </summary>
+        /// <param name="line"></param>
         public void SetRightLine(DockPanelLine line)
         {
             if (Right != null)
@@ -427,6 +513,10 @@ namespace huqiang.UIComposite
             Right = line;
             line.Left.Add(this);
         }
+        /// <summary>
+        /// 设置顶部的线
+        /// </summary>
+        /// <param name="line"></param>
         public void SetTopLine(DockPanelLine line)
         {
             if (Top != null)
@@ -434,6 +524,10 @@ namespace huqiang.UIComposite
             Top = line;
             line.Down.Add(this);
         }
+        /// <summary>
+        /// 设置底部的线
+        /// </summary>
+        /// <param name="line"></param>
         public void SetDownLine(DockPanelLine line)
         {
             if (Down != null)
@@ -441,6 +535,9 @@ namespace huqiang.UIComposite
             Down = line;
             line.Top.Add(this);
         }
+        /// <summary>
+        /// 区域尺寸被改变了,调用此函数
+        /// </summary>
         public void SizeChanged()
         {
             float hl = DockPanel.LineWidth * 0.5f;
@@ -472,6 +569,12 @@ namespace huqiang.UIComposite
                 UIElement.ResizeChild(model);//触发SizeChange事件
             }
         }
+        /// <summary>
+        /// 添加一个区域
+        /// </summary>
+        /// <param name="dock">停靠方位</param>
+        /// <param name="r">区域大小比例</param>
+        /// <returns></returns>
         public DockpanelArea AddAreaR(Dock dock, float r = 0.5f)
         {
             switch (dock)
@@ -503,6 +606,12 @@ namespace huqiang.UIComposite
             }
             return this;
         }
+        /// <summary>
+        /// 添加一个区域
+        /// </summary>
+        /// <param name="dock">停靠方位</param>
+        /// <param name="w">所占宽度</param>
+        /// <returns></returns>
         public DockpanelArea AddArea(Dock dock, float w = 100f)
         {
             switch (dock)
@@ -594,6 +703,9 @@ namespace huqiang.UIComposite
             SetDownLine(line);
             return area;
         }
+        /// <summary>
+        /// 释放资源
+        /// </summary>
         public void Dispose()
         {
             if (Left.realLine | Right.realLine | Top.realLine | Down.realLine)
@@ -646,6 +758,11 @@ namespace huqiang.UIComposite
                 }
             }
         }
+        /// <summary>
+        /// 存储布局信息
+        /// </summary>
+        /// <param name="fake">数据缓存</param>
+        /// <param name="index">索引位置</param>
         public void SaveToDataBuffer(FakeStructArray fake, int index)
         {
             fake[index, 0] = layout.GetLineID(Left);
@@ -653,6 +770,11 @@ namespace huqiang.UIComposite
             fake[index, 2] = layout.GetLineID(Top);
             fake[index, 3] = layout.GetLineID(Down);
         }
+        /// <summary>
+        /// 从缓存中读取布局信息
+        /// </summary>
+        /// <param name="fake">数据缓存</param>
+        /// <param name="index">索引位置</param>
         public void LoadFromBuffer(FakeStructArray fake, int index)
         {
             Left = layout.GetLine(fake[index, 0]);
@@ -661,11 +783,26 @@ namespace huqiang.UIComposite
             Down = layout.GetLine(fake[index, 3]);
         }
     }
+    /// <summary>
+    /// 停靠面板
+    /// </summary>
     public class DockPanel : Composite
     {
+        /// <summary>
+        /// 区域最小宽度
+        /// </summary>
         public float AreaWidth = 40f;
+        /// <summary>
+        /// 线宽
+        /// </summary>
         public static float LineWidth = 8f;
+        /// <summary>
+        /// 线列表
+        /// </summary>
         public List<DockPanelLine> lines = new List<DockPanelLine>();
+        /// <summary>
+        /// 区域列表
+        /// </summary>
         public List<DockpanelArea> areas = new List<DockpanelArea>();
         /// <summary>
         /// 左边相邻的线
@@ -683,13 +820,35 @@ namespace huqiang.UIComposite
         /// 底部相邻的线
         /// </summary>
         public DockPanelLine Down;
+        /// <summary>
+        /// 线模型
+        /// </summary>
         public FakeStruct LineMod;
+        /// <summary>
+        /// 区域模型
+        /// </summary>
         public FakeStruct AreaMod;
+        /// <summary>
+        /// 管理线的父物体
+        /// </summary>
         public Transform LineLevel;
+        /// <summary>
+        /// 管理区域的父物体
+        /// </summary>
         public Transform AreaLevel;
-
+        /// <summary>
+        /// 当布局被改变时回调
+        /// </summary>
         public Action<DockPanel> LayOutChanged;
+        /// <summary>
+        /// 主区域
+        /// </summary>
         public DockpanelArea MainArea { get; private set; }
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <param name="fake">数据模型</param>
+        /// <param name="element">元素主体</param>
         public override void Initial(FakeStruct fake,UIElement element)
         {
             base.Initial(fake,element);
@@ -745,6 +904,10 @@ namespace huqiang.UIComposite
             MainArea = area;
             area.SizeChanged();
         }
+        /// <summary>
+        /// 当元素尺寸被改变了
+        /// </summary>
+        /// <param name="mod">ui实体</param>
         public void SizeChanged(UIElement mod)
         {
             Vector2 size = Enity.SizeDelta;
@@ -760,6 +923,9 @@ namespace huqiang.UIComposite
             if (LayOutChanged != null)
                 LayOutChanged(this);
         }
+        /// <summary>
+        /// 刷新显示
+        /// </summary>
         public void Refresh()
         {
             for (int i = 0; i < lines.Count; i++)
@@ -786,6 +952,11 @@ namespace huqiang.UIComposite
             for (int i = 0; i < max; i++)
                 areas[i].LoadFromBuffer(fsa2,i);
         }
+        /// <summary>
+        /// 储存数据布局信息
+        /// </summary>
+        /// <param name="db">缓存实例</param>
+        /// <returns></returns>
         public FakeStruct SaveToDataBuffer(DataBuffer db)
         {
             FakeStruct fake = new FakeStruct(db, 2);
@@ -799,6 +970,11 @@ namespace huqiang.UIComposite
             fake.SetData(1,fsa);
             return fake;
         }
+        /// <summary>
+        /// 获取id的存储id
+        /// </summary>
+        /// <param name="line"></param>
+        /// <returns></returns>
         public int GetLineID(DockPanelLine line)
         {
             if(line==Left)
@@ -814,6 +990,11 @@ namespace huqiang.UIComposite
                     return i + 3;
             return -1;
         }
+        /// <summary>
+        /// 通过ID查找线
+        /// </summary>
+        /// <param name="id">id</param>
+        /// <returns></returns>
         public DockPanelLine GetLine(int id)
         {
             if (id < 0)
@@ -831,6 +1012,11 @@ namespace huqiang.UIComposite
                 return lines[id];
             return null;
         }
+        /// <summary>
+        /// 获取区域id
+        /// </summary>
+        /// <param name="area">区域实例</param>
+        /// <returns></returns>
         public int GetAreaID(DockpanelArea area)
         {
             for (int i = 0; i < areas.Count; i++)
@@ -838,6 +1024,11 @@ namespace huqiang.UIComposite
                     return i;
             return -1;
         }
+        /// <summary>
+        /// 通过id查找区域
+        /// </summary>
+        /// <param name="id">id</param>
+        /// <returns></returns>
         public DockpanelArea GetArea(int id)
         {
             if (id < 0)

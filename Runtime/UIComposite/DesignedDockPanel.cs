@@ -8,11 +8,28 @@ using huqiang.UIModel;
 
 namespace huqiang.UIComposite
 {
+    /// <summary>
+    /// 可设计停靠面板
+    /// </summary>
     public class DesignedDockPanel:DockPanel
     {
+        /// <summary>
+        /// 辅助类数据模型
+        /// </summary>
         public FakeStruct Auxiliary;
+        /// <summary>
+        /// 可拖放的UI元素实体
+        /// </summary>
         public UIElement Drag;
+        /// <summary>
+        /// 辅助停靠内容列表
+        /// </summary>
         public List<DesignedDockAuxiliary> contents=new List<DesignedDockAuxiliary>();
+        /// <summary>
+        /// 初始化函数
+        /// </summary>
+        /// <param name="fake">数据模型</param>
+        /// <param name="element">UI主体元素</param>
         public override void Initial(FakeStruct fake,UIElement element)
         {
             contents.Clear();
@@ -26,36 +43,75 @@ namespace huqiang.UIComposite
             contents.Add(MainContent);
             MainContent.SetParent(MainArea);
         }
+        /// <summary>
+        /// 显示所有可停靠区域
+        /// </summary>
         public void ShowAllDocker()
         {
             for (int i = 0; i < contents.Count; i++)
                 contents[i].ShowDocker();
         }
+        /// <summary>
+        /// 隐藏所有可停靠区域
+        /// </summary>
         public void HideAllDocker()
         {
             for (int i = 0; i < contents.Count; i++)
                 contents[i].HideDocker();
             Drag.gameObject.SetActive(false);
         }
+        /// <summary>
+        /// 拖放中
+        /// </summary>
+        /// <param name="action"></param>
         public void Draging(UserAction action)
         {
             Drag.transform.localPosition = UIElement.ScreenToLocal(Drag.transform.parent, action.CanPosition);
             Drag.gameObject.SetActive(true);
         }
+        /// <summary>
+        /// 拖放完毕
+        /// </summary>
+        /// <param name="action"></param>
         public void DragEnd(UserAction action)
         {
             Drag.gameObject.SetActive(false);
         }
+        /// <summary>
+        /// 当前拖放的内容
+        /// </summary>
         public DesignedDockAuxiliary.ItemContent DragContent;
+        /// <summary>
+        /// 当前拖放的停靠辅助实体
+        /// </summary>
         public DesignedDockAuxiliary DragAuxiliary;
+        /// <summary>
+        /// 当前拖放的停靠辅助实体的主体内容
+        /// </summary>
         public DesignedDockAuxiliary MainContent;
     }
+    /// <summary>
+    /// 停靠辅助实体
+    /// </summary>
     public class DesignedDockAuxiliary
     {
+        /// <summary>
+        /// 项目内容
+        /// </summary>
         public class ItemContent : TabControl.TableContent
         {
+            /// <summary>
+            /// 窗口关闭按钮
+            /// </summary>
             public UIElement Close;
+            /// <summary>
+            /// 窗口实体
+            /// </summary>
             public PopWindow window;
+            /// <summary>
+            /// 载入一个窗口
+            /// </summary>
+            /// <typeparam name="T"></typeparam>
             public void LoadPopWindow<T>() where T : PopWindow, new()
             {
                 if (window != null)
@@ -66,17 +122,44 @@ namespace huqiang.UIComposite
                 window = t;
             }
         }
+        /// <summary>
+        /// 停靠的区域
+        /// </summary>
         public DockpanelArea dockArea;
+        /// <summary>
+        /// 辅助区域模型
+        /// </summary>
         public UIElement model;
+        /// <summary>
+        /// 停靠的坐标变换
+        /// </summary>
         public Transform docker;
+        /// <summary>
+        /// 表主体元素
+        /// </summary>
         public UIElement tab;
+        /// <summary>
+        /// 控制表
+        /// </summary>
         public TabControl control;
+        /// <summary>
+        /// 停靠区域显示元素
+        /// </summary>
         public UIElement Cover;
         DesignedDockPanel layout;
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="panel">可设计停靠面板载体</param>
         public DesignedDockAuxiliary(DesignedDockPanel panel)
         {
             layout = panel;
         }
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <param name="area">停靠面板区域实例</param>
+        /// <param name="mod">停靠辅助区域模板</param>
         public void Initial(DockpanelArea area, UIElement mod)
         {
             dockArea = area;
@@ -90,6 +173,10 @@ namespace huqiang.UIComposite
             docker.gameObject.SetActive(false);
             InitialDocker();
         }
+        /// <summary>
+        /// 附属于某个停靠区域
+        /// </summary>
+        /// <param name="area">停靠区域</param>
         public void SetParent(DockpanelArea area)
         {
             dockArea = area;
@@ -249,6 +336,11 @@ namespace huqiang.UIComposite
                 }
             }
         }
+        /// <summary>
+        /// 添加一个内容标签,将使用默认模板
+        /// </summary>
+        /// <param name="name">名称</param>
+        /// <returns></returns>
         public ItemContent AddContent(string name)
         {
             var item = HGUIManager.GameBuffer.Clone(control.Item).GetComponent<UIElement>();
@@ -286,6 +378,10 @@ namespace huqiang.UIComposite
             control.AddContent(con);
             return con;
         }
+        /// <summary>
+        /// 添加一个内容
+        /// </summary>
+        /// <param name="con"></param>
         public void AddContent(ItemContent con)
         {
             var eve = con.Item.userEvent;
@@ -294,6 +390,10 @@ namespace huqiang.UIComposite
             eve.DragEnd = HeadDragEnd;
             control.AddContent(con);
         }
+        /// <summary>
+        /// 移除内容
+        /// </summary>
+        /// <param name="con">内容实例</param>
         public void RemoveContent(TabControl.TableContent con)
         {
             control.RemoveContent(con);
@@ -306,18 +406,34 @@ namespace huqiang.UIComposite
                 layout.Refresh();
             }
         }
+        /// <summary>
+        /// 展示内容
+        /// </summary>
+        /// <param name="con"></param>
         public void ShowContent(TabControl.TableContent con)
         {
             control.ShowContent(con);
         }
+        /// <summary>
+        /// 显示可停靠区域
+        /// </summary>
         public void ShowDocker()
         {
             docker.gameObject.SetActive(true);
         }
+        /// <summary>
+        /// 隐藏可停靠区域
+        /// </summary>
         public void HideDocker()
         {
             docker.gameObject.SetActive(false);
         }
+        /// <summary>
+        /// 添加可停靠区域
+        /// </summary>
+        /// <param name="dock">区域停靠方位</param>
+        /// <param name="r">占用大小</param>
+        /// <returns></returns>
         public DesignedDockAuxiliary AddArea(DockpanelArea.Dock dock, float r = 0.5f)
         {
             var area = dockArea.AddArea(dock,r);
@@ -332,6 +448,9 @@ namespace huqiang.UIComposite
             layout.contents.Add(con);
             return con;
         }
+        /// <summary>
+        /// 释放资源
+        /// </summary>
         public void Dispose()
         {
             dockArea.Dispose();

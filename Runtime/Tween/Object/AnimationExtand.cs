@@ -7,8 +7,16 @@ using UnityEngine;
 
 namespace huqiang
 {
+    /// <summary>
+    /// 动画函数式编写扩展
+    /// </summary>
     public static class AnimationExtand
     {
+        /// <summary>
+        /// 查询一个位移动画
+        /// </summary>
+        /// <param name="trans"></param>
+        /// <returns></returns>
         public static MoveAnimat FindMoveAni(this Transform trans)
         {
             if (trans == null)

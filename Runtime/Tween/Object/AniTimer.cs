@@ -12,18 +12,7 @@ namespace huqiang
     /// <param name="ratio"></param>
     /// <returns></returns>
     public delegate float LinearTransformation(AnimatBase sender, float ratio);
-    /// <summary>
-    /// 动画管理类，将所有动画添加至此类，进行统一更新
-    /// </summary>
-    public class AnimationManage:AnimationBase
-    {
-        static AnimationManage am;
-        /// <summary>
-        /// 返回此类的唯一实例
-        /// </summary>
-        public static AnimationManage Manage { get { if (am == null) am = new AnimationManage(); return am; } }
-        AnimationManage() { }
-    }
+ 
 
     /// <summary>
     /// 定时器
@@ -62,10 +51,16 @@ namespace huqiang
                 }
             }
         }
+        /// <summary>
+        /// 
+        /// </summary>
         public Timer()
         {
             AnimationManage.Manage.AddAnimat(this);
         }
+        /// <summary>
+        /// 
+        /// </summary>
         public void Dispose()
         {
             AnimationManage.Manage.ReleaseAnimat(this);

@@ -246,4 +246,16 @@ namespace huqiang
             return null;
         }
     }
+    /// <summary>
+    /// 动画管理类，将所有动画添加至此类，进行统一更新
+    /// </summary>
+    public class AnimationManage : AnimationBase
+    {
+        static AnimationManage am;
+        /// <summary>
+        /// 返回此类的唯一实例
+        /// </summary>
+        public static AnimationManage Manage { get { if (am == null) am = new AnimationManage(); return am; } }
+        AnimationManage() { }
+    }
 }

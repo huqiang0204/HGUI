@@ -6,12 +6,26 @@ using UnityEngine;
 
 namespace huqiang.UIComposite
 {
+    /// <summary>
+    /// 内容拖拽框
+    /// </summary>
     public class DragContent: Composite
     {
+        /// <summary>
+        /// 冻结方向
+        /// </summary>
         public enum FreezeDirection
         {
             None,X,Y
         }
+        /// <summary>
+        /// 固定滚动,撞到边界立马停止
+        /// </summary>
+        /// <param name="eventCall">用户事件</param>
+        /// <param name="v">参考移动量</param>
+        /// <param name="x">限定移动量x</param>
+        /// <param name="y">限定移动量y</param>
+        /// <returns></returns>
         protected Vector2 ScrollNone(UserEvent eventCall, ref Vector2 v, ref float x, ref float y)
         {
             Vector2 v2 = Vector2.zero;
@@ -53,6 +67,14 @@ namespace huqiang.UIComposite
             }
             return v2;
         }
+        /// <summary>
+        /// 回弹滚动,撞到边界会有减速回弹效果
+        /// </summary>
+        /// <param name="eventCall">用户事件</param>
+        /// <param name="v">参考移动量</param>
+        /// <param name="x">衰减移动量x</param>
+        /// <param name="y">衰减移动量y</param>
+        /// <returns></returns>
         protected Vector2 BounceBack(UserEvent eventCall, ref Vector2 v, ref float x, ref float y)
         {
             x -= v.x;
@@ -98,15 +120,47 @@ namespace huqiang.UIComposite
             }
             return v;
         }
+        /// <summary>
+        /// 滚动框尺寸
+        /// </summary>
         public Vector2 Size;
+        /// <summary>
+        /// 当前内容坐标
+        /// </summary>
         public Vector2 Position;
+        /// <summary>
+        /// 内容尺寸
+        /// </summary>
         public Vector2 ContentSize;
+        /// <summary>
+        /// 冻结方向
+        /// </summary>
         public FreezeDirection freeze = FreezeDirection.None;
+        /// <summary>
+        /// 滚动类型
+        /// </summary>
         public ScrollType scrollType = ScrollType.BounceBack;
+        /// <summary>
+        /// 内容主体元素
+        /// </summary>
         public UIElement Content;
+        /// <summary>
+        /// 事件
+        /// </summary>
         public UserEvent eventCall;
+        /// <summary>
+        /// 滚动事件
+        /// </summary>
         public Action<DragContent, Vector2> Scroll;
+        /// <summary>
+        /// 滚动完毕事件
+        /// </summary>
         public Action<DragContent> ScrollEnd;
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <param name="fake">数据模型</param>
+        /// <param name="script">元素主体</param>
         public override void Initial(FakeStruct fake,UIElement script)
         {
             base.Initial(fake,script);
@@ -144,6 +198,10 @@ namespace huqiang.UIComposite
             v.y /= ls.y;
             Move(v);
         }
+        /// <summary>
+        /// 移动内容
+        /// </summary>
+        /// <param name="v">移动量</param>
         public void Move(Vector2 v)
         {
             if (Content == null)
@@ -245,6 +303,9 @@ namespace huqiang.UIComposite
             else if (ScrollEnd != null)
                 ScrollEnd(this);
         }
+        /// <summary>
+        /// y轴位置,范围0-1
+        /// </summary>
         public float Pos
         {
             get

@@ -7,6 +7,9 @@ using UnityEngine;
 
 namespace huqiang.UIComposite
 {
+    /// <summary>
+    /// 文本输入框
+    /// </summary>
     public class InputBox:Composite
     {
         static float KeySpeed = 220;
@@ -19,7 +22,10 @@ namespace huqiang.UIComposite
         Color32 PointColor;
         Color32 SelectionColor;
         int CharacterLimit;
-        bool ReadOnly;
+        /// <summary>
+        /// 只读
+        /// </summary>
+        public bool ReadOnly;
         string m_TipString;
         string m_InputString;
         public InputType inputType = InputType.Standard;
@@ -28,11 +34,20 @@ namespace huqiang.UIComposite
         bool Editing;
         EmojiString FullString = new EmojiString();
         HImage Caret;
+        /// <summary>
+        /// 联系上下文
+        /// </summary>
         public object DataContext;
+        /// <summary>
+        /// 提示文本
+        /// </summary>
         public string TipString { get { return m_TipString; } set { 
                 m_TipString = value;
                 SetShowText();
             } }
+        /// <summary>
+        /// 输入文本
+        /// </summary>
         public string InputString { get { return FullString.FullString; } set {
                 if (value == null)
                     value = "";
@@ -40,13 +55,25 @@ namespace huqiang.UIComposite
                 TextOperation.ChangeText(TextCom,FullString);
                 SetShowText();
             } }
+        /// <summary>
+        /// 显示文本
+        /// </summary>
         public string ShowString { get; private set; }
+        /// <summary>
+        /// 选中文本
+        /// </summary>
         public string SelectString { get {
                 if (Editing)
                     return TextOperation.GetSelectString();
                 return "";
             } }
+        /// <summary>
+        /// 文本显示载体
+        /// </summary>
         public HText TextCom;
+        /// <summary>
+        /// 文本类型
+        /// </summary>
         public ContentType contentType
         {
             get { return m_ctpye; }
@@ -143,11 +170,31 @@ namespace huqiang.UIComposite
         }
         CharacterValidation characterValidation = CharacterValidation.None;
         TouchScreenKeyboardType touchType = TouchScreenKeyboardType.Default;
+        /// <summary>
+        /// 文本输入事件
+        /// </summary>
         public InputBoxEvent InputEvent;
+        /// <summary>
+        /// 文本提交事件
+        /// </summary>
         public Action<InputBox> OnSubmit;
+        /// <summary>
+        /// 文本输入完毕事件
+        /// </summary>
         public Action<InputBox> OnDone;
+        /// <summary>
+        /// 输入内容改变事件
+        /// </summary>
         public Action<InputBox> OnValueChanged;
+        /// <summary>
+        /// 验证新输入的字符
+        /// </summary>
         public Func<InputBox, int, char, char> ValidateChar;
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <param name="mod">模型数据</param>
+        /// <param name="element">元素主体</param>
         public override void Initial(FakeStruct mod, UIElement element)
         {
             base.Initial(mod,element);
@@ -188,6 +235,11 @@ namespace huqiang.UIComposite
             InputEvent.input = this;
             Caret = txt.GetComponentInChildren<HImage>();
         }
+        /// <summary>
+        /// 鼠标按压
+        /// </summary>
+        /// <param name="action">用户事件</param>
+        /// <param name="press">按压基本信息</param>
         public void OnMouseDown(UserAction action, ref PressInfo press)
         {
             TextOperation.contentType = m_ctpye;
@@ -200,6 +252,10 @@ namespace huqiang.UIComposite
             Input.imeCompositionMode = IMECompositionMode.On;
 #endif
         }
+        /// <summary>
+        /// 用户单击
+        /// </summary>
+        /// <param name="action">用户事件</param>
         public void OnClick(UserAction action)
         {
             if (!ReadOnly)
@@ -215,6 +271,10 @@ namespace huqiang.UIComposite
                 }
             }
         }
+        /// <summary>
+        /// 失去焦点
+        /// </summary>
+        /// <param name="action">用户事件</param>
         public void OnLostFocus(UserAction action)
         {
             Editing = false;
@@ -229,6 +289,11 @@ namespace huqiang.UIComposite
                 OnDone(this);
             Input.imeCompositionMode = IMECompositionMode.Auto;
         }
+        /// <summary>
+        /// 拖动选择
+        /// </summary>
+        /// <param name="action">用户事件</param>
+        /// <param name="press">当前按压信息</param>
         public void OnDrag(UserAction action, ref PressInfo press)
         {
             TextOperation.SetEndPress(ref press);
@@ -286,6 +351,9 @@ namespace huqiang.UIComposite
             if (OnValueChanged != null)
                 OnValueChanged(this);
         }
+        /// <summary>
+        /// 应用当前可显示文本内容
+        /// </summary>
         public void SetShowText()
         {
             var str = FullString.FullString;
@@ -320,6 +388,10 @@ namespace huqiang.UIComposite
                 InputEvent.ChangeText("");
             }
         }
+        /// <summary>
+        /// 删除选中文本内容
+        /// </summary>
+        /// <returns></returns>
         public bool DeleteSelectString()
         {
             if (TextOperation.DeleteSelectString())
@@ -329,6 +401,10 @@ namespace huqiang.UIComposite
             }
             return false;
         }
+        /// <summary>
+        /// 删除光标前面的字符
+        /// </summary>
+        /// <returns></returns>
         public bool DeleteLast()
         {
             if (TextOperation.DeleteLast())
@@ -338,6 +414,10 @@ namespace huqiang.UIComposite
             }
             return false;
         }
+        /// <summary>
+        /// 删除光标后面的字符
+        /// </summary>
+        /// <returns></returns>
         public bool DeleteNext()
         {
             if (TextOperation.DeleteNext())
@@ -347,12 +427,19 @@ namespace huqiang.UIComposite
             }
             return false;
         }
+        /// <summary>
+        /// 插入字符串
+        /// </summary>
+        /// <param name="str">字符串</param>
         public void InsertString(string str)
         {
             var es = new EmojiString(str);
             TextOperation.DeleteSelectString();
             TextOperation.InsertContent(es);
         }
+        /// <summary>
+        /// 光标向左移动
+        /// </summary>
         public void PointerMoveLeft()
         {
             bool lc = false;
@@ -362,6 +449,9 @@ namespace huqiang.UIComposite
                     SetShowText();
             }
         }
+        /// <summary>
+        /// 光标向右移动
+        /// </summary>
         public void PointerMoveRight()
         {
             bool lc = false;
@@ -371,6 +461,9 @@ namespace huqiang.UIComposite
                     SetShowText();
             }
         }
+        /// <summary>
+        /// 光标向上移动
+        /// </summary>
         public void PointerMoveUp()
         {
             bool lc = false;
@@ -380,6 +473,9 @@ namespace huqiang.UIComposite
                     SetShowText();
             }
         }
+        /// <summary>
+        /// 光标向下移动
+        /// </summary>
         public void PointerMoveDown()
         {
             bool lc = false;
@@ -389,6 +485,9 @@ namespace huqiang.UIComposite
                     SetShowText();
             }
         }
+        /// <summary>
+        /// 光标移动到文本开头
+        /// </summary>
         public void PointerMoveStart()
         {
             bool lc = false;
@@ -398,6 +497,9 @@ namespace huqiang.UIComposite
                     SetShowText();
             }
         }
+        /// <summary>
+        /// 光标移动到文本结尾
+        /// </summary>
         public void PointerMoveEnd()
         {
             bool lc = false;
@@ -407,6 +509,10 @@ namespace huqiang.UIComposite
                     SetShowText();
             }
         }
+        /// <summary>
+        /// 更新显示内容
+        /// </summary>
+        /// <param name="time">时间片</param>
         public override void Update(float time)
         {
             if (Editing)
@@ -461,6 +567,9 @@ namespace huqiang.UIComposite
             }
         }
         float time;
+        /// <summary>
+        /// 更新光标
+        /// </summary>
         void UpdateCaret()
         {
             if (Caret != null)
@@ -635,7 +744,16 @@ namespace huqiang.UIComposite
             }
             return EditState.Continue;
         }
+        /// <summary>
+        /// 更换的目标载体
+        /// </summary>
         public HText ReplaceTarget { get; private set; }
+        /// <summary>
+        /// 更换目标载体
+        /// </summary>
+        /// <param name="text">目标实例</param>
+        /// <param name="user">用户事件</param>
+        /// <param name="action">用户动作</param>
         public void Replace(HText text, UserEvent user, UserAction action)
         {
             ReplaceTarget = text;

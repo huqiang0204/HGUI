@@ -17,6 +17,9 @@ namespace huqiang.UIComposite
         [NonSerialized]
         public int Index;
     }
+    /// <summary>
+    /// 下拉框组件
+    /// </summary>
     public class DropdownEx : Composite
     {
         HText Label;
@@ -37,12 +40,27 @@ namespace huqiang.UIComposite
                 m_scroll.Enity.gameObject.SetActive(false);
             }
         }
-        public bool down = true;
+        //public bool down = true;
+        /// <summary>
+        /// 滚动框的最大高度
+        /// </summary>
         public float MaxHeight = 300;
+        /// <summary>
+        /// 弹出时的偏移位置
+        /// </summary>
         public float PopOffset = 0;
+        /// <summary>
+        /// 每个项目的尺寸
+        /// </summary>
         public Vector2 ItemSize;
         int s_index = -1;
+        /// <summary>
+        /// 主体事件
+        /// </summary>
         public UserEvent callBack;
+        /// <summary>
+        /// 选中项的索引
+        /// </summary>
         public int SelectIndex
         {
             get { return s_index; }
@@ -70,6 +88,11 @@ namespace huqiang.UIComposite
                 }
             }
         }
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <param name="mod">模式数据</param>
+        /// <param name="script">主体元素</param>
         public override void Initial(FakeStruct mod, UIElement script)
         {
             base.Initial(mod,script);
@@ -112,7 +135,9 @@ namespace huqiang.UIComposite
                 }
             }
         }
-
+        /// <summary>
+        /// 选择项改变事件
+        /// </summary>
         public Action<DropdownEx, object> OnSelectChanged;
 
         void LostFocus(UserEvent eve, UserAction action)
@@ -126,6 +151,12 @@ namespace huqiang.UIComposite
             }
         }
         GameObject Checked;
+        /// <summary>
+        /// 项更新函数
+        /// </summary>
+        /// <param name="g">UI模型实例</param>
+        /// <param name="o">数据实例</param>
+        /// <param name="index">数据索引</param>
         public void ItemUpdate(PopItemMod g,object o, int index)
         {
             PopItemMod item = g as PopItemMod;
@@ -179,6 +210,10 @@ namespace huqiang.UIComposite
             showAni = -1;
             showTime = 0;
         }
+        /// <summary>
+        /// 更新
+        /// </summary>
+        /// <param name="time">时间片,单位毫秒</param>
         public override void Update(float time)
         {
             if(showAni>0)

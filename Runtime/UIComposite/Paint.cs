@@ -5,19 +5,37 @@ using UnityEngine;
 
 namespace huqiang.UIComposite
 {
+    /// <summary>
+    /// 滑板
+    /// </summary>
     public class Paint : Composite
     {
+        /// <summary>
+        /// 绘制状态
+        /// </summary>
         public enum DrawModel
         {
             Brush,Scale,Rotate
         }
         HImage raw;
         Color[] buffer;
+        /// <summary>
+        /// 画板宽度
+        /// </summary>
         public int Width;
+        /// <summary>
+        /// 画板高度
+        /// </summary>
         public int Height;
         int HalfW;
         int HalfH;
+        /// <summary>
+        /// 画笔尺寸
+        /// </summary>
         public float BrushSize =2;
+        /// <summary>
+        /// 画笔颜色
+        /// </summary>
         public Color BrushColor=Color.white;
         GestureEvent gesture;
         Vector3 Origin;
@@ -27,7 +45,15 @@ namespace huqiang.UIComposite
         Vector2 LastDirect;
         Vector2 CurDirect;
         LoopBuffer<DrawArea> loopBuffer=new LoopBuffer<DrawArea>(2);
+        /// <summary>
+        /// 当前绘制状态
+        /// </summary>
         public DrawModel drawModel;
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <param name="fake">数据模型</param>
+        /// <param name="script">主体元素</param>
         public override void Initial(FakeStruct fake,UIElement script)
         {
             base.Initial(fake,script);
@@ -186,11 +212,26 @@ namespace huqiang.UIComposite
 
         }
     }
+    /// <summary>
+    /// 绘制区域
+    /// </summary>
     public class DrawArea
     {
+        /// <summary>
+        /// 线宽
+        /// </summary>
         public float hw;
+        /// <summary>
+        /// 起点
+        /// </summary>
         public Vector2 Start;
+        /// <summary>
+        /// 终点
+        /// </summary>
         public Vector2 End;
+        /// <summary>
+        /// 起点和终点生成的盒子
+        /// </summary>
         public Vector2[] box;
         public float minx, miny, maxx, maxy;
         float sqr;

@@ -12,41 +12,107 @@ namespace huqiang.UIComposite
 {
     public enum ScrollType
     {
-        None, Loop, BounceBack
+        /// <summary>
+        /// 撞到边界立即停止
+        /// </summary>
+        None,
+        /// <summary>
+        /// 循环滚动
+        /// </summary>
+        Loop,
+        /// <summary>
+        /// 撞到边界回弹
+        /// </summary>
+        BounceBack
     }
+    /// <summary>
+    /// 滚动内容附件信息,使用ScrollHelper收集
+    /// </summary>
     public unsafe struct ScrollInfo
     {
+        /// <summary>
+        /// 滚动类型
+        /// </summary>
         public ScrollType scrollType;
+        /// <summary>
+        /// 最小尺寸
+        /// </summary>
         public Vector2 minBox;
         public static int Size = sizeof(ScrollInfo);
         public static int ElementSize = Size / 4;
     }
+    /// <summary>
+    /// 构造器
+    /// </summary>
     public class Constructor
     {
+        /// <summary>
+        /// UI实体创建
+        /// </summary>
+        /// <returns></returns>
         public virtual object Create() { return null; }
+        /// <summary>
+        /// 项目更新函数
+        /// </summary>
+        /// <param name="obj">UI实体对象</param>
+        /// <param name="dat">数据实体对象</param>
+        /// <param name="index">数据索引</param>
         public virtual void Call(object obj, object dat, int index) {
             if (Update != null)
                 Update(obj,dat,index);
         }
+        /// <summary>
+        /// 自动创建
+        /// </summary>
         public bool create;
+        /// <summary>
+        /// 项目更新委托
+        /// </summary>
         public Action<object, object, int> Update;
+        /// <summary>
+        /// 反射组件,用于热更新
+        /// </summary>
         public Func<Transform, object> reflect;
+        /// <summary>
+        /// UI初始化器
+        /// </summary>
         public Initializer initializer;
     }
+    /// <summary>
+    /// 构造中间件
+    /// </summary>
+    /// <typeparam name="T">UI模型</typeparam>
+    /// <typeparam name="U">数据模型</typeparam>
     public class Middleware<T, U> : Constructor where T : class, new()
     {
+        /// <summary>
+        /// 构造函数
+        /// </summary>
         public Middleware()
         {
             initializer = new UIInitializer(TempReflection.ObjectFields(typeof(T)));
         }
+        /// <summary>
+        /// 创建UI实体
+        /// </summary>
+        /// <returns></returns>
         public override object Create()
         {
             var t = new T();
             initializer.Reset(t);
             return t;
         }
+        /// <summary>
+        /// 项目更新委托
+        /// </summary>
         public Action<T, U, int> Invoke;
         U u;
+        /// <summary>
+        /// 项目更新函数
+        /// </summary>
+        /// <param name="obj">UI实体</param>
+        /// <param name="dat">数据实体</param>
+        /// <param name="index">数据索引</param>
         public override void Call(object obj, object dat, int index)
         {
             if (Invoke != null)
@@ -62,29 +128,57 @@ namespace huqiang.UIComposite
             }
         }
     }
+    /// <summary>
+    /// 热更新构造中间件
+    /// </summary>
     public class HotMiddleware : Constructor
     {
+        /// <summary>
+        /// 联系上下文
+        /// </summary>
         public object Context;
+        /// <summary>
+        /// 实体创建委托
+        /// </summary>
         public Func<object> creator;
+        /// <summary>
+        /// 项目更新委托
+        /// </summary>
         public Action<object, object, int> caller;
+        /// <summary>
+        /// UI实体创建
+        /// </summary>
+        /// <returns></returns>
         public override object Create()
         {
             if (creator == null)
                 return null;
             return creator();
         }
+        /// <summary>
+        /// 项目更新函数
+        /// </summary>
+        /// <param name="obj">UI实体</param>
+        /// <param name="dat">数据实体</param>
+        /// <param name="index">数据索引</param>
         public override void Call(object obj, object dat, int index)
         {
             if (caller != null)
                 caller(obj, dat, index);
         }
     }
+    /// <summary>
+    /// 滚动内容管理器
+    /// </summary>
     public class ScrollContent: Composite
     {
         /// <summary>
         /// 滚动公差值
         /// </summary>
         public static float Tolerance = 0.25f;
+        /// <summary>
+        /// 滚动类型
+        /// </summary>
         public ScrollType scrollType = ScrollType.BounceBack;
         public static readonly Vector2 Center = new Vector2(0.5f, 0.5f);
         public Vector2 Size;//scrollView的尺寸

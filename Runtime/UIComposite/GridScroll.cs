@@ -6,9 +6,18 @@ using UnityEngine;
 
 namespace huqiang.UIComposite
 {
+    /// <summary>
+    /// 网格滚动框
+    /// </summary>
     public class GridScroll:ScrollContent 
     {
+        /// <summary>
+        /// 列数
+        /// </summary>
         public int Column = 1;
+        /// <summary>
+        /// 行数
+        /// </summary>
         public int Row = 0;
         /// <summary>
         /// 当前滚动的位置
@@ -39,6 +48,11 @@ namespace huqiang.UIComposite
                 Row++;
             ActualSize = new Vector2(Column * ItemSize.x, Row * ItemSize.y);
         }
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <param name="fake">数据模型</param>
+        /// <param name="script">主体元素</param>
         public override void Initial(FakeStruct fake,UIElement script)
         {
             base.Initial(fake,script);
@@ -89,7 +103,7 @@ namespace huqiang.UIComposite
             }
         }
         /// <summary>
-        /// 
+        /// 排序
         /// </summary>
         /// <param name="size">视口尺寸</param>
         /// <param name="pos">视口位置</param>

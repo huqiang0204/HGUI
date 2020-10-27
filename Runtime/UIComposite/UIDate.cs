@@ -91,7 +91,6 @@ namespace huqiang.UIComposite
             Year.ScrollEnd = YearScrollToEnd;
             Year.ItemDockCenter = true;
             Year.scrollType = ScrollType.Loop;
-            Year.eventCall.BoxAdjuvant = new Vector2(0, -200);
 
             Month = mask.Find("Month").GetComponent<UIElement>().composite as ScrollY;
             Month.SetItemUpdate<ItemView, string>((o, e, i) => { o.Item.Text = e; });
@@ -99,7 +98,6 @@ namespace huqiang.UIComposite
             Month.ScrollEnd = MonthScrollToEnd;
             Month.ItemDockCenter = true;
             Month.scrollType = ScrollType.Loop;
-            Month.eventCall.BoxAdjuvant = new Vector2(0, -200);
 
             Day = mask.Find("Day").GetComponent<UIElement>().composite as ScrollY;
             Day.SetItemUpdate<ItemView, string>((o, e, i) => { o.Item.Text = e ; });
@@ -108,7 +106,6 @@ namespace huqiang.UIComposite
             Day.ItemDockCenter = true;
             Day.ScrollEnd = DayScrollToEnd;
             Day.scrollType = ScrollType.Loop;
-            Day.eventCall.BoxAdjuvant = new Vector2(0, -200);
 
             unsafe
             {

@@ -16,8 +16,19 @@ namespace huqiang.UIEvent
     {
     
         internal int Frame;
+        /// <summary>
+        /// 单击事件触发时间间隔 默认1.8S
+        /// </summary>
         public static long ClickTime = 1800000;
+        /// <summary>
+        /// 当按压和弹起的距离平方小于此距离时触发单击事件,否则判定为拖拽事件,默认为20:(20*20=400)
+        /// </summary>
         public static float ClickArea = 400;
+        /// <summary>
+        /// 派发用户事件
+        /// </summary>
+        /// <param name="action"></param>
+        /// <param name="pipeLine"></param>
         internal static void DispatchEvent(UserAction action, HGUIElement[] pipeLine)
         {
             HGUIElement root = pipeLine[0];
@@ -40,7 +51,7 @@ namespace huqiang.UIEvent
             }
         }
         /// <summary>
-        /// 
+        /// 派发用户事件
         /// </summary>
         /// <param name="pipeLine">所有UI</param>
         /// <param name="index"></param>
@@ -180,10 +191,6 @@ namespace huqiang.UIEvent
         int yTime;
         float lastX;
         float lastY;
-        /// <summary>
-        /// 当物体的实际尺寸很小,很难点中时,是用此字段扩大点击范围,也可以是负数,缩小范围
-        /// </summary>
-        public Vector2 BoxAdjuvant;
         Vector2 maxVelocity;
         Vector2 sDistance;
         Vector2 mVelocity;

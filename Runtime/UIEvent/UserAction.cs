@@ -9,10 +9,25 @@ namespace huqiang.UIEvent
 {
     public class UserAction
     {
+        /// <summary>
+        /// 默认的加速时间,单位毫秒
+        /// </summary>
         public static float Accelerationtime = 60;
+        /// <summary>
+        /// 时间片,单位毫秒
+        /// </summary>
         public static int TimeSlice;
+        /// <summary>
+        /// 上一帧时间,单位毫秒
+        /// </summary>
         public static int LastTime;
+        /// <summary>
+        /// 当前时钟周期
+        /// </summary>
         public static long Ticks;
+        /// <summary>
+        /// 状态更新
+        /// </summary>
         public static void Update()
         {
             DateTime now = DateTime.Now;
@@ -24,31 +39,82 @@ namespace huqiang.UIEvent
             TimeSlice = t;
             LastTime = s;
         }
+        /// <summary>
+        /// 事件id
+        /// </summary>
         public int Id { get; private set; }
+        /// <summary>
+        /// 上一帧屏幕坐标
+        /// </summary>
         public Vector2 LastPosition;
+        /// <summary>
+        /// 当前帧画布坐标
+        /// </summary>
         public Vector2 CanPosition;
+        /// <summary>
+        /// 当前帧画布坐标
+        /// </summary>
         public Vector2 Position;
+        /// <summary>
+        /// 当前帧与上一帧的运动距离
+        /// </summary>
         public Vector2 Motion;
         Vector2 m_Velocities;
+        /// <summary>
+        /// 10内移动平均速率
+        /// </summary>
         public Vector2 Velocities { get { return m_Velocities; } }
+        /// <summary>
+        /// 是否移动了
+        /// </summary>
         public bool IsMoved { get; set; }
+        /// <summary>
+        /// 手指在操作
+        /// </summary>
         public bool FingerStationary { get; set; }
+        /// <summary>
+        /// 鼠标左键按下状态
+        /// </summary>
         public bool IsLeftButtonDown { get; set; }
+        /// <summary>
+        /// 鼠标左键按下
+        /// </summary>
         public bool isPressed { get; set; }
+        /// <summary>
+        /// 鼠标左键弹起
+        /// </summary>
         public bool IsLeftButtonUp { get; set; }
+        /// <summary>
+        /// 按下时的最初位置
+        /// </summary>
         public Vector2 rawPosition { get; set; }
+        /// <summary>
+        /// 触控的tapCount
+        /// </summary>
         public int tapCount { get; set; }
         public float altitudeAngle { get; set; }
         public float azimuthAngle { get; set; }
         public float radius { get; set; }
         public float radiusVariance { get; set; }
+        /// <summary>
+        /// 鼠标按压世间
+        /// </summary>
         public float PressTime { get; set; }
+        /// <summary>
+        /// 当前事件时钟周期
+        /// </summary>
         public long EventTicks { get; set; }
         Vector3[] FramePos = new Vector3[16];
         int Frame;
         List<UserEvent> LastEntry;
+        /// <summary>
+        /// 当前包含鼠标的所有UI
+        /// </summary>
         public List<UserEvent> CurrentEntry;
         List<UserEvent> LastFocus;
+        /// <summary>
+        /// 当前拥有焦点的所有UI
+        /// </summary>
         public List<UserEvent> MultiFocus;
         public UserAction(int id)
         {
@@ -58,6 +124,9 @@ namespace huqiang.UIEvent
             LastFocus = new List<UserEvent>();
             MultiFocus = new List<UserEvent>();
         }
+        /// <summary>
+        /// 释放资源
+        /// </summary>
         public void Clear()
         {
             LastEntry.Clear();
@@ -73,6 +142,9 @@ namespace huqiang.UIEvent
             IsMoved = false;
             FingerStationary = false;
         }
+        /// <summary>
+        /// 移除焦点所有UI
+        /// </summary>
         public void ReleaseFocus()
         {
             LastEntry.Clear();
@@ -111,6 +183,10 @@ namespace huqiang.UIEvent
             }
             else m_Velocities = Vector2.zero;
         }
+        /// <summary>
+        /// 载入触摸信息
+        /// </summary>
+        /// <param name="touch"></param>
         public void LoadFinger(ref Touch touch)
         {
             LastPosition = CanPosition;
@@ -185,6 +261,9 @@ namespace huqiang.UIEvent
             radius = touch.radius;
             radiusVariance = touch.radiusVariance;
         }
+        /// <summary>
+        /// 载入鼠标信息
+        /// </summary>
         public void LoadMouse()
         {
             LastPosition = CanPosition;
@@ -242,6 +321,11 @@ namespace huqiang.UIEvent
             if (Frame >= 16)
                 Frame = 0;
         }
+        /// <summary>
+        /// 复制事件
+        /// </summary>
+        /// <param name="action"></param>
+        /// <param name="FormSize"></param>
         public void CopyAction(UserAction action, Vector2 FormSize)
         {
             LastPosition = CanPosition;
@@ -295,6 +379,10 @@ namespace huqiang.UIEvent
             if (Frame >= 16)
                 Frame = 0;
         }
+        /// <summary>
+        /// 派发事件
+        /// </summary>
+        /// <param name="pipeLine">ui流水线</param>
         public void Dispatch(HGUIElement[] pipeLine)
         {
             if (IsLeftButtonDown | IsRightButtonDown | IsMiddleButtonDown)
@@ -365,10 +453,19 @@ namespace huqiang.UIEvent
             LastEntry = CurrentEntry;
             CurrentEntry = tmp;
         }
+        /// <summary>
+        /// 该用户事件是否存在焦点
+        /// </summary>
+        /// <param name="eve">用户事件实例</param>
+        /// <returns></returns>
         public bool ExistFocus(UserEvent eve)
         {
             return MultiFocus.Contains(eve);
         }
+        /// <summary>
+        /// 添加焦点
+        /// </summary>
+        /// <param name="eve">用户事件实例</param>
         public void AddFocus(UserEvent eve)
         {
             if (MultiFocus.Contains(eve))
@@ -378,13 +475,17 @@ namespace huqiang.UIEvent
             if (eve.Pressed)
                 eve.PressTime = EventTicks;
         }
-        public void RemoveFocus(UserEvent callBack)
+        /// <summary>
+        /// 移除焦点
+        /// </summary>
+        /// <param name="eve">用户事件实例</param>
+        public void RemoveFocus(UserEvent eve)
         {
-            LastEntry.Remove(callBack);
-            CurrentEntry.Remove(callBack);
-            LastFocus.Remove(callBack);
-            MultiFocus.Remove(callBack);
-            callBack.Pressed = false;
+            LastEntry.Remove(eve);
+            CurrentEntry.Remove(eve);
+            LastFocus.Remove(eve);
+            MultiFocus.Remove(eve);
+            eve.Pressed = false;
         }
     }
 }

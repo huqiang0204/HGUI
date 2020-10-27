@@ -24,21 +24,66 @@ namespace huqiang.UIEvent
             Delete
         }
         static KeyCode[] keys;
+        /// <summary>
+        /// 当前帧所有按下键的列表
+        /// </summary>
         public static List<KeyCode> KeyPress;
+        /// <summary>
+        /// 当前帧所有按下状态的键的列表
+        /// </summary>
         public static List<KeyCode> KeyDowns;
+        /// <summary>
+        /// 当前帧所有弹起键的列表
+        /// </summary>
         public static List<KeyCode> KeyUps;
+        /// <summary>
+        /// 输入字符串
+        /// </summary>
         public static string InputString;
+        /// <summary>
+        /// IME临时字符串
+        /// </summary>
         public static string TempString;
+        /// <summary>
+        /// Unity获取到的IME字符串
+        /// </summary>
         public static string CompositionString;
+        /// <summary>
+        /// IME临时字符串当前帧改变了
+        /// </summary>
         public static bool TempStringChanged;
+        /// <summary>
+        /// 受输入规则限定后的字符串
+        /// </summary>
         public static string CorrectionInput;
+        /// <summary>
+        /// 移动端输入字符串
+        /// </summary>
         public static string TouchString = "";
+        /// <summary>
+        /// 移动端受输入规则限定后的字符串
+        /// </summary>
         public static string CorrectionTouch;
+        /// <summary>
+        /// 输入字符串在当前帧改变了
+        /// </summary>
         public static bool InputChanged;
         static TouchScreenKeyboard m_touch;
+        /// <summary>
+        /// 软键盘
+        /// </summary>
         public static bool _touch = false;
+        /// <summary>
+        /// 系统粘贴板
+        /// </summary>
         public static string systemCopyBuffer;
+        /// <summary>
+        /// 输入法位置
+        /// </summary>
         public static Vector2 CursorPos;
+        /// <summary>
+        /// 键盘信息收集
+        /// </summary>
         public static void InfoCollection()
         {
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR
@@ -125,6 +170,14 @@ namespace huqiang.UIEvent
 #endif
             }
         }
+        /// <summary>
+        /// 弹出软键盘输入
+        /// </summary>
+        /// <param name="str">初始字符串</param>
+        /// <param name="type">键盘类型</param>
+        /// <param name="multiLine">允许多行</param>
+        /// <param name="passward">密码输入</param>
+        /// <param name="limit">字符个数限制,为0则不限制</param>
         public static void OnInput(string str, TouchScreenKeyboardType type,bool multiLine,bool passward,int limit)
         {
             if(_touch)
@@ -133,6 +186,9 @@ namespace huqiang.UIEvent
                 m_touch.characterLimit = limit;
             }
         }
+        /// <summary>
+        /// 结束输入
+        /// </summary>
         public static void EndInput()
         {
             if(_touch)
@@ -142,24 +198,44 @@ namespace huqiang.UIEvent
             }
         }
         public static int targetDisplay { get; set; }
+        /// <summary>
+        /// 触摸键盘类型
+        /// </summary>
         public  static TouchScreenKeyboardType type { get; private set; }
         public static RangeInt selection { get; set; }
         public static bool canSetSelection { get; private set; }
         public static bool active { get; set; }
         public static bool canGetSelection { get; private set; }
+        /// <summary>
+        /// 触摸键盘状态
+        /// </summary>
         public static TouchScreenKeyboard.Status status { get; private set; }
+        /// <summary>
+        /// 获取键的当前帧按压状态
+        /// </summary>
+        /// <param name="key">键</param>
+        /// <returns></returns>
         public static bool GetKey(KeyCode key)
         {
             if (KeyDowns.Contains(key))
                 return true;
             return false;
         }
+        /// <summary>
+        /// 获取键的当前帧是否按下
+        /// </summary>
+        /// <param name="key">键</param>
+        /// <returns></returns>
         public static bool GetKeyDown(KeyCode key)
         {
             if (KeyPress.Contains(key))
                 return true;
             return false;
         }
+        /// <summary>
+        /// 当前帧是否没有键输入
+        /// </summary>
+        /// <returns></returns>
         public static bool Nokey()
         {
             if (KeyPress.Count > 0)
@@ -170,6 +246,11 @@ namespace huqiang.UIEvent
                 return false;
             return true;
         }
+        /// <summary>
+        /// 获取键的当前帧是否弹起
+        /// </summary>
+        /// <param name="key">键</param>
+        /// <returns></returns>
         public static bool GetKeyUp(KeyCode key)
         {
             if (KeyUps.Contains(key))

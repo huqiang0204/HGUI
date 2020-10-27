@@ -7,23 +7,23 @@ using UnityEngine;
 
 namespace huqiang.UIModel
 {
+    /// <summary>
+    /// UI页面,位于UI最下层
+    /// </summary>
     public class UIPage : UIBase
     {
-        class PageInfo
-        {
-            public Type Pagetype;
-            public object DataContext;
-            public Type PopType;
-            public object PopData;
-        }
-        static Stack<PageInfo> pages = new Stack<PageInfo>();
-        public static Type typePop = typeof(PopWindow);
-        public static void ClearStack()
-        {
-            pages.Clear();
-        }
+        /// <summary>
+        /// 根节点
+        /// </summary>
         public static Transform Root { get;private set; }
+        /// <summary>
+        /// 根元素
+        /// </summary>
         public static UIElement UIRoot;
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <param name="Canvas">主画布</param>
         public static void Initial(Transform Canvas)
         {
             var page = new GameObject("Page");
@@ -34,7 +34,16 @@ namespace huqiang.UIModel
             Root.localScale = Vector3.one;
             Root.localRotation = Quaternion.identity;
         }
+        /// <summary>
+        /// 当前页面
+        /// </summary>
         public static UIPage CurrentPage { get; private set; }
+        /// <summary>
+        /// 载入页面
+        /// </summary>
+        /// <typeparam name="T">页面类型</typeparam>
+        /// <param name="dat">数据</param>
+        /// <returns></returns>
         public static T LoadPage<T>(object dat = null) where T : UIPage, new()
         {
             var p = CurrentPage as T;
@@ -48,7 +57,6 @@ namespace huqiang.UIModel
                 HCanvas.MainCanvas.ClearAllAction();
             if (CurrentPage != null)
             {
-                CurrentPage.Save();
                 CurrentPage.Dispose();
             }
             var t = new T();
@@ -58,6 +66,12 @@ namespace huqiang.UIModel
             t.ReSize();
             return t;
         }
+        /// <summary>
+        /// 载入页面
+        /// </summary>
+        /// <param name="type">页面类型</param>
+        /// <param name="dat">数据</param>
+        /// <returns></returns>
         public static UIPage LoadPage(Type type, object dat = null)
         {
             if (typeof(UIPage).IsAssignableFrom(type))
@@ -78,49 +92,41 @@ namespace huqiang.UIModel
                 t.Initial(Root, dat);
                 t.ChangeLanguage();
                 t.ReSize();
-                t.Recovery();
                 return t;
             }
             return null;
         }
-        public static void Back()
-        {
-            if (pages.Count > 0)
-            {
-                var page = pages.Pop();
-                if (page != null)
-                {
-                    LoadPage(page.Pagetype, page.DataContext);
-                    if (page.PopType != null)
-                    {
-                        CurrentPage.PopUpWindow(page.PopType, page.PopData);
-                    }
-                }
-            }
-        }
+        /// <summary>
+        /// 构造函数
+        /// </summary>
         public UIPage()
         {
             pops = new List<PopWindow>();
         }
-        protected Type BackPage;
-        protected Type BackPop;
-        protected object BackData;
+        /// <summary>
+        /// 当前显示的窗口
+        /// </summary>
         public PopWindow currentPop { get; set; }
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <param name="parent">父坐标变换</param>
+        /// <param name="dat">数据</param>
         public virtual void Initial(Transform parent, object dat = null)
         {
             Parent = parent;
             DataContext = dat;
         }
-        public virtual void Initial(Transform parent, object dat = null, Type back = null, Type pop = null, object backData = null)
-        {
-            Initial(parent, dat);
-            BackPage = back;
-            BackPop = pop;
-            BackData = backData;
-        }
+        /// <summary>
+        /// 显示
+        /// </summary>
+        /// <param name="dat">数据</param>
         public virtual void Show(object dat = null)
         {
         }
+        /// <summary>
+        /// 更新尺寸
+        /// </summary>
         public override void ReSize() 
         {
             if (UIRoot != null)
@@ -130,6 +136,9 @@ namespace huqiang.UIModel
             if (currentPop != null) 
                 currentPop.ReSize();
         }
+        /// <summary>
+        /// 资源释放
+        /// </summary>
         public override void Dispose()
         {
             if (pops != null)
@@ -139,6 +148,9 @@ namespace huqiang.UIModel
             currentPop = null;
             base.Dispose();
         }
+        /// <summary>
+        /// 隐藏当前窗口
+        /// </summary>
         public void HidePopWindow()
         {
             if (currentPop != null)
@@ -148,6 +160,13 @@ namespace huqiang.UIModel
             currentPop = null;
         }
         List<PopWindow> pops;
+        /// <summary>
+        /// 显示一个窗口
+        /// </summary>
+        /// <typeparam name="T">窗口类型</typeparam>
+        /// <param name="obj">数据</param>
+        /// <param name="parent">父坐标变换,为空则默认为当前页的父坐标变换</param>
+        /// <returns></returns>
         protected T ShowPopWindow<T>(object obj = null, Transform parent = null) where T : PopWindow, new()
         {
             if (currentPop != null)
@@ -174,6 +193,13 @@ namespace huqiang.UIModel
             t.ReSize();
             return t;
         }
+        /// <summary>
+        /// 显示一个窗口
+        /// </summary>
+        /// <param name="type">窗口类型</param>
+        /// <param name="obj">数据</param>
+        /// <param name="parent">父坐标变换,为空则默认为当前页的父坐标变换</param>
+        /// <returns></returns>
         protected object ShowPopWindow(Type type, object obj = null, Transform parent = null)
         {
             if (currentPop != null)
@@ -200,6 +226,12 @@ namespace huqiang.UIModel
             t.ReSize();
             return t;
         }
+        /// <summary>
+        /// 弹出一个窗口
+        /// </summary>
+        /// <typeparam name="T">窗口类型</typeparam>
+        /// <param name="obj">数据</param>
+        /// <returns></returns>
         public virtual T PopUpWindow<T>(object obj = null) where T : PopWindow, new()
         {
             return ShowPopWindow<T>(obj, null);
@@ -207,7 +239,6 @@ namespace huqiang.UIModel
         object PopUpWindow(Type type, object obj = null)
         {
             var pop = ShowPopWindow(type, obj, null) as PopWindow;
-            pop.Recovery();
             return pop;
         }
         /// <summary>
@@ -223,6 +254,10 @@ namespace huqiang.UIModel
             if (currentPop != null)
                 pops.Add(currentPop);
         }
+        /// <summary>
+        /// 释放当前窗口
+        /// </summary>
+        /// <param name="window">窗口实例</param>
         public void ReleasePopWindow(PopWindow window)
         {
             pops.Remove(window);
@@ -232,6 +267,10 @@ namespace huqiang.UIModel
             }
             window.Dispose();
         }
+        /// <summary>
+        /// 移除窗口
+        /// </summary>
+        /// <typeparam name="T">窗口类型</typeparam>
         public void ReleasePopWindow<T>()
         {
             for (int i = 0; i < pops.Count; i++)
@@ -246,6 +285,11 @@ namespace huqiang.UIModel
                 currentPop = null;
             }
         }
+        /// <summary>
+        /// 获取一个窗口
+        /// </summary>
+        /// <typeparam name="T">窗口类型</typeparam>
+        /// <returns></returns>
         public T GetPopWindow<T>() where T : PopWindow
         {
             for (int i = 0; i < pops.Count; i++)
@@ -255,28 +299,19 @@ namespace huqiang.UIModel
                 }
             return null;
         }
-        public override void Save()
-        {
-            if (pops != null)
-                for (int i = 0; i < pops.Count; i++)
-                    if (pops[i] != currentPop)
-                        pops[i].Save();
-            PageInfo page = new PageInfo();
-            page.Pagetype = GetType();
-            if (currentPop != null)
-                if (currentPop.Main.gameObject.activeSelf)
-                {
-                    page.PopType = currentPop.GetType();
-                    page.PopData = currentPop.DataContext;
-                }
-            page.DataContext = DataContext;
-            pages.Push(page);
-        }
+        /// <summary>
+        /// 更新
+        /// </summary>
+        /// <param name="time"></param>
         public override void Update(float time)
         {
             if (currentPop != null)
                 currentPop.Update(time);
         }
+        /// <summary>
+        /// 更换语言
+        /// </summary>
+        /// <returns></returns>
         public override bool ChangeLanguage()
         {
             if (currentPop != null)

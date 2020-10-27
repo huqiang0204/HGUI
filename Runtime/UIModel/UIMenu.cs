@@ -6,6 +6,9 @@ using UnityEngine;
 
 namespace huqiang.UIModel
 {
+    /// <summary>
+    /// 弹出式菜单,位于Window上层
+    /// </summary>
     public class UIMenu : UIBase
     {
         public const int LeftTop = 0;
@@ -16,9 +19,22 @@ namespace huqiang.UIModel
         public const int Down = 5;
         public const int LeftDown = 6;
         public const int Left = 7;
+        /// <summary>
+        /// 根节点
+        /// </summary>
         public static Transform Root { get;private set; }
+        /// <summary>
+        /// 根元素
+        /// </summary>
         public static UIElement UIRoot { get;private set; }
+        /// <summary>
+        /// 当前菜单实例
+        /// </summary>
         public static UIMenu Instance { get; set; }
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <param name="Canvas">主画布</param>
         public static void Initial(Transform Canvas)
         {
             var menu = new GameObject("Menu");
@@ -34,6 +50,9 @@ namespace huqiang.UIModel
             Root.localRotation = Quaternion.identity;
             menu.SetActive(false);
         }
+        /// <summary>
+        /// 隐藏菜单
+        /// </summary>
         public static void HideMenu()
         {
             if (Root != null)
@@ -41,6 +60,9 @@ namespace huqiang.UIModel
             if (CurrentMenu != null)
                 CurrentMenu.Hide();
         }
+        /// <summary>
+        /// 更新尺寸
+        /// </summary>
         public override void ReSize()
         {
             if (UIRoot != null)
@@ -49,6 +71,9 @@ namespace huqiang.UIModel
             base.ReSize();
         }
         static List<UIMenu> menus=new List<UIMenu>();
+        /// <summary>
+        /// 当前菜单
+        /// </summary>
         public static UIMenu CurrentMenu { get; private set; }
         /// <summary>
         /// 释放掉当前未激活的弹窗
@@ -70,6 +95,15 @@ namespace huqiang.UIModel
                 }
             }
         }
+        /// <summary>
+        /// 显示一个菜单
+        /// </summary>
+        /// <typeparam name="T">类型</typeparam>
+        /// <param name="context">联系上下文</param>
+        /// <param name="pos">弹出位置</param>
+        /// <param name="dic">方位</param>
+        /// <param name="obj">数据</param>
+        /// <returns></returns>
         public static T ShowMenu<T>(UIBase context, Rect pos, int dic, object obj = null) where T : UIMenu, new()
         {
             UIRoot.gameObject.SetActive(true);
@@ -226,6 +260,11 @@ namespace huqiang.UIModel
             }
             else return ShowMenu<T>(context, r, Left, obj);
         }
+        /// <summary>
+        /// 获取某个菜单
+        /// </summary>
+        /// <typeparam name="T">菜单类型</typeparam>
+        /// <returns></returns>
         public static T GetMenu<T>() where T : UIMenu
         {
             for (int i = 0; i < menus.Count; i++)
@@ -234,6 +273,13 @@ namespace huqiang.UIModel
             return null;
         }
         protected UIBase Context;
+        /// <summary>
+        /// 显示
+        /// </summary>
+        /// <param name="context">联系上下文</param>
+        /// <param name="pos">位置</param>
+        /// <param name="dic">方位</param>
+        /// <param name="obj">数据</param>
         public virtual void Show(UIBase context, Rect pos, int dic, object obj = null)
         {
             Context = context;
@@ -276,11 +322,17 @@ namespace huqiang.UIModel
             if (Main != null)
                 Main.SetActive(true);
         }
+        /// <summary>
+        /// 隐藏
+        /// </summary>
         public virtual void Hide()
         {
             if (Main != null)
                 Main.SetActive(false);
         }
+        /// <summary>
+        /// 释放
+        /// </summary>
         public override void Dispose()
         {
             base.Dispose();

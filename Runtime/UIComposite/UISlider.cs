@@ -6,6 +6,9 @@ using UnityEngine;
 
 namespace huqiang.UIComposite
 {
+    /// <summary>
+    /// 滑块条
+    /// </summary>
     public unsafe struct SliderInfo
     {
         public Vector2 StartOffset;

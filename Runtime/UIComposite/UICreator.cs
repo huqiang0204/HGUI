@@ -18,6 +18,14 @@ namespace huqiang.UIComposite
         private const string circleol = "Circle-Outline";
         private const string circlesm = "Circle-Small";
         private const string magicstick = "Magic-Stick";
+        /// <summary>
+        /// 创建一个元素
+        /// </summary>
+        /// <param name="pos">位置</param>
+        /// <param name="size">尺寸</param>
+        /// <param name="name">名称</param>
+        /// <param name="parent">父坐标变换</param>
+        /// <returns></returns>
         public static UIElement CreateElement(Vector3 pos, Vector2 size, string name, Transform parent)
         {
             var go = new GameObject(name);
@@ -30,6 +38,14 @@ namespace huqiang.UIComposite
             trans.localRotation = Quaternion.identity;
             return img;
         }
+        /// <summary>
+        /// 创建一个图像
+        /// </summary>
+        /// <param name="pos">位置</param>
+        /// <param name="size">尺寸</param>
+        /// <param name="name">名称</param>
+        /// <param name="parent">父坐标变换</param>
+        /// <returns></returns>
         public static HImage CreateHImage(Vector3 pos,Vector2 size, string name,Transform parent)
         {
             var go = new GameObject(name);
@@ -42,6 +58,14 @@ namespace huqiang.UIComposite
             trans.localRotation = Quaternion.identity;
             return img;
         }
+        /// <summary>
+        /// 创建一个文本
+        /// </summary>
+        /// <param name="pos">位置</param>
+        /// <param name="size">尺寸</param>
+        /// <param name="name">名称</param>
+        /// <param name="parent">父坐标变换</param>
+        /// <returns></returns>
         public static HText CreateHText(Vector3 pos, Vector2 size, string name, Transform parent)
         {
             var go = new GameObject(name);
@@ -54,6 +78,14 @@ namespace huqiang.UIComposite
             trans.localRotation = Quaternion.identity;
             return img;
         }
+        /// <summary>
+        /// 创建一个画线面板
+        /// </summary>
+        /// <param name="pos">位置</param>
+        /// <param name="size">尺寸</param>
+        /// <param name="name">名称</param>
+        /// <param name="parent">父坐标变换</param>
+        /// <returns></returns>
         public static HLine CreateHLine(Vector3 pos, Vector2 size, string name, Transform parent)
         {
             var go = new GameObject(name);

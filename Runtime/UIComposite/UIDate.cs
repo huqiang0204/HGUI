@@ -7,6 +7,9 @@ using huqiang.Core.HGUI;
 
 namespace huqiang.UIComposite
 {
+    /// <summary>
+    /// 日历组件
+    /// </summary>
     public class UIDate : Composite
     {
         class ItemView

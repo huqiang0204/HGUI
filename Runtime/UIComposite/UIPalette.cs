@@ -7,6 +7,9 @@ using UnityEngine;
 
 namespace huqiang.UIComposite
 {
+    /// <summary>
+    /// 调色板
+    /// </summary>
     public class UIPalette : Composite
     {
         UserEvent callBackR;

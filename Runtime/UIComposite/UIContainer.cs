@@ -20,16 +20,46 @@ namespace huqiang.UIComposite
         /// 实体模型,用于计算实体尺寸
         /// </summary>
         public Transform enityModel;
+        /// <summary>
+        /// 元素个数
+        /// </summary>
         public int ElementCount { get; private set; }
+        /// <summary>
+        /// 连接模型缓存
+        /// </summary>
         protected List<LinkerMod> buffer = new List<LinkerMod>();
+        /// <summary>
+        /// 创建一个连接模型
+        /// </summary>
+        /// <returns></returns>
         public virtual LinkerMod CreateUI() { return null; }
+        /// <summary>
+        /// 获取项目尺寸,如果没有则返回默认高度40
+        /// </summary>
+        /// <param name="u">模型实例</param>
+        /// <returns></returns>
         public virtual float GetItemSize(object u) { return 40; }
+        /// <summary>
+        /// 刷新项目内容
+        /// </summary>
+        /// <param name="t">项目UI实例</param>
+        /// <param name="u">数据实例</param>
+        /// <param name="index">数据索引</param>
         public virtual void RefreshItem(object t, object u, int index) { }
+        /// <summary>
+        /// 回收项目连接器
+        /// </summary>
+        /// <param name="mod"></param>
         public void RecycleItem(LinkerMod mod)
         {
             buffer.Add(mod);
             mod.main.SetActive(false);
         }
+        /// <summary>
+        /// 弹出一个项目连接器
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
         public LinkerMod PopItem(int index)
         {
             for(int i=0;i<buffer.Count;i++)
@@ -41,11 +71,18 @@ namespace huqiang.UIComposite
                 }
             return null;
         }
+        /// <summary>
+        /// 清除索引
+        /// </summary>
         public void ClearIndex()
         {
             for (int i = 0; i < buffer.Count; i++)
                 buffer[i].index = -1;
         }
+        /// <summary>
+        /// 获取子元素计数
+        /// </summary>
+        /// <param name="trans"></param>
         protected void GetElementCount(Transform trans)
         {
             ElementCount++;
@@ -71,6 +108,11 @@ namespace huqiang.UIComposite
         private UILinker()
         {
         }
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="container">容器实例</param>
+        /// <param name="mod">模型名称</param>
         public UILinker(UIContainer container, string mod)
         {
             if (container.model == null)
@@ -80,6 +122,11 @@ namespace huqiang.UIComposite
             container.linkers.Add(this);
             initializer = new UIInitializer(TempReflection.ObjectFields(typeof(T)));
         }
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="container">模型名称</param>
+        /// <param name="mod">模式数据</param>
         public UILinker(UIContainer container, FakeStruct mod)
         {
             con = container;
@@ -87,26 +134,48 @@ namespace huqiang.UIComposite
             container.linkers.Add(this);
             initializer = new UIInitializer(TempReflection.ObjectFields(typeof(T)));
         }
+        /// <summary>
+        /// 插入数据
+        /// </summary>
+        /// <param name="dat"></param>
         public void InsertData(U dat)
         {
             con.InsertData(this,dat);
         }
+        /// <summary>
+        /// 添加数据
+        /// </summary>
+        /// <param name="dat"></param>
         public void AddData(U dat)
         {
             con.AddData(this, dat);
         }
+        /// <summary>
+        /// 添加数据并移动指定长度
+        /// </summary>
+        /// <param name="dat">数据</param>
+        /// <param name="h">数据UI高度</param>
         public void AddAndMove(U dat,float h)
         {
             if (h <= 0)
                 unsafe { h = ((TransfromData*)model.ip)->size.y; }
             con.AddAndMove(this, dat, h);
         }
+        /// <summary>
+        /// 添加数据并移动到底部
+        /// </summary>
+        /// <param name="dat">数据</param>
+        /// <param name="h">数据UI高度</param>
         public void AddAndMoveEnd(U dat,float h)
         {
             if (h<=0)
                 unsafe { h = ((TransfromData*)model.ip)->size.y; }
             con.AddAndMoveEnd(this, dat, h);
         }
+        /// <summary>
+        /// 创建项目连接器
+        /// </summary>
+        /// <returns></returns>
         public override LinkerMod CreateUI()
         {
             for(int i=0;i<buffer.Count;i++)
@@ -125,12 +194,23 @@ namespace huqiang.UIComposite
             mod.UI = t;
             return mod;
         }
+        /// <summary>
+        /// 获取项目尺寸
+        /// </summary>
+        /// <param name="u">项目实例</param>
+        /// <returns></returns>
         public override float GetItemSize(object u)
         {
             if (CalculItemHigh != null)
                 return CalculItemHigh(u as U);
             unsafe { return ((TransfromData*)model.ip)->size.y; }
         }
+        /// <summary>
+        /// 刷新项目显示内容
+        /// </summary>
+        /// <param name="t">项目UI实例</param>
+        /// <param name="u">数据实例</param>
+        /// <param name="index">数据索引</param>
         public override void RefreshItem(object t, object u, int index)
         {
             if (ItemUpdate != null)
@@ -142,18 +222,39 @@ namespace huqiang.UIComposite
     /// </summary>
     public class ObjectLinker : Linker
     {
+        /// <summary>
+        /// 项目更新委托
+        /// </summary>
         public Action<object, object, int> ItemUpdate;
+        /// <summary>
+        /// 项目连接器创建委托
+        /// </summary>
         public Action<ObjectLinker, LinkerMod> ItemCreate;
+        /// <summary>
+        /// 项目高度计算委托
+        /// </summary>
         public Func<object, float> CalculItemHigh;
         UIContainer con;
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="container">容器实例</param>
         public ObjectLinker(UIContainer container)
         {
             container.linkers.Add(this);
         }
+        /// <summary>
+        /// 添加一条数据
+        /// </summary>
+        /// <param name="dat"></param>
         public void AddData(object dat)
         {
             con.AddData(this, dat);
         }
+        /// <summary>
+        /// 创建UI项目连接器
+        /// </summary>
+        /// <returns></returns>
         public override LinkerMod CreateUI()
         {
             for (int i = 0; i < buffer.Count; i++)
@@ -168,6 +269,12 @@ namespace huqiang.UIComposite
                 ItemCreate(this, mod);
             return mod;
         }
+        /// <summary>
+        /// 刷新项目内容
+        /// </summary>
+        /// <param name="t">项目实例</param>
+        /// <param name="u">数据实例</param>
+        /// <param name="index">数据索引</param>
         public override void RefreshItem(object t, object u, int index)
         {
             if (ItemUpdate != null)
@@ -180,15 +287,40 @@ namespace huqiang.UIComposite
         public Vector2 sizeDelta;
         public Quaternion rotate;
     }
+    /// <summary>
+    /// 绑定数据
+    /// </summary>
     public class BindingData
     {
+        /// <summary>
+        /// 容器中的偏移位置
+        /// </summary>
         public float offset;
+        /// <summary>
+        /// 内容宽度
+        /// </summary>
         public float width;
+        /// <summary>
+        /// 内容高度
+        /// </summary>
         public float high;
+        /// <summary>
+        /// 数据
+        /// </summary>
         public object Data;
+        /// <summary>
+        /// 连接器
+        /// </summary>
         public Linker linker;
+        /// <summary>
+        /// 布局数据缓存
+        /// </summary>
         public BaseLayout[] layouts;
         static int id = 0;
+        /// <summary>
+        /// 应用布局数据
+        /// </summary>
+        /// <param name="trans"></param>
         public void ApplayLayout(Transform trans)
         {
             id = 0;
@@ -208,6 +340,10 @@ namespace huqiang.UIComposite
             for (int i = 0; i < c; i++)
                 ApplayLayout(trans.GetChild(i), layouts);
         }
+        /// <summary>
+        /// 保存实例的布局数据
+        /// </summary>
+        /// <param name="trans"></param>
         public void LoadLayout(Transform trans)
         {
             id = 0;
@@ -229,22 +365,61 @@ namespace huqiang.UIComposite
         }
      
     }
+    /// <summary>
+    /// UI容器
+    /// </summary>
     public class UIContainer:Composite
     {
         class Item
         {
+            /// <summary>
+            /// 连接器
+            /// </summary>
             public Linker linker;
+            /// <summary>
+            /// 连接器模型
+            /// </summary>
             public LinkerMod mod;
+            /// <summary>
+            /// UI实例
+            /// </summary>
             public object UI;
+            /// <summary>
+            /// 数据实例
+            /// </summary>
             public object Data;
+            /// <summary>
+            /// 绑定数据
+            /// </summary>
             public BindingData binding;
+            /// <summary>
+            /// 在容器中的索引
+            /// </summary>
             public int Index = -1;
+            /// <summary>
+            /// 当前位置
+            /// </summary>
             public Vector3 pos;
+            /// <summary>
+            /// 当前尺寸
+            /// </summary>
             public Vector2 size;
+            /// <summary>
+            /// 主体实例对象
+            /// </summary>
             public GameObject main;
+            /// <summary>
+            /// 容器中的偏移位置
+            /// </summary>
             public float offset;
+            /// <summary>
+            /// 内容高度
+            /// </summary>
             public float high;
         }
+        /// <summary>
+        /// 主体事件
+        /// </summary>
         public UserEvent eventCall;
         /// <summary>
         /// 最大值滚动框的0.5倍
@@ -260,11 +435,22 @@ namespace huqiang.UIComposite
         public Action<UIContainer> ScrollOutTop;
         List<Item> items;
         List<BindingData> datas = new List<BindingData>();
+        /// <summary>
+        /// 模型集合
+        /// </summary>
         public FakeStruct model;
+        /// <summary>
+        /// 连接器列表
+        /// </summary>
         public List<Linker> linkers = new List<Linker>();
         public UIContainer()
         {
         }
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <param name="fake">数据模型</param>
+        /// <param name="script">元素主体</param>
         public override void Initial(FakeStruct fake, UIElement script)
         {
             base.Initial(fake, script);
@@ -285,7 +471,16 @@ namespace huqiang.UIComposite
             var trans = Enity.transform;
             HGUIManager.GameBuffer.RecycleChild(trans.gameObject);
         }
+        /// <summary>
+        /// 数据计数
+        /// </summary>
         public int DataCount { get { return datas.Count; } }
+        /// <summary>
+        /// 插入数据
+        /// </summary>
+        /// <param name="linker">连接器</param>
+        /// <param name="data">数据实例</param>
+        /// <returns></returns>
         public BindingData InsertData(Linker linker,object data)
         {
             BindingData binding = new BindingData();
@@ -296,6 +491,12 @@ namespace huqiang.UIComposite
             index++;
             return binding;
         }
+        /// <summary>
+        /// 添加数据
+        /// </summary>
+        /// <param name="linker">连接器</param>
+        /// <param name="data">数据实例</param>
+        /// <returns></returns>
         public BindingData AddData(Linker linker, object data)
         {
             BindingData binding = new BindingData();
@@ -305,6 +506,12 @@ namespace huqiang.UIComposite
             datas.Add(binding);
             return binding;
         }
+        /// <summary>
+        /// 添加数据并移动指定长度
+        /// </summary>
+        /// <param name="linker">连接器</param>
+        /// <param name="data">数据实例</param>
+        /// <param name="h">高度</param>
         public void AddAndMove(Linker linker, object data, float h)
         {
             float end = End;
@@ -320,6 +527,12 @@ namespace huqiang.UIComposite
                 y = h;
             Move(y);
         }
+        /// <summary>
+        /// 添加数据并移动到底部
+        /// </summary>
+        /// <param name="linker">连接器</param>
+        /// <param name="data">数据实例</param>
+        /// <param name="h">数据高度</param>
         public void AddAndMoveEnd(Linker linker, object data,float h)
         {
             float end = End;
@@ -530,7 +743,7 @@ namespace huqiang.UIComposite
         int index;
         float offsetRatio;
         int outState;
-        float Point {
+       public float Point {
             get
             {
                 if (datas == null)
@@ -572,7 +785,7 @@ namespace huqiang.UIComposite
                 }
             }
         }
-        float Start
+       public float Start
         {
             get
             {
@@ -583,7 +796,7 @@ namespace huqiang.UIComposite
                 return datas[0].offset;
             }
         }
-        float End
+       public float End
         {
             get
             {
@@ -665,6 +878,11 @@ namespace huqiang.UIComposite
                     offsetRatio = (p - datas[end].offset) / datas[end].high;
                 }
         }
+        /// <summary>
+        /// 滚动回弹限定
+        /// </summary>
+        /// <param name="eventCall">用户事件</param>
+        /// <param name="v">参考移动量</param>
         protected void BounceBack(UserEvent eventCall, ref Vector2 v)
         {
             OutRatio = 0;

@@ -6,6 +6,9 @@ using UnityEngine;
 
 namespace huqiang.UIComposite
 {
+    /// <summary>
+    /// 摇杆
+    /// </summary>
     public class UIRocker : Composite
     {
         public Transform Nob;

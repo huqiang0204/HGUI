@@ -11,10 +11,22 @@ namespace huqiang.UIComposite
     /// </summary>
     public class UIRocker : Composite
     {
+        /// <summary>
+        /// 握柄坐标变换
+        /// </summary>
         public Transform Nob;
+        /// <summary>
+        /// 主体事件
+        /// </summary>
         public UserEvent callBack;
         float _r;
+        /// <summary>
+        /// 握柄移动半径
+        /// </summary>
         public float Radius { get { return _r; }set { if (value <= 0) value = 0.01f; _r = value;_s = _r * _r; } }
+        /// <summary>
+        /// 握柄与中心的距离
+        /// </summary>
         public float Slider { get { return Mathf.Sqrt(vector.x * vector.x + vector.y * vector.y) / _r; } }
         public enum Direction
         {
@@ -22,19 +34,36 @@ namespace huqiang.UIComposite
         }
         float _angle;
         float _s;
+        /// <summary>
+        /// 顺时针握柄角度
+        /// </summary>
         public float Angle { get { return _angle; } set {
                 _angle = value;
                 _dir = (Direction)(value / 45);
                 vector = MathH.Tan2(_angle);
             } }
         Direction _dir;
+        /// <summary>
+        /// 设置或者获取握柄方位
+        /// </summary>
         public Direction direction { get { return _dir; }
             set { _dir = value;
                 _angle = (((int)_dir) - 1) * 45;
                 vector = MathH.Tan2(_angle);
             } }
+        /// <summary>
+        /// 握柄的方向向量
+        /// </summary>
         public Vector2 vector;
+        /// <summary>
+        /// 握柄转动事件
+        /// </summary>
         public Action<UIRocker> Rocking;
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <param name="fake">模型数据</param>
+        /// <param name="script">元素主体</param>
         public override void Initial(FakeStruct fake,UIElement script)
         {
             base.Initial(fake,script);

@@ -21,11 +21,25 @@ namespace huqiang.UIComposite
         HImage htemp;
         HImage slider;
         Palette palette;
+        /// <summary>
+        /// 选中颜色值
+        /// </summary>
         public Color SelectColor = Color.white;
         float Alpha;
+        /// <summary>
+        /// 选中色被改变事件
+        /// </summary>
         public Action<UIPalette> ColorChanged;
+        /// <summary>
+        /// 模板改变事件
+        /// </summary>
         public Action<UIPalette> TemplateChanged;
         UISlider uISlider;
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <param name="fake">模型数据</param>
+        /// <param name="element">元素主体</param>
         public override void Initial(FakeStruct fake,UIElement element)
         {
             base.Initial(fake,element);

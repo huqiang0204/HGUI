@@ -20,7 +20,13 @@ namespace huqiang.UIComposite
         ScrollY Year;
         ScrollY Month;
         ScrollY Day;
+        /// <summary>
+        /// 开始的年份
+        /// </summary>
         public int StartYear = 1800;
+        /// <summary>
+        /// 结束的年份
+        /// </summary>
         public int EndYear = 2400;
         int[] ys;
         string[] ms;
@@ -28,6 +34,9 @@ namespace huqiang.UIComposite
         string unitY = " Year";
         string unitM = " Month";
         string unitD = " Day";
+        /// <summary>
+        /// 年份的单位
+        /// </summary>
         public string YearUnit
         {
             get { return unitY; }
@@ -46,6 +55,9 @@ namespace huqiang.UIComposite
                 }
             }
         }
+        /// <summary>
+        /// 月份的单位
+        /// </summary>
         public string MonUnit
         {
             get { return unitM; }
@@ -64,6 +76,9 @@ namespace huqiang.UIComposite
                 }
             }
         }
+        /// <summary>
+        /// 日的单位
+        /// </summary>
         public string DayUnit
         {
             get { return unitD; }
@@ -82,6 +97,11 @@ namespace huqiang.UIComposite
                 }
             }
         }
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <param name="mod">数据模型</param>
+        /// <param name="element">元素主体</param>
         public override void Initial(FakeStruct mod,UIElement element)
         {
             base.Initial(mod,element);
@@ -195,8 +215,17 @@ namespace huqiang.UIComposite
             var item = ScrollY.GetCenterItem(scroll.Items);
             day = item.index + 1;
         }
+        /// <summary>
+        /// 年
+        /// </summary>
         public int year;
+        /// <summary>
+        /// 月
+        /// </summary>
         public int month = 1;
+        /// <summary>
+        /// 日
+        /// </summary>
         public int day = 1;
         static int[] daysTable = new int[] { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
         void RefreshDay()

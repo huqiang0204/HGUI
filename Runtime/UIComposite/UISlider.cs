@@ -11,10 +11,25 @@ namespace huqiang.UIComposite
     /// </summary>
     public unsafe struct SliderInfo
     {
+        /// <summary>
+        /// 前位置的偏移量
+        /// </summary>
         public Vector2 StartOffset;
+        /// <summary>
+        /// 终点位置的偏移量
+        /// </summary>
         public Vector2 EndOffset;
+        /// <summary>
+        /// 起点位置的握柄缩放
+        /// </summary>
         public float MinScale;
+        /// <summary>
+        /// 终点位置的握柄缩放
+        /// </summary>
         public float MaxScale;
+        /// <summary>
+        /// 方向
+        /// </summary>
         public UISlider.Direction direction;
         public static int Size = sizeof(SliderInfo);
         public static int ElementSize = Size / 4;
@@ -25,12 +40,25 @@ namespace huqiang.UIComposite
         {
             Horizontal, Vertical
         }
+        /// <summary>
+        /// 填充的图像主体
+        /// </summary>
         public HImage FillImage;
+        /// <summary>
+        /// 握柄,可空
+        /// </summary>
         public HImage Nob;
+        /// <summary>
+        /// 附加信息
+        /// </summary>
         public SliderInfo info;
         float ratio;
         UserEvent callBack;
         Vector2 pos;
+        /// <summary>
+        /// 设置填充值
+        /// </summary>
+        /// <param name="value"></param>
         public void SetFillSize(float value)
         {
             if (value < 0)
@@ -57,8 +85,17 @@ namespace huqiang.UIComposite
                 }
             }
         }
+        /// <summary>
+        /// 滑块值被改变事件
+        /// </summary>
         public Action<UISlider> OnValueChanged;
+        /// <summary>
+        /// 滑块值改变完毕事件
+        /// </summary>
         public Action<UISlider> ValueEndChange;
+        /// <summary>
+        /// 滑块位置百分比,0-1
+        /// </summary>
         public float Percentage { get { return ratio; } set {
                 if (value < 0)
                     value = 0;
@@ -68,11 +105,19 @@ namespace huqiang.UIComposite
                 RatioToPos();
                 ApplyValue();
             } }
+        /// <summary>
+        /// 构造函数
+        /// </summary>
         public UISlider()
         {
             info.MinScale = 1;
             info.MaxScale = 1;
         }
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <param name="mod">模型数据</param>
+        /// <param name="script">元素主体</param>
         public override void Initial(FakeStruct mod, UIElement script)
         {
             base.Initial(mod,script);

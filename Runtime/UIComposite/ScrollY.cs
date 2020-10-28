@@ -9,8 +9,15 @@ using UnityEngine;
 
 namespace huqiang.UIComposite
 {
+    /// <summary>
+    /// 纵向滚动框
+    /// </summary>
     public class ScrollY : ScrollContent
     {
+        /// <summary>
+        /// 滚动项目居中
+        /// </summary>
+        /// <param name="scroll"></param>
         public static void CenterScroll(ScrollY scroll)
         {
             var eve = scroll.eventCall;
@@ -25,7 +32,13 @@ namespace huqiang.UIComposite
             tar += sy * 0.5f;
             scroll.eventCall.ScrollDistanceY = tar;
         }
-        public UserEvent eventCall;//scrollY自己的按钮
+        /// <summary>
+        /// 主体事件
+        /// </summary>
+        public UserEvent eventCall;
+        /// <summary>
+        /// 内容总宽度
+        /// </summary>
         protected float height;
         int Column = 1;
         float m_point;
@@ -56,11 +69,23 @@ namespace huqiang.UIComposite
                 Order();
             }
         }
+        /// <summary>
+        /// 项目每次滚动居中
+        /// </summary>
         public bool ItemDockCenter;
+        /// <summary>
+        /// 内容总尺寸
+        /// </summary>
         public Vector2 ContentSize { get; private set; }
+        /// <summary>
+        /// 动态尺寸,用以适应宽度
+        /// </summary>
         public bool DynamicSize = true;
         Vector2 ctSize;
         float ctScale;
+        /// <summary>
+        /// 滑块条,可以为空
+        /// </summary>
         public override UISlider Slider { 
             get => m_slider; 
             set {
@@ -70,21 +95,17 @@ namespace huqiang.UIComposite
                 if (m_slider != null)
                     m_slider.OnValueChanged = (o) => { Pos = 1 - o.Percentage; };
             } }
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <param name="mod">数据模型</param>
+        /// <param name="script">主体元素</param>
         public override void Initial(FakeStruct mod, UIElement script)
         {
             base.Initial(mod,script);
             eventCall = Enity.RegEvent<UserEvent>();
             eventCall.Drag = Draging;
-            eventCall.DragEnd = (o, e, s) =>
-            {
-                Scrolling(o, s);
-                if (ItemDockCenter)
-                    CenterScroll(this);
-                if (ScrollStart != null)
-                    ScrollStart(this);
-                if (eventCall.VelocityY == 0)
-                    OnScrollEnd(o);
-            };
+            eventCall.DragEnd = OnDragEnd;
             eventCall.MouseWheel = (o, e) => { Scrolling(o, new Vector2(0, e.MouseWheelDelta * 100)); };
             eventCall.Scrolling = Scrolling;
             eventCall.ScrollEndY = OnScrollEnd;
@@ -98,14 +119,42 @@ namespace huqiang.UIComposite
                 Refresh(0,m_point);
             };
         }
+        /// <summary>
+        /// 滚动事件
+        /// </summary>
         public Action<ScrollY, Vector2> Scroll;
+        /// <summary>
+        /// 开始滚动事件
+        /// </summary>
         public Action<ScrollY> ScrollStart;
+        /// <summary>
+        /// 结束滚动事件
+        /// </summary>
         public Action<ScrollY> ScrollEnd;
+        /// <summary>
+        /// 光标拖拽完毕
+        /// </summary>
+        public Action<UserEvent, UserAction, Vector2> DragEnd;
+        /// <summary>
+        /// 滚动衰减率,越接近1衰减越慢
+        /// </summary>
         public float DecayRate = 0.998f;
         void Draging(UserEvent back, UserAction action, Vector2 v)
         {
             back.DecayRateY = DecayRate;
             Scrolling(back, v);
+        }
+        void OnDragEnd(UserEvent back, UserAction action, Vector2 v)
+        {
+            Scrolling(back, v);
+            if (ItemDockCenter)
+                CenterScroll(this);
+            if (ScrollStart != null)
+                ScrollStart(this);
+            if (eventCall.VelocityY == 0)
+                OnScrollEnd(back);
+            if (DragEnd != null)
+                DragEnd(back,action,v);
         }
         /// <summary>
         /// 
@@ -183,6 +232,9 @@ namespace huqiang.UIComposite
             if (m_slider != null)
                 m_slider.Percentage = 1- Pos;
         }
+        /// <summary>
+        /// 内容尺寸计算
+        /// </summary>
         public void Calcul()
         {
             float w = Enity.m_sizeDelta.x - ItemOffset.x;
@@ -212,6 +264,11 @@ namespace huqiang.UIComposite
                 height = Size.y;
             ActualSize = new Vector2(Size.x, height);
         }
+        /// <summary>
+        /// 刷新
+        /// </summary>
+        /// <param name="x">无效</param>
+        /// <param name="y">纵向位置</param>
         public override void Refresh(float x = 0, float y = 0)
         {
             m_point = y;
@@ -331,6 +388,11 @@ namespace huqiang.UIComposite
                 ItemUpdate(a.obj, dat, index);
             }
         }
+        /// <summary>
+        /// 获取最接近中心的项目
+        /// </summary>
+        /// <param name="items">项目列表</param>
+        /// <returns></returns>
         public static ScrollItem GetCenterItem(List<ScrollItem> items)
         {
             if (items.Count < 1)

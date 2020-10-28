@@ -7,8 +7,15 @@ using UnityEngine;
 
 namespace huqiang.UIComposite
 {
+    /// <summary>
+    /// 横向滚动框
+    /// </summary>
     public class ScrollX:ScrollContent
     {
+        /// <summary>
+        /// 滚动项目居中
+        /// </summary>
+        /// <param name="scroll"></param>
         public static void CenterScroll(ScrollX scroll)
         {
             var eve = scroll.eventCall;
@@ -24,6 +31,11 @@ namespace huqiang.UIComposite
             d = qt - scroll.Point;
             scroll.eventCall.ScrollDistanceX = -d;
         }
+        /// <summary>
+        /// 滚动居中
+        /// </summary>
+        /// <param name="scroll">横向滚动框</param>
+        /// <param name="index">索引</param>
         public static void CenterScrollByIndex(ScrollX scroll,int index)
         {
             var eve = scroll.eventCall;
@@ -38,7 +50,13 @@ namespace huqiang.UIComposite
             d = qt - scroll.Point;
             scroll.eventCall.ScrollDistanceX = -d;
         }
-        public UserEvent eventCall;//scrollx自己的按钮
+        /// <summary>
+        /// 主体事件
+        /// </summary>
+        public UserEvent eventCall;
+        /// <summary>
+        /// 内容总计宽度
+        /// </summary>
         protected float width;
         int Row = 1;
         float m_point;
@@ -67,8 +85,13 @@ namespace huqiang.UIComposite
                 Order();
             }
         }
+        /// <summary>
+        /// 项目每次滚动居中
+        /// </summary>
         public bool ItemDockCenter;
-        public int PreDockindex { get; private set; }
+        /// <summary>
+        /// 内容占用尺寸
+        /// </summary>
         public Vector2 ContentSize { get; private set; }
         /// <summary>
         /// 动态尺寸,自动对齐
@@ -76,6 +99,9 @@ namespace huqiang.UIComposite
         public bool DynamicSize = true;
         Vector2 ctSize;
         float ctScale;
+        /// <summary>
+        /// 滑块条,可以为空
+        /// </summary>
         public override UISlider Slider
         {
             get => m_slider;
@@ -88,6 +114,11 @@ namespace huqiang.UIComposite
                     m_slider.OnValueChanged = (o) => { Pos = o.Percentage; };
             }
         }
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <param name="mod">数据模型</param>
+        /// <param name="script">主体元素</param>
         public override void Initial(FakeStruct mod, UIElement script)
         {
             base.Initial(mod,script);
@@ -116,11 +147,21 @@ namespace huqiang.UIComposite
                 Refresh(m_point,0);
             };
         }
+        /// <summary>
+        /// 滚动事件
+        /// </summary>
         public Action<ScrollX, Vector2> Scroll;
+        /// <summary>
+        /// 开始滚动事件
+        /// </summary>
         public Action<ScrollX> ScrollStart;
+        /// <summary>
+        /// 滚动结束事件
+        /// </summary>
         public Action<ScrollX> ScrollEnd;
-        public Action<ScrollX> ScrollToTop;
-        public Action<ScrollX> ScrollToDown;
+        /// <summary>
+        /// 滚动衰减率,越接近1衰减越慢
+        /// </summary>
         public float DecayRate = 0.998f;
         void Draging(UserEvent back, UserAction action, Vector2 v)
         {
@@ -203,6 +244,9 @@ namespace huqiang.UIComposite
             if (m_slider != null)
                 m_slider.Percentage =  Pos;
         }
+        /// <summary>
+        /// 内容尺寸计算
+        /// </summary>
         public void Calcul()
         {
             float w = Size.y - ItemOffset.y;
@@ -232,6 +276,11 @@ namespace huqiang.UIComposite
                 width = Size.x;
             ActualSize = new Vector2(width, Size.y);
         }
+        /// <summary>
+        /// 刷新
+        /// </summary>
+        /// <param name="x">横向位置</param>
+        /// <param name="y">无效</param>
         public override void Refresh(float x = 0, float y = 0)
         {
             m_point = x;
@@ -346,6 +395,11 @@ namespace huqiang.UIComposite
                 ItemUpdate(a.obj,dat, index);
             }
         }
+        /// <summary>
+        /// 获取最接近中心的项目
+        /// </summary>
+        /// <param name="items">项目列表</param>
+        /// <returns></returns>
         public static ScrollItem GetCenterItem(List<ScrollItem> items)
         {
             if (items.Count < 1)

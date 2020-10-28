@@ -7,6 +7,9 @@ using UnityEngine;
 
 namespace huqiang.Unit
 {
+    /// <summary>
+    /// 网格单元
+    /// </summary>
     public class Unit
     {
         public Vector2 size;
@@ -72,6 +75,9 @@ namespace huqiang.Unit
         }
         public UCollider2D collider;
     }
+    /// <summary>
+    /// 热更新网格单元
+    /// </summary>
     public class HotUnit : Unit
     {
         public object Context;

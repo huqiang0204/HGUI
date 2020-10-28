@@ -6,6 +6,9 @@ using UnityEngine;
 
 namespace huqiang.Unit
 {
+    /// <summary>
+    /// 多边形碰撞器
+    /// </summary>
     public class UPolygonCollider:UCollider2D
     {
         public Vector2[] points;

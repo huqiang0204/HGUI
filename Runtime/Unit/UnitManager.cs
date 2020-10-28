@@ -6,6 +6,9 @@ using UnityEngine;
 
 namespace huqiang.Unit
 {
+    /// <summary>
+    /// 单元管理器
+    /// </summary>
     public class HotUnitManager : UnitCarrier, ICarrier
     {
         public HotUnit AddUnit()

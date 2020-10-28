@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace huqiang.Unit
 {
-  
+    /// <summary>
+    /// 单元碰撞检测器
+    /// </summary>
     public class UnitCollision
     {
         struct Context

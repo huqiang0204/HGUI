@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace huqiang.Unit
 {
+    /// <summary>
+    /// 单元工厂
+    /// </summary>
     public class UnitFactory
     {
         public static List<UnitFactory> factories;

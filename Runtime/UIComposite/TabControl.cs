@@ -7,16 +7,43 @@ using huqiang.Data;
 
 namespace huqiang.UIComposite
 {
+    /// <summary>
+    /// 表控制器
+    /// </summary>
     public class TabControl:Composite
     {
+        /// <summary>
+        /// 表内容
+        /// </summary>
         public class TableContent
         {
+            /// <summary>
+            /// 父控制器
+            /// </summary>
             public TabControl Parent;
+            /// <summary>
+            /// 项目主体
+            /// </summary>
             public UIElement Item;
+            /// <summary>
+            /// 主体事件
+            /// </summary>
             public UserEvent eventCall;
+            /// <summary>
+            /// 标签
+            /// </summary>
             public HText Label;
+            /// <summary>
+            /// 背景
+            /// </summary>
             public HImage Back;
+            /// <summary>
+            /// 绑定内容
+            /// </summary>
             public UIElement Content;
+            /// <summary>
+            /// 联系上下文
+            /// </summary>
             public object Context;
         }
         /// <summary>
@@ -26,11 +53,29 @@ namespace huqiang.UIComposite
         {
             Top, Down
         }
+        /// <summary>
+        /// 标头
+        /// </summary>
         public UIElement Head;
+        /// <summary>
+        /// 所有项目父坐标变换
+        /// </summary>
         public Transform Items;
+        /// <summary>
+        /// 所有项目的父元素
+        /// </summary>
         public UIElement Content;
+        /// <summary>
+        /// 项目模型
+        /// </summary>
         public FakeStruct Item;
+        /// <summary>
+        /// 当前激活状态的表内容
+        /// </summary>
         public TableContent CurContent;
+        /// <summary>
+        /// 激活的内容被改变事件
+        /// </summary>
         public Action<TabControl> SelectChanged;
         StackPanel stackPanel;
         HeadDock dock;
@@ -58,7 +103,13 @@ namespace huqiang.UIComposite
                 }
                 UIElement.ResizeChild(Enity);
             } }
+        /// <summary>
+        /// 标头高度
+        /// </summary>
         public float headHigh = 0;
+        /// <summary>
+        /// 所有内容列表
+        /// </summary>
         public List<TableContent> contents;
         /// <summary>
         /// 当前被选中项的背景色
@@ -68,6 +119,11 @@ namespace huqiang.UIComposite
         /// 鼠标停靠时的背景色
         /// </summary>
         public Color HoverColor = 0x5379FFff.ToColor();
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <param name="mod">数据模型</param>
+        /// <param name="element">元素主体</param>
         public override void Initial(FakeStruct mod,UIElement element)
         {
             base.Initial(mod,element);
@@ -174,6 +230,10 @@ namespace huqiang.UIComposite
             HGUIManager.GameBuffer.RecycleGameObject(table.Content.gameObject);
             HGUIManager.GameBuffer.RecycleGameObject(table.Item.gameObject);
         }
+        /// <summary>
+        /// 添加一张表
+        /// </summary>
+        /// <param name="table">实例</param>
         public void AddTable(TableContent table)
         {
             table.eventCall.Click = ItemClick;
@@ -182,6 +242,10 @@ namespace huqiang.UIComposite
             table.Label.transform.SetParent(Head.transform);
             table.Content.transform.SetParent(Content.transform);
         }
+        /// <summary>
+        /// 显示某张表
+        /// </summary>
+        /// <param name="content">实例</param>
         public void ShowContent(TableContent content)
         {
             if (CurContent != null)
@@ -199,10 +263,20 @@ namespace huqiang.UIComposite
                 CurContent.Back.gameObject.SetActive(true);
             }
         }
+        /// <summary>
+        /// 是否存在此表
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
         public bool ExistContent(TableContent content)
         {
             return contents.Contains(content);
         }
+        /// <summary>
+        /// 标头被单击的默认处理函数
+        /// </summary>
+        /// <param name="callBack"></param>
+        /// <param name="action"></param>
         public void ItemClick(UserEvent callBack,UserAction action)
         {
             var con = callBack.DataContext as TableContent;
@@ -212,6 +286,11 @@ namespace huqiang.UIComposite
                 if (SelectChanged != null)
                     SelectChanged(this);
         }
+        /// <summary>
+        /// 标头项鼠标进入默认处理函数
+        /// </summary>
+        /// <param name="callBack"></param>
+        /// <param name="action"></param>
         public void ItemPointEntry(UserEvent callBack,UserAction action)
         {
             var c = callBack.DataContext as TableContent;
@@ -226,6 +305,11 @@ namespace huqiang.UIComposite
                 }
             }
         }
+        /// <summary>
+        /// 标头项鼠标离开默认处理函数
+        /// </summary>
+        /// <param name="callBack"></param>
+        /// <param name="action"></param>
         public void ItemPointLeave(UserEvent callBack,UserAction action)
         {
             var c = callBack.DataContext as TableContent;

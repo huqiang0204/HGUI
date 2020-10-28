@@ -13,25 +13,63 @@ namespace huqiang.UIComposite
     /// </summary>
     public class ScrollYExtand : Composite
     {
+        /// <summary>
+        /// 数据模板
+        /// </summary>
         public class DataTemplate
         {
+            /// <summary>
+            /// 标题对象实例
+            /// </summary>
             public object Title;
+            /// <summary>
+            /// 尾部对象实例
+            /// </summary>
             public object Tail;
+            /// <summary>
+            /// 绑定数据
+            /// </summary>
             public IList Data;
+            /// <summary>
+            /// 隐藏数据
+            /// </summary>
             public bool Hide;
+            /// <summary>
+            /// 隐藏尾部
+            /// </summary>
             public bool HideTail;
+            /// <summary>
+            /// 数据高度
+            /// </summary>
             public float Height { internal set; get; }
+            /// <summary>
+            /// 最后计算高度,用于比对是否需要重新计算
+            /// </summary>
             public float ShowHeight = 0;
+            /// <summary>
+            /// 展开动画时间
+            /// </summary>
             public float aniTime;
         }
+        /// <summary>
+        /// 事件主体
+        /// </summary>
         UserEvent eventCall;
         protected float height;
         int wm = 1;
         public float Point;
         public Vector2 ActualSize;
+        /// <summary>
+        /// 滚动事件
+        /// </summary>
         public Action<ScrollYExtand, Vector2> Scroll;
         Transform BodyParent;
         Transform TitleParent;
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <param name="fake">数据模型</param>
+        /// <param name="element">主体元素</param>
         public override void Initial(FakeStruct fake,UIElement element)
         {
             base.Initial(fake,element);
@@ -100,17 +138,53 @@ namespace huqiang.UIComposite
             }
         }
         public float Space = 0;
+        /// <summary>
+        /// 滚动框尺寸
+        /// </summary>
         public Vector2 Size;
+        /// <summary>
+        /// 标头模型尺寸
+        /// </summary>
         public Vector2 TitleSize;
+        /// <summary>
+        /// 项目尺寸
+        /// </summary>
         public Vector2 ItemSize;
+        /// <summary>
+        /// 尾部尺寸
+        /// </summary>
         public Vector2 TailSize;
+        /// <summary>
+        /// 标头模型
+        /// </summary>
         public FakeStruct TitleMod;
+        /// <summary>
+        /// 尾部模型
+        /// </summary>
         public FakeStruct TailMod;
+        /// <summary>
+        /// 项目模型
+        /// </summary>
         public FakeStruct ItemMod;
+        /// <summary>
+        /// 项目载体模型
+        /// </summary>
         public FakeStruct Body;
+        /// <summary>
+        /// 绑定模板数据
+        /// </summary>
         public List<DataTemplate> BindingData;
+        /// <summary>
+        /// 标头偏移位置
+        /// </summary>
         public Vector2 TitleOffset = Vector2.zero;
+        /// <summary>
+        /// 尾部偏移位置
+        /// </summary>
         public Vector2 TailOffset = Vector2.zero;
+        /// <summary>
+        /// 项目偏移位置
+        /// </summary>
         public Vector2 ItemOffset = Vector2.zero;
         List<ScrollItem> Titles=new List<ScrollItem>();
         List<ScrollItem> Tails=new List<ScrollItem>();
@@ -140,6 +214,9 @@ namespace huqiang.UIComposite
             CalculSize();
             Order(true);
         }
+        /// <summary>
+        /// 计算尺寸
+        /// </summary>
         public void CalculSize()
         {
             height = 0;
@@ -288,12 +365,18 @@ namespace huqiang.UIComposite
             if (force | u)
                 ItemUpdate(t.obj, dat, index, TailCreator);
         }
-  
+        /// <summary>
+        /// 设置滚动框尺寸
+        /// </summary>
+        /// <param name="size"></param>
         public void SetSize(Vector2 size)
         {
             Enity.SizeDelta = size;
             Size = size;
         }
+        /// <summary>
+        /// 释放缓存资源
+        /// </summary>
         public void Dispose()
         {
             for (int i = 0; i < Titles.Count; i++)
@@ -309,6 +392,12 @@ namespace huqiang.UIComposite
         Constructor ItemCreator;
         Constructor TitleCreator;
         Constructor TailCreator;
+        /// <summary>
+        /// 设置标头更新函数
+        /// </summary>
+        /// <typeparam name="T">UI模板</typeparam>
+        /// <typeparam name="U">数据模板</typeparam>
+        /// <param name="action">更新函数回调</param>
         public void SetTitleUpdate<T, U>(Action<T, U, int> action) where T : class, new()
         {
             for (int i = 0; i < Titles.Count; i++)
@@ -318,6 +407,10 @@ namespace huqiang.UIComposite
             m.Invoke = action;
             TitleCreator = m;
         }
+        /// <summary>
+        /// 设置标头更新函数
+        /// </summary>
+        /// <param name="constructor">热更新的中间件</param>
         public void SetTitleUpdate(HotMiddleware constructor)
         {
             for (int i = 0; i < Titles.Count; i++)
@@ -325,6 +418,12 @@ namespace huqiang.UIComposite
             Titles.Clear();
             TitleCreator = constructor;
         }
+        /// <summary>
+        /// 设置项目更新函数
+        /// </summary>
+        /// <typeparam name="T">UI模板</typeparam>
+        /// <typeparam name="U">数据模板</typeparam>
+        /// <param name="action">更新函数回调</param>
         public void SetItemUpdate<T, U>(Action<T, U, int> action) where T : class, new()
         {
             for (int i = 0; i < Items.Count; i++)
@@ -334,6 +433,10 @@ namespace huqiang.UIComposite
             m.Invoke = action;
             ItemCreator = m;
         }
+        /// <summary>
+        /// 设置项目更新函数
+        /// </summary>
+        /// <param name="constructor">热更新的中间件</param>
         public void SetItemUpdate(HotMiddleware constructor)
         {
             for (int i = 0; i < Items.Count; i++)
@@ -341,6 +444,12 @@ namespace huqiang.UIComposite
             Items.Clear();
             ItemCreator = constructor;
         }
+        /// <summary>
+        /// 设置标尾更新函数
+        /// </summary>
+        /// <typeparam name="T">UI模板</typeparam>
+        /// <typeparam name="U">数据模板</typeparam>
+        /// <param name="action">更新函数回调</param>
         public void SetTailUpdate<T, U>(Action<T, U, int> action) where T : class, new()
         {
             for (int i = 0; i < Tails.Count; i++)
@@ -350,6 +459,10 @@ namespace huqiang.UIComposite
             m.Invoke = action;
             TailCreator = m;
         }
+        /// <summary>
+        /// 设置标尾更新函数
+        /// </summary>
+        /// <param name="constructor">热更新的中间件</param>
         public void SetTailUpdate(HotMiddleware constructor)
         {
             for (int i = 0; i < Tails.Count; i++)
@@ -357,6 +470,13 @@ namespace huqiang.UIComposite
             Tails.Clear();
             TailCreator = constructor;
         }
+        /// <summary>
+        /// 更新项目
+        /// </summary>
+        /// <param name="obj">UI实例对象</param>
+        /// <param name="dat">数据实例对象</param>
+        /// <param name="index">数据索引</param>
+        /// <param name="con">构造器</param>
         protected void ItemUpdate(object obj, object dat, int index,Constructor con)
         {
             if (con != null)
@@ -364,6 +484,14 @@ namespace huqiang.UIComposite
                 con.Call(obj, dat, index);
             }
         }
+        /// <summary>
+        /// 创建项目
+        /// </summary>
+        /// <param name="buffer">项目缓存</param>
+        /// <param name="con">构造器</param>
+        /// <param name="mod">UI模型数据</param>
+        /// <param name="parent">父坐标变换</param>
+        /// <returns></returns>
         protected ScrollItem CreateItem(List<ScrollItem> buffer, Constructor con, FakeStruct mod, Transform parent)
         {
             if (buffer.Count > 0)
@@ -405,6 +533,11 @@ namespace huqiang.UIComposite
         {
             return CreateItem(BodyRecycler, null, Body, BodyParent);
         }
+        /// <summary>
+        /// 将源项目压入目标项目
+        /// </summary>
+        /// <param name="tar"></param>
+        /// <param name="src"></param>
         protected void PushItems(List<ScrollItem> tar, List<ScrollItem> src)
         {
             for (int i = 0; i < src.Count; i++)
@@ -412,6 +545,9 @@ namespace huqiang.UIComposite
             tar.AddRange(src);
             src.Clear();
         }
+        /// <summary>
+        /// 将项目压入缓存
+        /// </summary>
         protected void PushItems()
         {
             PushItems(TitleBuffer,Titles);
@@ -419,6 +555,9 @@ namespace huqiang.UIComposite
             PushItems(TailBuffer,Tails);
             PushItems(BodyBuffer,Bodys);
         }
+        /// <summary>
+        /// 回收未被重复利用的项目
+        /// </summary>
         protected void RecycleRemain()
         {
             PushItems(TitleRecycler, TitleBuffer);
@@ -426,6 +565,12 @@ namespace huqiang.UIComposite
             PushItems(TailRecycler, TailBuffer);
             PushItems(BodyRecycler,BodyBuffer);
         }
+        /// <summary>
+        /// 弹出一个目标项目与数据索引相同的项目
+        /// </summary>
+        /// <param name="tar">缓存</param>
+        /// <param name="index">数据索引</param>
+        /// <returns></returns>
         protected ScrollItem PopItem(List<ScrollItem> tar, int index)
         {
             for (int i = 0; i < tar.Count; i++)
@@ -440,7 +585,14 @@ namespace huqiang.UIComposite
             }
             return null;
         }
- 
+        /// <summary>
+        /// 回弹滚动
+        /// </summary>
+        /// <param name="eventCall">用户事件</param>
+        /// <param name="v">参考移动量</param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
         protected Vector2 BounceBack(UserEvent eventCall, ref Vector2 v, ref float x, ref float y)
         {
             if (eventCall.Pressed)
@@ -515,6 +667,10 @@ namespace huqiang.UIComposite
         }
         DataTemplate hideSect;
         DataTemplate showSect;
+        /// <summary>
+        /// 隐藏节点,带动画
+        /// </summary>
+        /// <param name="template"></param>
         public void HideSection(DataTemplate template)
         {
             if (template == null)
@@ -523,6 +679,10 @@ namespace huqiang.UIComposite
             template.aniTime = 0;
             hideSect = template;
         }
+        /// <summary>
+        /// 展开节点,带动画
+        /// </summary>
+        /// <param name="template"></param>
         public void OpenSection(DataTemplate template)
         {
             if (template == null)
@@ -557,6 +717,10 @@ namespace huqiang.UIComposite
                 height = Size.y;
             ActualSize.y = height;
         }
+        /// <summary>
+        /// 帧更新,包含展开收缩动画
+        /// </summary>
+        /// <param name="time">时间片</param>
         public override void Update(float time)
         {
             bool up = false;

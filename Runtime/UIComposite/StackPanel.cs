@@ -12,17 +12,46 @@ namespace huqiang.UIComposite
 {
     public enum Direction
     {
+        /// <summary>
+        /// 水平方向
+        /// </summary>
         Horizontal,
+        /// <summary>
+        /// 垂直方向
+        /// </summary>
         Vertical
     }
+    /// <summary>
+    /// 栈面板,用于排序
+    /// </summary>
     public class StackPanel:Composite
     {
         int c = 0;
+        /// <summary>
+        /// 排序方向
+        /// </summary>
         public Direction direction = Direction.Horizontal;
+        /// <summary>
+        /// 项目之间的间隔
+        /// </summary>
         public float spacing = 0;
+        /// <summary>
+        /// 开启固定尺寸,会改变项目的尺寸
+        /// </summary>
         public bool FixedSize;
+        /// <summary>
+        /// 固定尺寸比例
+        /// </summary>
         public float FixedSizeRatio = 1;
+        /// <summary>
+        /// 项目偏移位置
+        /// </summary>
         public float ItemOffset = 0;
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <param name="mod">模型数据</param>
+        /// <param name="script">元素主体</param>
         public override void Initial(FakeStruct mod, UIElement script)
         {
             base.Initial(mod, script);
@@ -40,7 +69,9 @@ namespace huqiang.UIComposite
                 }
             }
         }
-       
+       /// <summary>
+       /// 排序
+       /// </summary>
         public void Order()
         {
             switch (direction)
@@ -127,6 +158,10 @@ namespace huqiang.UIComposite
                 }
             }
         }
+        /// <summary>
+        /// 更新
+        /// </summary>
+        /// <param name="time"></param>
         public override void Update(float time)
         {
             var a = Enity.transform.childCount;
@@ -137,94 +172,5 @@ namespace huqiang.UIComposite
             }
         }
     }
-    public enum OptionsType
-    {
-        Radio,
-        MultiChoice
-    }
-    public class OptionGroup
-    {
-        public OptionsType options;
-        UserEvent m_select;
-        UserEvent m_last;
-        List<UserEvent> userEvents = new List<UserEvent>();
-        public List<UserEvent> MultiSelect;
-        public void AddEvent(UserEvent user)
-        {
-            if (user == null)
-                return;
-            user.Click = Click;
-            user.AutoColor = false;
-            userEvents.Add(user);
-        }
-        public void AddEvent(UIElement element)
-        {
-            if(element.userEvent==null)
-            {
-                element.eventType = huqiang.Core.HGUI.EventType.UserEvent;
-                element.RegEvent<UserEvent>();
-            }
-            AddEvent(element.userEvent);
-        }
-        void Click(UserEvent user,UserAction action)
-        {
-            switch (options)
-            {
-                case OptionsType.Radio:
-                    Radio(user, action);
-                    break;
-                case OptionsType.MultiChoice:
-                    MultiChoice(user, action);
-                    break;
-            }
-        }
-        void Radio(UserEvent user,UserAction action)
-        {
-            if (m_select == user)
-                return;
-            m_last = m_select;
-            m_select = user;
-            if (SelectChanged != null)
-                SelectChanged(this,action);
-        }
-        void MultiChoice(UserEvent user,UserAction action)
-        {
-            if (MultiSelect == null)
-                MultiSelect = new List<UserEvent>();
-            if(MultiSelect.Contains(user))
-            {
-                m_last = user;
-                m_select = null;
-                MultiSelect.Remove(user);
-            }
-            else
-            {
-                m_last = null;
-                m_select = user;
-                MultiSelect.Add(user);
-            }
-            if (SelectChanged != null)
-                SelectChanged(this, action);
-        }
-        public Action<OptionGroup,UserAction> SelectChanged;
-        public UserEvent LastSelect { get => m_last; }
-        public UserEvent Selecet
-        {
-            get => m_select;
-            set {
-                if(userEvents.Contains(value))
-                {
-                    switch (options)
-                    {
-                        case OptionsType.Radio:
-                            Radio(value, null);
-                            break;
-                        case OptionsType.MultiChoice:
-                            MultiChoice(value, null);
-                            break;
-                    }
-                }
-            }
-        }
-    }
+ 
 }

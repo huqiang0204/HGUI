@@ -43,7 +43,7 @@ UDP，TCP，KCP，数据封包，线程池，等等
 9.  UI管理方面有自己的回收池，切换界面使用UIPage.LoadPage即可
 10. 视频教程地址https://space.bilibili.com/19050274/video 不定期更新
 11. 函数文档https://huqiang0204.gitee.io/home
-12. 注释使用请将HGUI.xml复制到Library\ScriptAssemblies\文件夹中
+12. 注释使用请将PackageCache\com.huqiang.hguiframework@...\HGUI.xml复制到Library\ScriptAssemblies\文件夹中
 
 #### 参与贡献
 

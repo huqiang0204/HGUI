@@ -6319,6 +6319,22 @@
             <param name="b"></param>
             <returns></returns>
         </member>
+        <member name="M:huqiang.Tool.CalculUV(UnityEngine.Rect,System.Single,System.Single)">
+            <summary>
+            创建纹理UV
+            </summary>
+            <param name="sr">精灵矩形区域</param>
+            <param name="w">纹理宽度</param>
+            <param name="h">纹理高度</param>
+            <returns></returns>
+        </member>
+        <member name="M:huqiang.Tool.CalculUVS(huqiang.Data.SpriteRectInfo[])">
+            <summary>
+            创建纹理UV数组
+            </summary>
+            <param name="sprites">精灵信息数组</param>
+            <returns></returns>
+        </member>
         <member name="T:huqiang.Pool.InstanceContext">
             <summary>
             实例联系上下文

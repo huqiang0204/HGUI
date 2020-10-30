@@ -83,7 +83,7 @@ namespace huqiang
     internal struct MsgInfo:IDisposable
     {
         /// <summary>
-        /// 此消息的id
+        /// 此消息的id 
         /// </summary>
         public UInt16 MsgID;//2
         /// <summary>
@@ -146,8 +146,20 @@ namespace huqiang
     }
     public class KcpData:NetworkLink
     {
+        /// <summary>
+        /// 最后一次接受到数据的时钟周期
+        /// </summary>
         public long RecvTime;
-        public static int FragmentSize = (1472 - 8 - 15) - 12 * 4;//包头4字节,包尾4字节,数据头21字节,12个节点,每个节点4字节=1399
+        /// <summary>
+        /// 包头4字节,包尾4字节,数据头21字节,12个节点,每个节点4字节=1399
+        /// </summary>
+        public static int FragmentSize = (1472 - 8 - 15) - 12 * 4;
+        /// <summary>
+        /// 设置分包分卷状态
+        /// </summary>
+        /// <param name="checks">状态缓存</param>
+        /// <param name="part">当前分卷</param>
+        /// <returns>如果已经缓存过了返回假</returns>
         unsafe static bool SetChecked(Int32* checks, int part)
         {
             int c = part / 32;
@@ -182,6 +194,9 @@ namespace huqiang
                 }
             }
         }
+        /// <summary>
+        /// 接受到的消息缓存信息
+        /// </summary>
         struct MsgCache
         {
             public KcpHead head;
@@ -190,8 +205,11 @@ namespace huqiang
             public BlockInfo<byte> buff;
             public long time;
             public BlockInfo<int> states;
-            public bool done;//保留一定时效
+            //public bool done;//保留一定时效
         }
+        /// <summary>
+        /// 接受到的消息缓存
+        /// </summary>
         MsgCache[] caches = new MsgCache[128];
         int delayStart;
         int delayEnd;
@@ -222,10 +240,10 @@ namespace huqiang
         /// <summary>
         /// 添加一个接收到的消息分卷
         /// </summary>
-        /// <param name="dat"></param>
-        /// <param name="len"></param>
-        /// <param name="kcp"></param>
-        /// <param name="time"></param>
+        /// <param name="dat">数据缓存</param>
+        /// <param name="len">数据长度</param>
+        /// <param name="kcp">封包器</param>
+        /// <param name="time">数据接收时间,单位毫秒</param>
         public void AddMsgPart(byte[] dat, int len, Kcp kcp, Int16 time)
         {
             byte type = dat[0];
@@ -395,9 +413,9 @@ namespace huqiang
         public override void Recive(long now)
         {
             int c = recvQueue.Count;
-            for (int i = 0; i < c; i++)
+            for(int i=0;i<c;i++)
             {
-                recvQueue.Dequeue().dat.Release();//释放指针内存
+                recvQueue.Dequeue().dat.Release();
             }
         }
         /// <summary>

@@ -20,10 +20,6 @@ namespace huqiang
         /// </summary>
         public int port;
         /// <summary>
-        /// 所在线程中的索引
-        /// </summary>
-        public int Index;
-        /// <summary>
         /// 线程的索引
         /// </summary>
         public int buffIndex;

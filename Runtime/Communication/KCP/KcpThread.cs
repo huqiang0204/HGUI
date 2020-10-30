@@ -7,10 +7,6 @@ using System.Threading;
 
 namespace huqiang
 {
-    /// <summary>
-    /// 管理kcp连接的线程
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
     public class KcpThread<T> : ThreadBuffer<T> where T : KcpData, new()
     {
         class Mission
@@ -24,7 +20,7 @@ namespace huqiang
         /// 消息的解压包由kcpserver的sendThread线程统一管理
         /// </summary>
         Thread thread;
-        QueueBuffer<Mission> queue = new QueueBuffer<Mission>();
+        QueueBuffer<Mission> missions = new QueueBuffer<Mission>();
         /// <summary>
         /// kcp线程用户管理类
         /// </summary>
@@ -44,10 +40,10 @@ namespace huqiang
                 try
                 {
                     Recive();
-                    int c = queue.Count;
+                    int c = missions.Count;
                     for (int i = 0; i < c; i++)
                     {
-                        var mis = queue.Dequeue();
+                        var mis = missions.Dequeue();
                         if (mis != null)
                             if (mis.action != null)
                                 mis.action(mis.data);
@@ -74,7 +70,7 @@ namespace huqiang
             Mission mis = new Mission();
             mis.action = action;
             mis.data = obj;
-            queue.Enqueue(mis);
+            missions.Enqueue(mis);
         }
         /// <summary>
         /// 发送缓存中的消息
@@ -83,9 +79,10 @@ namespace huqiang
         /// <param name="time">时间</param>
         public void SendAll(Kcp kcp, Int16 time)
         {
-            for (int i = 0; i < top; i++)
+            int c = queue.Count;
+            for (int i = 0; i < c; i++)
             {
-                var l = buffer[i];
+                var l = queue[i];
                 if (l != null)
                 {
                     kcp.SendMsg(l, time);
@@ -101,9 +98,10 @@ namespace huqiang
         /// <param name="heart">心跳包</param>
         public void SendAll(Socket soc, Kcp kcp, Int16 time, byte[] heart)
         {
-            for (int i = 0; i < top; i++)
+            int c = queue.Count;
+            for (int i = 0; i < c; i++)
             {
-                var l = buffer[i];
+                var l = queue[i];
                 if (l != null)
                 {
                     if (kcp.SendMsg(l, time) == 0)
@@ -118,21 +116,16 @@ namespace huqiang
         /// </summary>
         public void DeleteTimeOutLink(KcpListener kcp, long now)
         {
-            for (int i = 0; i < top; i++)
+            int c = queue.Count;
+            for (int i = c; i >= 1; i--)
             {
-                var link = buffer[i];
+                var link = queue[i];
                 if (now - link.RecvTime > KcpListener.TimeOut)
                     if (link.Disconnect())
                     {
                         link.RecyclingTime = now;
                         kcp.PreRecycling(link);
-                        buffer[i] = null;
-                        top--;
-                        buffer[i] = buffer[top];
-                        buffer[top] = null;
-                        if (top > 0)
-                            buffer[i].Index = i;
-                        i--;
+                        queue.RemoveAt(i);
                     }
             }
         }

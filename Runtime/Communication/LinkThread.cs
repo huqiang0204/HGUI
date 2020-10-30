@@ -13,18 +13,18 @@ namespace huqiang
     /// <typeparam name="T"></typeparam>
     public class ThreadBuffer<T> where T : NetworkLink, new()
     {
-        protected T[] buffer;
-        protected int max;
-        protected int top;
         public bool running;
+        /// <summary>
+        /// 内容缓存
+        /// </summary>
+        protected DisorderlyQueue<T> queue;
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="size">缓存大小,容纳用户最大的连接数</param>
         public ThreadBuffer(int size = 2048)
         {
-            buffer = new T[size];
-            max = size;
+            queue = new DisorderlyQueue<T>(size);
         }
         /// <summary>
         /// 使用ip地址查询某个用户
@@ -34,15 +34,11 @@ namespace huqiang
         /// <returns></returns>
         public T Find(int ip,int port)
         {
-            for (int i = 0; i < top; i++)
-            {
-                var link = buffer[i];
-                if (link != null)
-                    if (link.ip == ip)
-                        if (link.port == port)
-                            return link;
-            }
-            return null;
+            return queue.Find((o) => {
+                if (o == null)
+                    return false;
+                return o.ip == ip & o.port == port;
+            });
         }
         /// <summary>
         /// 使用id查询某个用户
@@ -51,14 +47,11 @@ namespace huqiang
         /// <returns></returns>
         public T Find(Int64 id)
         {
-            for (int i = 0; i < top; i++)
-            {
-                var link = buffer[i];
-                if (link != null)
-                    if (link.id == id)
-                        return link;
-            }
-            return null;
+            return queue.Find((o)=> {
+                if (o == null)
+                    return false;
+                return o.id==id;
+            });
         }
         /// <summary>
         /// 添加一个用户连接
@@ -66,9 +59,7 @@ namespace huqiang
         /// <param name="link"></param>
         public void Add(T link)
         {
-            link.Index = top;
-            buffer[top] = link;
-            top++;
+            queue.Add(link);
         }
         /// <summary>
         /// 移除某个用户连接
@@ -76,21 +67,15 @@ namespace huqiang
         /// <param name="link"></param>
         public void Delete(NetworkLink link)
         {
-            int index = link.Index;
-            buffer[index] = null;
-            top--;
-            buffer[index] = buffer[top];
-            buffer[top] = null;
-            if (top > 0)
-                buffer[index].Index = index;
+            queue.Remove(link as T);
         }
         /// <summary>
         /// 当前连接数
         /// </summary>
-        public int Count { get { return top; } }
+        public int Count { get { return queue.Count; } }
         public T this[int index]
         {
-            get { return buffer[index]; }
+            get { return queue[index]; }
         }
         /// <summary>
         /// 个欸所有连接发送消息
@@ -99,9 +84,10 @@ namespace huqiang
         /// <param name="data">数据</param>
         public void SendAll(Socket soc, byte[][] data)
         {
-            for (int i = 0; i < top; i++)
+            int c = queue.Count;
+            for (int i = 0; i < c; i++)
             {
-                var l = buffer[i];
+                var l = queue[i];
                 if (l != null)
                     for (int j = 0; j < data.Length; j++)
                         soc.SendTo(data[j], l.endpPoint);
@@ -113,9 +99,10 @@ namespace huqiang
         /// <param name="msgs"></param>
         public void AddMsg(MsgInfo2[] msgs)
         {
-            for (int i = 0; i < top; i++)
+            int c = queue.Count;
+            for (int i = 0; i < c; i++)
             {
-                var l = buffer[i];
+                var l = queue[i];
                 if (l != null)
                 {
                     l.AddMsg(msgs);
@@ -128,14 +115,15 @@ namespace huqiang
         public void Recive()
         {
             var now = DateTime.Now.Ticks;
-            for (int i = 0; i < top; i++)
+            int c = queue.Count;
+            for (int i = 0; i < c; i++)
             {
-                var c = buffer[i];
-                if (c != null)
+                var r = queue[i];
+                if (r != null)
                 {
                     try
                     {
-                        c.Recive(now);
+                        r.Recive(now);
                     }catch
                     {
                     }

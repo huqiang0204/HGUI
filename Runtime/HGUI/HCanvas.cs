@@ -79,8 +79,7 @@ namespace huqiang.Core.HGUI
             MainCanvas = this;
             Font.textureRebuilt += FontTextureRebuilt;
             //Main = new QueueBuffer<TempBuffer>();
-            //Sub = new QueueBuffer<TempBuffer>();
-            
+            //Sub = new QueueBuffer<TempBuffer>();            
         }
         bool ftr;
         void FontTextureRebuilt(Font font)

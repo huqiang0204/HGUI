@@ -280,6 +280,12 @@ namespace huqiang
                     link.MsgId = MinID;
                 PackAll(link, dat.dat,dat.type,link.MsgId,time);
             }
+            var msg2 = link.Msgs2;
+            c = msg2.Count;
+            for (int i = 0; i < c; i++)
+            {
+                kcpListener.soc.SendTo(msg2[i].data, SocketFlags.None, link.endpPoint);//发送广播消息
+            }
             ReSendTimeOut(link, time);
             return c;
         }

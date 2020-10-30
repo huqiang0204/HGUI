@@ -116,8 +116,8 @@ namespace huqiang
         /// </summary>
         public void DeleteTimeOutLink(KcpListener kcp, long now)
         {
-            int c = queue.Count;
-            for (int i = c; i >= 1; i--)
+            int c = queue.Count - 1;
+            for (int i = c; i >= 0; i--)
             {
                 var link = queue[i];
                 if (now - link.RecvTime > KcpListener.TimeOut)

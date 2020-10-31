@@ -436,7 +436,7 @@ namespace huqiang.UIComposite
         /// <returns></returns>
         public DesignedDockAuxiliary AddArea(DockpanelArea.Dock dock, float r = 0.5f)
         {
-            var area = dockArea.AddArea(dock,r);
+            var area = dockArea.AddAreaR(dock,r);
             var go = HGUIManager.GameBuffer.Clone(layout.Auxiliary);
             var trans = go.transform;
             trans.SetParent(area.model.transform);

@@ -6,6 +6,7 @@ using Assets.Scripts;
 using System.Collections.Generic;
 using Assets.Net;
 using huqiang.UIModel;
+using huqiang.UIComposite;
 
 public class MainScript : HCanvas
 {
@@ -26,6 +27,8 @@ public class MainScript : HCanvas
         //    UIPage.LoadPage<ChatPage>();
         //};
         UIPage.LoadPage<StartPage>();
+        DataGrid.CursorX = DockPanelLine.CursorX = Resources.Load<Texture2D>("StretchWX");
+        DataGrid.CursorY = DockPanelLine.CursorY = Resources.Load<Texture2D>("StretchWY");
     }
 
     protected override void Update()

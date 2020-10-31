@@ -17,10 +17,12 @@ public class UITest : TestPageHelper
         //Scale.DpiScale = true;
 #endif
 #if UNITY_EDITOR
-        UIPage.LoadPage<StartPage>();
+        UIPage.LoadPage<LayoutPage>();
 #else
         //ElementAsset.LoadAssetsAsync("base.unity3d",(o,e)=> { UIPage.LoadPage<ChatPage>(); });
 #endif
+        DataGrid.CursorX = DockPanelLine.CursorX = Resources.Load<Texture2D>("StretchWX");
+        DataGrid.CursorY = DockPanelLine.CursorY = Resources.Load<Texture2D>("StretchWY");
     }
     public override void OnUpdate()
     {

@@ -190,7 +190,7 @@ namespace huqiang.Core.HGUI
         {
             if (Pause)
                 return;
-            MaterialManager.renderQueue = renderQueue;
+            MatCollector.renderQueue = renderQueue;
             LateFrame++;
             point = 1;
             max = 0;
@@ -617,7 +617,7 @@ namespace huqiang.Core.HGUI
             {
                 return;
             }
-            MaterialManager.renderQueue = renderQueue;
+            MatCollector.renderQueue = renderQueue;
             MainCanvas = this;
             point = 1;
             max = 0;

@@ -267,7 +267,7 @@ namespace huqiang.Core.HGUI
         /// <returns></returns>
         public Material[] GenerateMaterial()
         {
-            MaterialManager.Reset();
+            Reset();
             int len = max + 1;
             Material[] mats = new Material[len];
             for (int i = 0; i < len; i++)
@@ -276,7 +276,7 @@ namespace huqiang.Core.HGUI
                 var mat = materials[i].material;
                 if (mat == null)//如果为空,则使用默认材质球
                 {
-                    mat = MaterialManager.GetNextMaterial();
+                    mat = GetNextMaterial();
                     Vector4 v = Vector4.zero;
                     int s = i * 4;
                     for (int j = 0; j < 4; j++)
@@ -316,6 +316,52 @@ namespace huqiang.Core.HGUI
                 mats[i] = mat;
             }
             return mats;
+        }
+        static Shader shader;
+        public int renderQueue = 3100;
+        /// <summary>
+        /// 默认着色器
+        /// </summary>
+        internal static Shader DefShader
+        {
+            get
+            {
+                if (shader == null)
+                    shader = Shader.Find("HGUI/UIDef");//Custom/UIDef
+                return shader;
+            }
+        }
+        List<Material> matList = new List<Material>();
+        int point;
+        public void Reset()
+        {
+            point = 0;
+        }
+        /// <summary>
+        /// 获取下一个材质球,如果没有则重新创建
+        /// </summary>
+        /// <returns></returns>
+        internal Material GetNextMaterial()
+        {
+            Material mat;
+            if (point == matList.Count)
+            {
+                mat = new Material(DefShader);
+                matList.Add(mat);
+            }
+            else
+            {
+                mat = matList[point];
+                if (mat == null)
+                {
+                    mat = new Material(DefShader);
+                    matList[point] = mat;
+                }
+            }
+
+            mat.renderQueue = renderQueue;
+            point++;
+            return mat;
         }
     }
 }

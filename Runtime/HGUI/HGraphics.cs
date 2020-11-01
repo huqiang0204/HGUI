@@ -188,8 +188,9 @@ namespace huqiang.Core.HGUI
                 m_colorChanged = false;
             }
         }
-        private void Start()
+        protected override void Start()
         {
+            base.Start();
             m_dirty = true;
         }
         /// <summary>

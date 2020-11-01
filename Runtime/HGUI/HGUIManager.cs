@@ -55,6 +55,17 @@ namespace huqiang.Core.HGUI
             File.WriteAllBytes(path, db.ToBytes());
         }
         /// <summary>
+        /// 将实例对象数据模型导入
+        /// </summary>
+        /// <param name="uiRoot"></param>
+        /// <returns></returns>
+        public static FakeStruct GetFakeData(Transform uiRoot)
+        {
+            DataBuffer db = new DataBuffer(1024);
+            db.fakeStruct = GameBuffer.GetDataLoader(0).LoadFromObject(uiRoot, db);
+            return db.fakeStruct;
+        }
+        /// <summary>
         /// 所有预制体资源列表
         /// </summary>
         public static List<PrefabAsset> prefabAssets = new List<PrefabAsset>();

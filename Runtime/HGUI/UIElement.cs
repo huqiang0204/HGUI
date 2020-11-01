@@ -836,5 +836,31 @@ namespace huqiang.Core.HGUI
         public virtual void Clear()
         {
         }
+        protected virtual void Start()
+        {
+            if (eventType != EventType.None)
+            {
+                if (userEvent == null)
+                    switch (eventType)
+                    {
+                        case EventType.UserEvent:
+                            RegEvent<UserEvent>(mod);
+                            break;
+                        case EventType.GestureEvent:
+                            RegEvent<GestureEvent>(mod);
+                            break;
+                    }
+            }
+            if (compositeType != CompositeType.None)
+            {
+                if (composite == null)
+                {
+                    if (mod == null)
+                        mod = HGUIManager.GetFakeData(this.transform);
+                    CreateUIComposite(this, mod);
+                }
+            }
+        }
+
     }
 }

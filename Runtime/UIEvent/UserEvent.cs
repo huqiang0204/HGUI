@@ -29,19 +29,19 @@ namespace huqiang.UIEvent
         /// </summary>
         /// <param name="action"></param>
         /// <param name="pipeLine"></param>
-        internal static void DispatchEvent(UserAction action, HGUIElement[] pipeLine)
+        internal static bool DispatchEvent(UserAction action, HGUIElement[] pipeLine)
         {
             HGUIElement root = pipeLine[0];
             float s = HCanvas.MainCanvas.PhysicalScale;
             if (root.script != null)
             {
-                 int c = root.childCount;
-                for (int i = c; i >0; i--)
+                int c = root.childCount;
+                for (int i = c; i > 0; i--)
                 {
                     try
                     {
                         if (DispatchEvent(pipeLine, i, action))
-                            return;
+                            return true;
                     }
                     catch (Exception ex)
                     {
@@ -49,6 +49,7 @@ namespace huqiang.UIEvent
                     }
                 }
             }
+            return false;
         }
         /// <summary>
         /// 派发用户事件

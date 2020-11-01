@@ -74,7 +74,7 @@ namespace huqiang.Core.HGUI
         /// </summary>
         public bool Pause;
         public int renderQueue = 3100;
-        protected virtual void Start()
+        protected override void Start()
         {
             MainCanvas = this;
             Font.textureRebuilt += FontTextureRebuilt;

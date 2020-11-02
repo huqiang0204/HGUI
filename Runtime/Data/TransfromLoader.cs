@@ -26,11 +26,11 @@ namespace huqiang.Data
         /// <summary>
         /// 名称
         /// </summary>
-        public Int32 name;
+        public StringPoint name;
         /// <summary>
         /// 标记
         /// </summary>
-        public FakeStrcutPoint tag;
+        public StringPoint tag;
         /// <summary>
         /// int32数组,高16位为索引,低16位为类型
         /// </summary>

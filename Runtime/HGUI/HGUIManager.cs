@@ -62,6 +62,8 @@ namespace huqiang.Core.HGUI
         public static FakeStruct GetFakeData(Transform uiRoot)
         {
             DataBuffer db = new DataBuffer(1024);
+            if (GameBuffer == null)
+                Initial(null);
             db.fakeStruct = GameBuffer.GetDataLoader(0).LoadFromObject(uiRoot, db);
             return db.fakeStruct;
         }

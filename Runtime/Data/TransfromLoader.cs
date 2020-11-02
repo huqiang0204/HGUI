@@ -109,17 +109,19 @@ namespace huqiang.Data
         /// <param name="initializer">初始化器,用于反射</param>
         public unsafe override void LoadToObject(FakeStruct fake, Component com,Initializer initializer)
         {
-            var transfrom = (TransfromData*)fake.ip;
+            TransfromData data = new TransfromData();
+            unsafe { helper.LoadData((byte*)&data,fake.ip); }
+            var src = (TransfromData*)fake.ip;
             var buff = fake.buffer;
             var trans = com as Transform;
-            com.name = buff.GetData(transfrom->name) as string;
-            com.tag = buff.GetData(transfrom->tag) as string;
-            trans.localEulerAngles = transfrom->localEulerAngles;
-            trans.localPosition = transfrom->localPosition;
-            trans.localScale = transfrom->localScale;
-            trans.gameObject.layer = transfrom->layer;
+            com.name = buff.GetData(src->name) as string;
+            com.tag = buff.GetData(src->tag) as string;
+            trans.localEulerAngles = src->localEulerAngles;
+            trans.localPosition = src->localPosition;
+            trans.localScale = src->localScale;
+            trans.gameObject.layer = src->layer;
 
-            Int16[] chi = fake.buffer.GetData(transfrom->child) as Int16[];
+            Int16[] chi = fake.buffer.GetData(src->child) as Int16[];
             if (chi != null)
                 for (int i = 0; i < chi.Length; i++)
                 {
@@ -135,7 +137,7 @@ namespace huqiang.Data
                     }
                 }
 
-            Int16[] coms = buff.GetData(transfrom->coms) as Int16[];
+            Int16[] coms = buff.GetData(src->coms) as Int16[];
             if (coms != null)
             {
                 for (int i = 0; i < coms.Length; i++)

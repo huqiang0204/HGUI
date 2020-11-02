@@ -279,45 +279,69 @@ namespace huqiang.Data
             }
             return -1;
         }
-        public int GetOriginIndex(int index)
+        //public int GetOriginIndex(int index)
+        //{
+        //    if (indexs == null)
+        //        return -1;
+        //    if (index < 0 | index >= indexs.Length)
+        //        return -1;
+        //    int i = indexs[index];
+        //    if (i < 0)
+        //        return -1;
+        //    return i;
+        //}
+        public unsafe void LoadData(byte* tar, byte* src)
         {
-            if (indexs == null)
-                return -1;
-            if (index < 0 | index >= indexs.Length)
-                return -1;
-            int i = indexs[index];
-            if (i < 0)
-                return -1;
-            return i;
+            byte* p = tar;
+            for (int i = 0; i < indexs.Length; i++)
+            {
+                int a = indexs[i];
+                int c = TarInfos[i].Size;
+                if (a > 0)
+                {
+                    byte* sp = src + OriInfos[a].Offset;
+                    for (int j = 0; j < TarInfos[i].Size; j++)
+                    {
+                        *p = *sp;
+                        p++;
+                        sp++;
+                    }
+                }
+                else
+                {
+                    p += c;
+                }
+            }
         }
         public T LoadData<T>(FakeStruct ori) where T : unmanaged
         {
             T t = new T();
-            unsafe
-            {
-                byte* p = (byte*)&t;
-                int s = 0;
-                for (int i = 0; i < indexs.Length; i++)
-                {
-                    int a = indexs[i];
-                    int c = TarInfos[i].Size;
-                    if (a > 0)
-                    {
-                        byte* src = ori.ip + OriInfos[a].Offset;
-                        for (int j = 0; j < TarInfos[i].Size; j++)
-                        {
-                            *p = *src;
-                            p++;
-                            src++;
-                        }
-                    }
-                    else
-                    {
-                        p += c;
-                    }
-                }
-            }
+           unsafe { LoadData((byte*)&t, ori.ip); }
+            //unsafe
+            //{
+            //    byte* p = (byte*)&t;
+            //    for (int i = 0; i < indexs.Length; i++)
+            //    {
+            //        int a = indexs[i];
+            //        int c = TarInfos[i].Size;
+            //        if (a > 0)
+            //        {
+            //            byte* src = ori.ip + OriInfos[a].Offset;
+            //            for (int j = 0; j < TarInfos[i].Size; j++)
+            //            {
+            //                *p = *src;
+            //                p++;
+            //                src++;
+            //            }
+            //        }
+            //        else
+            //        {
+            //            p += c;
+            //        }
+            //    }
+            //}
             return t;
         }
+        
     }
 }

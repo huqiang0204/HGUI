@@ -30,25 +30,48 @@ namespace huqiang.Data
         /// <summary>
         /// 标记
         /// </summary>
-        public Int32 tag;
+        public FakeStrcutPoint tag;
         /// <summary>
         /// int32数组,高16位为索引,低16位为类型
         /// </summary>
-        public Int32 coms;
+        public IntArrayPoint coms;
         /// <summary>
         /// int16数组
         /// </summary>
-        public Int32 child;
+        public Int16ArrayPoint child;
         public int layer;
         /// <summary>
         /// 附加信息,用于存储helper中写入的数据
         /// </summary>
-        public Int32 ex;
+        public FakeStrcutPoint ex;
         public static int Size = sizeof(TransfromData);
         public static int ElementSize = Size / 4;
     }
     public class TransfromLoader : DataLoader
     {
+        public TransfromLoader()
+        {
+            helper = new FakeStructHelper();
+            helper.SetTargetModel<TransfromData>();
+        }
+        public override void LoadTable(FakeStruct fake)
+        {
+            int c = fake.Length;
+            for (int i = 0; i < c; i++)
+            {
+                var fs = fake.GetData<FakeStruct>(i);
+                if (fs != null)
+                    if (fs.GetData<string>(0) == "TransfromData")
+                    {
+                        helper.SetOriginModel(fs);
+                        break;
+                    }
+            }
+        }
+        public override FakeStruct CreateTable(DataBuffer buffer)
+        {
+            return FakeStructHelper.CreateTable<TransfromData>(buffer);
+        }
         /// <summary>
         /// 从假结构体中找到该类型的数据
         /// </summary>

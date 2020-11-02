@@ -85,7 +85,7 @@ namespace huqiang.Data
         /// <summary>
         /// 元素长度
         /// </summary>
-        public int Length { get=>element; }
+        public int Length { get => element; }
         /// <summary>
         /// 数据缓存器
         /// </summary>

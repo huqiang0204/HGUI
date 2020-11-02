@@ -27,10 +27,6 @@ namespace huqiang.Data
         public const short Int64Array = 7;
         public const short DoubleArray = 8;
         public const short FakeStringArray = 9;
-        public const short Int = 10;
-        public const short Float = 11;
-        public const short Long = 12;
-        public const short Double = 13;
     }
     /// <summary>
     /// C#的这些类型不能被继承：System.ValueType, System.Enum, System.Delegate, System.Array, etc.

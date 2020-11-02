@@ -32,6 +32,7 @@ namespace huqiang.Data
     /// </summary>
     public abstract class DataLoader
     {
+        public FakeStructHelper helper;
         /// <summary>
         /// 游戏对象管理缓存器
         /// </summary>
@@ -57,5 +58,12 @@ namespace huqiang.Data
         /// <param name="buffer">DataBuffer</param>
         /// <returns></returns>
         public virtual FakeStruct LoadFromObject(Component com, DataBuffer buffer) { return null; }
+        public virtual FakeStruct CreateTable(DataBuffer buffer)
+        {
+            return null;
+        }
+        public virtual void LoadTable(FakeStruct fake)
+        {
+        }
     }
 }

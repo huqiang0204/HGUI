@@ -1,4 +1,5 @@
 ﻿using huqiang.Data;
+using huqiang.UIEvent;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -57,7 +58,18 @@ namespace huqiang.Core.HGUI
             GameBuffer.RegComponent(new ComponentInfo<HText>() { loader = txtLoader });
             GameBuffer.RegComponent(new ComponentInfo<HLine>() { loader = grapLoader });
             GameBuffer.RegComponent(new ComponentInfo<UIElement>() { loader = eleLoader });
-          
+           
+        }
+        static void AddDataTable(DataBuffer db)
+        {
+            List<FakeStruct> list = new List<FakeStruct>();
+            list.Add(FakeStructHelper.CreateTable<TransfromData>(db));
+            list.Add(FakeStructHelper.CreateTable<UIElementData>(db));
+            list.Add(FakeStructHelper.CreateTable<HGraphicsData>(db));
+            list.Add(FakeStructHelper.CreateTable<HImageData>(db));
+            list.Add(FakeStructHelper.CreateTable<HTextData>(db));
+            list.Add(FakeStructHelper.CreateTable<TextInputData>(db));
+           
         }
         /// <summary>
         /// 

@@ -26,6 +26,7 @@ namespace huqiang.Core.HGUI
         /// 结构体声明
         /// </summary>
         public FakeStruct[] tables;
+        public string Version;
     }
     public class HGUIManager
     {
@@ -33,6 +34,7 @@ namespace huqiang.Core.HGUI
         /// 游戏对象缓存
         /// </summary>
         public static GameobjectBuffer GameBuffer;
+        public static String Version = "1.0.30";
         /// <summary>
         /// 初始化UI组件,包含有:Transform,HImage,TextBox,HText,HLine,UIElement
         /// </summary>
@@ -82,7 +84,7 @@ namespace huqiang.Core.HGUI
             var loader = GameBuffer.GetDataLoader(0);
             var root = loader.LoadFromObject(uiRoot, db);
 
-            FakeStruct fake = new FakeStruct(db, 2);
+            FakeStruct fake = new FakeStruct(db, 3);
             fake[0] = db.AddData(root);
             int c = GameBuffer.TypeSize;
             Int16[] arr = new Int16[c];
@@ -93,6 +95,7 @@ namespace huqiang.Core.HGUI
                     arr[i] = (Int16)db.AddData(dl.CreateTable(db));
             }
             fake[1] = db.AddData(arr);
+            fake[2] = db.AddData(Version);
             db.fakeStruct = fake;
             return db;
         }
@@ -141,6 +144,7 @@ namespace huqiang.Core.HGUI
                     fsa[i] = db.GetData(arr[i]) as FakeStruct;
                 asset.tables = fsa;
             }
+            asset.Version = fake.GetData<string>(2);
             asset.name = name;
             for (int i = 0; i < prefabAssets.Count; i++)
                 if (prefabAssets[i].name == name)

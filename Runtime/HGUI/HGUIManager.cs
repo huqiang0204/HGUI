@@ -21,6 +21,10 @@ namespace huqiang.Core.HGUI
         /// 模型数据
         /// </summary>
         public FakeStruct models;
+        /// <summary>
+        /// 结构体声明
+        /// </summary>
+        public FakeStruct[] tables;
     }
     public class HGUIManager
     {
@@ -35,13 +39,50 @@ namespace huqiang.Core.HGUI
         public static void Initial(Transform buff)
         {
             GameBuffer = new GameobjectBuffer(buff);
-            GameBuffer.RegComponent(new ComponentInfo<Transform>() { loader = new TransfromLoader() });
-            GameBuffer.RegComponent(new ComponentInfo<HImage>() { loader = new HImageLoader() });
-            GameBuffer.RegComponent(new ComponentInfo<TextBox>() { loader = new HTextLoader() });
-            GameBuffer.RegComponent(new ComponentInfo<HText>() { loader = new HTextLoader() });
-            GameBuffer.RegComponent(new ComponentInfo<HLine>() { loader = new HGraphicsLoader() });
-            GameBuffer.RegComponent(new ComponentInfo<UIElement>() { loader = new UIElementLoader() });
+            var transHleper = GameBuffer.RegFakeStructHelper<TransfromData>();
+            var imgHelper = GameBuffer.RegFakeStructHelper<HImageData>();
+            var txtHelper= GameBuffer.RegFakeStructHelper<HTextData>();
+            var graphHelper = GameBuffer.RegFakeStructHelper<HGraphicsData>();
+            var eleHelper = GameBuffer.RegFakeStructHelper<UIElementData>();
+
+            var transLoader = new TransfromLoader();
+            var imgLoader = new HImageLoader() { ImageHelper = imgHelper, GraphicsHelper = graphHelper, ElementHelper = eleHelper };
+            var txtLoader= new HTextLoader() { TextHelper = txtHelper, GraphicsHelper = graphHelper, ElementHelper = eleHelper };
+            var grapLoader = new HGraphicsLoader() { GraphicsHelper = graphHelper, ElementHelper = eleHelper };
+            var eleLoader = new UIElementLoader() { ElementHelper = eleHelper };
+
+            GameBuffer.RegComponent(new ComponentInfo<Transform>() { loader = transLoader }); 
+            GameBuffer.RegComponent(new ComponentInfo<HImage>() { loader = imgLoader});
+            GameBuffer.RegComponent(new ComponentInfo<TextBox>() { loader =txtLoader });
+            GameBuffer.RegComponent(new ComponentInfo<HText>() { loader = txtLoader });
+            GameBuffer.RegComponent(new ComponentInfo<HLine>() { loader = grapLoader });
+            GameBuffer.RegComponent(new ComponentInfo<UIElement>() { loader = eleLoader });
           
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="uiRoot"></param>
+        /// <returns></returns>
+        public static DataBuffer GetPrefab(Transform uiRoot)
+        {
+            DataBuffer db = new DataBuffer(1024);
+            var loader = GameBuffer.GetDataLoader(0);
+            var root = loader.LoadFromObject(uiRoot, db);
+
+            FakeStruct fake = new FakeStruct(db, 2);
+            fake[0] = db.AddData(root);
+            int c = GameBuffer.TypeSize;
+            Int16[] arr = new Int16[c];
+            for (int i = 0; i < arr.Length; i++)
+            {
+                var dl = GameBuffer.GetDataLoader(i);
+                if (dl != null)
+                    arr[i] = (Int16)db.AddData(dl.CreateTable(db));
+            }
+            fake[1] = db.AddData(arr);
+            db.fakeStruct = fake;
+            return db;
         }
         /// <summary>
         /// 将场景内的对象保存到文件
@@ -50,9 +91,7 @@ namespace huqiang.Core.HGUI
         /// <param name="path"></param>
         public static void SavePrefab(Transform uiRoot, string path)
         {
-            DataBuffer db = new DataBuffer(1024);
-            db.fakeStruct = GameBuffer.GetDataLoader(0).LoadFromObject(uiRoot, db);
-            File.WriteAllBytes(path, db.ToBytes());
+            File.WriteAllBytes(path, GetPrefab(uiRoot).ToBytes());
         }
         /// <summary>
         /// 将实例对象数据模型导入
@@ -74,20 +113,42 @@ namespace huqiang.Core.HGUI
         /// <summary>
         /// 载入一个预制体资源
         /// </summary>
+        /// <param name="db">资源数据</param>
+        /// <param name="name">资源名</param>
+        /// <returns></returns>
+        public unsafe static PrefabAsset LoadModels(DataBuffer db, string name)
+        {
+            var fake = db.fakeStruct;
+            var asset = new PrefabAsset();
+            asset.models = fake.GetData<FakeStruct>(0);
+            Int16[] arr = fake.GetData<Int16[]>(1);
+            if (arr != null)
+            {
+                FakeStruct[] fsa = new FakeStruct[arr.Length];
+                for (int i = 0; i < arr.Length; i++)
+                    fsa[i] = db.GetData(arr[i]) as FakeStruct;
+                asset.tables = fsa;
+            }
+            asset.name = name;
+            for (int i = 0; i < prefabAssets.Count; i++)
+                if (prefabAssets[i].name == name)
+                {
+                    prefabAssets.RemoveAt(i);
+                    break;
+                }
+            prefabAssets.Add(asset);
+            return asset;
+        }
+        /// <summary>
+        /// 载入一个预制体资源
+        /// </summary>
         /// <param name="dat">资源数据</param>
         /// <param name="name">资源名</param>
         /// <returns></returns>
         public unsafe static PrefabAsset LoadModels(byte[] dat, string name)
         {
             DataBuffer db = new DataBuffer(dat);
-            var asset = new PrefabAsset();
-            asset.models = db.fakeStruct;
-            asset.name = name;
-            for (int i = 0; i < prefabAssets.Count; i++)
-                if (prefabAssets[i].name == name)
-                { prefabAssets.RemoveAt(i); break; }
-            prefabAssets.Add(asset);
-            return asset;
+            return LoadModels(db,name);
         }
         /// <summary>
         /// 查询transform的子物体
@@ -126,6 +187,25 @@ namespace huqiang.Core.HGUI
             {
                 if (prefabAssets[i].name == assetName)
                 {
+                    return FindChild(prefabAssets[i].models, childName);
+                }
+            }
+            return null;
+        }
+        /// <summary>
+        /// 查询一个模型
+        /// </summary>
+        /// <param name="assetName">资源包名</param>
+        /// <param name="childName">模型名称</param>
+        /// <returns></returns>
+        public static unsafe FakeStruct FindModelAndSetAssets(string assetName, string childName)
+        {
+            for (int i = 0; i < prefabAssets.Count; i++)
+            {
+                if (prefabAssets[i].name == assetName)
+                {
+                    if (prefabAssets[i].tables != null)
+                        GameBuffer.SetTables(prefabAssets[i].tables, assetName);
                     return FindChild(prefabAssets[i].models, childName);
                 }
             }

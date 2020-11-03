@@ -129,7 +129,8 @@ namespace huqiang.Data
         {
             CycleBuffer = buffer;
         }
-        int point;
+        int point = 0;
+        public int TypeSize { get => point; }
         TypeInfo[] types = new TypeInfo[63];
         List<ModelBuffer> models = new List<ModelBuffer>();
         Container<InstanceContext> container = new Container<InstanceContext>(4096);
@@ -410,6 +411,40 @@ namespace huqiang.Data
             if (initializer != null)
                 initializer.Done();
             return go;
+        }
+        string curTables;
+        public void SetTables(FakeStruct[] fakes,string name)
+        {
+            if (curTables == name)
+                return;
+            for (int i = 0; i < helpers.Count; i++)
+            {
+                SetOriTable(fakes, helpers[i]);
+            }
+        }
+        void SetOriTable(FakeStruct[] fakes, FakeStructHelper helper)
+        {
+            string hn = helper.Name;
+            int c = fakes.Length;
+            for (int j = 0; j < c; j++)
+            {
+                var fs = fakes[j];
+                string name = fs.GetData<string>(0);
+                if (name == hn)
+                {
+                    helper.SetOriginModel(fs);
+                    return;
+                }
+            }
+            helper.SetOriginModel(null);
+        }
+        public List<FakeStructHelper> helpers = new List<FakeStructHelper>();
+        public FakeStructHelper RegFakeStructHelper<T>()where T:unmanaged
+        {
+            FakeStructHelper helper = new FakeStructHelper();
+            helper.SetTargetModel<T>();
+            helpers.Add(helper);
+            return helper;
         }
     }
 }

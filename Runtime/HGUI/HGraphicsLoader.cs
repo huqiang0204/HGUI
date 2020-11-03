@@ -9,13 +9,13 @@ namespace huqiang.Core.HGUI
 {
     public unsafe struct HGraphicsData
     {
-        public UIElementData scriptData;
-        public Int32 shader;
-        public Int32 asset;
-        public Int32 MainTexture;
-        public Int32 STexture;
-        public Int32 TTexture;
-        public Int32 FTexture;
+        public UIElementData element;
+        public StringPoint shader;
+        public StringPoint asset;
+        public StringPoint MainTexture;
+        public StringPoint STexture;
+        public StringPoint TTexture;
+        public StringPoint FTexture;
         public Color32 color;
         public Vector4 uvRect;
         public bool Shadow;
@@ -32,36 +32,46 @@ namespace huqiang.Core.HGUI
         protected string STexture;
         protected string TTexture;
         protected string FTexture;
-        protected unsafe void LoadHGraphics(FakeStruct fake, HGraphics tar)
+        public FakeStructHelper GraphicsHelper;
+        public override FakeStruct CreateTable(DataBuffer buffer)
         {
-            HGraphicsData* src = (HGraphicsData*)fake.ip;
-            var buffer = fake.buffer;
-            asset = buffer.GetData(src->asset)as string ;
-            MainTexture = buffer.GetData(src->MainTexture) as string;
-            if (MainTexture != null)
-                tar.MainTexture = ElementAsset.FindTexture(asset, MainTexture);
-            else tar.MainTexture = null;
-            STexture = buffer.GetData(src->STexture) as string;
-            if (STexture != null)
-                tar.STexture = ElementAsset.FindTexture(asset, STexture);
-            else tar.STexture = null;
-            TTexture = buffer.GetData(src->TTexture) as string;
-            if (TTexture != null)
-                tar.TTexture = ElementAsset.FindTexture(asset, TTexture);
-            else TTexture = null;
-            FTexture = buffer.GetData(src->FTexture) as string;
-            if (FTexture != null)
-                tar.FTexture = ElementAsset.FindTexture(asset, FTexture);
-            else FTexture = null;
-            shader = buffer.GetData(src->shader)as string ;
-            if (shader != null)
-                tar.Material = new Material(Shader.Find(shader));
-            else tar.Material = null;
-            tar.m_color = src->color;
-            tar.uvrect = src->uvRect;
-            tar.Shadow = src->Shadow;
-            tar.shadowOffsset = src->shadowOffsset;
-            tar.shadowColor = src->shadowColor;
+            return FakeStructHelper.CreateTable<HGraphicsData>(buffer);
+        }
+        protected void LoadHGraphics(FakeStruct fake, HGraphics tar)
+        {
+            HGraphicsData tmp = new HGraphicsData();
+            unsafe 
+            {
+                HGraphicsData* src = &tmp;
+                GraphicsHelper.LoadData((byte*)src, fake.ip);
+                var buffer = fake.buffer;
+                asset = buffer.GetData(src->asset) as string;
+                MainTexture = buffer.GetData(src->MainTexture) as string;
+                if (MainTexture != null)
+                    tar.MainTexture = ElementAsset.FindTexture(asset, MainTexture);
+                else tar.MainTexture = null;
+                STexture = buffer.GetData(src->STexture) as string;
+                if (STexture != null)
+                    tar.STexture = ElementAsset.FindTexture(asset, STexture);
+                else tar.STexture = null;
+                TTexture = buffer.GetData(src->TTexture) as string;
+                if (TTexture != null)
+                    tar.TTexture = ElementAsset.FindTexture(asset, TTexture);
+                else TTexture = null;
+                FTexture = buffer.GetData(src->FTexture) as string;
+                if (FTexture != null)
+                    tar.FTexture = ElementAsset.FindTexture(asset, FTexture);
+                else FTexture = null;
+                shader = buffer.GetData(src->shader) as string;
+                if (shader != null)
+                    tar.Material = new Material(Shader.Find(shader));
+                else tar.Material = null;
+            }
+            tar.m_color = tmp.color;
+            tar.uvrect = tmp.uvRect;
+            tar.Shadow = tmp.Shadow;
+            tar.shadowOffsset = tmp.shadowOffsset;
+            tar.shadowColor = tmp.shadowColor;
             tar.tris = null;
         }
         protected unsafe void SaveHGraphics(FakeStruct fake, HGraphics src)
@@ -114,7 +124,7 @@ namespace huqiang.Core.HGUI
             if (hg == null)
                 return;
             hg.mod = fake;
-            LoadScript(fake.ip, hg);
+            LoadElement(fake, hg);
             LoadHGraphics(fake, hg);
             hg.Initial(main);
         }

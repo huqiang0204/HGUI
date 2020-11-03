@@ -197,7 +197,9 @@ namespace huqiang.Data
             {
                 string typ = fs[i].FieldType.Name;
                 string name = fs[i].Name;
-                fsa[s] = Marshal.SizeOf(fs[i].FieldType);
+                if (fs[i].FieldType.IsEnum)
+                    fsa[s] = 4;
+                else fsa[s] = Marshal.SizeOf(fs[i].FieldType);
                 s++;
                 fsa.SetData(s, typ);
                 s++;
@@ -208,7 +210,7 @@ namespace huqiang.Data
         }
         public string Name { get; private set; }
         Type type;
-        int Size;
+        public int Size { get; private set; }
         FakeInfo[] TarInfos;
         int[] indexs;
         struct FakeInfo
@@ -231,7 +233,9 @@ namespace huqiang.Data
             {
                 TarInfos[i].Type = fs[i].FieldType.Name;
                 TarInfos[i].Name = fs[i].Name;
-                TarInfos[i].Size = Marshal.SizeOf(fs[i].FieldType);
+                if (fs[i].FieldType.IsEnum)
+                    TarInfos[i].Size = 4;
+                else TarInfos[i].Size = Marshal.SizeOf(fs[i].FieldType);
                 TarInfos[i].Offset = os;
                 os += TarInfos[i].Size;
             }
@@ -239,6 +243,12 @@ namespace huqiang.Data
         }
         public void SetOriginModel(FakeStruct fake)
         {
+            if(fake==null)
+            {
+                OriInfos = null;
+                indexs = null;
+                return;
+            }
             int c = fake.Length;
             int u = c / 3;
             OriInfos = new FakeInfo[u];
@@ -257,6 +267,10 @@ namespace huqiang.Data
             }
             Order();
         }
+        /// <summary>
+        /// 两张表的排列相同
+        /// </summary>
+        bool same;
         void Order()
         {
             if (OriInfos == null)
@@ -264,34 +278,40 @@ namespace huqiang.Data
             if (TarInfos == null)
                 return;
             indexs = new int[TarInfos.Length];
+            same = true;
             for (int i = 0; i < indexs.Length; i++)
             {
-                indexs[i] = GetDataIndex(TarInfos[i].Type, TarInfos[i].Name);
+                indexs[i] = -1;
+                string type = TarInfos[i].Type;
+                string name = TarInfos[i].Name;
+                int size =TarInfos[i].Size;
+                for (int j = 0; j < OriInfos.Length; j++)
+                {
+                    if (OriInfos[j].Type == type)
+                        if (OriInfos[j].Name == name)
+                            if (OriInfos[j].Size == size)
+                            {
+                                indexs[i] = j;
+                                break;
+                            }
+                }
+                if (same)
+                    if (i != indexs[i])
+                        same = false;
             }
         }
-        int GetDataIndex(string type, string name)
-        {
-            for (int i = 0; i < OriInfos.Length; i++)
-            {
-                if (OriInfos[i].Type == type)
-                    if (OriInfos[i].Name == name)
-                        return i;
-            }
-            return -1;
-        }
-        //public int GetOriginIndex(int index)
-        //{
-        //    if (indexs == null)
-        //        return -1;
-        //    if (index < 0 | index >= indexs.Length)
-        //        return -1;
-        //    int i = indexs[index];
-        //    if (i < 0)
-        //        return -1;
-        //    return i;
-        //}
         public unsafe void LoadData(byte* tar, byte* src)
         {
+            if (same)//排列相同则直接复制数据
+            {
+                for (int i = 0; i < Size; i++)
+                {
+                    tar[i] = src[i];
+                }
+                return;
+            }
+            if (indexs == null)
+                return;
             byte* p = tar;
             for (int i = 0; i < indexs.Length; i++)
             {
@@ -317,31 +337,7 @@ namespace huqiang.Data
         {
             T t = new T();
            unsafe { LoadData((byte*)&t, ori.ip); }
-            //unsafe
-            //{
-            //    byte* p = (byte*)&t;
-            //    for (int i = 0; i < indexs.Length; i++)
-            //    {
-            //        int a = indexs[i];
-            //        int c = TarInfos[i].Size;
-            //        if (a > 0)
-            //        {
-            //            byte* src = ori.ip + OriInfos[a].Offset;
-            //            for (int j = 0; j < TarInfos[i].Size; j++)
-            //            {
-            //                *p = *src;
-            //                p++;
-            //                src++;
-            //            }
-            //        }
-            //        else
-            //        {
-            //            p += c;
-            //        }
-            //    }
-            //}
             return t;
         }
-        
     }
 }

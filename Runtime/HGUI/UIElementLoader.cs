@@ -28,22 +28,32 @@ namespace huqiang.Core.HGUI
     }
     public class UIElementLoader:DataLoader
     {
-        protected unsafe void LoadScript(byte* ip, UIElement tar)
+        public FakeStructHelper ElementHelper;
+        public override FakeStruct CreateTable(DataBuffer buffer)
+        {
+            return FakeStructHelper.CreateTable<UIElementData>(buffer);
+        }
+        protected  void LoadElement(FakeStruct fake, UIElement tar)
         {
             tar.Clear();
-            var src = (UIElementData*)ip;
-            tar.m_sizeDelta = src->m_sizeDelta;
-            tar.Pivot = src->Pivot;
-            tar.scaleType = src->scaleType;
-            tar.anchorType = src->anchorType;
-            tar.anchorPointType = src->anchorPointType;
-            tar.anchorOffset = src->anchorOffset;
-            tar.marginType = src->marginType;
-            tar.parentType = src->parentType;
-            tar.margin = src->margin;
-            tar.Mask = src->Mask;
-            tar.eventType = src->eventType;
-            tar.compositeType = src->compositeType;
+            UIElementData tmp = new UIElementData();
+            unsafe
+            {
+                UIElementData* src = &tmp;
+                ElementHelper.LoadData((byte*)src, fake.ip);
+            }
+            tar.m_sizeDelta = tmp.m_sizeDelta;
+            tar.Pivot = tmp.Pivot;
+            tar.scaleType = tmp.scaleType;
+            tar.anchorType = tmp.anchorType;
+            tar.anchorPointType = tmp.anchorPointType;
+            tar.anchorOffset = tmp.anchorOffset;
+            tar.marginType = tmp.marginType;
+            tar.parentType = tmp.parentType;
+            tar.margin = tmp.margin;
+            tar.Mask = tmp.Mask;
+            tar.eventType = tmp.eventType;
+            tar.compositeType = tmp.compositeType;
             tar.userEvent = null;
             tar.composite = null;
             tar.SizeChanged = null;
@@ -70,7 +80,7 @@ namespace huqiang.Core.HGUI
             ui.composite = null;
             ui.userEvent = null;
             ui.mod = fake;
-            LoadScript(fake.ip, ui);
+            LoadElement(fake, ui);
 #if UNITY_EDITOR
             if (Application.isPlaying)
                 ui.Initial(main);

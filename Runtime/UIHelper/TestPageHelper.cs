@@ -43,13 +43,9 @@ public class TestPageHelper:UICompositeHelp
     {
         LoadBundle();
         HGUIManager.Initial(transform);
-        DataBuffer db = new DataBuffer(1024);
-        db.fakeStruct = HGUIManager.GameBuffer.GetDataLoader(0).LoadFromObject(transform, db);
-        PrefabAsset asset = new PrefabAsset();
-        asset.models = db.fakeStruct;
-        asset.name = AssetName;
+        var db = HGUIManager.GetPrefab(transform);
         HGUIManager.prefabAssets.Clear();
-        HGUIManager.prefabAssets.Add(asset);
+        HGUIManager.LoadModels(db, AssetName);
         var c = transform.childCount;
         for (int i = 0; i < c; i++)
             GameObject.Destroy(transform.GetChild(i).gameObject);

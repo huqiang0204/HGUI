@@ -22,10 +22,20 @@ namespace huqiang.Core.HGUI
     public class HImageLoader:HGraphicsLoader
     {
         protected string Sprite;
-        protected unsafe void LoadHImage(FakeStruct fake, HImage tar)
+        public FakeStructHelper ImageHelper;
+        public override FakeStruct CreateTable(DataBuffer buffer)
         {
-            HImageData* src = (HImageData*)fake.ip;
-            Sprite = fake.buffer.GetData(src->Sprite)as string;
+            return FakeStructHelper.CreateTable<HImageData>(buffer);
+        }
+        protected  void LoadHImage(FakeStruct fake, HImage tar)
+        {
+            HImageData tmp= new HImageData();
+            unsafe
+            {
+                HImageData* src = &tmp;
+                ImageHelper.LoadData((byte*)src, fake.ip);
+                Sprite = fake.buffer.GetData(src->Sprite) as string;
+            }
             if (Sprite != null)
                 tar.Sprite = ElementAsset.FindSprite(asset, MainTexture, Sprite);
             else {
@@ -33,14 +43,14 @@ namespace huqiang.Core.HGUI
                 if (MainTexture != null)
                     tar.MainTexture = ElementAsset.FindTexture(asset,MainTexture);
             }
-            tar.m_spriteType = src->spriteType;
-            tar.m_fillAmount = src->fillAmount;
-            tar.m_fillCenter = src->fillCenter;
-            tar.m_fillClockwise = src->fillClockwise;
-            tar.m_fillMethod = src->fillMethod;
-            tar.m_fillOrigin = src->fillOrigin;
-            tar.m_pixelsPerUnit = src->pixelsPerUnit;
-            tar.m_preserveAspect = src->preserveAspect;
+            tar.m_spriteType = tmp.spriteType;
+            tar.m_fillAmount =tmp.fillAmount;
+            tar.m_fillCenter = tmp.fillCenter;
+            tar.m_fillClockwise = tmp.fillClockwise;
+            tar.m_fillMethod = tmp.fillMethod;
+            tar.m_fillOrigin = tmp.fillOrigin;
+            tar.m_pixelsPerUnit = tmp.pixelsPerUnit;
+            tar.m_preserveAspect = tmp.preserveAspect;
         }
         protected unsafe void SaveHImage(FakeStruct fake, HImage src)
         {
@@ -63,7 +73,7 @@ namespace huqiang.Core.HGUI
             if (image == null)
                 return;
             image.mod = fake;
-            LoadScript(fake.ip, image);
+            LoadElement(fake, image);
             LoadHGraphics(fake, image);
             LoadHImage(fake, image);
             image.Initial(main);
@@ -79,6 +89,5 @@ namespace huqiang.Core.HGUI
             SaveHImage(fake,src);
             return fake;
         }
-
     }
 }

@@ -49,25 +49,7 @@ namespace huqiang.Data
     }
     public class TransfromLoader : DataLoader
     {
-        public TransfromLoader()
-        {
-            helper = new FakeStructHelper();
-            helper.SetTargetModel<TransfromData>();
-        }
-        public override void LoadTable(FakeStruct fake)
-        {
-            int c = fake.Length;
-            for (int i = 0; i < c; i++)
-            {
-                var fs = fake.GetData<FakeStruct>(i);
-                if (fs != null)
-                    if (fs.GetData<string>(0) == "TransfromData")
-                    {
-                        helper.SetOriginModel(fs);
-                        break;
-                    }
-            }
-        }
+        //public FakeStructHelper TransHelper;
         public override FakeStruct CreateTable(DataBuffer buffer)
         {
             return FakeStructHelper.CreateTable<TransfromData>(buffer);
@@ -109,8 +91,8 @@ namespace huqiang.Data
         /// <param name="initializer">初始化器,用于反射</param>
         public unsafe override void LoadToObject(FakeStruct fake, Component com,Initializer initializer)
         {
-            TransfromData data = new TransfromData();
-            unsafe { helper.LoadData((byte*)&data,fake.ip); }
+            //TransfromData src = new TransfromData();
+            //unsafe { transHelper.LoadData((byte*)&src,fake.ip); }
             var src = (TransfromData*)fake.ip;
             var buff = fake.buffer;
             var trans = com as Transform;

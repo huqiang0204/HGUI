@@ -29,6 +29,11 @@ namespace huqiang.Core.HGUI
     }
     public class HTextLoader : HGraphicsLoader
     {
+        public FakeStructHelper TextHelper;
+        public override FakeStruct CreateTable(DataBuffer buffer)
+        {
+            return FakeStructHelper.CreateTable<HTextData>(buffer);
+        }
         public static List<Font> fonts = new List<Font>();
         public static Font FindFont(string str)
         {
@@ -50,26 +55,32 @@ namespace huqiang.Core.HGUI
             return fonts[0];
         }
         protected string fontName;
-        protected unsafe void LoadHText(FakeStruct fake, HText tar)
+        protected void LoadHText(FakeStruct fake, HText tar)
         {
-            HTextData* src = (HTextData*)fake.ip;
-            var buffer = fake.buffer;
-            tar.m_text = buffer.GetData(src->text) as string;
-            fontName = buffer.GetData(src->font) as string;
-            if (fontName != null)
-                tar._font = FindFont(fontName);
-            else tar._font = null;
-            tar.TextPivot = src->pivot;
-            tar.m_hof = src->m_hof;
-            tar.m_vof = src->m_vof;
-            tar.TextAnchor = src->anchor;
-            tar.m_richText = src->m_richText;
-            tar.m_lineSpace = src->m_lineSpace;
-            tar.m_fontSize = src->m_fontSize;
-            tar.m_align = src->m_align;
-            tar.m_fontStyle = src->m_fontStyle;
-            tar.sizeFitter = src->sizeFitter;
-            tar.OutLine = src->OutLine;
+            HTextData tmp = new HTextData();
+            unsafe
+            {
+                HTextData* src = &tmp;
+                TextHelper.LoadData((byte*)src, fake.ip);
+               
+                var buffer = fake.buffer;
+                tar.m_text = buffer.GetData(src->text) as string;
+                fontName = buffer.GetData(src->font) as string;
+                if (fontName != null)
+                    tar._font = FindFont(fontName);
+                else tar._font = null;
+            }
+            tar.TextPivot = tmp.pivot;
+            tar.m_hof = tmp.m_hof;
+            tar.m_vof = tmp.m_vof;
+            tar.TextAnchor = tmp.anchor;
+            tar.m_richText = tmp.m_richText;
+            tar.m_lineSpace = tmp.m_lineSpace;
+            tar.m_fontSize = tmp.m_fontSize;
+            tar.m_align = tmp.m_align;
+            tar.m_fontStyle = tmp.m_fontStyle;
+            tar.sizeFitter = tmp.sizeFitter;
+            tar.OutLine = tmp.OutLine;
         }
         protected unsafe void SaveHText(FakeStruct fake, HText src)
         {
@@ -95,7 +106,7 @@ namespace huqiang.Core.HGUI
             if (image == null)
                 return;
             image.mod = fake;
-            LoadScript(fake.ip, image);
+            LoadElement(fake, image);
             LoadHGraphics(fake, image);
             LoadHText(fake, image);
             image.Initial(main);

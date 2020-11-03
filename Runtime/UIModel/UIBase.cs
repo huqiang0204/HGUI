@@ -162,7 +162,7 @@ namespace huqiang.UIModel
         public T LoadUI<T>(string asset, string name) where T : class, new()
         {
             uiName = name;
-            model = HGUIManager.FindModel(asset, name);
+            model = HGUIManager.FindModelAndSetAssets(asset, name);
             T t = new T();
             uiInitializer = new UIInitializer(ObjectFields(typeof(T)));
             uiInitializer.Reset(t);

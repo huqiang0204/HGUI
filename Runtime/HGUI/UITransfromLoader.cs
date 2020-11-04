@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace huqiang.Data
+namespace huqiang.Core.HGUI
 {
     public unsafe struct UITransfromData
     {
@@ -55,7 +55,7 @@ namespace huqiang.Data
         /// <summary>
         /// 附加信息,用于存储helper中写入的数据
         /// </summary>
-        //public FakeStrcutPoint ex;
+        public FakeStrcutPoint ex;
         public static int Size = sizeof(UITransfromData);
         public static int ElementSize = Size / 4;
     }
@@ -107,14 +107,14 @@ namespace huqiang.Data
                 return fake.buffer.GetData(trans->composite) as FakeStruct;
             }
         }
-        //public static FakeStruct GetEx(FakeStruct fake)
-        //{
-        //    unsafe
-        //    {
-        //        var trans = (UITransfromData*)fake.ip;
-        //        return fake.buffer.GetData(trans->ex) as FakeStruct;
-        //    }
-        //}
+        public static FakeStruct GetEx(FakeStruct fake)
+        {
+            unsafe
+            {
+                var trans = (UITransfromData*)fake.ip;
+                return fake.buffer.GetData(trans->ex) as FakeStruct;
+            }
+        }
         /// <summary>
         /// 将假结构体中的数据载入到组件实体中
         /// </summary>

@@ -59,14 +59,9 @@ namespace huqiang.UIComposite
         /// 握柄转动事件
         /// </summary>
         public Action<UIRocker> Rocking;
-        /// <summary>
-        /// 初始化
-        /// </summary>
-        /// <param name="fake">模型数据</param>
-        /// <param name="script">元素主体</param>
-        public override void Initial(FakeStruct fake,UIElement script)
+        public override void Initial(FakeStruct fake,UIElement script,Initializer initializer)
         {
-            base.Initial(fake,script);
+            base.Initial(fake,script,initializer);
             callBack = script.RegEvent<UserEvent>(new UICircleCollider());
             callBack.Drag = Draging;
             callBack.DragEnd = DragEnd;

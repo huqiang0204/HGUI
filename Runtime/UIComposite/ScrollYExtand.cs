@@ -70,9 +70,9 @@ namespace huqiang.UIComposite
         /// </summary>
         /// <param name="fake">数据模型</param>
         /// <param name="element">主体元素</param>
-        public override void Initial(FakeStruct fake,UIElement element)
+        public override void Initial(FakeStruct fake,UIElement element,Initializer initializer)
         {
-            base.Initial(fake,element);
+            base.Initial(fake,element,initializer);
             element.SizeChanged = (o) => { Refresh(); };
             eventCall = Enity.RegEvent<UserEvent>();
             eventCall.Drag = (o, e, s) => { Scrolling(o, s); };
@@ -93,10 +93,10 @@ namespace huqiang.UIComposite
             Body = HGUIManager.FindChild(fake, "Body");
             unsafe
             {
-                ItemSize = ((TransfromData*)ItemMod.ip)->size;
-                TitleSize= ((TransfromData*)TitleMod.ip)->size;
+                ItemSize = ((UITransfromData*)ItemMod.ip)->size;
+                TitleSize= ((UITransfromData*)TitleMod.ip)->size;
                 if(TailMod!=null)
-                    TailSize= ((TransfromData*)TailMod.ip)->size;
+                    TailSize= ((UITransfromData*)TailMod.ip)->size;
             }
         }
         void Scrolling(UserEvent back, Vector2 v)

@@ -42,14 +42,14 @@ namespace huqiang.Core.HGUI
         public static void Initial(Transform buff)
         {
             GameBuffer = new GameobjectBuffer(buff);
-            var transHleper = GameBuffer.RegFakeStructHelper<TransfromData>();
+            var transHleper = GameBuffer.RegFakeStructHelper<UITransfromData>();
             var imgHelper = GameBuffer.RegFakeStructHelper<HImageData>();
             var txtHelper= GameBuffer.RegFakeStructHelper<HTextData>();
             var graphHelper = GameBuffer.RegFakeStructHelper<HGraphicsData>();
             var eleHelper = GameBuffer.RegFakeStructHelper<UIElementData>();
             GameBuffer.RegFakeStructHelper<TextInputData>();
 
-            var transLoader = new TransfromLoader();
+            var transLoader = new UITransfromLoader();
             var imgLoader = new HImageLoader() { ImageHelper = imgHelper, GraphicsHelper = graphHelper, ElementHelper = eleHelper };
             var txtLoader= new HTextLoader() { TextHelper = txtHelper, GraphicsHelper = graphHelper, ElementHelper = eleHelper };
             var grapLoader = new HGraphicsLoader() { GraphicsHelper = graphHelper, ElementHelper = eleHelper };
@@ -66,7 +66,7 @@ namespace huqiang.Core.HGUI
         static List<FakeStruct> AddDataTable(DataBuffer db)
         {
             List<FakeStruct> list = new List<FakeStruct>();
-            list.Add(FakeStructHelper.CreateTable<TransfromData>(db));
+            list.Add(FakeStructHelper.CreateTable<UITransfromData>(db));
             list.Add(FakeStructHelper.CreateTable<UIElementData>(db));
             list.Add(FakeStructHelper.CreateTable<HGraphicsData>(db));
             list.Add(FakeStructHelper.CreateTable<HImageData>(db));
@@ -174,7 +174,7 @@ namespace huqiang.Core.HGUI
         /// <returns></returns>
         public static unsafe FakeStruct FindChild(FakeStruct fake, string childName)
         {
-            var data = (TransfromData*)fake.ip;
+            var data = (UITransfromData*)fake.ip;
             var buff = fake.buffer;
             Int16[] chi = fake.buffer.GetData(data->child) as Int16[];
             if (chi != null)
@@ -183,7 +183,7 @@ namespace huqiang.Core.HGUI
                     var fs = buff.GetData(chi[i]) as FakeStruct;
                     if (fs != null)
                     {
-                        var cd = (TransfromData*)fs.ip;
+                        var cd = (UITransfromData*)fs.ip;
                         string name = buff.GetData(cd->name) as string;
                         if (name == childName)
                             return fs;
@@ -235,7 +235,7 @@ namespace huqiang.Core.HGUI
         /// <returns></returns>
         public static unsafe FakeStruct[] GetAllChild(FakeStruct fake)
         {
-            var data = (TransfromData*)fake.ip;
+            var data = (UITransfromData*)fake.ip;
             var buff = fake.buffer;
             Int16[] chi = fake.buffer.GetData(data->child) as Int16[];
             if (chi != null)

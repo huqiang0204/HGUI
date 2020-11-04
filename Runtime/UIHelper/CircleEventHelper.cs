@@ -10,7 +10,7 @@ using UnityEngine;
 /// <summary>
 /// 圆形事件区域帮助类
 /// </summary>
-public class CircleEventHelper : UICompositeHelp
+public class CircleEventHelper : UIHelper
 {
     /// <summary>
     /// 半径
@@ -18,12 +18,12 @@ public class CircleEventHelper : UICompositeHelp
     public float Radius;
     [Range(0,10)]
     public float Ratio = 1;
-    public override object ToBufferData(DataBuffer data)
+    public unsafe override void ToBufferData(DataBuffer db, UITransfromData* data)
     {
-        FakeStruct fs = new FakeStruct(data,3);
+        FakeStruct fs = new FakeStruct(db,3);
         fs[0] = (int)EventColliderType.Circle;
         fs.SetFloat(1,Radius);
         fs.SetFloat(2,Ratio);
-        return fs;
+        data->eve = db.AddData(fs);
     }
 }

@@ -49,14 +49,9 @@ namespace huqiang.UIComposite
         /// 当前绘制状态
         /// </summary>
         public DrawModel drawModel;
-        /// <summary>
-        /// 初始化
-        /// </summary>
-        /// <param name="fake">数据模型</param>
-        /// <param name="script">主体元素</param>
-        public override void Initial(FakeStruct fake,UIElement script)
+        public override void Initial(FakeStruct fake,UIElement script,Initializer initializer)
         {
-            base.Initial(fake,script);
+            base.Initial(fake,script,initializer);
             raw = Enity as HImage;
             raw.MainColor = Color.white;
             var size = Enity.SizeDelta;

@@ -30,10 +30,10 @@ namespace huqiang.UIComposite
         /// </summary>
         /// <param name="fake">数据模型</param>
         /// <param name="element">UI主体元素</param>
-        public override void Initial(FakeStruct fake,UIElement element)
+        public override void Initial(FakeStruct fake,UIElement element,Initializer initializer)
         {
             contents.Clear();
-            base.Initial(fake,element);
+            base.Initial(fake,element,initializer);
             Auxiliary = HGUIManager.FindChild(fake, "Auxiliary");
             var trans = element.transform;
             Drag = trans.Find("Drag").GetComponent<UIElement>();

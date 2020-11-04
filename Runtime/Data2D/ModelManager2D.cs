@@ -17,7 +17,7 @@ namespace huqiang.Data2D
         public static void Initial(Transform buff)
         {
             GameBuffer = new GameobjectBuffer(buff);
-            GameBuffer.RegComponent(new ComponentInfo<Transform>() { loader = new TransfromLoader() });
+            GameBuffer.RegComponent(new ComponentInfo<Transform>() { loader = new UITransfromLoader() });
             GameBuffer.RegComponent(new ComponentInfo<SpriteRenderer>() { loader=new SpriteRenderLoader() });
             GameBuffer.RegComponent(new ComponentInfo<SpriteMask>() { loader = new SpriteMaskLoader() });
             GameBuffer.RegComponent(new ComponentInfo<BoxCollider2D>() { loader=new BoxColliderLoader()});
@@ -76,7 +76,7 @@ namespace huqiang.Data2D
         /// <returns></returns>
         public static unsafe FakeStruct FindChild(FakeStruct fake, string childName)
         {
-            var data = (TransfromData*)fake.ip;
+            var data = (UITransfromData*)fake.ip;
             var buff = fake.buffer;
             Int16[] chi = fake.buffer.GetData(data->child) as Int16[];
             if (chi != null)
@@ -85,7 +85,7 @@ namespace huqiang.Data2D
                     var fs = buff.GetData(chi[i]) as FakeStruct;
                     if (fs != null)
                     {
-                        var cd = (TransfromData*)fs.ip;
+                        var cd = (UITransfromData*)fs.ip;
                         string name = buff.GetData(cd->name) as string;
                         if (name == childName)
                             return fs;
@@ -101,7 +101,7 @@ namespace huqiang.Data2D
         /// <returns></returns>
         public static unsafe FakeStruct[] GetAllChild(FakeStruct fake)
         {
-            var data = (TransfromData*)fake.ip;
+            var data = (UITransfromData*)fake.ip;
             var buff = fake.buffer;
             Int16[] chi = fake.buffer.GetData(data->child) as Int16[];
             if (chi != null)

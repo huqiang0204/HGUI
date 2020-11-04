@@ -35,14 +35,10 @@ namespace huqiang.UIComposite
         /// </summary>
         public Action<UIPalette> TemplateChanged;
         UISlider uISlider;
-        /// <summary>
-        /// 初始化
-        /// </summary>
-        /// <param name="fake">模型数据</param>
-        /// <param name="element">元素主体</param>
-        public override void Initial(FakeStruct fake,UIElement element)
+  
+        public override void Initial(FakeStruct fake,UIElement element,Initializer initializer)
         {
-            base.Initial(fake,element);
+            base.Initial(fake,element,initializer);
             palette = new Palette();
             callBackR = element.RegEvent<UserEvent>(new UICircleCollider());
             callBackR.Drag = callBackR.DragEnd = DragingR;

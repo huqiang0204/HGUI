@@ -50,12 +50,12 @@ public class HCanvasEditorUpdate
         if(time>1)
         {
             time = 0;
-            var objs = SceneAsset.FindObjectsOfType(typeof(UICompositeHelp));
+            var objs = SceneAsset.FindObjectsOfType(typeof(UIHelper));
             if (objs != null)
             {
                 for (int i = 0; i < objs.Length; i++)
                 {
-                    var obj = objs[i] as UICompositeHelp;
+                    var obj = objs[i] as UIHelper;
                     if (obj != null)
                         obj.Refresh();
                 }

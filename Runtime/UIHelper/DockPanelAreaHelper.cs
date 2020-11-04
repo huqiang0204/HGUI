@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-public class DockPanelAreaHelper : UICompositeHelp
+public class DockPanelAreaHelper : UIHelper
 {
     public void AddArea(Transform trans)
     {

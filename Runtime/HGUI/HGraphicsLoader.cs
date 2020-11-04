@@ -122,7 +122,7 @@ namespace huqiang.Core.HGUI
             hg.mod = fake;
             LoadElement(fake, hg);
             LoadHGraphics(fake, hg);
-            hg.Initial(main);
+            hg.Initial(main,initializer);
         }
         public unsafe override FakeStruct LoadFromObject(Component com, DataBuffer buffer)
         {

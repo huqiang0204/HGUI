@@ -4,7 +4,7 @@ using huqiang.Data;
 using huqiang.UIEvent;
 using UnityEngine;
 
-public class TextInputHelper:UICompositeHelp
+public class TextInputHelper:UIHelper
 {
     public Color inputColor = Color.white;
     public Color tipColor = Color.gray;
@@ -16,21 +16,21 @@ public class TextInputHelper:UICompositeHelp
     public bool ReadyOnly;
     public ContentType contentType;
     public LineType lineType;
-    public unsafe override object ToBufferData(DataBuffer data)
+    public unsafe override void ToBufferData(DataBuffer db, UITransfromData* data)
     {
-        FakeStruct fake = new FakeStruct(data, TextInputData.ElementSize);
+        FakeStruct fake = new FakeStruct(db, TextInputData.ElementSize);
         TextInputData* sp = (TextInputData*)fake.ip;
         sp->inputColor = inputColor;
         sp->tipColor = tipColor;
         sp->pointColor = pointColor;
         sp->selectColor = selectColor;
-        sp->inputString = data.AddData(InputString);
-        sp->tipString = data.AddData(TipString);
+        sp->inputString = db.AddData(InputString);
+        sp->tipString = db.AddData(TipString);
         sp->CharacterLimit = CharacterLimit;
         sp->ReadyOnly = ReadyOnly;
         sp->contentType = contentType;
         sp->lineType = lineType;
-        return fake;
+        data->eve = db.AddData(fake);
     }
     public override void Refresh()
     {

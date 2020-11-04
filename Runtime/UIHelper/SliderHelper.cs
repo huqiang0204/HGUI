@@ -4,7 +4,7 @@ using huqiang.Data;
 using huqiang.UIComposite;
 using UnityEngine;
 
-public class SliderHelper : UICompositeHelp
+public class SliderHelper : UIHelper
 {
     public Vector2 StartOffset;
     public Vector2 EndOffset;
@@ -12,15 +12,15 @@ public class SliderHelper : UICompositeHelp
     public float MaxScale=1;
     public UISlider.Direction direction;
     UISlider slider;
-    public unsafe override object ToBufferData(DataBuffer buffer)
+    public unsafe override void ToBufferData(DataBuffer db, UITransfromData* data)
     {
-        FakeStruct fake = new FakeStruct(buffer, SliderInfo.ElementSize);
-        SliderInfo* data = (SliderInfo*)fake.ip;
-        data->StartOffset = StartOffset;
-        data->EndOffset = EndOffset;
-        data->MinScale = MinScale;
-        data->MaxScale = MaxScale;
-        data->direction = direction;
-        return fake;
+        FakeStruct fake = new FakeStruct(db, SliderInfo.ElementSize);
+        SliderInfo* si = (SliderInfo*)fake.ip;
+        si->StartOffset = StartOffset;
+        si->EndOffset = EndOffset;
+        si->MinScale = MinScale;
+        si->MaxScale = MaxScale;
+        si->direction = direction;
+        data->composite = db.AddData(fake);
     }
 }

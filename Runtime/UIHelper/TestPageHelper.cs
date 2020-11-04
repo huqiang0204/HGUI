@@ -9,7 +9,7 @@ using UnityEngine;
 /// <summary>
 /// 挂载在Canvas下
 /// </summary>
-public class TestPageHelper:UICompositeHelp
+public class TestPageHelper:UIHelper
 {
     public virtual void LoadBundle()
     {

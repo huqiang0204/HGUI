@@ -105,7 +105,7 @@ namespace huqiang.Core.HGUI
             LoadElement(fake, image);
             LoadHGraphics(fake, image);
             LoadHText(fake, image);
-            image.Initial(main);
+            image.Initial(main,initializer);
         }
         public unsafe override FakeStruct LoadFromObject(Component com, DataBuffer buffer)
         {

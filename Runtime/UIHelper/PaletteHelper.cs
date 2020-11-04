@@ -2,7 +2,7 @@
 using huqiang.Other;
 using System;
 
-public class PaletteHelper:UICompositeHelp
+public class PaletteHelper:UIHelper
 {
     Palette palette;
     public void Initial()

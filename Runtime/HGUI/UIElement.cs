@@ -749,7 +749,7 @@ namespace huqiang.Core.HGUI
         /// 初始化数据
         /// </summary>
         /// <param name="ex">数据模型</param>
-        public void Initial(FakeStruct ex)
+        public void Initial(FakeStruct ex,Initializer initializer)
         {
             switch(eventType)
             {
@@ -758,75 +758,75 @@ namespace huqiang.Core.HGUI
                 case EventType.TextInput: RegEvent<InputBoxEvent>(ex); break;
                 case EventType.GestureEvent: RegEvent<GestureEvent>(ex); break;
             }
-            CreateUIComposite(this,ex);
+            CreateUIComposite(this,ex, initializer);
         }
         /// <summary>
         /// 创建复合型UI实体
         /// </summary>
         /// <param name="script">ui元素实体</param>
         /// <param name="ex">数据模型</param>
-        public static void CreateUIComposite(UIElement script,FakeStruct ex)
+        public static void CreateUIComposite(UIElement script,FakeStruct ex,Initializer initializer)
         {
             switch(script.compositeType)
             {
                 case CompositeType.None:
                     break;
                 case CompositeType.ScrollY:
-                    new ScrollY().Initial(ex,script);
+                    new ScrollY().Initial(ex,script,initializer);
                     break;
                 case CompositeType.ScrollX:
-                    new ScrollX().Initial(ex, script);
+                    new ScrollX().Initial(ex, script,initializer);
                     break;
                 case CompositeType.Slider:
-                    new UISlider().Initial(ex, script);
+                    new UISlider().Initial(ex, script,initializer);
                     break;
                 case CompositeType.GridScroll:
-                    new GridScroll().Initial(ex,script);
+                    new GridScroll().Initial(ex,script,initializer);
                     break;
                 case CompositeType.Paint:
-                    new Paint().Initial(ex,script);
+                    new Paint().Initial(ex,script,initializer);
                     break;
                 case CompositeType.Rocker:
-                    new UIRocker().Initial(ex,script);
+                    new UIRocker().Initial(ex,script,initializer);
                     break;
                 case CompositeType.UIContainer:
-                    new UIContainer().Initial(ex,script);
+                    new UIContainer().Initial(ex,script,initializer);
                     break;
                 case CompositeType.TreeView:
-                    new TreeView().Initial(ex,script);
+                    new TreeView().Initial(ex,script,initializer);
                     break;
                 case CompositeType.UIDate:
-                    new UIDate().Initial(ex,script);
+                    new UIDate().Initial(ex,script,initializer);
                     break;
                 case CompositeType.UIPalette:
-                    new UIPalette().Initial(ex,script);
+                    new UIPalette().Initial(ex,script,initializer);
                     break;
                 case CompositeType.ScrollYExtand:
-                    new ScrollYExtand().Initial(ex,script);
+                    new ScrollYExtand().Initial(ex,script,initializer);
                     break;
                 case CompositeType.DropDown:
-                    new DropdownEx().Initial(ex,script);
+                    new DropdownEx().Initial(ex,script,initializer);
                     break;
                 case CompositeType.StackPanel:
-                    new StackPanel().Initial(ex,script);
+                    new StackPanel().Initial(ex,script,initializer);
                     break;
                 case CompositeType.DragContent:
-                    new DragContent().Initial(ex,script);
+                    new DragContent().Initial(ex,script,initializer);
                     break;
                 case CompositeType.TabControl:
-                    new TabControl().Initial(ex,script);
+                    new TabControl().Initial(ex,script,initializer);
                     break;
                 case CompositeType.DockPanel:
-                    new DockPanel().Initial(ex,script);
+                    new DockPanel().Initial(ex,script,initializer);
                     break;
                 case CompositeType.DesignedDockPanel:
-                    new DesignedDockPanel().Initial(ex,script);
+                    new DesignedDockPanel().Initial(ex,script,initializer);
                     break;
                 case CompositeType.DataGrid:
-                    new DataGrid().Initial(ex,script);
+                    new DataGrid().Initial(ex,script,initializer);
                     break;
                 case CompositeType.InputBox:
-                    new InputBox().Initial(ex,script);
+                    new InputBox().Initial(ex,script,initializer);
                     break;
             }
         }
@@ -857,7 +857,7 @@ namespace huqiang.Core.HGUI
                 {
                     if (mod == null)
                         mod = HGUIManager.GetFakeData(this.transform);
-                    CreateUIComposite(this, mod);
+                    CreateUIComposite(this, mod, null);
                 }
             }
         }

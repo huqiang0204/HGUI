@@ -6,23 +6,21 @@ using UnityEngine;
 /// ui帮助类,只存在Editor模式
 /// </summary>
 [DisallowMultipleComponent]
-public class UICompositeHelp : MonoBehaviour
+public class UIHelper : MonoBehaviour
 {
     /// <summary>
     /// 将数据存储到FakeStrcut中
     /// </summary>
     /// <param name="data">数据缓存</param>
     /// <returns>FakeStruct数据</returns>
-    public virtual object ToBufferData(DataBuffer data)
+    public unsafe virtual void ToBufferData(DataBuffer db, UITransfromData* data)
     {
-        return null;
     }
     /// <summary>
     /// 刷新
     /// </summary>
     public virtual void Refresh()
     {
-
     }
     /// <summary>
     /// 重新设置尺寸

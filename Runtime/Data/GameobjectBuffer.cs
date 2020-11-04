@@ -169,7 +169,7 @@ namespace huqiang.Data
                     return i;
                 }
             }
-            return 0;
+            return -1;
         }
         /// <summary>
         /// 获取组件索引
@@ -365,7 +365,7 @@ namespace huqiang.Data
         /// <returns></returns>
         public unsafe FakeStruct FindChild(FakeStruct fake, string childName)
         {
-            var data = (TransfromData*)fake.ip;
+            var data = (UITransfromData*)fake.ip;
             var buff = fake.buffer;
             Int16[] chi = fake.buffer.GetData(data->child) as Int16[];
             if (chi != null)
@@ -374,7 +374,7 @@ namespace huqiang.Data
                     var fs = buff.GetData(chi[i]) as FakeStruct;
                     if (fs != null)
                     {
-                        var cd = (TransfromData*)fs.ip;
+                        var cd = (UITransfromData*)fs.ip;
                         string name = buff.GetData(cd->name) as string;
                         if (name == childName)
                             return fs;

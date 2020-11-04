@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using UnityEngine;
 
-public class StackPanelHelper:UICompositeHelp
+public class StackPanelHelper:UIHelper
 {
     public Direction direction = Direction.Horizontal;
     public float spacing = 0;
@@ -107,14 +107,14 @@ public class StackPanelHelper:UICompositeHelp
     {
         Order();
     }
-    public override object ToBufferData(DataBuffer data)
+    public unsafe override void ToBufferData(DataBuffer db, UITransfromData* data)
     {
-        FakeStruct fake = new FakeStruct(data,5);
+        FakeStruct fake = new FakeStruct(db,5);
         fake[0] = (int)direction;
         fake.SetFloat(1,spacing);
         fake[2] = FixedSize?1:0;
         fake.SetFloat(3,FixedSizeRatio);
         fake.SetFloat(4,ItemOffset);
-        return fake;
+        data->composite = db.AddData(fake);
     }
 }

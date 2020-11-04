@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace huqiang.Data
 {
-    public unsafe struct TransfromData
+    public unsafe struct UITransfromData
     {
         /// <summary>
         /// 对象类型, 所有组件的位或值
@@ -45,13 +45,21 @@ namespace huqiang.Data
         public Int16ArrayPoint child;
         public int layer;
         /// <summary>
+        /// 用户事件的附加信息
+        /// </summary>
+        public FakeStrcutPoint eve;
+        /// <summary>
+        /// 复合型UI附加信息
+        /// </summary>
+        public FakeStrcutPoint composite;
+        /// <summary>
         /// 附加信息,用于存储helper中写入的数据
         /// </summary>
-        public FakeStrcutPoint ex;
-        public static int Size = sizeof(TransfromData);
+        //public FakeStrcutPoint ex;
+        public static int Size = sizeof(UITransfromData);
         public static int ElementSize = Size / 4;
     }
-    public class TransfromLoader : DataLoader
+    public class UITransfromLoader : DataLoader
     {
         //public FakeStructHelper TransHelper;
         /// <summary>
@@ -64,7 +72,7 @@ namespace huqiang.Data
         {
             unsafe
             {
-                var transfrom = (TransfromData*)fake.ip;
+                var transfrom = (UITransfromData*)fake.ip;
                 var buff = fake.buffer;
                 int index = HGUIManager.GameBuffer.GetTypeIndex(type);
                 if(index>0)
@@ -83,6 +91,30 @@ namespace huqiang.Data
             }
             return null;
         }
+        public static FakeStruct GetEventData(FakeStruct fake)
+        {
+            unsafe
+            {
+                var trans = (UITransfromData*)fake.ip;
+                return fake.buffer.GetData(trans->eve) as FakeStruct;
+            }
+        }
+        public static FakeStruct GetCompositeData(FakeStruct fake)
+        {
+            unsafe
+            {
+                var trans = (UITransfromData*)fake.ip;
+                return fake.buffer.GetData(trans->composite) as FakeStruct;
+            }
+        }
+        //public static FakeStruct GetEx(FakeStruct fake)
+        //{
+        //    unsafe
+        //    {
+        //        var trans = (UITransfromData*)fake.ip;
+        //        return fake.buffer.GetData(trans->ex) as FakeStruct;
+        //    }
+        //}
         /// <summary>
         /// 将假结构体中的数据载入到组件实体中
         /// </summary>
@@ -93,7 +125,7 @@ namespace huqiang.Data
         {
             //TransfromData src = new TransfromData();
             //unsafe { transHelper.LoadData((byte*)&src,fake.ip); }
-            var src = (TransfromData*)fake.ip;
+            var src = (UITransfromData*)fake.ip;
             var buff = fake.buffer;
             var trans = com as Transform;
             com.name = buff.GetData(src->name) as string;
@@ -132,7 +164,10 @@ namespace huqiang.Data
                     {
                         var loader = gameobjectBuffer.GetDataLoader(type);
                         if (loader != null)
+                        {
+                            loader.initializer = initializer;
                             loader.LoadToComponent(fs, com, fake);
+                        }
                     }
                 }
             }
@@ -154,8 +189,8 @@ namespace huqiang.Data
             var trans =  com as Transform;
             if (trans == null)
                 return null;
-            FakeStruct fake = new FakeStruct(buffer, TransfromData.ElementSize);
-            TransfromData* td = (TransfromData*)fake.ip;
+            FakeStruct fake = new FakeStruct(buffer, UITransfromData.ElementSize);
+            UITransfromData* td = (UITransfromData*)fake.ip;
             td->insID = trans.GetInstanceID();
             td->localEulerAngles = trans.localEulerAngles;
             td->localPosition = trans.localPosition;
@@ -168,26 +203,29 @@ namespace huqiang.Data
             List<Int16> tmp = new List<short>();
             for(int i=0;i<coms.Length;i++)
             {
-                if (coms[i] is UICompositeHelp)
+                if (coms[i] is UIHelper)
                 {
-                    td->ex = buffer.AddData((coms[i] as UICompositeHelp).ToBufferData(buffer));
+                    (coms[i] as UIHelper).ToBufferData(buffer,td);
                 }else
                 if (!(coms[i] is Transform))
                 {
                     Int32 type = gameobjectBuffer.GetTypeIndex(coms[i]);
-                    var loader = gameobjectBuffer.GetDataLoader(type);
-                    if (loader != null)
+                    if(type>=0)
                     {
-                        var fs = loader.LoadFromObject(coms[i], buffer);
-                        tmp.Add((Int16)buffer.AddData(fs));
-                    }
-                    else tmp.Add(0);
-                    tmp.Add((Int16)type);
-                    var scr = coms[i] as UIElement;
-                    if (scr != null)
-                    {
-                        td->size = scr.SizeDelta;
-                        td->pivot = scr.Pivot;
+                        var loader = gameobjectBuffer.GetDataLoader(type);
+                        if (loader != null)
+                        {
+                            var fs = loader.LoadFromObject(coms[i], buffer);
+                            tmp.Add((Int16)buffer.AddData(fs));
+                        }
+                        else tmp.Add(0);
+                        tmp.Add((Int16)type);
+                        var scr = coms[i] as UIElement;
+                        if (scr != null)
+                        {
+                            td->size = scr.SizeDelta;
+                            td->pivot = scr.Pivot;
+                        }
                     }
                 }
             }

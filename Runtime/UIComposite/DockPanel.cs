@@ -849,9 +849,9 @@ namespace huqiang.UIComposite
         /// </summary>
         /// <param name="fake">数据模型</param>
         /// <param name="element">元素主体</param>
-        public override void Initial(FakeStruct fake,UIElement element)
+        public override void Initial(FakeStruct fake,UIElement element,Initializer initializer)
         {
-            base.Initial(fake,element);
+            base.Initial(fake,element,initializer);
             var mod = Enity.transform;
             LineLevel = mod.Find("LineLevel");
             AreaLevel= mod.Find("AreaLevel");
@@ -862,13 +862,10 @@ namespace huqiang.UIComposite
             InitialFixLine();
             InitialArea();
             Enity.SizeChanged = SizeChanged;
-            unsafe
+            var ex = UITransfromLoader.GetCompositeData(fake);
+            if (ex != null)
             {
-                var ex = fake.buffer.GetData(((TransfromData*)fake.ip)->ex) as FakeStruct;
-                if (ex != null)
-                {
-                    LoadFromBuffer(ex);
-                }
+                LoadFromBuffer(ex);
             }
         }
         void InitialFixLine()

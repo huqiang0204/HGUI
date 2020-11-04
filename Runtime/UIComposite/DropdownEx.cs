@@ -88,14 +88,9 @@ namespace huqiang.UIComposite
                 }
             }
         }
-        /// <summary>
-        /// 初始化
-        /// </summary>
-        /// <param name="mod">模式数据</param>
-        /// <param name="script">主体元素</param>
-        public override void Initial(FakeStruct mod, UIElement script)
+        public override void Initial(FakeStruct mod, UIElement script,Initializer initializer)
         {
-            base.Initial(mod,script);
+            base.Initial(mod,script,initializer);
             var trans = Enity.transform;
             Label = trans.Find("Label").GetComponent<HText>();
             callBack = Enity.RegEvent<UserEvent>();

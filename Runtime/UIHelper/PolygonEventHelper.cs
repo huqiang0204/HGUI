@@ -7,18 +7,17 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public class PolygonEventHelper : UICompositeHelp
+public class PolygonEventHelper : UIHelper
 {
     public Vector2[] Points;
-    public override object ToBufferData(DataBuffer data)
+    public unsafe override void ToBufferData(DataBuffer db,UITransfromData* data)
     {
         if (Points != null)
         {
-            FakeStruct fs = new FakeStruct(data, 2);
+            FakeStruct fs = new FakeStruct(db, 2);
             fs[0] = (int)EventColliderType.Polygon;
-            fs[1] = data.AddArray<Vector2>(Points);
-            return fs;
+            fs[1] = db.AddArray<Vector2>(Points);
+            data->eve = db.AddData(fs);
         }
-        return null;
     }
 }

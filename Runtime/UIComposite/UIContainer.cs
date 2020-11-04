@@ -158,7 +158,7 @@ namespace huqiang.UIComposite
         public void AddAndMove(U dat,float h)
         {
             if (h <= 0)
-                unsafe { h = ((TransfromData*)model.ip)->size.y; }
+                unsafe { h = ((UITransfromData*)model.ip)->size.y; }
             con.AddAndMove(this, dat, h);
         }
         /// <summary>
@@ -169,7 +169,7 @@ namespace huqiang.UIComposite
         public void AddAndMoveEnd(U dat,float h)
         {
             if (h<=0)
-                unsafe { h = ((TransfromData*)model.ip)->size.y; }
+                unsafe { h = ((UITransfromData*)model.ip)->size.y; }
             con.AddAndMoveEnd(this, dat, h);
         }
         /// <summary>
@@ -203,7 +203,7 @@ namespace huqiang.UIComposite
         {
             if (CalculItemHigh != null)
                 return CalculItemHigh(u as U);
-            unsafe { return ((TransfromData*)model.ip)->size.y; }
+            unsafe { return ((UITransfromData*)model.ip)->size.y; }
         }
         /// <summary>
         /// 刷新项目显示内容
@@ -451,9 +451,9 @@ namespace huqiang.UIComposite
         /// </summary>
         /// <param name="fake">数据模型</param>
         /// <param name="script">元素主体</param>
-        public override void Initial(FakeStruct fake, UIElement script)
+        public override void Initial(FakeStruct fake, UIElement script,Initializer initializer)
         {
-            base.Initial(fake, script);
+            base.Initial(fake, script, initializer);
             items = new List<Item>();
             eventCall = Enity.RegEvent<UserEvent>();
             eventCall.AutoColor = false;

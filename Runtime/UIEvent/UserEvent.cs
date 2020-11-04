@@ -570,7 +570,7 @@ namespace huqiang.UIEvent
             FakeStruct fs = null;
             unsafe
             {
-                 fs = mod.buffer.GetData(((TransfromData*)mod.ip)->ex) as FakeStruct;
+                fs = UITransfromLoader.GetEventData(mod);
              }
             if(fs==null)
             {

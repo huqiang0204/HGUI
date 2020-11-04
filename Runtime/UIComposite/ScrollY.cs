@@ -100,9 +100,9 @@ namespace huqiang.UIComposite
         /// </summary>
         /// <param name="mod">数据模型</param>
         /// <param name="script">主体元素</param>
-        public override void Initial(FakeStruct mod, UIElement script)
+        public override void Initial(FakeStruct mod, UIElement script,Initializer initializer)
         {
-            base.Initial(mod,script);
+            base.Initial(mod,script,initializer);
             eventCall = Enity.RegEvent<UserEvent>();
             eventCall.Drag = Draging;
             eventCall.DragEnd = OnDragEnd;

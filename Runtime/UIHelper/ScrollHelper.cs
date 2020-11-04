@@ -5,17 +5,21 @@ using huqiang.UIComposite;
 using UnityEngine;
 
 
-public class ScrollHelper: UICompositeHelp
+public class ScrollHelper: UIHelper
 {
-    public ScrollType scrollType = ScrollType.Loop;
+    public ScrollType scrollType = ScrollType.BounceBack;
     public Vector2 minBox=new Vector2(80,80);
+    public Transform Slider;
 
-    public unsafe override object ToBufferData(DataBuffer data)
+    public unsafe override void ToBufferData(DataBuffer db, UITransfromData* data)
     {
-        FakeStruct fake = new FakeStruct(data, ScrollInfo.ElementSize);
+        FakeStruct fake = new FakeStruct(db, ScrollInfo.ElementSize);
         ScrollInfo* info = (ScrollInfo*)fake.ip;
         info->minBox = minBox;
         info->scrollType = scrollType;
-        return fake;
+        if (Slider != null)
+            info->Slider = Slider.GetInstanceID();
+        else info->Slider = 0;
+        data->composite = db.AddData(fake);
     }
 }

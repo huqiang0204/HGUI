@@ -23,6 +23,7 @@ namespace huqiang.Core.HGUI
         public EventType eventType;
         public CompositeType compositeType;
         public bool Mask;
+
         public static int Size = sizeof(UIElementData);
         public static int ElementSize = Size / 4;
     }
@@ -77,12 +78,7 @@ namespace huqiang.Core.HGUI
             ui.userEvent = null;
             ui.mod = fake;
             LoadElement(fake, ui);
-#if UNITY_EDITOR
-            if (Application.isPlaying)
-                ui.Initial(main);
-#else
-            ui.Initial(main);
-#endif
+            ui.Initial(main,initializer);
         }
         public override unsafe FakeStruct LoadFromObject(Component com, DataBuffer buffer)
         {

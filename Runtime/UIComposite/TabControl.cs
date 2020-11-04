@@ -124,9 +124,9 @@ namespace huqiang.UIComposite
         /// </summary>
         /// <param name="mod">数据模型</param>
         /// <param name="element">元素主体</param>
-        public override void Initial(FakeStruct mod,UIElement element)
+        public override void Initial(FakeStruct mod,UIElement element,Initializer initializer)
         {
-            base.Initial(mod,element);
+            base.Initial(mod,element,initializer);
             contents = new List<TableContent>();
             var trans = Enity.transform;
             Head = trans.Find("Head").GetComponent<UIElement>();

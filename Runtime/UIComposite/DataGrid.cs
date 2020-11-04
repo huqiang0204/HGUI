@@ -216,9 +216,9 @@ namespace huqiang.UIComposite
         /// </summary>
         /// <param name="mod">数据模型</param>
         /// <param name="element">UI元素主体</param>
-        public override void Initial(FakeStruct mod, UIElement element)
+        public override void Initial(FakeStruct mod, UIElement element,Initializer initializer)
         {
-            base.Initial(mod, element);
+            base.Initial(mod, element,initializer);
             HeadMod = HGUIManager.FindChild(mod, "Head");
             ItemMod = HGUIManager.FindChild(mod, "Item");
             DragMod = HGUIManager.FindChild(mod, "Drag");
@@ -230,8 +230,8 @@ namespace huqiang.UIComposite
             lines = Grid.Find("Line").GetComponent<HLine>();
             unsafe
             {
-                headSize = ((TransfromData*)HeadMod.ip)->size;
-                itemY = ((TransfromData*)ItemMod.ip)->size.y;
+                headSize = ((UITransfromData*)HeadMod.ip)->size;
+                itemY = ((UITransfromData*)ItemMod.ip)->size.y;
             }
             HGUIManager.GameBuffer.RecycleGameObject(trans.Find("Head").gameObject);
             HGUIManager.GameBuffer.RecycleGameObject(trans.Find("Item").gameObject);

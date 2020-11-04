@@ -190,21 +190,16 @@ namespace huqiang.UIComposite
         /// 验证新输入的字符
         /// </summary>
         public Func<InputBox, int, char, char> ValidateChar;
-        /// <summary>
-        /// 初始化
-        /// </summary>
-        /// <param name="mod">模型数据</param>
-        /// <param name="element">元素主体</param>
-        public override void Initial(FakeStruct mod, UIElement element)
+        public override void Initial(FakeStruct mod, UIElement element,Initializer initializer)
         {
-            base.Initial(mod,element);
+            base.Initial(mod,element,initializer);
             var txt = TextCom = element.GetComponentInChildren<HText>();
             textColor = txt.m_color;
             unsafe
             {
                 if(mod!=null)
                 {
-                    var ex = mod.buffer.GetData(((TransfromData*)mod.ip)->ex) as FakeStruct;
+                    var ex = UITransfromLoader.GetEventData(mod);
                     if (ex != null)
                     {
                         TextInputData* tp = (TextInputData*)ex.ip;

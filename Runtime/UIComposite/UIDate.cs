@@ -97,14 +97,9 @@ namespace huqiang.UIComposite
                 }
             }
         }
-        /// <summary>
-        /// 初始化
-        /// </summary>
-        /// <param name="mod">数据模型</param>
-        /// <param name="element">元素主体</param>
-        public override void Initial(FakeStruct mod,UIElement element)
+        public override void Initial(FakeStruct mod,UIElement element,Initializer initializer)
         {
-            base.Initial(mod,element);
+            base.Initial(mod,element,initializer);
             var mui = Enity.GetComponent<UIElement>();
             mui.userEvent.CutRect = true;
             var mask = Enity.transform;
@@ -130,18 +125,15 @@ namespace huqiang.UIComposite
             Day.ScrollEnd = DayScrollToEnd;
             Day.scrollType = ScrollType.Loop;
 
-            unsafe
+            var ex = UITransfromLoader.GetCompositeData(mod);
+            if (ex != null)
             {
-                var ex = mod.buffer.GetData(((TransfromData*)mod.ip)->ex) as FakeStruct;
-                if (ex != null)
-                {
-                    StartYear = ex[0];
-                    EndYear = ex[1];
-                    if (EndYear < StartYear)
-                        EndYear = StartYear;
-                }
+                StartYear = ex[0];
+                EndYear = ex[1];
+                if (EndYear < StartYear)
+                    EndYear = StartYear;
             }
-        
+
             year = StartYear;
             month = 1;
             day = 1;

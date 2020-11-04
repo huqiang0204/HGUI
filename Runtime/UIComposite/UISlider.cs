@@ -113,14 +113,9 @@ namespace huqiang.UIComposite
             info.MinScale = 1;
             info.MaxScale = 1;
         }
-        /// <summary>
-        /// 初始化
-        /// </summary>
-        /// <param name="mod">模型数据</param>
-        /// <param name="script">元素主体</param>
-        public override void Initial(FakeStruct mod, UIElement script)
+        public override void Initial(FakeStruct mod, UIElement script,Initializer initializer)
         {
-            base.Initial(mod,script);
+            base.Initial(mod,script,initializer);
             var trans = script.transform;
             callBack = Enity.RegEvent<UserEvent>();
             callBack.Drag  = Draging;
@@ -134,7 +129,7 @@ namespace huqiang.UIComposite
             Nob = tmp.GetComponent<HImage>();
             unsafe
             {
-                var ex = mod.buffer.GetData(((TransfromData*)mod.ip)->ex) as FakeStruct;
+                var ex = UITransfromLoader.GetCompositeData(mod);
                 if (ex != null)
                     info = *(SliderInfo*)ex.ip;
             }

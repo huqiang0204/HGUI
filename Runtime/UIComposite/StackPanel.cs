@@ -52,21 +52,18 @@ namespace huqiang.UIComposite
         /// </summary>
         /// <param name="mod">模型数据</param>
         /// <param name="script">元素主体</param>
-        public override void Initial(FakeStruct mod, UIElement script)
+        public override void Initial(FakeStruct mod, UIElement script,Initializer initializer)
         {
-            base.Initial(mod, script);
+            base.Initial(mod, script, initializer);
             script.SizeChanged = (o) => Order();
-            unsafe
+            var ex = UITransfromLoader.GetCompositeData(mod);
+            if (ex != null)
             {
-                var ex = mod.buffer.GetData(((TransfromData*)mod.ip)->ex) as FakeStruct;
-                if (ex != null)
-                {
-                    direction = (Direction) ex[0];
-                    spacing = ex.GetFloat(1);
-                    FixedSize = ex[2]==1;
-                    FixedSizeRatio = ex.GetFloat(3);
-                    ItemOffset = ex.GetFloat(4);
-                }
+                direction = (Direction)ex[0];
+                spacing = ex.GetFloat(1);
+                FixedSize = ex[2] == 1;
+                FixedSizeRatio = ex.GetFloat(3);
+                ItemOffset = ex.GetFloat(4);
             }
         }
        /// <summary>

@@ -312,14 +312,9 @@ namespace huqiang.UIComposite
             swap = new SwapBuffer<TreeViewItem, TreeViewNode>(512);
             queue = new QueueBuffer<TreeViewItem>(256);
         }
-        /// <summary>
-        /// 初始化
-        /// </summary>
-        /// <param name="fake">数据模型</param>
-        /// <param name="script">元素主体</param>
-        public override void Initial(FakeStruct fake, UIElement script)
+        public override void Initial(FakeStruct fake, UIElement script,Initializer initializer)
         {
-            base.Initial(fake, script);
+            base.Initial(fake, script,initializer);
             eventCall = script.RegEvent<UserEvent>();
             eventCall.Drag = (o, e, s) => { Scrolling(o, s); };
             eventCall.DragEnd = (o, e, s) => { Scrolling(o, s); };
@@ -333,7 +328,7 @@ namespace huqiang.UIComposite
             if (ItemMod != null)
             {
                 HGUIManager.GameBuffer.RecycleChild(script.gameObject);
-                unsafe { ItemSize = ((TransfromData*)ItemMod.ip)->size; }
+                unsafe { ItemSize = ((UITransfromData*)ItemMod.ip)->size; }
                 ItemHigh = ItemSize.y;
             }
             Enity.SizeChanged = (o) => { Refresh(); };

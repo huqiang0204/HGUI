@@ -161,9 +161,9 @@ namespace huqiang.UIComposite
         /// </summary>
         /// <param name="fake">数据模型</param>
         /// <param name="script">元素主体</param>
-        public override void Initial(FakeStruct fake,UIElement script)
+        public override void Initial(FakeStruct fake,UIElement script,Initializer initializer)
         {
-            base.Initial(fake,script);
+            base.Initial(fake,script,initializer);
             Size = Enity.SizeDelta;
             eventCall = Enity.RegEvent<UserEvent>();
             eventCall.Drag = (o, e, s) =>

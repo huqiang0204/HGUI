@@ -91,6 +91,10 @@ namespace huqiang.Data
         /// </summary>
         public GameobjectBuffer gameobjectBuffer;
         /// <summary>
+        /// 初始化器
+        /// </summary>
+        public Initializer initializer;
+        /// <summary>
         /// 载入组件数据
         /// </summary>
         /// <param name="fake">假结构体</param>

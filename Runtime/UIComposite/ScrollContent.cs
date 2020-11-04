@@ -38,6 +38,10 @@ namespace huqiang.UIComposite
         /// 最小尺寸
         /// </summary>
         public Vector2 minBox;
+        /// <summary>
+        /// 滑块条的实例ID
+        /// </summary>
+        public Int32 Slider;
         public static int Size = sizeof(ScrollInfo);
         public static int ElementSize = Size / 4;
     }
@@ -206,7 +210,7 @@ namespace huqiang.UIComposite
                 modData = value;
                 if(modData!=null)
                 {
-                    ItemElement = TransfromLoader.GetComponent(modData, "UIElement");
+                    ItemElement = UITransfromLoader.GetComponent(modData, "UIElement");
                     if (ItemElement != null)
                         ItemSize = UIElement.GetSize(Enity, ItemElement);
                 }
@@ -352,8 +356,8 @@ namespace huqiang.UIComposite
             {
                 unsafe
                 {
-                    ItemSize = ((TransfromData*)mod.ip)->size;
-                    var ex = mod.buffer.GetData(((TransfromData*)mod.ip)->ex) as FakeStruct;
+                    ItemSize = ((UITransfromData*)mod.ip)->size;
+                    var ex = UITransfromLoader.GetCompositeData(mod);
                     if (ex != null)
                     {
                         ScrollInfo* tp = (ScrollInfo*)ex.ip;
@@ -369,22 +373,24 @@ namespace huqiang.UIComposite
         /// </summary>
         /// <param name="mod">模型数据</param>
         /// <param name="script">主体元素</param>
-        public override void Initial(FakeStruct mod, UIElement script)
+        public override void Initial(FakeStruct mod, UIElement script, Initializer initializer)
         {
-            base.Initial(mod,script);
+            base.Initial(mod,script,initializer);
             Main = script.transform;
-            int c = Main.childCount;
-            if (c > 0)
+            SetItemMod("Item");
+            HGUIManager.GameBuffer.RecycleChild(script.gameObject);
+            var ex = UITransfromLoader.GetCompositeData(mod);
+            if(ex!=null)
             {
-                var sli = Main.Find("Slider");
-                if (sli != null)
+                if(initializer!=null)
                 {
-                    var ui = sli.GetComponent<UIElement>();
-                    Slider = ui.composite as UISlider;
+                    initializer.AddContextAction((trans)=> {
+                        var ele = trans.GetComponent<UIElement>();
+                        if (ele != null)
+                            Slider = ele.composite as UISlider;
+                    },ex[3]);
                 }
             }
-            SetItemMod("Item");
-            HGUIManager.GameBuffer.RecycleChild(script.gameObject, new string[] { "Slider" });
         }
         /// <summary>
         /// 刷新显示UI

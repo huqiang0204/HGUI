@@ -70,7 +70,7 @@ namespace huqiang.Core.HGUI
                             if (scr.composite == null)
                             {
                                 var obj = Activator.CreateInstance(m.FieldType) as Composite;
-                                obj.Initial(fake, scr);
+                                obj.Initial(fake, scr, this);
                                 m.Value = obj;
                             }
                             else

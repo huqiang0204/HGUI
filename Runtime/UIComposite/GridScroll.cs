@@ -48,14 +48,9 @@ namespace huqiang.UIComposite
                 Row++;
             ActualSize = new Vector2(Column * ItemSize.x, Row * ItemSize.y);
         }
-        /// <summary>
-        /// 初始化
-        /// </summary>
-        /// <param name="fake">数据模型</param>
-        /// <param name="script">主体元素</param>
-        public override void Initial(FakeStruct fake,UIElement script)
+        public override void Initial(FakeStruct fake,UIElement script,Initializer initializer)
         {
-            base.Initial(fake,script);
+            base.Initial(fake,script,initializer);
             eventCall = script.RegEvent<UserEvent>();
             eventCall.Drag = (o, e, s) => { Scrolling(o, s); };
             eventCall.DragEnd = (o, e, s) => { Scrolling(o, s); };

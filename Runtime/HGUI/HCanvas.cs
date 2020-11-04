@@ -682,6 +682,6 @@ namespace huqiang.Core.HGUI
            
         }
 #endif
-#endregion
+        #endregion
     }
 }

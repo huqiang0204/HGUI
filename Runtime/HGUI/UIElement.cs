@@ -38,6 +38,7 @@ namespace huqiang.Core.HGUI
         DataGrid,
         InputBox
     }
+    [DisallowMultipleComponent]
     /// <summary>
     /// UI基本元素组件
     /// </summary>

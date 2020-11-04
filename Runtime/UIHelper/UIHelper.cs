@@ -5,7 +5,7 @@ using UnityEngine;
 /// <summary>
 /// ui帮助类,只存在Editor模式
 /// </summary>
-[DisallowMultipleComponent]
+//[DisallowMultipleComponent]
 public class UIHelper : MonoBehaviour
 {
     /// <summary>

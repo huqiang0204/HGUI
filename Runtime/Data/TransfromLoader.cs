@@ -12,6 +12,10 @@ namespace huqiang.Data
         /// 对象类型, 所有组件的位或值
         /// </summary>
         public Int64 type;
+        /// <summary>
+        /// 实例ID
+        /// </summary>
+        public Int32 insID;
         public Vector3 localEulerAngles;
         public Vector3 localPosition;
         public Vector3 localScale;
@@ -50,10 +54,6 @@ namespace huqiang.Data
     public class TransfromLoader : DataLoader
     {
         //public FakeStructHelper TransHelper;
-        public override FakeStruct CreateTable(DataBuffer buffer)
-        {
-            return FakeStructHelper.CreateTable<TransfromData>(buffer);
-        }
         /// <summary>
         /// 从假结构体中找到该类型的数据
         /// </summary>
@@ -136,9 +136,12 @@ namespace huqiang.Data
                     }
                 }
             }
-    
+
             if (initializer != null)
-                initializer.Initialiezd(fake,trans);
+            { 
+                initializer.Initialiezd(fake, trans);
+                initializer.AddContext(trans,src->insID);
+            }
         }
         /// <summary>
         ///  将到组件实体中的数据载入假结构体中
@@ -153,6 +156,7 @@ namespace huqiang.Data
                 return null;
             FakeStruct fake = new FakeStruct(buffer, TransfromData.ElementSize);
             TransfromData* td = (TransfromData*)fake.ip;
+            td->insID = trans.GetInstanceID();
             td->localEulerAngles = trans.localEulerAngles;
             td->localPosition = trans.localPosition;
             td->localScale = trans.localScale;

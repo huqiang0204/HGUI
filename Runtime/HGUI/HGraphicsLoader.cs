@@ -33,10 +33,6 @@ namespace huqiang.Core.HGUI
         protected string TTexture;
         protected string FTexture;
         public FakeStructHelper GraphicsHelper;
-        public override FakeStruct CreateTable(DataBuffer buffer)
-        {
-            return FakeStructHelper.CreateTable<HGraphicsData>(buffer);
-        }
         protected void LoadHGraphics(FakeStruct fake, HGraphics tar)
         {
             HGraphicsData tmp = new HGraphicsData();

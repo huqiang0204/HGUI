@@ -108,6 +108,7 @@ namespace huqiang.Core.HGUI
         /// </summary>
         public override void Done()
         {
+            base.Done();
             if (target == null)
                 return;
             ReflectionModel[] all = reflections.All;
@@ -199,5 +200,6 @@ namespace huqiang.Core.HGUI
                 }
             }
         }
+
     }
 }

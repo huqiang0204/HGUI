@@ -47,6 +47,7 @@ namespace huqiang.Core.HGUI
             var txtHelper= GameBuffer.RegFakeStructHelper<HTextData>();
             var graphHelper = GameBuffer.RegFakeStructHelper<HGraphicsData>();
             var eleHelper = GameBuffer.RegFakeStructHelper<UIElementData>();
+            GameBuffer.RegFakeStructHelper<TextInputData>();
 
             var transLoader = new TransfromLoader();
             var imgLoader = new HImageLoader() { ImageHelper = imgHelper, GraphicsHelper = graphHelper, ElementHelper = eleHelper };
@@ -62,7 +63,7 @@ namespace huqiang.Core.HGUI
             GameBuffer.RegComponent(new ComponentInfo<UIElement>() { loader = eleLoader });
            
         }
-        static void AddDataTable(DataBuffer db)
+        static List<FakeStruct> AddDataTable(DataBuffer db)
         {
             List<FakeStruct> list = new List<FakeStruct>();
             list.Add(FakeStructHelper.CreateTable<TransfromData>(db));
@@ -71,7 +72,7 @@ namespace huqiang.Core.HGUI
             list.Add(FakeStructHelper.CreateTable<HImageData>(db));
             list.Add(FakeStructHelper.CreateTable<HTextData>(db));
             list.Add(FakeStructHelper.CreateTable<TextInputData>(db));
-           
+            return list;
         }
         /// <summary>
         /// 
@@ -86,13 +87,12 @@ namespace huqiang.Core.HGUI
 
             FakeStruct fake = new FakeStruct(db, 3);
             fake[0] = db.AddData(root);
-            int c = GameBuffer.TypeSize;
+            var list = AddDataTable(db);
+            int c = list.Count;
             Int16[] arr = new Int16[c];
             for (int i = 0; i < arr.Length; i++)
             {
-                var dl = GameBuffer.GetDataLoader(i);
-                if (dl != null)
-                    arr[i] = (Int16)db.AddData(dl.CreateTable(db));
+                arr[i] = (Int16)db.AddData(list[i]);
             }
             fake[1] = db.AddData(arr);
             fake[2] = db.AddData(Version);

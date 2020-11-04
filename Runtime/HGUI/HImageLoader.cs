@@ -23,10 +23,6 @@ namespace huqiang.Core.HGUI
     {
         protected string Sprite;
         public FakeStructHelper ImageHelper;
-        public override FakeStruct CreateTable(DataBuffer buffer)
-        {
-            return FakeStructHelper.CreateTable<HImageData>(buffer);
-        }
         protected  void LoadHImage(FakeStruct fake, HImage tar)
         {
             HImageData tmp= new HImageData();

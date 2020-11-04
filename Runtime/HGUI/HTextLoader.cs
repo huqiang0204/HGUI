@@ -30,10 +30,6 @@ namespace huqiang.Core.HGUI
     public class HTextLoader : HGraphicsLoader
     {
         public FakeStructHelper TextHelper;
-        public override FakeStruct CreateTable(DataBuffer buffer)
-        {
-            return FakeStructHelper.CreateTable<HTextData>(buffer);
-        }
         public static List<Font> fonts = new List<Font>();
         public static Font FindFont(string str)
         {

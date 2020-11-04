@@ -29,10 +29,6 @@ namespace huqiang.Core.HGUI
     public class UIElementLoader:DataLoader
     {
         public FakeStructHelper ElementHelper;
-        public override FakeStruct CreateTable(DataBuffer buffer)
-        {
-            return FakeStructHelper.CreateTable<UIElementData>(buffer);
-        }
         protected  void LoadElement(FakeStruct fake, UIElement tar)
         {
             tar.Clear();

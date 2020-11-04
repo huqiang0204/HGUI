@@ -1,5 +1,6 @@
 ﻿using huqiang.Data;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace huqiang.Data
@@ -9,6 +10,16 @@ namespace huqiang.Data
     /// </summary>
     public abstract class Initializer
     {
+        protected struct ContextAction
+        {
+            public Action<Transform> CallBack;
+            public int InsID;
+        }
+        protected struct ContextObject
+        {
+            public Transform Ins;
+            public int InsID;
+        }
         /// <summary>
         /// 当预制体创建好时调用此函数
         /// </summary>
@@ -25,7 +36,50 @@ namespace huqiang.Data
         /// <summary>
         /// 初始化完毕
         /// </summary>
-        public virtual void Done() { }
+        public virtual void Done()
+        {
+            int c = contexts.Count;
+            int m = objects.Count;
+            for (int i = 0; i < c; i++)
+            {
+                var act = contexts[i].CallBack;
+                int id = contexts[i].InsID;
+                if(act!=null)
+                {
+                    for (int j = 0; j < m; j++)
+                    {
+                        if(objects[j].InsID==id)
+                        {
+                            act(objects[j].Ins);
+                            break;
+                        }
+                    }
+                }
+            }
+            objects.Clear();
+            contexts.Clear();
+        }
+        /// <summary>
+        /// 添加联系上下文
+        /// </summary>
+        /// <param name="trans"></param>
+        /// <param name="insID"></param>
+        public void AddContext(Transform trans, int insID)
+        {
+            ContextObject co = new ContextObject();
+            co.Ins = trans;
+            co.InsID = insID;
+            objects.Add(co);
+        }
+        protected List<ContextObject> objects = new List<ContextObject>();
+        protected List<ContextAction> contexts = new List<ContextAction>();
+        public void AddContextAction(Action<Transform> action, int insID)
+        {
+            ContextAction ca = new ContextAction();
+            ca.CallBack = action;
+            ca.InsID = insID;
+            contexts.Add(ca);
+        }
     }
     /// <summary>
     /// 数据对象载入器
@@ -57,9 +111,5 @@ namespace huqiang.Data
         /// <param name="buffer">DataBuffer</param>
         /// <returns></returns>
         public virtual FakeStruct LoadFromObject(Component com, DataBuffer buffer) { return null; }
-        public virtual FakeStruct CreateTable(DataBuffer buffer)
-        {
-            return null;
-        }
     }
 }

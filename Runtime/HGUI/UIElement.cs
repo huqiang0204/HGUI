@@ -861,6 +861,5 @@ namespace huqiang.Core.HGUI
                 }
             }
         }
-
     }
 }

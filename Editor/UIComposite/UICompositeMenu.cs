@@ -521,7 +521,10 @@ public static class UICompositeMenu
         Transform pt = null;
         if (parent != null)
             pt = parent.transform;
-        var scroll = UICreator.CreateHImage(Vector3.zero, new Vector2(400, 400), "ScrollY", pt);
+        UIElement p = UICreator.CreateElement(new Vector3(-10,200,0),new Vector2(420,400),"Scroll",pt);
+        var scroll = UICreator.CreateHImage(Vector3.zero, new Vector2(400, 400), "ScrollY", p.transform);
+        scroll.marginType = MarginType.Margin;
+        scroll.margin.right = 20;
         scroll.Mask = true;
         scroll.MainColor = new Color32(224, 224, 224, 255);
         scroll.eventType = huqiang.Core.HGUI.EventType.UserEvent;
@@ -536,20 +539,21 @@ public static class UICompositeMenu
         item.transform.Find("Image").localPosition = new Vector3(0, -50, 0);
         item.transform.Find("Text").localPosition = new Vector3(0, -50, 0);
 
-        var slider = UICreator.CreateHImage(new Vector3(190, -200, 0), new Vector2(20, 400), "Slider", scroll.transform);
-        slider.eventType = huqiang.Core.HGUI.EventType.UserEvent;
-        slider.compositeType = CompositeType.Slider;
-        slider.Sprite = scroll.Sprite;
-        slider.SprType = SpriteType.Sliced;
-        slider.MainColor = 0x295B7680.ToColor();
-
-        var help = slider.gameObject.AddComponent<SliderHelper>();
-        help.direction = UISlider.Direction.Vertical;
-
-        var Nob = UICreator.CreateHImage(new Vector3(0, 185, 0), new Vector2(20, 30), "Nob", slider.transform);
-        Nob.MainColor = 0x5F5263ff.ToColor();
-        Nob.Sprite = EditorModelManager.FindSprite(icons, background);
-        Nob.SprType = SpriteType.Sliced;
+        var go = CreateSliderV();
+        if (parent != null)
+        {
+            var rect = go.transform;
+            rect.SetParent(p.transform);
+            rect.localPosition = new Vector3(200,0,0);
+            rect.localScale = Vector3.one;
+            rect.localRotation = Quaternion.identity;
+        }
+        var slider = go.GetComponent<UIElement>();
+        slider.anchorType = AnchorType.Alignment;
+        slider.anchorPointType = AnchorPointType.Right;
+        slider.marginType = MarginType.MarginY;
+        var help = scroll.gameObject.AddComponent<ScrollHelper>();
+        help.Slider = go.transform;
     }
     [MenuItem("GameObject/HGUI/ScrollYExtand", false, 14)]
     static public void AddScrollYExtand(MenuCommand menuCommand)
@@ -622,7 +626,10 @@ public static class UICompositeMenu
         Transform pt = null;
         if (parent != null)
             pt = parent.transform;
-        var scroll = UICreator.CreateHImage(Vector3.zero,new Vector2(400,400),"ScrollX",pt);
+        UIElement p = UICreator.CreateElement(Vector3.zero, new Vector2(400, 420), "Scroll", pt);
+        var scroll = UICreator.CreateHImage(Vector3.zero,new Vector2(400,400),"ScrollX",p.transform);
+        scroll.marginType = MarginType.Margin;
+        scroll.margin.down = 20;
         scroll.Mask = true;
         scroll.MainColor = new Color32(224, 224, 224, 255);
         scroll.eventType = huqiang.Core.HGUI.EventType.UserEvent;
@@ -632,19 +639,21 @@ public static class UICompositeMenu
 
         CreateItem(scroll.transform, "Item");
 
-        var slider = UICreator.CreateHImage(new Vector3(0, -190, 0),new Vector2(400,20),"Slider",scroll.transform);
-        slider.eventType = huqiang.Core.HGUI.EventType.UserEvent;
-        slider.compositeType = CompositeType.Slider;
-        slider.Sprite = scroll.Sprite;
-        slider.SprType = SpriteType.Sliced;
-        slider.MainColor = 0x295B7680.ToColor();
-
-        var help = slider.gameObject.AddComponent<SliderHelper>();
-
-        var Nob = UICreator.CreateHImage(new Vector3(-185, 0, 0), new Vector2(30, 20), "Nob", slider.transform);
-        Nob.MainColor = 0x5F5263ff.ToColor();
-        Nob.Sprite = EditorModelManager.FindSprite(icons, background);
-        Nob.SprType = SpriteType.Sliced;
+        var go = CreateSliderH();
+        if (parent != null)
+        {
+            var rect = go.transform;
+            rect.SetParent(p.transform);
+            rect.localPosition = new Vector3(200, 0, 0);
+            rect.localScale = Vector3.one;
+            rect.localRotation = Quaternion.identity;
+        }
+        var slider = go.GetComponent<UIElement>();
+        slider.anchorType = AnchorType.Alignment;
+        slider.anchorPointType = AnchorPointType.Down;
+        slider.marginType = MarginType.MarginX;
+        var help = scroll.gameObject.AddComponent<ScrollHelper>();
+        help.Slider = go.transform;
     }
     static UIElement CreateItem(Transform parent,string name)
     {

@@ -453,7 +453,7 @@ public class AssetBundleCreate : Editor {
             var sr = sp->rect = sprite.rect;
             sp->pivot = sprite.pivot;
             float w = sprite.texture.width;
-            float h = sprite.texture.width;
+            float h = sprite.texture.height;
             float x = sr.x;
             float rx = sr.width + x;
             float y = sr.y;

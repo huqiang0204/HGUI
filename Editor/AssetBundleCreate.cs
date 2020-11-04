@@ -371,7 +371,7 @@ public class AssetBundleCreate : Editor {
     [MenuItem("Assets/CreateDataBuffer/SpriteInfo")]
     public static void GetAllSprite()
     {
-        SpriteData data = new SpriteData();
+        lsc.Clear();
         var o = Selection.GetFiltered(typeof(UnityEngine.Object), SelectionMode.DeepAssets);
         var g = Selection.assetGUIDs;
         for (int i = 0; i < o.Length; i++)
@@ -384,16 +384,108 @@ public class AssetBundleCreate : Editor {
                 {
                     for (int j = 0; j < sp.Length; j++)
                     {
-                        data.AddSprite(sp[j] as Sprite);
+                        AddSprite(sp[j] as Sprite);
                     }
                 }
             }
         }
 
         string path = Application.dataPath + "/AssetsBundle/SpriteInfo.bytes";
-        data.Save("spriteInfo", path);
-        data.Clear();
+        Save("spriteInfo", path);
+        lsc.Clear();
         Debug.Log("create done : " + path);
+    }
+    class SpriteCategory
+    {
+        public string txtName;
+        public int width;
+        public int height;
+        public List<Sprite> sprites = new List<Sprite>();
+    }
+    static List<SpriteCategory> lsc = new List<SpriteCategory>();
+    /// <summary>
+    /// 添加精灵
+    /// </summary>
+    /// <param name="sprite">精灵</param>
+    static void AddSprite(Sprite sprite)
+    {
+        if (sprite == null)
+            return;
+        string tname = sprite.texture.name;
+        for (int i = 0; i < lsc.Count; i++)
+        {
+            if (tname == lsc[i].txtName)
+            {
+                lsc[i].sprites.Add(sprite);
+                return;
+            }
+        }
+        SpriteCategory category = new SpriteCategory();
+        category.txtName = tname;
+        category.width = sprite.texture.width;
+        category.height = sprite.texture.height;
+        category.sprites.Add(sprite);
+        lsc.Add(category);
+    }
+    static FakeStructArray SaveCategory(DataBuffer buffer)
+    {
+        FakeStructArray array = new FakeStructArray(buffer, 4, lsc.Count);
+        for (int i = 0; i < lsc.Count; i++)
+        {
+            array.SetData(i, 0, lsc[i].txtName);
+            array.SetData(i, 1, SaveSprites(buffer, lsc[i].sprites));
+            array.SetInt32(i, 2, lsc[i].width);
+            array.SetInt32(i, 3, lsc[i].height);
+        }
+        return array;
+    }
+    static unsafe FakeStructArray SaveSprites(DataBuffer buffer, List<Sprite> sprites)
+    {
+        FakeStructArray array = new FakeStructArray(buffer, SpriteDataS.ElementSize, sprites.Count);
+        float tx = sprites[0].texture.width;
+        float ty = sprites[0].texture.height;
+        for (int i = 0; i < sprites.Count; i++)
+        {
+            var sprite = sprites[i];
+            string name = sprite.name;
+            SpriteDataS* sp = (SpriteDataS*)array[i];
+            sp->name = buffer.AddData(name);
+            var sr = sp->rect = sprite.rect;
+            sp->pivot = sprite.pivot;
+            float w = sprite.texture.width;
+            float h = sprite.texture.width;
+            float x = sr.x;
+            float rx = sr.width + x;
+            float y = sr.y;
+            ty = sr.height + y;
+            x /= w;
+            rx /= w;
+            y /= h;
+            ty /= h;
+            sp->uv0.x = x;
+            sp->uv0.y = y;
+            sp->uv1.x = x;
+            sp->uv1.y = ty;
+            sp->uv2.x = rx;
+            sp->uv2.y = ty;
+            sp->uv3.x = rx;
+            sp->uv3.y = y;
+        }
+        return array;
+    }
+    /// <summary>
+    /// 保存精灵信息为二进制数据
+    /// </summary>
+    /// <param name="name">数据包名</param>
+    /// <param name="path">文件路径</param>
+    static void Save(string name, string path)
+    {
+        DataBuffer buffer = new DataBuffer(4096);
+        var fs = buffer.fakeStruct = new FakeStruct(buffer, 2);
+        fs.SetData(0, name);
+        fs.SetData(1, SaveCategory(buffer));
+        byte[] dat = buffer.ToBytes();
+        File.WriteAllBytes(path, dat);
     }
 }
 

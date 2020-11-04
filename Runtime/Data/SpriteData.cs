@@ -14,10 +14,6 @@ namespace huqiang.Data
         /// </summary>
         public Int32 name;
         /// <summary>
-        /// 纹理名称
-        /// </summary>
-        public Vector2 txtSize;
-        /// <summary>
         /// 精灵矩形
         /// </summary>
         public Rect rect;
@@ -43,101 +39,25 @@ namespace huqiang.Data
     /// </summary>
     public class SpriteData
     {
-        class SpriteCategory
+        struct SpriteInfo
         {
-            public string txtName;
-            public List<Sprite> sprites = new List<Sprite>();
+            public string Name;
+            public Rect rect;
+            /// <summary>
+            /// 精灵轴心
+            /// </summary>
+            public Vector2 pivot;
+            public Vector2[] uv;
         }
-        List<SpriteCategory> lsc = new List<SpriteCategory>();
-        /// <summary>
-        /// 添加精灵
-        /// </summary>
-        /// <param name="sprite">精灵</param>
-        public void AddSprite(Sprite sprite)
+        struct TextureInfo
         {
-            if (sprite == null)
-                return;
-            string tname = sprite.texture.name;
-            for (int i = 0; i < lsc.Count; i++)
-            {
-                if (tname == lsc[i].txtName)
-                {
-                    lsc[i].sprites.Add(sprite);
-                    return;
-                }
-            }
-            SpriteCategory category = new SpriteCategory();
-            category.txtName = tname;
-            category.sprites.Add(sprite);
-            lsc.Add(category);
+            public string Name;
+            public SpriteInfo[] sprites;
+            public int width;
+            public int height;
         }
-        FakeStructArray SaveCategory(DataBuffer buffer)
-        {
-            FakeStructArray array = new FakeStructArray(buffer, 2, lsc.Count);
-            for (int i=0;i<lsc.Count;i++)
-            {
-                array.SetData(i,0,lsc[i].txtName);
-                array.SetData(i,1,SaveSprites(buffer,lsc[i].sprites));
-            }
-            return array;
-        }
-        unsafe FakeStructArray SaveSprites(DataBuffer buffer,List<Sprite> sprites)
-        {
-            FakeStructArray array = new FakeStructArray(buffer, SpriteDataS.ElementSize, sprites.Count);
-            float tx = sprites[0].texture.width;
-            float ty = sprites[0].texture.height;
-            for (int i = 0; i < sprites.Count; i++)
-            {
-                var sprite = sprites[i];
-                string name = sprite.name;
-                SpriteDataS* sp = (SpriteDataS*)array[i];
-                sp->name = buffer.AddData(name);
-                sp->txtSize.x = tx;
-                sp->txtSize.y = ty;
-                var sr = sp->rect = sprite.rect;
-                sp->pivot = sprite.pivot;
-                float w = sprite.texture.width;
-                float h = sprite.texture.width;
-                float x = sr.x;
-                float rx = sr.width + x;
-                float y = sr.y;
-                ty = sr.height + y;
-                x /= w;
-                rx /= w;
-                y /= h;
-                ty /= h;
-                sp->uv0.x = x;
-                sp->uv0.y = y;
-                sp->uv1.x = x;
-                sp->uv1.y = ty;
-                sp->uv2.x = rx;
-                sp->uv2.y = ty;
-                sp->uv3.x = rx;
-                sp->uv3.y = y;
-            }
-            return array;
-        }
-        /// <summary>
-        /// 保存精灵信息为二进制数据
-        /// </summary>
-        /// <param name="name">数据包名</param>
-        /// <param name="path">文件路径</param>
-        public void Save(string name,string path)
-        {
-            DataBuffer buffer = new DataBuffer(4096);
-            var fs = buffer.fakeStruct = new FakeStruct(buffer, 2);
-            fs.SetData(0, name);
-            fs.SetData(1, SaveCategory(buffer));
-            byte[] dat = buffer.ToBytes();
-            File.WriteAllBytes(path,dat);
-        }
-        /// <summary>
-        /// 清除缓存
-        /// </summary>
-        public void Clear()
-        {
-            lsc.Clear();
-        }
+        public string Name;
+        TextureInfo[] infos;
         FakeStruct fakeStruct;
         /// <summary>
         /// 载入精灵数据包
@@ -146,6 +66,96 @@ namespace huqiang.Data
         public void LoadSpriteData(byte[] data)
         {
             fakeStruct = new DataBuffer(data).fakeStruct;
+            Name = fakeStruct.GetData<string>(0);
+            var fsa = fakeStruct.GetData<FakeStructArray>(1);
+            if(fsa!=null)
+            {
+                int c = fsa.Length;
+                infos = new TextureInfo[c];
+                for (int i = 0; i < infos.Length; i++)
+                {
+                    infos[i].Name = fsa.GetData<string>(i, 0);
+                    var arr = fsa.GetData<FakeStructArray>(i,1);
+                    if(arr!=null)
+                    {
+                        infos[i].sprites = LoadSpriteData(arr);
+                    }
+                    infos[i].width = fsa[i,2];
+                    infos[i].height = fsa[i, 3];
+                }
+            }
+        }
+        SpriteInfo[] LoadSpriteData(FakeStructArray array)
+        {
+            var db = array.buffer;
+            SpriteInfo[] spr = new SpriteInfo[array.Length];
+            for (int i = 0; i < spr.Length; i++)
+            {
+                unsafe
+                {
+                    SpriteDataS* sp = (SpriteDataS*)array[i];
+                    spr[i].rect = sp->rect;
+                    spr[i].pivot = sp->pivot;
+                    spr[i].Name = db.GetData(sp->name) as string;
+                    spr[i].uv = new Vector2[4];
+                    spr[i].uv[0] = sp->uv0;
+                    spr[i].uv[1] = sp->uv1;
+                    spr[i].uv[2] = sp->uv2;
+                    spr[i].uv[3] = sp->uv3;
+                }
+            }
+            return spr;
+        }
+        public Vector2[] FindSpriteUV(string tName, string sName)
+        {
+            if (infos == null)
+                return null;
+            for (int i = 0; i < infos.Length; i++)
+            {
+                if (infos[i].Name == tName)
+                {
+                    var spr = infos[i].sprites;
+                    for (int j = 0; j < spr.Length; j++)
+                    {
+                        if(spr[j].Name==sName)
+                        {
+                            return spr[j].uv;
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+        public Vector2[][] FindSpriteUVs(string tName, string[] sName)
+        {
+            if (infos == null)
+                return null;
+            for (int i = 0; i < infos.Length; i++)
+            {
+                if (infos[i].Name == tName)
+                {
+                    var spr = infos[i].sprites;
+                    return FindSpriteUVs(spr,sName);
+                }
+            }
+            return null;
+        }
+        Vector2[][] FindSpriteUVs(SpriteInfo[] spr, string[] sName)
+        {
+            Vector2[][] uvs = new Vector2[sName.Length][];
+            for(int i=0;i<sName.Length;i++)
+            {
+                string name = sName[i];
+                for (int j = 0; j < spr.Length; j++)
+                {
+                    if (spr[j].Name == name)
+                    {
+                        uvs[i] = spr[j].uv;
+                        break;
+                    }
+                }
+            }
+            return uvs;
         }
     }
 }

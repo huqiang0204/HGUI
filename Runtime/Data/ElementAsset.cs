@@ -263,11 +263,6 @@ namespace huqiang.Data
             }
             return sprites;
         }
-        class SpriteData
-        {
-            public string name;
-            public DataBuffer buffer;
-        }
         static List<SpriteData> SpriteDatas=new List<SpriteData>();
         /// <summary>
         /// 添加精灵信息数据
@@ -279,10 +274,9 @@ namespace huqiang.Data
             if (dat == null)
                 return;
             RemoveSpriteData(name);
-            DataBuffer db = new DataBuffer(dat);
             SpriteData data = new SpriteData();
-            data.name = name;
-            data.buffer = db;
+            data.LoadSpriteData(dat);
+            data.Name = name;
             SpriteDatas.Add(data);
         }
         /// <summary>
@@ -293,7 +287,7 @@ namespace huqiang.Data
         {
             for(int i=0;i<SpriteDatas.Count;i++)
             {
-                if (SpriteDatas[i].name == name)
+                if (SpriteDatas[i].Name == name)
                 {
                     SpriteDatas.RemoveAt(i);
                     return;
@@ -312,46 +306,17 @@ namespace huqiang.Data
         /// </summary>
         /// <param name="tName">纹理名</param>
         /// <param name="sName">精灵名</param>
-        /// <param name="rect">精灵矩形</param>
-        /// <param name="txtSize">纹理尺寸</param>
-        /// <param name="pivot">精灵轴心</param>
-        public static void FindSpriteUV(string tName, string sName,ref Rect rect, ref Vector2 txtSize,ref Vector2 pivot)
+        public static Vector2[] FindSpriteUV(string tName, string sName)
         {
             for(int k=0;k<SpriteDatas.Count;k++)
             {
-                var fs = SpriteDatas[k].buffer.fakeStruct;
+                var fs = SpriteDatas[k].FindSpriteUV(tName,sName);
                 if(fs!=null)
                 {
-                    var fsa = fs.GetData<FakeStructArray>(1);
-                    if (fsa != null)
-                    {
-                        for (int i = 0; i < fsa.Length; i++)
-                        {
-                            if (fsa.GetData(i, 0) as string == tName)
-                            {
-                                fsa = fsa.GetData(i, 1) as FakeStructArray;
-                                if (fsa != null)
-                                {
-                                    for (int j = 0; j < fsa.Length; j++)
-                                    {
-                                        if (fsa.GetData(j, 0) as string == sName)
-                                        {
-                                            unsafe
-                                            {
-                                                SpriteDataS* sp =(SpriteDataS*)fsa[j];
-                                                txtSize = sp->txtSize;
-                                                rect= sp->rect;
-                                                pivot = sp->pivot;
-                                            }
-                                        }
-                                    }
-                                }
-                                break;
-                            }
-                        }
-                    }
+                    return fs;
                 }
             }
+            return null;
         }
         /// <summary>
         /// 查询精灵的uv
@@ -359,48 +324,17 @@ namespace huqiang.Data
         /// <param name="tName">纹理名</param>
         /// <param name="sns">精灵名数组</param>
         /// <returns></returns>
-        public static SpriteDataS[] FindSpriteUVs(string tName, string[] sns)
+        public static Vector2[][] FindSpriteUVs(string tName, string[] sns)
         {
-            SpriteDataS[] infos = new SpriteDataS[sns.Length];
             for (int k = 0; k < SpriteDatas.Count; k++)
             {
-                var fs = SpriteDatas[k].buffer.fakeStruct;
+                var fs = SpriteDatas[k].FindSpriteUVs(tName,sns);
                 if (fs != null)
                 {
-                    var fsa = fs.GetData<FakeStructArray>(1);
-                    if (fsa != null)
-                    {
-                        for (int i = 0; i < fsa.Length; i++)
-                        {
-                            var ts = fsa.GetData(i, 0) as string;
-                            if (ts == tName)
-                            {
-                                fsa = fsa.GetData(i, 1) as FakeStructArray;
-                                if (fsa != null)
-                                {
-                                    for (int t = 0; t < sns.Length; t++)
-                                    {
-                                        var sName = sns[t];
-                                        for (int j = 0; j < fsa.Length; j++)
-                                        {
-                                            if (fsa.GetData(j, 0) as string == sName)
-                                            {
-                                                unsafe
-                                                {
-                                                    infos[t]= *(SpriteDataS*)fsa[j];
-                                                }
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
-                                break;
-                            }
-                        }
-                    }
+                    return fs;
                 }
             }
-            return infos;
+            return null;
         }
         /// <summary>
         /// 载入资源

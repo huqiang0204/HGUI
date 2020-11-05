@@ -13,7 +13,7 @@ namespace huqiang.Core.HGUI
     /// </summary>
     public class HCanvas:UIElement
     {
-        //protected static ThreadMission thread = new ThreadMission("UI");
+        protected static ThreadMission thread;// = new ThreadMission("UI");
         /// <summary>
         /// 目标相机,如果为空则使用主相机
         /// </summary>
@@ -43,9 +43,8 @@ namespace huqiang.Core.HGUI
         /// 主画布实例
         /// </summary>
         public static HCanvas MainCanvas;
-        //public bool SubBatch;//是否开启子线程合批处理,开启后画面会延迟一帧
+        public bool SubBatch;//是否开启子线程合批处理,开启后画面会延迟一帧
         //LoopBuffer<HGUIElement[]> loopBuffer = new LoopBuffer<HGUIElement[]>(3);
-        //QueueBuffer<TempBuffer> Main,Sub;
         /// <summary>
         /// UI元素流水线缓存
         /// </summary>
@@ -183,6 +182,7 @@ namespace huqiang.Core.HGUI
                     UIMenu.CurrentMenu.ReSize();
             }
         }
+   
         /// <summary>
         /// 更新内容包含:UI流水线采集,UI MainUpdate函数执行,UI Populate函数执行,文本更新,合批处理,应用网格,投递到相机
         /// </summary>
@@ -190,6 +190,11 @@ namespace huqiang.Core.HGUI
         {
             if (Pause)
                 return;
+            if(SubBatch)
+            {
+                Batch2();
+                return;
+            }
             MatCollector.renderQueue = renderQueue;
             LateFrame++;
             point = 1;
@@ -225,6 +230,55 @@ namespace huqiang.Core.HGUI
             Batch();
             ApplyMeshRenderer();
             ApplyToCamera();
+        }
+        int mainFrame = 0;
+        int subFrame = 0;
+        void Batch2()
+        {
+            if (subFrame == mainFrame)
+            {
+                MatCollector.renderQueue = renderQueue;
+                LateFrame++;
+                point = 1;
+                max = 0;
+                top_txt = 0;
+                Collection(transform, -1, 0);
+                MainUpdate();
+                for (int i = 1; i < max; i++)//跳过HCanvas
+                {
+                    var scr = scripts[i];
+                    if (scr.LateFrame != LateFrame)
+                    {
+                        scr.LateFrame = LateFrame;
+                        scr.MainUpdate();
+                    }
+                    else
+                    {
+                        Debug.Log("脚本重复更新");
+                    }
+                }
+                Collection(transform, -1, 0);
+                for (int i = 0; i < top_txt; i++)
+                {
+                    texts[i].Populate();
+                }
+                if (ftr)//纹理被改变了,需要重新计算
+                {
+                    ftr = false;
+                    HText.DirtyAll();
+                    for (int i = 0; i < top_txt; i++)
+                        texts[i].Populate();
+                }
+                ApplyMeshRenderer();
+                ApplyToCamera();
+                mainFrame++;
+                if (thread == null)
+                    thread = new ThreadMission("UI");
+                thread.AddSubMission((o) => {
+                    Batch();
+                    subFrame++;
+                }, this);
+            }
         }
         MeshFilter meshFilter;
         MeshRenderer renderer;

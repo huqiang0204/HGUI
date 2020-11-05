@@ -15,6 +15,10 @@ namespace huqiang.Core.HGUI
     {
         protected static ThreadMission thread;// = new ThreadMission("UI");
         /// <summary>
+        /// 主画布实例
+        /// </summary>
+        public static HCanvas MainCanvas;
+        /// <summary>
         /// 目标相机,如果为空则使用主相机
         /// </summary>
         public Camera camera;
@@ -39,12 +43,7 @@ namespace huqiang.Core.HGUI
         public Vector2 C = new Vector2(8,1.2f);
         public Vector2 D = new Vector2(10,1.3f);//贝塞尔曲线终点
         public RenderMode renderMode;
-        /// <summary>
-        /// 主画布实例
-        /// </summary>
-        public static HCanvas MainCanvas;
         public bool SubBatch;//是否开启子线程合批处理,开启后画面会延迟一帧
-        //LoopBuffer<HGUIElement[]> loopBuffer = new LoopBuffer<HGUIElement[]>(3);
         /// <summary>
         /// UI元素流水线缓存
         /// </summary>
@@ -76,9 +75,7 @@ namespace huqiang.Core.HGUI
         protected override void Start()
         {
             MainCanvas = this;
-            Font.textureRebuilt += FontTextureRebuilt;
-            //Main = new QueueBuffer<TempBuffer>();
-            //Sub = new QueueBuffer<TempBuffer>();            
+            Font.textureRebuilt += FontTextureRebuilt;         
         }
         bool ftr;
         void FontTextureRebuilt(Font font)
@@ -566,23 +563,6 @@ namespace huqiang.Core.HGUI
             ClearMesh();
             HBatch.Batch(this, PipeLine);
         }
-        //void SubBatch(object obj)
-        //{
-        //    var m = Sub.Dequeue();
-        //    if(m!=null)
-        //    {
-        //        PipeLine = m.PipeLine;
-        //        scripts = m.scripts;
-        //        vertex = m.vertex;
-        //        uv = m.uv;
-        //        uv1 = m.uv1;
-        //        uv2 = m.uv2;
-        //        uv3 = m.uv3;
-        //        colors = m.colors;
-        //        Batch();
-        //        Main.Enqueue(m);
-        //    }
-        //}
         internal List<Vector3> vertex = new List<Vector3>();
         internal List<Vector2> uv = new List<Vector2>();
         /// <summary>

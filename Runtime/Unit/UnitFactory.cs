@@ -54,6 +54,7 @@ namespace huqiang.Unit
             }
             m = new ManagerInfo();
             var ins = new HotUnitManager();
+            ins.shader = shader;
             ins.collisionType = collisionType;
             m.Instance = ins;
             m.carrier = ins;
@@ -79,6 +80,7 @@ namespace huqiang.Unit
             }
             m = new ManagerInfo();
             var ins = new UnitManager<T>();
+            ins.shader = shader;
             ins.collisionType = collisionType;
             m.Instance = ins;
             m.carrier = ins;

@@ -27,6 +27,8 @@ namespace huqiang.Unit
         public GameObject game;
         public MeshFilter meshFilter;
         public MeshRenderer renderer;
+        public string assetsName= "picture.unity3d";
+        public string shader = "Sprites/Default";
         public string textrue;
         public float level;
         public void Initial(string name = "car")
@@ -34,7 +36,7 @@ namespace huqiang.Unit
             game = new GameObject(name);
             meshFilter = game.AddComponent<MeshFilter>();
             renderer = game.AddComponent<MeshRenderer>();
-            renderer.material = new Material(Shader.Find("Sprites/Default"));
+            renderer.material = new Material(Shader.Find(shader));
             var trans = game.transform;
             trans.SetParent(Root);
             trans.localScale = Vector3.one;

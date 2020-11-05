@@ -45,7 +45,7 @@ namespace huqiang.Unit
             {
                 Initial(textrue);
                 if (textrue != null)
-                    renderer.material.mainTexture = ElementAsset.FindTexture("picture.unity3d", textrue);
+                    renderer.material.mainTexture = ElementAsset.FindTexture(assetsName, textrue);
             }
             vertex.Clear();
             uv.Clear();
@@ -113,7 +113,7 @@ namespace huqiang.Unit
             {
                 Initial(textrue);
                 if(textrue!=null)
-                renderer.material.mainTexture = ElementAsset.FindTexture("picture.unity3d", textrue);
+                renderer.material.mainTexture = ElementAsset.FindTexture(assetsName, textrue);
             }
             vertex.Clear();
             uv.Clear();

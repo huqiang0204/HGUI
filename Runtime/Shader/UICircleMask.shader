@@ -1,12 +1,17 @@
-﻿Shader "Custom/UICircleMask"
+﻿Shader "HGUI/UICircleMask"
 {
 	Properties
 	{
-		  [PerRendererData] _MainTex("Sprite Texture", 2D) = "white" {}
+		  _MainTex("Sprite Texture", 2D) = "white" {}
 		  [PerRendererData]_Color("Tint", Color) = (1,1,1,1)
-		  [PerRendererData]_Rdius("Rdius", Range(0,0.5)) = 0.5
+		  _Rdius("Rdius", Range(0,0.5)) = 0.5
+		_SRect("_SpriteClipRect",Vector) = (0.5,0.5,0.5,0.5)
 		 [PerRendererData]_Rect("_ClipRect",Vector) = (0,0,1,1)
 		 [PerRendererData]_FillColor("Fill color", Vector) = (0,0,0,0)
+		 [PerRendererData]_STex("Sprite Texture", 2D) = "white" {}
+		 [PerRendererData]_TTex("Sprite Texture", 2D) = "white" {}
+		 [PerRendererData]_FTex("Sprite Texture", 2D) = "white" {}
+		 [PerRendererData]_Color("Tint", Color) = (1,1,1,1)
 	}
 
 		SubShader
@@ -20,14 +25,13 @@
 				"CanUseSpriteAtlas" = "True"
 			}
 
-			Cull Off
-			Lighting Off
-			ZWrite Off
-			ZTest Off //[unity_GUIZTestMode]
-			Blend SrcAlpha OneMinusSrcAlpha
-
 			Pass
 			{
+					Cull Off
+			Lighting Off
+			ZWrite Off
+			 //ZTest Off //[unity_GUIZTestMode]
+			 Blend SrcAlpha OneMinusSrcAlpha
 				Name "Default"
 			CGPROGRAM
 				#pragma vertex vert
@@ -63,10 +67,14 @@
 					UNITY_VERTEX_OUTPUT_STEREO
 				};
 
-				sampler2D _MainTex;
 				float _Rdius;
-				fixed4 _Color;
+				sampler2D _MainTex;
+				sampler2D _STex;
+				sampler2D _TTex;
+				sampler2D _FTex;
+				float4 _SRect;
 				float4 _Rect;
+				float4 _Color;
 				float4 _FillColor;
 				v2f vert(appdata_t IN)
 				{
@@ -75,20 +83,74 @@
 					UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(OUT);
 					OUT.vertex = UnityObjectToClipPos(IN.vertex);
 					OUT.uv = IN.uv;
-					OUT.uv = IN.uv;
 					OUT.uv1 = IN.uv1;
 					OUT.uv2 = IN.uv2;
+					OUT.uv3 = IN.uv3;
+					OUT.uv4 = IN.uv4;
 					OUT.color = IN.color;
 					return OUT;
 				}
 				fixed4 frag(v2f IN) : SV_Target
 				{
-					half4 color = tex2D(_MainTex, IN.uv);
-				    float x=IN.uv.x-0.5;
-					float y=IN.uv.y-0.5;
-					if (_Rdius * _Rdius < x * x + y * y)
-						color.a = 0;
+						half4 color;
+					float2 uv = IN.uv;
+					uv.x *= IN.uv4.x;
+					uv.y *= IN.uv4.y;
+					uv.x += IN.uv3.x;
+					uv.y += IN.uv3.y;
+					if (IN.uv1.x == 0)
+					{
+						if (IN.uv1.y == 0)
+						{
+							color = tex2D(_MainTex, uv);
+							if (_FillColor.x == 0)
+								color *= IN.color;
+							else {
+								color.xyz = IN.color.xyz;
+								color.a *= IN.color.a;
+							}
+						}
+						else
+						{
+							color = tex2D(_STex, uv);
+							if (_FillColor.y == 0)
+								color *= IN.color;
+							else {
+								color.xyz = IN.color.xyz;
+								color.a *= IN.color.a;
+							}
+						}
+					}
+				   else
+				   {
+						if (IN.uv1.y == 0)
+						{
+							color = tex2D(_TTex, uv);
+							if (_FillColor.z == 0)
+								color *= IN.color;
+							else {
+								color.xyz = IN.color.xyz;
+								color.a *= IN.color.a;
+							}
+						}
+						else
+						{
+							color = tex2D(_FTex, uv);
+							if (_FillColor.w == 0)
+								color *= IN.color;
+							else {
+								color.xyz = IN.color.xyz;
+								color.a *= IN.color.a;
+							}
+						}
+				   }
 					if (IN.uv2.x < _Rect.x || IN.uv2.x > _Rect.z || IN.uv2.y < _Rect.y || IN.uv2.y > _Rect.w)
+						color.a = 0;
+				    float x=IN.uv.x - _SRect.x;
+					x /= _SRect.z;
+					float y=IN.uv.y - _SRect.y;
+					y/= _SRect.w;
+					if (_Rdius * _Rdius < x * x + y * y)
 						color.a = 0;
 					return color;
 				}

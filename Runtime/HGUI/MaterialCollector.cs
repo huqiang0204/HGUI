@@ -141,14 +141,6 @@ namespace huqiang.Core.HGUI
         public void CombinationMaterial(HGraphics graphics, int[] tris, int len, ref int offset, ref Vector4 clip)
         {
             int id = graphics.MatID;
-#if UNITY_EDITOR
-            if(!Application.isPlaying)
-            {
-                var mat = graphics.Material;
-                if (mat != null)
-                    id = mat.GetInstanceID();
-            }
-#endif
             if (id == 0)//使用默认材质球
             {
                 bool mask = graphics.Mask;
@@ -171,7 +163,6 @@ namespace huqiang.Core.HGUI
                     CompeleteSub();
                 for (int i = 0; i < len; i++)
                     tmpMesh.Add(tris[i]);
-                graphics.Material.SetTexture(tc[0], graphics.textures[0]);
                 CombinationMaterial(graphics.Material, id, ref clip);
             }
         }
@@ -187,14 +178,6 @@ namespace huqiang.Core.HGUI
         public void CombinationMaterial(HGraphics graphics, int[] trisArray,ArrayInfo[] address, int[] offsets, int len, ref Vector4 clip)
         {
             int id = graphics.MatID;
-#if UNITY_EDITOR
-            if (!Application.isPlaying)
-            {
-                var mat = graphics.Material;
-                if (mat != null)
-                    id = mat.GetInstanceID();
-            }
-#endif
             if (id == 0)//使用默认材质球
             {
                 if (trisArray != null)
@@ -242,7 +225,6 @@ namespace huqiang.Core.HGUI
                         s++;
                     }
                 }
-                graphics.Material.SetTexture(tc[0],graphics.textures[0]);
                 CombinationMaterial(graphics.Material, id, ref clip);
             }
         }

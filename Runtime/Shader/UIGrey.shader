@@ -1,4 +1,4 @@
-﻿Shader "Custom/UIGrey"
+﻿Shader "HGUI/UIGrey"
 {
 	Properties
 	{
@@ -14,6 +14,12 @@
 		_ColorMask("Color Mask", Float) = 15
 
 		[Toggle(UNITY_UI_ALPHACLIP)] _UseUIAlphaClip("Use Alpha Clip", Float) = 0
+		[PerRendererData]_STex("Sprite Texture", 2D) = "white" {}
+		 [PerRendererData]_TTex("Sprite Texture", 2D) = "white" {}
+		 [PerRendererData]_FTex("Sprite Texture", 2D) = "white" {}
+		 [PerRendererData]_Color("Tint", Color) = (1,1,1,1)
+		 [PerRendererData]_Rect("_ClipRect",Vector) = (0,0,1,1)
+		 [PerRendererData]_FillColor("Fill color", Vector) = (0,0,0,0)
 	}
 
 		SubShader
@@ -58,9 +64,13 @@
 
 				struct appdata_t
 				{
-					float4 vertex   : POSITION;
-					float4 color    : COLOR;
-					float2 texcoord : TEXCOORD0;
+					float4 vertex  : POSITION;
+					float4 color  : COLOR;
+					float2 uv : TEXCOORD0;
+					float2 uv1 : TEXCOORD1;
+					float2 uv2 : TEXCOORD2;
+					float2 uv3 : TEXCOORD3;
+					float2 uv4 : TEXCOORD4;
 					UNITY_VERTEX_INPUT_INSTANCE_ID
 				};
 
@@ -68,12 +78,14 @@
 				{
 					float4 vertex   : SV_POSITION;
 					fixed4 color : COLOR;
-					float2 texcoord  : TEXCOORD0;
-					float4 worldPosition : TEXCOORD1;
+					float2 uv  : TEXCOORD0;
+					float2 uv1 : TEXCOORD1;
+					float2 uv2 : TEXCOORD2;
+					float2 uv3 : TEXCOORD3;
+					float2 uv4 : TEXCOORD4;
 					UNITY_VERTEX_OUTPUT_STEREO
 				};
 
-				fixed4 _Color;
 				fixed4 _TextureSampleAdd;
 				float4 _ClipRect;
 
@@ -82,23 +94,81 @@
 					v2f OUT;
 					UNITY_SETUP_INSTANCE_ID(IN);
 					UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(OUT);
-					OUT.worldPosition = IN.vertex;
-					OUT.vertex = UnityObjectToClipPos(OUT.worldPosition);
-					OUT.texcoord = IN.texcoord;
-					OUT.color = IN.color * _Color;
+					OUT.vertex = UnityObjectToClipPos(IN.vertex);
+					OUT.uv = IN.uv;
+					OUT.uv1 = IN.uv1;
+					OUT.uv2 = IN.uv2;
+					OUT.uv3 = IN.uv3;
+					OUT.uv4 = IN.uv4;
+					OUT.color = IN.color;
 					return OUT;
 				}
 
 				sampler2D _MainTex;
+				sampler2D _STex;
+				sampler2D _TTex;
+				sampler2D _FTex;
+				float4 _Rect;
+				float4 _Color;
+				float4 _FillColor;
 
 				fixed4 frag(v2f IN) : SV_Target
 				{
-					half4 color = (tex2D(_MainTex, IN.texcoord) + _TextureSampleAdd) * IN.color;
-					color.a *= UnityGet2DClipping(IN.worldPosition.xy, _ClipRect);
+						half4 color;
+					float2 uv = IN.uv;
+					uv.x *= IN.uv4.x;
+					uv.y *= IN.uv4.y;
+					uv.x += IN.uv3.x;
+					uv.y += IN.uv3.y;
+					if (IN.uv1.x == 0)
+					{
+						if (IN.uv1.y == 0)
+						{
+							color = tex2D(_MainTex, uv);
+							if (_FillColor.x == 0)
+								color *= IN.color;
+							else {
+								color.xyz = IN.color.xyz;
+								color.a *= IN.color.a;
+							}
+						}
+						else
+						{
+							color = tex2D(_STex, uv);
+							if (_FillColor.y == 0)
+								color *= IN.color;
+							else {
+								color.xyz = IN.color.xyz;
+								color.a *= IN.color.a;
+							}
+						}
+					}
+				   else
+				   {
+						if (IN.uv1.y == 0)
+						{
+							color = tex2D(_TTex, uv);
+							if (_FillColor.z == 0)
+								color *= IN.color;
+							else {
+								color.xyz = IN.color.xyz;
+								color.a *= IN.color.a;
+							}
+						}
+						else
+						{
+							color = tex2D(_FTex, uv);
+							if (_FillColor.w == 0)
+								color *= IN.color;
+							else {
+								color.xyz = IN.color.xyz;
+								color.a *= IN.color.a;
+							}
+						}
+				   }
+					if (IN.uv2.x < _Rect.x || IN.uv2.x > _Rect.z || IN.uv2.y < _Rect.y || IN.uv2.y > _Rect.w)
+						color.a = 0;
 					color.rgb = dot(color.rgb, float3(0.22, 0.707, 0.071));
-					#ifdef UNITY_UI_ALPHACLIP
-					clip(color.a - 0.001);
-					#endif
 					return color;
 				}
 			ENDCG

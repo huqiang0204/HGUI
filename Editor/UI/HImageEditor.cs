@@ -105,7 +105,9 @@ public class HImageEditor:UIElementEditor
             img.MainTexture = EditorGUILayout.ObjectField("Texture", img.MainTexture, typeof(Texture), true) as Texture;
             if (GUILayout.Button("Set Native Size"))
                 img.SetNativeSize();
-            if(GUI.changed |changed)
+            if (GUILayout.Button("Set Circle Mask"))
+                img.SetCircleMask();
+            if (GUI.changed |changed)
             {
                 var can = FindHCanvas(img.transform);
                 if (can != null)

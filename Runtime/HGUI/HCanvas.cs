@@ -663,6 +663,9 @@ namespace huqiang.Core.HGUI
                 var grap = scripts[i] as HGraphics;
                 if (grap != null)
                 {
+                    if (grap.m_material != null)
+                        grap.MatID = grap.m_material.GetInstanceID();
+                    else grap.MatID = 0;
                     grap.m_dirty = true;
                     grap.m_vertexChange = true;
                 }

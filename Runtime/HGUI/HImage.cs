@@ -171,6 +171,26 @@ namespace huqiang.Core.HGUI
                 m_sizeDelta.y = m_sprite.rect.height;
             }
         }
+        public void SetCircleMask()
+        {
+            if (m_material == null)
+                return;
+            if (m_sprite == null)
+            {
+                m_material.SetVector("_SRect", new Vector4(0.5f, 0.5f, 1, 1));
+                return;
+            }
+            var sp = m_sprite;
+            float w = sp.texture.width;
+            float h = sp.texture.height;
+            float lx = sp.rect.x / w;
+            float pw = sp.rect.width / w;
+            float cx = lx + pw * 0.5f;
+            float dy = sp.rect.y / h;
+            float ph = sp.rect.height / h;
+            float cy = dy + ph * 0.5f;
+            m_material.SetVector("_SRect", new Vector4(cx, cy, pw, ph));
+        }
         public override void MainUpdate()
         {
             base.MainUpdate();

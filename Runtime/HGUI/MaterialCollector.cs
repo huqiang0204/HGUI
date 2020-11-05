@@ -142,9 +142,12 @@ namespace huqiang.Core.HGUI
         {
             int id = graphics.MatID;
 #if UNITY_EDITOR
-            var mat = graphics.Material;
-            if (mat != null)
-                id = mat.GetInstanceID();
+            if(!Application.isPlaying)
+            {
+                var mat = graphics.Material;
+                if (mat != null)
+                    id = mat.GetInstanceID();
+            }
 #endif
             if (id == 0)//使用默认材质球
             {
@@ -185,9 +188,12 @@ namespace huqiang.Core.HGUI
         {
             int id = graphics.MatID;
 #if UNITY_EDITOR
-            var mat = graphics.Material;
-            if (mat != null)
-                id = mat.GetInstanceID();
+            if (!Application.isPlaying)
+            {
+                var mat = graphics.Material;
+                if (mat != null)
+                    id = mat.GetInstanceID();
+            }
 #endif
             if (id == 0)//使用默认材质球
             {

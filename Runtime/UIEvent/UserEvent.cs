@@ -269,6 +269,10 @@ namespace huqiang.UIEvent
         /// </summary>
         public bool Pressed { get; internal set; }
         /// <summary>
+        /// 焦点状态
+        /// </summary>
+        public bool Focus { get; protected set; }
+        /// <summary>
         /// 用户拖拽造成的速率X
         /// </summary>
         public float VelocityX { get { return mVelocity.x; } set { maxVelocity.x = mVelocity.x = value; RefreshRateX(); } }
@@ -419,6 +423,7 @@ namespace huqiang.UIEvent
         {
             if (!action.MultiFocus.Contains(this))
                 action.MultiFocus.Add(this);
+            Focus = true;
             Pressed = true;
             PressTime = action.EventTicks;
             RawPosition = action.CanPosition;
@@ -546,6 +551,7 @@ namespace huqiang.UIEvent
         }
         internal virtual void OnLostFocus(UserAction action)
         {
+            Focus = false;
             FocusAction = null;
             if (LostFocus != null)
                 LostFocus(this, action);
@@ -596,9 +602,10 @@ namespace huqiang.UIEvent
         }
         public void RemoveFocus()
         {
+            Focus = false;
+            Pressed = false;
             if (FocusAction != null)
             {
-                Pressed = false;
                 FocusAction.RemoveFocus(this);
                 FocusAction = null;
             }

@@ -253,11 +253,11 @@ namespace huqiang.UIComposite
         /// <param name="action">用户事件</param>
         public void OnClick(UserAction action)
         {
+            TextOperation.contentType = m_ctpye;
             if (!ReadOnly)
             {
                 Input.imeCompositionMode = IMECompositionMode.On;
                 Editing = true;
-                TextOperation.contentType = m_ctpye;
                 if (!Keyboard.active)
                 {
                     bool pass = contentType == ContentType.Password ? true : false;
@@ -510,7 +510,7 @@ namespace huqiang.UIComposite
         /// <param name="time">时间片</param>
         public override void Update(float time)
         {
-            if (Editing)
+            if (InputEvent.Focus)
             {
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR
                 var state = KeyPressed();

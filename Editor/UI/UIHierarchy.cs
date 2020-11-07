@@ -33,6 +33,31 @@ public class UIHierarchy : EditorWindow
 		treeIndex = 0;
 		if (Root != null)
 			DrawFileTree(Root, 0);
+		var evt = Event.current;
+		var contextRect = new Rect(0, 0, 1000, 1000);
+
+		if (evt.type == UnityEngine.EventType.ContextClick)
+		{
+			var mousePos  = evt.mousePosition;
+			if (contextRect.Contains(mousePos))
+			{
+				// Now create the menu, add items and show it
+				var menu  = new GenericMenu();
+
+				menu.AddItem(new GUIContent("MenuItem1"), false, Callback, "item 1");
+				menu.AddItem(new GUIContent("MenuItem2"), false, Callback, "item 2");
+				menu.AddSeparator("");
+				menu.AddItem(new GUIContent("SubMenu/MenuItem3"), false, Callback, "item 3");
+
+				menu.ShowAsContext();
+
+				evt.Use();
+			}
+		}
+	}
+	void Callback(System.Object obj)
+	{
+		Debug.Log("Selected: " + obj);
 	}
 	private void DrawFileTree(TreeViewNode node, int level)
 	{

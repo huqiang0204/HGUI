@@ -24,7 +24,6 @@ public static class UICompositeMenu
     private const string box = "Border2";
     private const string diamond = "Diamond-Outline5";
     private const string star = "Star";
-
     [MenuItem("GameObject/HGUI/Canvas", false, 0)]
     static public void AddCanvas(MenuCommand menuCommand)
     {

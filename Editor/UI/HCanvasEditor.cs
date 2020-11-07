@@ -12,6 +12,12 @@ public class HCanvasEditor:UIElementEditor
     //    base.OnSceneGUI();
     //    Refresh(target as HCanvas);
     //}
+
+    public static HCanvas Instance;
+    public override void OnEnable()
+    {
+        UIHierarchy.ChangeRoot((target as HCanvas).transform);
+    }
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();

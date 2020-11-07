@@ -53,18 +53,39 @@ public class UIHierarchy : EditorWindow
 
 		if ( node.child.Count>0)
 		{
-			node.expand = EditorGUI.Foldout(rect, node.expand, node.content, true);
+			//node.expand = EditorGUI.Foldout(rect, node.expand, node.content, true);
+			if(node.expand)
+            {
+				if (GUI.Button(rect, "▼ " + node.content, style))
+				{
+					currentNode = node;
+					node.expand = false;
+					Debug.Log(node.content);
+				}
+			}
+            else
+            {
+				if (GUI.Button(rect, "► "+ node.content, style))
+				{
+					currentNode = node;
+					node.expand = true;
+					Debug.Log(node.content);
+				}
+			}
+		
 		}
 		else
 		{
-			if (GUI.Button(rect, node.content, style))
-			{
-				Debug.Log(node.content);
-				currentNode = node;
-			}
-		}
+            //node.content  = GUI.TextArea(rect, node.content, style);
+            if (GUI.Button(rect, node.content, style))
+            {
+                Debug.Log(node.content);
+                currentNode = node;
+            }
+            //EditorGUI.Foldout(rect, true, node.content, true);
+        }
 
-		if (node == null || !node.expand || node.child.Count == 0)
+        if (node == null || !node.expand || node.child.Count == 0)
 		{
 			return;
 		}

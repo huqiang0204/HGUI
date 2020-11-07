@@ -79,6 +79,26 @@ namespace huqiang.UIComposite
             return img;
         }
         /// <summary>
+        /// 创建一个文本
+        /// </summary>
+        /// <param name="pos">位置</param>
+        /// <param name="size">尺寸</param>
+        /// <param name="name">名称</param>
+        /// <param name="parent">父坐标变换</param>
+        /// <returns></returns>
+        public static HText CreateTextBox(Vector3 pos, Vector2 size, string name, Transform parent)
+        {
+            var go = new GameObject(name);
+            var img = go.AddComponent<TextBox>();
+            img.SizeDelta = size;
+            var trans = go.transform;
+            trans.SetParent(parent);
+            trans.localPosition = pos;
+            trans.localScale = Vector3.one;
+            trans.localRotation = Quaternion.identity;
+            return img;
+        }
+        /// <summary>
         /// 创建一个画线面板
         /// </summary>
         /// <param name="pos">位置</param>

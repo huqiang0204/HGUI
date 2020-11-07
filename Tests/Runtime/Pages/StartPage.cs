@@ -23,6 +23,7 @@ namespace Assets.Scripts
             public HLine Line;
             public GameObject TipA;
             public GameObject TipB;
+            public InputBox inputBox;
         }
         View view;
         class ItemView
@@ -37,8 +38,8 @@ namespace Assets.Scripts
             view = LoadUI<View>("baseUI", "start");
             InitialEvent();
             InitialData();
-        
-       
+            view.inputBox.ReadOnly = true;
+            view.inputBox.InputString = "dfgkldfkglkdf;lkffgl;dkfl;gkdl;fkgl;dkfgdfjgjhkjhgjkhskjdlhfskjdhflksjdhjfkljsjdjjhfkjjshdkfjjhsdkjfhhkjsjdhfkjhsjdkjjhfksjjdhfkjjshdkjfhjskdhfkshdkfhsdkhfkjhsdjkfhkjshdfjkjhsdjhfjjksjdhfkhsdkfjjjhjsdkjhfksjhjdfkjhsdjkfhksjdhjfkjljhsdfhgsdgh";
         }
         void InitialEvent()
         {

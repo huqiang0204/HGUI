@@ -104,7 +104,13 @@ public static class UICompositeMenu
         GameObject parent = menuCommand.context as GameObject;
         UICreator.CreateHText(Vector3.zero, new Vector2(160, 40), "Text", parent.transform);
     }
-    [MenuItem("GameObject/HGUI/InputBox", false, 5)]
+    [MenuItem("GameObject/HGUI/TextBox", false, 5)]
+    static public void AddTextBox(MenuCommand menuCommand)
+    {
+        GameObject parent = menuCommand.context as GameObject;
+        UICreator.CreateTextBox(Vector3.zero, new Vector2(400, 400), "TextBox", parent.transform);
+    }
+    [MenuItem("GameObject/HGUI/InputBox", false, 6)]
     static public void AddInputBox(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;
@@ -139,7 +145,7 @@ public static class UICompositeMenu
         UICreator.CreateHImage(Vector3.zero, new Vector2(2, 28), "Cursor", son);
         help.Refresh();
     }
-    [MenuItem("GameObject/HGUI/UISliderH", false, 6)]
+    [MenuItem("GameObject/HGUI/UISliderH", false, 7)]
     static public void AddSliderH(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;
@@ -192,7 +198,7 @@ public static class UICompositeMenu
         image.Sprite = EditorModelManager.FindSprite(icons, leaves);
         return go;
     }
-    [MenuItem("GameObject/HGUI/UISliderV", false, 7)]
+    [MenuItem("GameObject/HGUI/UISliderV", false, 8)]
     static public void AddSliderV(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;
@@ -246,7 +252,7 @@ public static class UICompositeMenu
         image.Sprite = EditorModelManager.FindSprite(icons, ufo);
         return go;
     }
-    [MenuItem("GameObject/HGUI/Scroll", false, 8)]
+    [MenuItem("GameObject/HGUI/Scroll", false, 9)]
     static public void AddScroll(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;
@@ -263,7 +269,7 @@ public static class UICompositeMenu
 
         CreateItem(scroll.transform, "Item");
     }
-    [MenuItem("GameObject/HGUI/UIRocker", false, 9)]
+    [MenuItem("GameObject/HGUI/UIRocker", false, 10)]
     static public void AddRocker(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;
@@ -290,7 +296,7 @@ public static class UICompositeMenu
         son.localScale = Vector3.one;
        
     }
-    [MenuItem("GameObject/HGUI/TreeView", false, 10)]
+    [MenuItem("GameObject/HGUI/TreeView", false, 11)]
     static public void AddTreeView(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;
@@ -323,7 +329,7 @@ public static class UICompositeMenu
         ht.TextAnchor = TextAnchor.MiddleLeft;
         ht.FontSize = 24;
     }
-    [MenuItem("GameObject/HGUI/UIDate", false, 11)]
+    [MenuItem("GameObject/HGUI/UIDate", false, 12)]
     static public void AddDate(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;
@@ -445,7 +451,7 @@ public static class UICompositeMenu
         txt.Text = now.Day.ToString();
         txt.FontSize = 24;
     }
-    [MenuItem("GameObject/HGUI/UIPalette", false, 12)]
+    [MenuItem("GameObject/HGUI/UIPalette", false, 13)]
     static public void AddPalette(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;
@@ -514,7 +520,7 @@ public static class UICompositeMenu
 
         palette.AddComponent<PaletteHelper>().Initial();
     }
-    [MenuItem("GameObject/HGUI/ScrollY", false, 13)]
+    [MenuItem("GameObject/HGUI/ScrollY", false, 14)]
     static public void AddScrollY(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;
@@ -555,7 +561,7 @@ public static class UICompositeMenu
         var help = scroll.gameObject.AddComponent<ScrollHelper>();
         help.Slider = go.transform;
     }
-    [MenuItem("GameObject/HGUI/ScrollYExtand", false, 14)]
+    [MenuItem("GameObject/HGUI/ScrollYExtand", false, 15)]
     static public void AddScrollYExtand(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;
@@ -619,7 +625,7 @@ public static class UICompositeMenu
         txt.TextAnchor = TextAnchor.MiddleLeft;
         return mod;
     }
-    [MenuItem("GameObject/HGUI/ScrollX", false, 15)]
+    [MenuItem("GameObject/HGUI/ScrollX", false, 16)]
     static public void AddScrollX(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;
@@ -671,7 +677,7 @@ public static class UICompositeMenu
         txt.TextAnchor = TextAnchor.MiddleLeft;
         return mod;
     }
-    [MenuItem("GameObject/HGUI/DropDown", false, 16)]
+    [MenuItem("GameObject/HGUI/DropDown", false, 17)]
     static public void AddDropDown(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;
@@ -750,7 +756,7 @@ public static class UICompositeMenu
         Nob.Sprite = EditorModelManager.FindSprite(icons, background);
         Nob.SprType = SpriteType.Sliced;
     }
-    [MenuItem("GameObject/HGUI/TabControl", false, 17)]
+    [MenuItem("GameObject/HGUI/TabControl", false, 18)]
     static public void AddTabControl(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;
@@ -800,7 +806,7 @@ public static class UICompositeMenu
         content.margin.top = 44;
         return tab;
     }
-    [MenuItem("GameObject/HGUI/DockPanel", false, 18)]
+    [MenuItem("GameObject/HGUI/DockPanel", false, 19)]
     static public void AddDockPanel(MenuCommand menuCommand)
     {
         var game = menuCommand.context as GameObject;
@@ -838,7 +844,7 @@ public static class UICompositeMenu
  
         return dock;
     }
-    [MenuItem("GameObject/HGUI/DesignedDockPanel", false, 19)]
+    [MenuItem("GameObject/HGUI/DesignedDockPanel", false, 20)]
     static public void AddDesignedDockPanel(MenuCommand menuCommand)
     {
         var game = menuCommand.context as GameObject;
@@ -890,7 +896,7 @@ public static class UICompositeMenu
         down.Sprite = bk;
         down.MainColor = 0x69DCF8d0.ToColor();
     }
-    [MenuItem("GameObject/HGUI/DataGrid", false, 20)]
+    [MenuItem("GameObject/HGUI/DataGrid", false, 21)]
     static public void AddDataGrid(MenuCommand menuCommand)
     {
         GameObject parent = menuCommand.context as GameObject;

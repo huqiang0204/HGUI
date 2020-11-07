@@ -275,7 +275,7 @@ namespace huqiang.Core.HGUI
                     for (int i = 0; i < ol; i++)
                     {
                         int start = lines[l].startCharIdx;
-                        int oc = lines[l].endIdx - start + 1;
+                        int oc = lines[l].endIdx - start;
                         for(int k=0;k<verts.Count;k+=4)
                         {
                             if(verts[k].Index>=start)

@@ -27,12 +27,28 @@ public class UIHierarchy : EditorWindow
         UIHierarchy window = (UIHierarchy)EditorWindow.GetWindow(typeof(UIHierarchy));
         window.Show();
     }
-
+	Vector2 pos;
+	GUIStyle defStyle;
+	GUIStyle selectStyle;
 	void OnGUI()
     {
+		defStyle = new GUIStyle();
+		defStyle.normal.background = null;
+		defStyle.normal.textColor = new Color(0.7f, 0.7f, 0.7f, 1);
+		selectStyle = new GUIStyle();
+		selectStyle.normal.background = null;
+		selectStyle.normal.textColor = Color.white;
+
 		treeIndex = 0;
-		if (Root != null)
-			DrawFileTree(Root, 0);
+		var w = position.width;
+		var h = position.height;
+		//EditorGUILayout.BeginVertical();
+		pos = EditorGUILayout.BeginScrollView(pos, GUILayout.Width(w), GUILayout.Height(h));
+        if (Root != null)
+            DrawFileTree(Root, 0);
+        //GUILayout.Label("ttt",GUILayout.Width(w),GUILayout.Height(h+200));
+        EditorGUILayout.EndScrollView();
+		//EditorGUILayout.EndVertical();
 		var evt = Event.current;
 		var contextRect = new Rect(0, 0, 1000, 1000);
 
@@ -65,52 +81,48 @@ public class UIHierarchy : EditorWindow
 		{
 			return;
 		}
-		GUIStyle style = new GUIStyle();
-		style.normal.background = null;
-		style.normal.textColor = new Color(0.7f,0.7f,0.7f,1);
+		GUILayout.BeginHorizontal();
+
+		GUIStyle style;
 		if (node == currentNode)
 		{
-			style.normal.textColor = Color.red;
+			style = selectStyle;
 		}
-
-		Rect rect = new Rect(5 + 20 * level, 5 + 16 * treeIndex, node.content.Length * 25, 20);
+		else 
+		{
+			style = defStyle; 
+		}
+		GUILayout.Space(5 + 14 * level);
 		treeIndex++;
-
 		if ( node.child.Count>0)
 		{
-			//node.expand = EditorGUI.Foldout(rect, node.expand, node.content, true);
 			if(node.expand)
             {
-				if (GUI.Button(rect, "▼ " + node.content, style))
+				
+				if (GUILayout.Button( "▼ " + node.content, style))
 				{
 					currentNode = node;
 					node.expand = false;
-					Debug.Log(node.content);
 				}
 			}
             else
             {
-				if (GUI.Button(rect, "► "+ node.content, style))
+				if (GUILayout.Button("► "+ node.content, style))
 				{
 					currentNode = node;
 					node.expand = true;
-					Debug.Log(node.content);
 				}
 			}
-		
 		}
 		else
 		{
-            //node.content  = GUI.TextArea(rect, node.content, style);
-            if (GUI.Button(rect, node.content, style))
+            if (GUILayout.Button("  "+node.content, style))
             {
-                Debug.Log(node.content);
                 currentNode = node;
             }
-            //EditorGUI.Foldout(rect, true, node.content, true);
         }
-
-        if (node == null || !node.expand || node.child.Count == 0)
+		GUILayout.EndHorizontal();
+		if (node == null || !node.expand || node.child.Count == 0)
 		{
 			return;
 		}

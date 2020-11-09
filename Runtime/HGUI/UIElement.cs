@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace huqiang.Core.HGUI
 {
-    public enum EventType
+    public enum HEventType
     {
         None,
         UserEvent,
@@ -626,7 +626,7 @@ namespace huqiang.Core.HGUI
         /// <summary>
         /// 用户事件类型
         /// </summary>
-        public EventType eventType;
+        public HEventType eventType;
         /// <summary>
         /// 复合型UI类型
         /// </summary>
@@ -754,10 +754,10 @@ namespace huqiang.Core.HGUI
         {
             switch(eventType)
             {
-                case EventType.None: break;
-                case EventType.UserEvent:RegEvent<UserEvent>(ex); break;
-                case EventType.TextInput: RegEvent<InputBoxEvent>(ex); break;
-                case EventType.GestureEvent: RegEvent<GestureEvent>(ex); break;
+                case HEventType.None: break;
+                case HEventType.UserEvent:RegEvent<UserEvent>(ex); break;
+                case HEventType.TextInput: RegEvent<InputBoxEvent>(ex); break;
+                case HEventType.GestureEvent: RegEvent<GestureEvent>(ex); break;
             }
             CreateUIComposite(this,ex, initializer);
         }
@@ -839,15 +839,15 @@ namespace huqiang.Core.HGUI
         }
         protected virtual void Start()
         {
-            if (eventType != EventType.None)
+            if (eventType != HEventType.None)
             {
                 if (userEvent == null)
                     switch (eventType)
                     {
-                        case EventType.UserEvent:
+                        case HEventType.UserEvent:
                             RegEvent<UserEvent>(mod);
                             break;
-                        case EventType.GestureEvent:
+                        case HEventType.GestureEvent:
                             RegEvent<GestureEvent>(mod);
                             break;
                     }

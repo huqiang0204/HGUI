@@ -52,7 +52,7 @@ namespace huqiang.UIComposite
         {
             if (element.userEvent == null)
             {
-                element.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+                element.eventType = huqiang.Core.HGUI.HEventType.UserEvent;
                 element.RegEvent<UserEvent>();
             }
             AddEvent(element.userEvent);

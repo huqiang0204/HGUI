@@ -20,7 +20,7 @@ namespace huqiang.Core.HGUI
         public MarginType marginType;
         public ParentType parentType;
         public Margin margin;
-        public EventType eventType;
+        public HEventType eventType;
         public CompositeType compositeType;
         public bool Mask;
 

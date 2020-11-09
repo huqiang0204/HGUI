@@ -261,7 +261,7 @@ public static class UICompositeMenu
         var scroll = UICreator.CreateHImage(Vector3.zero, new Vector2(400, 400), "gridScroll", pt);
         scroll.Mask = true;
         scroll.MainColor = new Color32(224, 224, 224, 255);
-        scroll.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        scroll.eventType = huqiang.Core.HGUI.HEventType.UserEvent;
         scroll.compositeType = CompositeType.GridScroll;
         scroll.Sprite = EditorModelManager.FindSprite(icons, background);
         scroll.SprType = SpriteType.Sliced;
@@ -275,7 +275,7 @@ public static class UICompositeMenu
         var ss = new GameObject("Rocker");
         var scr = ss.AddComponent<HImage>();
         scr.SizeDelta = new Vector2(300, 300);
-        scr.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        scr.eventType = huqiang.Core.HGUI.HEventType.UserEvent;
         scr.compositeType = CompositeType.Rocker;
         scr.Sprite = EditorModelManager.FindSprite(icons, circleol);
         var rect = ss.transform;
@@ -335,7 +335,7 @@ public static class UICompositeMenu
         var date = new GameObject("Date");
         var main = date.AddComponent<UIElement>();
         main.SizeDelta = new Vector2(400,200);
-        main.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        main.eventType = huqiang.Core.HGUI.HEventType.UserEvent;
         main.compositeType = CompositeType.UIDate;
         Transform rect = date.transform;
         if (parent != null)
@@ -384,7 +384,7 @@ public static class UICompositeMenu
         var Year = new GameObject("Year", typeof(UIElement));
         var ui = Year.GetComponent<UIElement>();
         ui.SizeDelta = new Vector2(80,400);
-        ui.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        ui.eventType = huqiang.Core.HGUI.HEventType.UserEvent;
         ui.compositeType = CompositeType.ScrollY;
         var fr = Year.transform;
         fr.SetParent(rect);
@@ -407,7 +407,7 @@ public static class UICompositeMenu
         var Month = new GameObject("Month",typeof(UIElement));
         ui = Month.GetComponent<UIElement>();
         ui.SizeDelta = new Vector2(80, 400);
-        ui.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        ui.eventType = huqiang.Core.HGUI.HEventType.UserEvent;
         ui.compositeType = CompositeType.ScrollY;
         fr = Month.transform;
         fr.SetParent(rect);
@@ -430,7 +430,7 @@ public static class UICompositeMenu
         var Day = new GameObject("Day", typeof(UIElement));
         ui = Day.GetComponent<UIElement>();
         ui.SizeDelta = new Vector2(80, 400);
-        ui.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        ui.eventType = huqiang.Core.HGUI.HEventType.UserEvent;
         ui.compositeType = CompositeType.ScrollY;
         fr = Day.transform;
         fr.SetParent(rect);
@@ -457,7 +457,7 @@ public static class UICompositeMenu
         var palette = new GameObject("Palette");
         var main = palette.AddComponent<HImage>();
         main.SizeDelta = new Vector2(500,500);
-        main.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        main.eventType = huqiang.Core.HGUI.HEventType.UserEvent;
         main.compositeType = CompositeType.UIPalette;
         Transform rect = palette.transform;
         if (parent != null)
@@ -469,7 +469,7 @@ public static class UICompositeMenu
         var Fill = new GameObject("HTemplate");
         var fr = Fill.transform;
         var ht = Fill.AddComponent<HImage>();
-        ht.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        ht.eventType = huqiang.Core.HGUI.HEventType.UserEvent;
         ht.SizeDelta = new Vector2(256, 256);
         fr.SetParent(rect);
         fr.localPosition = Vector3.zero;
@@ -503,7 +503,7 @@ public static class UICompositeMenu
         fn.localScale = Vector3.one;
         fn.localRotation = Quaternion.identity;
         img= Slider.AddComponent<HImage>();
-        img.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        img.eventType = huqiang.Core.HGUI.HEventType.UserEvent;
         img.compositeType = CompositeType.Slider;
         img.SizeDelta = new Vector2(400, 20);
 
@@ -532,7 +532,7 @@ public static class UICompositeMenu
         scroll.margin.right = 20;
         scroll.Mask = true;
         scroll.MainColor = new Color32(224, 224, 224, 255);
-        scroll.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        scroll.eventType = huqiang.Core.HGUI.HEventType.UserEvent;
         scroll.compositeType = CompositeType.ScrollY;
         scroll.Sprite = EditorModelManager.FindSprite(icons, background);
         scroll.SprType = SpriteType.Sliced;
@@ -570,7 +570,7 @@ public static class UICompositeMenu
         var scroll = UICreator.CreateHImage(new Vector3(0,400,0), new Vector2(400, 800), "ScrollEx", pt);
         scroll.Mask = true;
         scroll.MainColor = new Color32(224, 224, 224, 255);
-        scroll.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        scroll.eventType = huqiang.Core.HGUI.HEventType.UserEvent;
         scroll.compositeType = CompositeType.ScrollYExtand;
         scroll.Sprite = EditorModelManager.FindSprite(icons, background);
         scroll.SprType = SpriteType.Sliced;
@@ -613,7 +613,7 @@ public static class UICompositeMenu
         var img = UICreator.CreateHImage(Vector3.zero, new Vector2(400, 90), "Image", mod.transform);
         img.Pivot = new Vector2(0.5f,1);
         img.MainColor = new Color32(68, 68, 68, 255);
-        img.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        img.eventType = huqiang.Core.HGUI.HEventType.UserEvent;
         img.Sprite = EditorModelManager.FindSprite(icons, background);
         img.SprType = SpriteType.Sliced;
 
@@ -637,7 +637,7 @@ public static class UICompositeMenu
         scroll.margin.down = 20;
         scroll.Mask = true;
         scroll.MainColor = new Color32(224, 224, 224, 255);
-        scroll.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        scroll.eventType = huqiang.Core.HGUI.HEventType.UserEvent;
         scroll.compositeType = CompositeType.ScrollX;
         scroll.Sprite = EditorModelManager.FindSprite(icons, background);
         scroll.SprType = SpriteType.Sliced;
@@ -666,7 +666,7 @@ public static class UICompositeMenu
 
         var img = UICreator.CreateHImage(Vector3.zero,new Vector2(90,90),"Image",mod.transform);
         img.MainColor = new Color32(68,68,68,255);
-        img.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        img.eventType = huqiang.Core.HGUI.HEventType.UserEvent;
         img.Sprite = EditorModelManager.FindSprite(icons, background);
         img.SprType = SpriteType.Sliced;
 
@@ -688,7 +688,7 @@ public static class UICompositeMenu
         drop.Sprite = EditorModelManager.FindSprite(icons, background);
         drop.SprType = SpriteType.Sliced;
         drop.MainColor = new Color32(224,224,224,255);
-        drop.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        drop.eventType = huqiang.Core.HGUI.HEventType.UserEvent;
         drop.compositeType = CompositeType.DropDown;
         if (parent != null)
             rect.SetParent(parent.transform);
@@ -715,13 +715,13 @@ public static class UICompositeMenu
         main.Pivot = new Vector2(0.5f, 1);
         main.Mask = true;
         main.MainColor = new Color32(224, 224, 224, 255);
-        main.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        main.eventType = huqiang.Core.HGUI.HEventType.UserEvent;
         main.compositeType = CompositeType.ScrollY;
         main.Sprite = EditorModelManager.FindSprite(icons, background);
         main.SprType = SpriteType.Sliced;
 
         var item = UICreator.CreateElement(new Vector3(0, -150, 0), new Vector2(300, 60), "Item", main.transform);
-        item.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        item.eventType = huqiang.Core.HGUI.HEventType.UserEvent;
         img = UICreator.CreateHImage(Vector3.zero,new Vector2(290,50),"Image",item.transform);
         img.Sprite = EditorModelManager.FindSprite(icons, background);
         img.SprType = SpriteType.Sliced;
@@ -740,7 +740,7 @@ public static class UICompositeMenu
         img.MainColor = Color.black;
 
         var slider = UICreator.CreateHImage(new Vector3(140,-150,0), new Vector2(20, 300), "Slider", main.transform);
-        slider.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        slider.eventType = huqiang.Core.HGUI.HEventType.UserEvent;
         slider.compositeType = CompositeType.Slider;
         slider.Sprite = EditorModelManager.FindSprite(icons, background);
         slider.SprType = SpriteType.Sliced;
@@ -769,7 +769,7 @@ public static class UICompositeMenu
         var tab = UICreator.CreateHImage(Vector3.zero, new Vector2(800, 800), "TabControl",parent);
         tab.Mask = true;
         tab.MainColor = new Color32(204, 204, 204, 255);
-        tab.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        tab.eventType = huqiang.Core.HGUI.HEventType.UserEvent;
         tab.compositeType = CompositeType.TabControl;
         tab.Sprite = EditorModelManager.FindSprite(icons, background);
         tab.SprType = SpriteType.Sliced;
@@ -870,7 +870,7 @@ public static class UICompositeMenu
         var item = tab.transform.Find("Item");
 
         var clo = UICreator.CreateHImage(new Vector3(41.5f,0,0),new Vector2(30,30),"Close",item);
-        clo.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        clo.eventType = huqiang.Core.HGUI.HEventType.UserEvent;
         clo.Sprite = EditorModelManager.FindSprite(icons, close);
 
         var Cover = UICreator.CreateHImage(Vector3.zero,new Vector2(30,30),"Cover",aux.transform);
@@ -945,7 +945,7 @@ public static class UICompositeMenu
         txt.Text = "数据";
 
         var drag = UICreator.CreateElement(Vector3.zero, new Vector2(40, 60), "Drag", dg.transform);
-        drag.eventType = huqiang.Core.HGUI.EventType.UserEvent;
+        drag.eventType = huqiang.Core.HGUI.HEventType.UserEvent;
       
     }
 }

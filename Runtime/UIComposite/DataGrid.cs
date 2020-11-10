@@ -10,7 +10,7 @@ namespace huqiang.UIComposite
 {
     public class DataBaseItem
     {
-        public int index;
+        public int index =-1;
         public GameObject target;
     }
     public class DataGridHead:DataBaseItem
@@ -353,6 +353,9 @@ namespace huqiang.UIComposite
                 if(colunn.itemCreator!=null)
                 {
                     item = colunn.CreateEnity();
+                    item.index = -1;
+                    item.Row = -1;
+                    item.Column = -1;
                     if (item.Item == null)
                         item.Item = item.target.GetComponent<UIElement>();
                     var trans = item.target.transform;

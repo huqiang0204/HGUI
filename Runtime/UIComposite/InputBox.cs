@@ -274,12 +274,7 @@ namespace huqiang.UIComposite
         {
             Editing = false;
             TextCom.Text = FullString.FullString;
-            if (ReplaceTarget != null)
-            {
-                ReplaceTarget.Text = FullString.FullString;
-                Enity.gameObject.SetActive(false);
-            }
-            else SetShowText();
+            SetShowText();
             if (OnDone != null)
                 OnDone(this);
             Input.imeCompositionMode = IMECompositionMode.Auto;
@@ -740,50 +735,17 @@ namespace huqiang.UIComposite
             return EditState.Continue;
         }
         /// <summary>
-        /// 更换的目标载体
-        /// </summary>
-        public HText ReplaceTarget { get; private set; }
-        /// <summary>
         /// 更换目标载体
         /// </summary>
         /// <param name="text">目标实例</param>
         /// <param name="user">用户事件</param>
         /// <param name="action">用户动作</param>
-        public void Replace(HText text, UserEvent user, UserAction action)
+        public void Replace(UserAction action)
         {
-            ReplaceTarget = text;
-            if (text == null)
-            {
-                return;
-            }
-            var son = Enity.transform;
-            var par = text.transform;
-            son.SetParent(par);
-            son.localPosition = Vector3.zero;
-            son.localScale = Vector3.one;
-            son.localRotation = Quaternion.identity;
-            Enity.marginType = MarginType.Margin;
-            Enity.margin.left = 0;
-            Enity.margin.right = 0;
-            Enity.margin.top = 0;
-            Enity.margin.down = 0;
-            UIElement.Resize(Enity);
-            HTextLoader.CopyTo(text,TextCom);
-            FullString.FullString = text.Text;
-            TextOperation.contentType = m_ctpye;
-            TextOperation.ChangeText(TextCom,FullString);
             action.AddFocus(InputEvent);
-            Input.imeCompositionMode = IMECompositionMode.On;
-            Enity.gameObject.SetActive(true);
-            text.Text = "";
-            Editing = true;
-            SetShowText();
             PressInfo press = new PressInfo();
-            InputEvent.GlobalPosition = user.GlobalPosition;
-            InputEvent.GlobalScale = user.GlobalScale;
-            InputEvent.GlobalRotation = user.GlobalRotation;
             InputEvent.CheckPointer(action,ref press);
-            TextOperation.SetPress(ref press);
+            OnMouseDown(action,ref press);
         }
     }
 }

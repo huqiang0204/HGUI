@@ -16,6 +16,7 @@ public class DataGridPage:UIPage
         public DataGrid grid;
         public UserEvent last;
         public UserEvent next;
+        public InputBox inputBox;
     }
     View view;
     public override void Initial(Transform parent, object dat = null)
@@ -28,6 +29,7 @@ public class DataGridPage:UIPage
     }
     void InitialDataGrid()
     {
+        view.grid.SetItemUpdate<DataGridItem, DataGridItemContext>(ItemUpdate);
         DataGridColumn column = new DataGridColumn();
         column.Head = "姓名";
         view.grid.AddColumn(column);
@@ -43,7 +45,7 @@ public class DataGridPage:UIPage
         column = new DataGridColumn();
         column.Head = "婚否";
         view.grid.AddColumn(column);
-        for(int i=0;i<20;i++)
+        for(int i=0;i<1;i++)
         view.grid.AddRow(
             new DataGridItemContext() { Text="胡强"},
             new DataGridItemContext() { Text="28"},
@@ -52,5 +54,26 @@ public class DataGridPage:UIPage
             new DataGridItemContext() { Text="单身贵族"}
             );
         view.grid.Refresh();
+    }
+    int SelectRow;
+    void ItemUpdate(DataGridItem item, DataGridItemContext context)
+    {
+        item.Text.Text = context.Text;
+        Debug.Log(context.Text);
+        var ue = item.Item.RegEvent<UserEvent>();
+        ue.DataContext = item;
+        ue.Click = (o, e) => {
+            var i = o.DataContext as DataGridItem;
+            SelectRow = i.Row;
+            var trans = view.inputBox.Enity.transform;
+            trans.SetParent(i.Text.transform);
+            trans.localScale = Vector3.one;
+            UIElement.Resize(view.inputBox.Enity);
+            view.inputBox.InputString = i.Text.Text;
+            //e.AddFocus(view.inputBox.InputEvent);
+            e.RemoveFocus(o);
+            view.inputBox.Replace(e);
+            view.inputBox.DataContext = o.DataContext;
+        };
     }
 }

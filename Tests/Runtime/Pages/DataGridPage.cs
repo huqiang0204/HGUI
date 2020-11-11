@@ -24,8 +24,22 @@ public class DataGridPage:UIPage
         base.Initial(parent, dat);
         view = LoadUI<View>("baseUI", "datagrid");//"baseUI"创建的bytes文件名,"page"为创建的页面名
         InitialDataGrid();
+        view.inputBox.OnDone = InputDone;
+        view.inputBox.OnSubmit = InputSubmit;
         view.last.Click = (o, e) => { LoadPage<TreeViewPage>(); };
         view.next.Click = (o, e) => { LoadPage<StartPage>(); };
+        view.inputBox.Enity.gameObject.SetActive(false);
+    }
+    void InputDone(InputBox input)
+    {
+        var dgc = input.DataContext as DataGridItem;
+        dgc.Text.Text = dgc.Context.Text = input.InputString;
+        view.inputBox.Enity.gameObject.SetActive(false);
+    }
+    void InputSubmit(InputBox input)
+    {
+        var dgc = input.DataContext as DataGridItem;
+        dgc.Text.Text = dgc.Context.Text = input.InputString;
     }
     void InitialDataGrid()
     {
@@ -59,7 +73,6 @@ public class DataGridPage:UIPage
     void ItemUpdate(DataGridItem item, DataGridItemContext context)
     {
         item.Text.Text = context.Text;
-        Debug.Log(context.Text);
         var ue = item.Item.RegEvent<UserEvent>();
         ue.DataContext = item;
         ue.Click = (o, e) => {
@@ -70,10 +83,12 @@ public class DataGridPage:UIPage
             trans.localScale = Vector3.one;
             UIElement.Resize(view.inputBox.Enity);
             view.inputBox.InputString = i.Text.Text;
-            //e.AddFocus(view.inputBox.InputEvent);
             e.RemoveFocus(o);
-            view.inputBox.Replace(e);
+            e.AddFocus(view.inputBox.InputEvent);
             view.inputBox.DataContext = o.DataContext;
+            view.inputBox.Enity.gameObject.SetActive(true);
+            view.inputBox.PointerMoveEnd();
+            TextOperation.EndPress = TextOperation.StartPress;
         };
     }
 }

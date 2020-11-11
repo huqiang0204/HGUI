@@ -734,18 +734,5 @@ namespace huqiang.UIComposite
             }
             return EditState.Continue;
         }
-        /// <summary>
-        /// 更换目标载体
-        /// </summary>
-        /// <param name="text">目标实例</param>
-        /// <param name="user">用户事件</param>
-        /// <param name="action">用户动作</param>
-        public void Replace(UserAction action)
-        {
-            action.AddFocus(InputEvent);
-            PressInfo press = new PressInfo();
-            InputEvent.CheckPointer(action,ref press);
-            OnMouseDown(action,ref press);
-        }
     }
 }

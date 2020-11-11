@@ -474,6 +474,7 @@ namespace huqiang.UIEvent
             eve.Pressed = isPressed;
             if (eve.Pressed)
                 eve.PressTime = EventTicks;
+            eve.Focus = true;
         }
         /// <summary>
         /// 移除焦点
@@ -486,6 +487,7 @@ namespace huqiang.UIEvent
             LastFocus.Remove(eve);
             MultiFocus.Remove(eve);
             eve.Pressed = false;
+            eve.Focus = false;
         }
     }
 }

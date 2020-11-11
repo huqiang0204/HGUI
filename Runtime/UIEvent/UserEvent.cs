@@ -271,7 +271,7 @@ namespace huqiang.UIEvent
         /// <summary>
         /// 焦点状态
         /// </summary>
-        public bool Focus { get; protected set; }
+        public bool Focus { get; internal set; }
         /// <summary>
         /// 用户拖拽造成的速率X
         /// </summary>

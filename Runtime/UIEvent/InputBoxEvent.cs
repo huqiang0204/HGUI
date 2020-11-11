@@ -82,20 +82,20 @@ namespace huqiang.UIEvent
         }
         public override void OnMouseDown(UserAction action)
         {
-            PressInfo press = new PressInfo();
-            CheckPointer(action,ref press);
-            input.OnMouseDown(action,ref press);
             base.OnMouseDown(action);
+            PressInfo press = new PressInfo();
+            CheckPointer(action, ref press);
+            input.OnMouseDown(action, ref press);
         }
         internal override void OnClick(UserAction action)
         {
-            input.OnClick(action);
             base.OnClick(action);
+            input.OnClick(action);
         }
         internal override void OnLostFocus(UserAction action)
         {
-            input.OnLostFocus(action);
             base.OnLostFocus(action);
+            input.OnLostFocus(action);
         }
         protected override void OnDrag(UserAction action)
         {

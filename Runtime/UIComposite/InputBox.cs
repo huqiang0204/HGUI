@@ -244,7 +244,7 @@ namespace huqiang.UIComposite
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR
             if (!ReadOnly)
                 Editing = true;
-            Input.imeCompositionMode = IMECompositionMode.On;
+            //Input.imeCompositionMode = IMECompositionMode.On;
 #endif
         }
         /// <summary>
@@ -256,7 +256,7 @@ namespace huqiang.UIComposite
             TextOperation.contentType = m_ctpye;
             if (!ReadOnly)
             {
-                Input.imeCompositionMode = IMECompositionMode.On;
+                //Input.imeCompositionMode = IMECompositionMode.On;
                 Editing = true;
                 if (!Keyboard.active)
                 {
@@ -277,7 +277,7 @@ namespace huqiang.UIComposite
             SetShowText();
             if (OnDone != null)
                 OnDone(this);
-            Input.imeCompositionMode = IMECompositionMode.Auto;
+            //Input.imeCompositionMode = IMECompositionMode.Auto;
         }
         /// <summary>
         /// 拖动选择

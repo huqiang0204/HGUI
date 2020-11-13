@@ -89,6 +89,7 @@ public class DataGridPage:UIPage
             view.inputBox.Enity.gameObject.SetActive(true);
             view.inputBox.PointerMoveEnd();
             TextOperation.EndPress = TextOperation.StartPress;
+            //TextOperation.SelectAll();
         };
     }
 }

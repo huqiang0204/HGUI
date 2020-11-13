@@ -315,6 +315,7 @@ namespace huqiang.UIComposite
                 if (ValidateChar(this, s, str[0]) == 0)
                     return "";
             InsertString(str);
+            SetShowText();
             return str;
         }
         void TouchInputChanged(string input)
@@ -514,7 +515,6 @@ namespace huqiang.UIComposite
                     if (Keyboard.InputChanged)
                     {
                         OnInputChanged(Keyboard.InputString);
-                        SetShowText();
                     }
                     else if (Keyboard.TempStringChanged)
                     {

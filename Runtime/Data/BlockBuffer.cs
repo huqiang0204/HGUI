@@ -222,6 +222,15 @@ namespace huqiang.Data
             usage -= block;
         }
         /// <summary>
+        /// 清除所有注册信息
+        /// </summary>
+        public unsafe void Clear()
+        {
+            byte* bp = (byte*)ptr;
+            for (int i = 0; i < pe; i++)//填0
+                bp[i] = 0;
+        }
+        /// <summary>
         /// 数据填0
         /// </summary>
         /// <param name="offset">偏移位置</param>

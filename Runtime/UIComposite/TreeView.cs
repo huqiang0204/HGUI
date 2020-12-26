@@ -1,4 +1,5 @@
 ﻿using huqiang.Core.HGUI;
+using huqiang.Core.UIData;
 using huqiang.Data;
 using huqiang.UIEvent;
 using System;
@@ -61,6 +62,22 @@ namespace huqiang.UIComposite
             if (node != null)
                 node.child.Add(this);
             parent = node;
+        }
+        public int GetSiblingIndex()
+        {
+            if (parent == null)
+                return 0;
+            return parent.child.IndexOf(this);
+        }
+        public void SetSiblingIndex(int index)
+        {
+            if (parent == null)
+                return;
+            var c = parent.child;
+            c.Remove(this);
+            if (index >= c.Count)
+                c.Add(this);
+            else c.Insert(index, this);
         }
         /// <summary>
         /// 父节点
@@ -145,7 +162,7 @@ namespace huqiang.UIComposite
         /// <summary>
         /// 主体游戏对象
         /// </summary>
-        public GameObject target;
+        public UIElement target;
         /// <summary>
         /// 文本内容展示主体
         /// </summary>
@@ -268,7 +285,7 @@ namespace huqiang.UIComposite
         /// 树形框尺寸
         /// </summary>
         public Vector2 Size;
-        Vector2 contentSize;
+        Vector2 ContentSize;
         /// <summary>
         /// 项目节点尺寸
         /// </summary>
@@ -289,8 +306,9 @@ namespace huqiang.UIComposite
         /// 项目模型
         /// </summary>
         public FakeStruct ItemMod;
-        float m_pointY;
-        float m_pointX;
+        Vector2 Position;
+        //float m_pointY;
+        //float m_pointX;
         /// <summary>
         /// 交换缓存
         /// </summary>
@@ -312,14 +330,14 @@ namespace huqiang.UIComposite
             swap = new SwapBuffer<TreeViewItem, TreeViewNode>(512);
             queue = new QueueBuffer<TreeViewItem>(256);
         }
-        public override void Initial(FakeStruct fake, UIElement script,Initializer initializer)
+        public override void Initial(FakeStruct fake, UIElement script,UIInitializer initializer)
         {
             base.Initial(fake, script,initializer);
             eventCall = script.RegEvent<UserEvent>();
+            eventCall.PointerDown = (o, e) => { UpdateVelocity = false; };
             eventCall.Drag = (o, e, s) => { Scrolling(o, s); };
-            eventCall.DragEnd = (o, e, s) => { Scrolling(o, s); };
+            eventCall.DragEnd = OnDragEnd;
             eventCall.MouseWheel = (o, e) => { Scrolling(o,new Vector2(0, e.MouseWheelDelta*100)); };
-            eventCall.Scrolling = Scrolling;
             eventCall.ForceEvent = true;
             eventCall.AutoColor = false;
             Size = Enity.SizeDelta;
@@ -327,8 +345,8 @@ namespace huqiang.UIComposite
             ItemMod = HGUIManager.FindChild(fake, "Item");
             if (ItemMod != null)
             {
-                HGUIManager.GameBuffer.RecycleChild(script.gameObject);
-                unsafe { ItemSize = ((UITransfromData*)ItemMod.ip)->size; }
+                HGUIManager.RecycleChild(script);
+                ItemSize = UIElementLoader.GetSize(ItemMod);
                 ItemHigh = ItemSize.y;
             }
             Enity.SizeChanged = (o) => { Refresh(); };
@@ -342,12 +360,19 @@ namespace huqiang.UIComposite
         {
             if (Enity == null)
                 return;
-            var trans = eventCall.Context.transform;
+            var trans = eventCall.Context;
             v.x /= trans.localScale.x;
             v.y /= trans.localScale.y;
-            LimitX(back, -v.x);
-            LimitY(back, v.y);
+            LimitX(-v.x);
+            LimitY(v.y);
             Refresh();
+        }
+        void OnDragEnd(UserEvent back, UserAction action, Vector2 v)
+        {
+            Scrolling(back, v);
+            startVelocity.x = mVelocity.x = -back.VelocityX;
+            startVelocity.y = mVelocity.y = back.VelocityY;
+            UpdateVelocity = true;
         }
         float hy;
         float hx;
@@ -361,17 +386,17 @@ namespace huqiang.UIComposite
             Size = Enity.SizeDelta;
             hy = Size.y * 0.5f;
             hx = Size.x * 0.5f;
-            contentSize.x = ItemSize.x;
-            contentSize.y = CalculHigh(Root, 0, 0);
+            ContentSize.x = ItemSize.x;
+            ContentSize.y = CalculHigh(Root, 0, 0);
             RecycleItem();
-            if (m_pointX + ItemSize.x > contentSize.x)
-                m_pointX = contentSize.x - ItemSize.x;
+            if (Position.x + ItemSize.x > ContentSize.x)
+                Position.x = ContentSize.x - ItemSize.x;
 
             for (int i = 0; i < swap.Length; i++)
             {
-                var trans = swap[i].target.transform;
+                var trans = swap[i].target;
                 var p = trans.localPosition;
-                p.x -= m_pointX;
+                p.x -= Position.x;
                 trans.localPosition = p;
             }
         }
@@ -384,7 +409,7 @@ namespace huqiang.UIComposite
             for (int i = 0; i < len; i++)
             {
                 var it = swap.Pop();
-                it.target.SetActive(false);
+                it.target.activeSelf = false;
                 queue.Enqueue(it);
             }
             swap.Done();
@@ -402,13 +427,13 @@ namespace huqiang.UIComposite
                 for (int i = 0; i < node.child.Count; i++)
                     high = CalculHigh(node.child[i], level, high);
             float x = level * ItemHigh + ItemSize.x;
-            if (x > contentSize.x)
-                contentSize.x = x;
+            if (x > ContentSize.x)
+                ContentSize.x = x;
             return high;
         }
         void UpdateItem(TreeViewNode node)
         {
-            float dy = node.offset.y - m_pointY;
+            float dy = node.offset.y - Position.y;
             if (dy <= Size.y)
                 if (dy + ItemHigh > 0)
                 {
@@ -433,7 +458,7 @@ namespace huqiang.UIComposite
                         else item.Text.Text = node.content;
                     }
                     var m = item.Item.Context;
-                    m.transform.localPosition = new Vector3(node.offset.x, hy - dy - ItemHigh * 0.5f, 0);
+                    m.localPosition = new Vector3(node.offset.x, hy - dy - ItemHigh * 0.5f, 0);
                 }
         }
         /// <summary>
@@ -445,30 +470,29 @@ namespace huqiang.UIComposite
             TreeViewItem it = queue.Dequeue();
             if (it != null)
             {
-                it.target.SetActive(true);
+                it.target.activeSelf = true;
                 return it;
             }
             if (creator != null)
             {
                 var t = creator.Create();
-                t.target = HGUIManager.GameBuffer.Clone(ItemMod, creator.initializer);
-                var trans = t.target.transform;
-                trans.SetParent(Enity.transform);
+                t.target = HGUIManager.Clone(ItemMod, creator.initializer);
+                var trans = t.target;
+                trans.SetParent(Enity);
                 trans.localScale = Vector3.one;
                 trans.localRotation = Quaternion.identity;
                 return t;
             }
             else
             {
-                var go = HGUIManager.GameBuffer.Clone(ItemMod);
-                var trans = go.transform;
-                trans.SetParent(Enity.transform);
-                trans.localScale = Vector3.one;
-                trans.localRotation = Quaternion.identity;
+                var go = HGUIManager.Clone(ItemMod);
+                go.SetParent(Enity);
+                go.localScale = Vector3.one;
+                go.localRotation = Quaternion.identity;
                 TreeViewItem a = new TreeViewItem();
                 a.target = go;
-                a.Text = go.GetComponent<HText>();
-                a.Item = a.Text.RegEvent<UserEvent>();
+                a.Text = go as HText;
+                a.Item = go.RegEvent<UserEvent>();
                 a.Item.Click = DefultItemClick;
                 a.Item.DataContext = a;
                 return a;
@@ -480,60 +504,60 @@ namespace huqiang.UIComposite
         /// </summary>
         /// <param name="callBack">用户事件</param>
         /// <param name="x">参考移动距离</param>
-        protected void LimitX(UserEvent callBack, float x)
+        protected void LimitX(float x)
         {
             var size = Size;
-            if (size.x > contentSize.x)
+            if (size.x > ContentSize.x)
             {
-                m_pointX = 0;
+                Position.x = 0;
                 return;
             }
             if (x == 0)
                 return;
-            float vx = m_pointX + x;
+            float vx = Position.x + x;
             if (vx < 0)
             {
-                m_pointX = 0;
-                eventCall.VelocityX = 0;
+                Position.x = 0;
+                mVelocity.x = 0;
                 return;
             }
-            else if (vx + size.x > contentSize.x)
+            else if (vx + size.x > ContentSize.x)
             {
-                m_pointX = contentSize.x - size.x;
-                eventCall.VelocityX = 0;
+                Position.x = ContentSize.x - size.x;
+                mVelocity.x = 0;
                 return;
             }
-            m_pointX += x;
+            Position.x += x;
         }
         /// <summary>
         /// 限制纵向滚动
         /// </summary>
         /// <param name="callBack">用户事件</param>
         /// <param name="x">参考移动距离</param>
-        protected void LimitY(UserEvent callBack, float y)
+        protected void LimitY(float y)
         {
             var size = Size;
-            if (size.y > contentSize.y)
+            if (size.y > ContentSize.y)
             {
-                m_pointY = 0;
+                Position.y = 0;
                 return;
             }
             if (y == 0)
                 return;
-            float vy = m_pointY + y;
+            float vy = Position.y + y;
             if (vy < 0)
             {
-                m_pointY = 0;
-                eventCall.VelocityY = 0;
+                Position.y = 0;
+                mVelocity.y = 0;
                 return;
             }
-            else if (vy + size.y > contentSize.y)
+            else if (vy + size.y > ContentSize.y)
             {
-                m_pointY = contentSize.y - size.y;
-                eventCall.VelocityY = 0;
+                Position.y = ContentSize.y - size.y;
+                mVelocity.y = 0;
                 return;
             }
-            m_pointY += y;
+            Position.y += y;
         }
         /// <summary>
         /// 横向滚动百分比0-1
@@ -542,10 +566,10 @@ namespace huqiang.UIComposite
         {
             get
             {
-                float o = contentSize.x - Enity.SizeDelta.x;
+                float o = ContentSize.x - Enity.SizeDelta.x;
                 if (o < 0)
                     return 0;
-                o = m_pointX / o;
+                o = Position.x / o;
                 if (o > 1)
                     o = 1;
                 return o;
@@ -556,8 +580,8 @@ namespace huqiang.UIComposite
                     value = 0;
                 else if (value > 1)
                     value = 1;
-                if (contentSize.x > Enity.SizeDelta.x)
-                    m_pointX = value * (contentSize.x - Enity.SizeDelta.x);
+                if (ContentSize.x > Enity.SizeDelta.x)
+                    Position.x = value * (ContentSize.x - Enity.SizeDelta.x);
             }
         }
         /// <summary>
@@ -567,10 +591,10 @@ namespace huqiang.UIComposite
         {
             get
             {
-                float o = contentSize.y - Enity.SizeDelta.y;
+                float o = ContentSize.y - Enity.SizeDelta.y;
                 if (o < 0)
                     return 0;
-                o = m_pointY / o;
+                o = Position.y / o;
                 if (o > 1)
                     o = 1;
                 return o;
@@ -581,8 +605,8 @@ namespace huqiang.UIComposite
                     value = 0;
                 else if (value > 1)
                     value = 1;
-                if (contentSize.y > Enity.SizeDelta.y)
-                    m_pointY = value * (contentSize.y - Enity.SizeDelta.y);
+                if (ContentSize.y > Enity.SizeDelta.y)
+                    Position.y = value * (ContentSize.y - Enity.SizeDelta.y);
             }
         }
         /// <summary>
@@ -630,7 +654,56 @@ namespace huqiang.UIComposite
         {
             swap.Clear();
             queue.Clear();
-            HGUIManager.GameBuffer.RecycleChild(Enity.gameObject);
+            HGUIManager.RecycleChild(Enity);
+        }
+        /// <summary>
+        /// 初始速率
+        /// </summary>
+        protected Vector2 startVelocity;
+        Vector2 mVelocity;
+        public float DecayRate = 0.997f;
+        protected bool UpdateVelocity = true;
+        public override void Update(float time)
+        {
+            if (!UpdateVelocity)
+                return;
+            float x = 0;
+            float y = 0;
+            int count = UserAction.TimeSlice;
+            if (mVelocity.x != 0)
+            {
+                float dr = DecayRate;
+                for (int i = 0; i < count; i++)
+                {
+                    mVelocity.x *= dr;
+                    x += mVelocity.x;
+                }
+                if (mVelocity.x < 0.01f & mVelocity.x > -0.01f)
+                {
+                    mVelocity.x = 0;
+                }
+            }
+            if (mVelocity.y != 0)
+            {
+                float dr = DecayRate;
+                for (int i = 0; i < count; i++)
+                {
+                    mVelocity.y *= dr;
+                    y += mVelocity.y;
+                }
+                if (mVelocity.y < 0.01f & mVelocity.y > -0.01f)
+                {
+                    mVelocity.y = 0;
+                }
+            }
+            LimitX(x);
+            LimitY(y);
+            Refresh();
+            //if (x != 0 | y != 0)
+            //    Move(new Vector2(x, y));
+
+            if (mVelocity.x == 0 & mVelocity.y == 0)
+                UpdateVelocity = false;
         }
     }
 }

@@ -1,20 +1,27 @@
-﻿using huqiang;
+﻿using huqiang.Core.UIData;
 using huqiang.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace huqiang.Core.HGUI
 {
-    /// <summary>
-    /// HImage的网格处理类
-    /// </summary>
     public class HGUIMesh
     {
+        /// <summary>
+        /// 三角形块级缓存
+        /// </summary>
+        public static BlockBuffer<int> trisBuffer = new BlockBuffer<int>(48, 1024);
         public static BlockBuffer<HVertex> blockBuffer = new BlockBuffer<HVertex>(4, 2048);
-        public static int[] Triangle = new int[] { 0,1,2};
+        public static void Clear()
+        {
+            blockBuffer.Clear();
+            trisBuffer.Clear();
+        }
+        public static int[] Triangle = new int[] { 0, 1, 2 };
         public static int[] Rectangle = new int[] { 0, 2, 3, 0, 3, 1 };
         public static int[] TowRectangle = new int[] { 0, 3, 4, 0, 4, 1, 1, 4, 5, 1, 5, 2 };
         public static int[] FourRectangle = new int[] { 0, 3, 4, 0, 4, 1, 1, 4, 5, 1, 5, 2, 3, 6, 7, 3, 7, 4, 4, 7, 8, 4, 8, 5 };
@@ -55,9 +62,9 @@ namespace huqiang.Core.HGUI
                     //CreateFilledMesh(image);
                     break;
             }
-        label:;
+            label:;
             var c = image.vertInfo.DataCount;
-            if(c>0)
+            if (c > 0)
             {
                 var col = image.m_color;
                 Vector4 tang = image.uvrect;
@@ -113,7 +120,7 @@ namespace huqiang.Core.HGUI
                 hv[3].uv.x = 1;
                 hv[3].uv.y = 1;
             }
-           
+
             image.tris = Rectangle;
         }
         static void CreateSimpleMesh(HImage image)
@@ -163,7 +170,7 @@ namespace huqiang.Core.HGUI
                 hv[3].uv.x = rx;
                 hv[3].uv.y = ty;
             }
-    
+
             image.tris = Rectangle;
         }
         static void CreateSlicedMesh(HImage image)
@@ -179,11 +186,11 @@ namespace huqiang.Core.HGUI
             float p = image.m_pixelsPerUnit;
             if (p < 0.01f)
                 p = 0.01f;
-            float slx = lx +  image.m_border.x / image.m_pixelsPerUnit;
-            float sdy = dy +  image.m_border.y / image.m_pixelsPerUnit;
-            float srx = rx -  image.m_border.z / image.m_pixelsPerUnit;
+            float slx = lx + image.m_border.x / image.m_pixelsPerUnit;
+            float sdy = dy + image.m_border.y / image.m_pixelsPerUnit;
+            float srx = rx - image.m_border.z / image.m_pixelsPerUnit;
             float sty = ty - image.m_border.w / image.m_pixelsPerUnit;
-            if (srx <= slx )
+            if (srx <= slx)
             {
                 float cx = image.m_border.x / (image.m_border.x + image.m_border.z) * x + lx;
                 slx = cx;
@@ -340,15 +347,15 @@ namespace huqiang.Core.HGUI
             float uslx = ulx + image.m_border.x / w;
             float usdy = udy + image.m_border.y / h;
             float usrx = urx - image.m_border.z / w;
-            float usty = uty -  image.m_border.w / h;
+            float usty = uty - image.m_border.w / h;
 
-            if(image.m_fillCenter)
+            if (image.m_fillCenter)
             {
                 int all = (col + 3) * (row + 3);
                 HVertex[] hv = new HVertex[all];
                 int t = (col + 2) * (row + 2) * 2;
                 int[] tris = new int[t];//
-                
+
                 ///填充4个角的顶点
                 hv[0].position.x = lx;
                 hv[0].position.y = dy;
@@ -449,7 +456,7 @@ namespace huqiang.Core.HGUI
         }
         static void CreateFilledMesh(HImage image)
         {
-            switch(image.m_fillMethod)
+            switch (image.m_fillMethod)
             {
                 case FillMethod.Horizontal:
                     FillHorizontal(image);
@@ -472,7 +479,7 @@ namespace huqiang.Core.HGUI
         {
             float px = image.m_pivot.x / image.m_rect.width;
             float py = image.m_pivot.y / image.m_rect.height;
-          
+
             float x = image.SizeDelta.x;
             float y = image.SizeDelta.y;
             float dy = -py * y;
@@ -483,7 +490,7 @@ namespace huqiang.Core.HGUI
             float udy = image.m_rect.y / h;
             float uty = udy + image.m_rect.height / h;
             float lx, rx, ulx, urx;
-            if(image.m_fillOrigin==1)
+            if (image.m_fillOrigin == 1)
             {
                 rx = (1 - px) * x;
                 lx = rx - image.m_fillAmount * x;
@@ -732,16 +739,16 @@ namespace huqiang.Core.HGUI
                     image.tris = Triangle;
                 }
             }
-         
+
         }
         static void FillRadial180(HImage image)
         {
-            if(image.m_fillAmount==1)
+            if (image.m_fillAmount == 1)
             {
                 CreateSimpleMesh(image);
                 return;
             }
-            switch(image.m_fillOrigin)
+            switch (image.m_fillOrigin)
             {
                 case 0:
                     FillRadial180Bottom(image);
@@ -889,7 +896,7 @@ namespace huqiang.Core.HGUI
                     image.tris = Triangle;
                 }
             }
-        
+
         }
         static int[] TriangleL4 = new int[] { 0, 2, 3, 0, 3, 1, 2, 4, 5, 2, 5, 3 };
         static int[] TriangleL3 = new int[] { 0, 1, 2, 1, 3, 4, 1, 4, 2 };
@@ -1025,9 +1032,9 @@ namespace huqiang.Core.HGUI
                     image.tris = Triangle;
                 }
             }
-        
+
         }
-        static int[] TriangleT4 = new int[] { 0, 3, 4, 0, 4, 1, 1, 4, 5,1,5,2};
+        static int[] TriangleT4 = new int[] { 0, 3, 4, 0, 4, 1, 1, 4, 5, 1, 5, 2 };
         static int[] TriangleT3 = new int[] { 0, 3, 1, 1, 3, 4, 1, 4, 2 };
         static void FillRadial180Top(HImage image)
         {
@@ -1160,7 +1167,7 @@ namespace huqiang.Core.HGUI
                     image.tris = Triangle;
                 }
             }
-           
+
         }
         static int[] TriangleR3 = new int[] { 0, 2, 3, 0, 3, 1, 2, 4, 3 };
         static void FillRadial180Right(HImage image)
@@ -1338,7 +1345,7 @@ namespace huqiang.Core.HGUI
                 Vector2 d = MathH.Tan2(360 - a * 360);//方向
                 unsafe
                 {
-                    Vector2* lines =stackalloc Vector2[9];
+                    Vector2* lines = stackalloc Vector2[9];
                     lines[0].x = ocx;
                     lines[2].y = ocy;
                     lines[3].y = y;
@@ -1703,7 +1710,7 @@ namespace huqiang.Core.HGUI
                             break;
                         }
                     }
-                }       
+                }
             }
             float px = image.m_pivot.x / image.m_rect.width;
             float py = image.m_pivot.y / image.m_rect.height;
@@ -2007,7 +2014,7 @@ namespace huqiang.Core.HGUI
             float a = image.m_fillAmount;
             float x = image.SizeDelta.x;
             float y = image.SizeDelta.y;
-            if(image.m_preserveAspect & a>0)
+            if (image.m_preserveAspect & a > 0)
             {
                 float ocx = x * 0.5f;
                 float ocy = y * 0.5f;

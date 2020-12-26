@@ -1,5 +1,6 @@
 ﻿using huqiang;
 using huqiang.Core.HGUI;
+using huqiang.Core.UIData;
 using huqiang.Data;
 using huqiang.Pool;
 using huqiang.UIEvent;
@@ -29,6 +30,15 @@ namespace huqiang.Data
         {
             return false;
         }
+        /// <summary>
+        /// 类型比较
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public virtual bool IsSubType(string obj)
+        {
+            return false;
+        }
     }
     /// <summary>
     /// unity 组件比较器
@@ -52,6 +62,21 @@ namespace huqiang.Data
         public override bool Compare(object obj)
         {
             return obj is T;
+        }
+        public override bool IsSubType(string obj)
+        {
+            if (name == obj)
+                return true;
+            var t = type.BaseType;
+            for (int i = 0; i < 32; i++)
+            {
+                if (obj == t.Name)
+                    return true;
+                if (t.Name == "Component")//不用判定到Object
+                    return false;
+                t = t.BaseType;
+            }
+            return false;
         }
     }
     /// <summary>
@@ -95,17 +120,21 @@ namespace huqiang.Data
         {
             var fs = type.GetFields();
             TempReflection temp = new TempReflection();
-            temp.Top = fs.Length;
-            ReflectionModel[] reflections = new ReflectionModel[temp.Top];
+        
+            List<ReflectionModel> list = new List<ReflectionModel>();
             for (int i = 0; i < fs.Length; i++)
             {
-                ReflectionModel r = new ReflectionModel();
-                r.field = fs[i];
-                r.FieldType = fs[i].FieldType;
-                r.name = fs[i].Name;
-                reflections[i] = r;
+                if(!fs[i].IsNotSerialized)
+                {
+                    ReflectionModel r = new ReflectionModel();
+                    r.field = fs[i];
+                    r.FieldType = fs[i].FieldType;
+                    r.name = fs[i].Name;
+                    list.Add(r);
+                }
             }
-            temp.All = reflections;
+            temp.Top = list.Count;
+            temp.All = list.ToArray();
             return temp;
         }
         /// <summary>
@@ -170,6 +199,19 @@ namespace huqiang.Data
                 }
             }
             return -1;
+        }
+        /// <summary>
+        /// 获取组件索引
+        /// </summary>
+        /// <param name="name">组件名称</param>
+        /// <returns></returns>
+        public TypeInfo GetTypeInfo(int index)
+        {
+            if (index < 0)
+                return null;
+            if (index >= point)
+                return null;
+            return types[index];
         }
         /// <summary>
         /// 获取组件索引
@@ -289,17 +331,15 @@ namespace huqiang.Data
                 return;
             int id = game.GetInstanceID();
             InstanceContext ins = container.Find((o) => { return o.Id == id; });
+            bool rc = false;
             if (ins != null)
-                ins.buffer.ReCycle(game);
+                rc = ins.buffer.ReCycle(game);
             var p = game.transform;
             for (int i = p.childCount - 1; i >= 0; i--)
                 RecycleGameObject(p.GetChild(i).gameObject);
-            if (ins != null)
-            { 
+            if (rc)
                 p.SetParent(CycleBuffer);
-            }
-            else
-                GameObject.Destroy(game);
+            else GameObject.Destroy(game);
         }
         /// <summary>
         /// 回收对象的子物体
@@ -356,31 +396,6 @@ namespace huqiang.Data
         public DataLoader GetDataLoader(int Index)
         {
             return types[Index].loader;
-        }
-        /// <summary>
-        /// 查询transform的子物体
-        /// </summary>
-        /// <param name="fake"></param>
-        /// <param name="childName"></param>
-        /// <returns></returns>
-        public unsafe FakeStruct FindChild(FakeStruct fake, string childName)
-        {
-            var data = (UITransfromData*)fake.ip;
-            var buff = fake.buffer;
-            Int16[] chi = fake.buffer.GetData(data->child) as Int16[];
-            if (chi != null)
-                for (int i = 0; i < chi.Length; i++)
-                {
-                    var fs = buff.GetData(chi[i]) as FakeStruct;
-                    if (fs != null)
-                    {
-                        var cd = (UITransfromData*)fs.ip;
-                        string name = buff.GetData(cd->name) as string;
-                        if (name == childName)
-                            return fs;
-                    }
-                }
-            return null;
         }
         /// <summary>
         /// 克隆一个预制体对象

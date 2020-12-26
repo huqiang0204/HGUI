@@ -12,10 +12,6 @@ namespace huqiang.UIModel
     public class UINotify : UIBase
     {
         /// <summary>
-        /// 根节点
-        /// </summary>
-        public static Transform Root { get; set; }
-        /// <summary>
         /// 根元素
         /// </summary>
         public static UIElement UIRoot { get; private set; }
@@ -27,16 +23,16 @@ namespace huqiang.UIModel
         /// 初始化
         /// </summary>
         /// <param name="Canvas">主画布</param>
-        public static void Initial(Transform Canvas)
+        public static void Initial(UIElement Canvas)
         {
-            var menu = new GameObject("Notify");
-            var ele = UIRoot = menu.AddComponent<UIElement>();
-            ele.marginType = MarginType.Margin;
-            Root = menu.transform;
-            menu.transform.SetParent(Canvas);
-            Root.localPosition = Vector3.zero;
-            Root.localScale = Vector3.one;
-            Root.localRotation = Quaternion.identity;
+            var menu = new UIElement();
+            menu.name = "Notify";
+            UIRoot = menu;
+            //menu.marginType = MarginType.Margin;
+            menu.SetParent(Canvas);
+            menu.localPosition = Vector3.zero;
+            menu.localScale = Vector3.one;
+            menu.localRotation = Quaternion.identity;
         }
         /// <summary>
         /// 更新所有通知栏
@@ -67,7 +63,7 @@ namespace huqiang.UIModel
         /// <returns></returns>
         public static T ShowNotify<T>(UIBase context, object obj = null) where T : UINotify, new()
         {
-            UIRoot.gameObject.SetActive(true);
+            UIRoot.activeSelf = true;
             for (int i = 0; i < notifys.Count; i++)
                 if (notifys[i] is T)
                 {
@@ -79,7 +75,7 @@ namespace huqiang.UIModel
             var t = new T();
             notifys.Add(t);
             CurrentNotify = t;
-            t.Initial(Root, context, obj);
+            t.Initial(UIRoot, context, obj);
             t.ChangeLanguage();
             t.Show(context, obj);
             t.ReSize();
@@ -100,7 +96,7 @@ namespace huqiang.UIModel
         public virtual void Show(UIBase context, object dat = null)
         {
             if (Main != null)
-                Main.SetActive(true);
+                Main.activeSelf = true;
         }
         /// <summary>
         /// 更新尺寸
@@ -108,8 +104,8 @@ namespace huqiang.UIModel
         public override void ReSize()
         {
             if (UIRoot != null)
-                if (HCanvas.MainCanvas != null)
-                    UIRoot.SizeDelta = HCanvas.MainCanvas.SizeDelta;
+                if (HCanvas.CurrentCanvas != null)
+                    UIRoot.SizeDelta = HCanvas.CurrentCanvas.SizeDelta;
             base.ReSize();
         }
         /// <summary>
@@ -118,9 +114,8 @@ namespace huqiang.UIModel
         public virtual void Hide()
         {
             if (Main != null)
-                Main.SetActive(false);
+                Main.activeSelf = false;
         }
-
     }
 }
 

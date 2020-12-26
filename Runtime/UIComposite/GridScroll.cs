@@ -20,10 +20,6 @@ namespace huqiang.UIComposite
         /// </summary>
         public int Row = 0;
         /// <summary>
-        /// 当前滚动的位置
-        /// </summary>
-        public Vector2 Position;
-        /// <summary>
         /// 事件
         /// </summary>
         public UserEvent eventCall;
@@ -46,20 +42,20 @@ namespace huqiang.UIComposite
             Row = c / Column;
             if (c % Column > 0)
                 Row++;
-            ActualSize = new Vector2(Column * ItemSize.x, Row * ItemSize.y);
+            _contentSize = new Vector2(Column * ItemSize.x, Row * ItemSize.y);
+            ItemActualSize = ItemSize;
+            GetItemOffset();
         }
-        public override void Initial(FakeStruct fake,UIElement script,Initializer initializer)
+        public override void Initial(FakeStruct fake,UIElement script,UIInitializer initializer)
         {
             base.Initial(fake,script,initializer);
             eventCall = script.RegEvent<UserEvent>();
+            eventCall.PointerDown = (o, e) => { UpdateVelocity = false; };
             eventCall.Drag = (o, e, s) => { Scrolling(o, s); };
-            eventCall.DragEnd = (o, e, s) => { Scrolling(o, s); };
-            eventCall.Scrolling = Scrolling;
+            eventCall.DragEnd = OnDragEnd;
             eventCall.ForceEvent = true;
             Size =Enity.SizeDelta;
             eventCall.CutRect = true;
-            eventCall.ScrollEndX = OnScrollEndX;
-            eventCall.ScrollEndY = OnScrollEndY;
             Enity.SizeChanged = (o) =>
             {
                 Refresh(Position);
@@ -71,18 +67,28 @@ namespace huqiang.UIComposite
                 return;
             if (BindingData == null)
                 return;
-            v.x /= eventCall.Context.transform.localScale.x;
-            v.y /= eventCall.Context.transform.localScale.y;
+            v.x /= eventCall.Context.localScale.x;
+            v.x = -v.x;
+            v.y /= eventCall.Context.localScale.y;
             switch (scrollType)
             {
                 case ScrollType.None:
-                    v = ScrollNone(back, ref v, ref Position.x, ref Position.y);
+                    v = ScrollNone(v);
+                    _pos += v;
                     break;
                 case ScrollType.Loop:
-                    v = ScrollLoop(back, ref v, ref Position.x, ref Position.y);
+                    _pos.x += v.x;
+                    if (_pos.x < 0)
+                        _pos.x += _contentSize.x;
+                    else _pos.x %= _contentSize.x;
+                    _pos.y += v.y;
+                    if (_pos.y < 0)
+                        _pos.y += _contentSize.y;
+                    else _pos.y %= _contentSize.y;
                     break;
                 case ScrollType.BounceBack:
-                    v = BounceBack(back, ref v, ref Position.x, ref Position.y);
+                    v = BounceBack(v);
+                    _pos += v;
                     break;
             }
             Order();
@@ -97,6 +103,13 @@ namespace huqiang.UIComposite
                     ScrollEnd(this);
             }
         }
+        void OnDragEnd(UserEvent back, UserAction action, Vector2 v)
+        {
+            Scrolling(back, v);
+            startVelocity.x = mVelocity.x = -back.VelocityX;
+            startVelocity.y = mVelocity.y = back.VelocityY;
+            UpdateVelocity = true;
+        }
         /// <summary>
         /// 排序
         /// </summary>
@@ -106,81 +119,84 @@ namespace huqiang.UIComposite
         {
             float w = Size.x;
             float h = Size.y;
-            float left = Position.x;
-            float ls = left - ItemSize.x;
-            float right = Position.x + w;
-            float rs = right + ItemSize.x;
-            float top = Position.y + h;//与unity坐标相反
-            float ts = top + ItemSize.y;
-            float down = Position.y;//与unity坐标相反
-            float ds = down - ItemSize.y;
-            RecycleOutside(left, right, down, top);
-            int colStart = (int)(left / ItemSize.x);
+
+            int colStart = (int)(_pos.x / ItemActualSize.x);
             if (colStart < 0)
                 colStart = 0;
-            int colEnd = (int)(rs / ItemSize.x);
-            if (colEnd > Column)
-                colEnd = Column;
-            int rowStart = (int)(down / ItemSize.y);
+            int rowStart = (int)(_pos.y / ItemActualSize.y);
             if (rowStart < 0)
                 rowStart = 0;
-            int rowEnd = (int)(ts / ItemSize.y);
-            if (rowEnd > Row)
-                rowEnd = Row;
-            for (; rowStart < rowEnd; rowStart++)
-                UpdateRow(rowStart, colStart, colEnd, force);
-        }
-        void RecycleOutside(float left, float right, float down, float top)
-        {
-            int c = Items.Count - 1;
-            for (; c >= 0; c--)
+            int rc = (int)(h / ItemActualSize.y) + 1;
+            int cc = (int)(w / ItemActualSize.x) + 1;
+            if (scrollType != ScrollType.Loop)
             {
-                var it = Items[c];
-                int index = Items[c].index;
-                int r = index / Column;
-                float y = (r + 1) * ItemSize.y;
-                if (y < down | y > top)
+                if (cc + colStart > Column)
+                    cc = Column - colStart;
+                if (rc + rowStart > Row)
+                    rc = Row - rowStart;
+            }
+
+            Recycler.AddRange(Items);
+            Items.Clear();
+            for (int i = 0; i < rc; i++)
+            {
+                int index = (rowStart+ i )* Column + colStart;
+                int cou = DataLength;
+                for (int j = 0; j < cc; j++)
                 {
-                    Items.RemoveAt(c);
-                    RecycleItem(it);
-                    if (ItemRecycle != null)
-                        ItemRecycle(it);
-                }
-                else
-                {
-                    int col = index % Column;
-                    float x = (col + 1) * ItemSize.x;
-                    if (x < left | x > right)
+                    if (index >= cou)
+                        break;
+                    for (int k = 0; k < Recycler.Count; k++)
                     {
-                        Items.RemoveAt(c);
-                        RecycleItem(it);
-                        if (ItemRecycle != null)
-                            ItemRecycle(it);
+                        var t = Recycler[k];
+                        if (t.index == index)
+                        {
+                            Items.Add(t);
+                            Recycler.RemoveAt(k);
+                            t.target.activeSelf = true;
+                            break;
+                        }
                     }
+                    index++;
+                }
+            }
+            float oy = 0;
+            for (int i=0; i < rc; i++)
+            {
+                UpdateRow(rowStart, colStart, cc, force, oy);
+                rowStart++;
+                if (rowStart >= Row)
+                { 
+                    rowStart = 0;
+                    oy = _contentSize.y;
+                }
+            }
+            for (int i = 0; i < Recycler.Count; i++)
+                Recycler[i].target.activeSelf = false;
+        }
+        void UpdateRow(int row, int colStart, int colLen, bool force,float oy)
+        {
+            float ox = 0;
+            int index = row * Column;
+            for (int i = 0; i < colLen; i++)
+            {
+                UpdateItem(index + colStart, force,ox, oy);
+                colStart++;
+                if (colStart >= Column)
+                { 
+                    colStart = 0;
+                    ox = _contentSize.x;
                 }
             }
         }
-        void UpdateRow(int row, int colStart, int colEnd, bool force)
-        {
-            int index = row * Column + colStart;
-            int len = colEnd - colStart;
-            int cou = DataLength;
-            for (int i = 0; i < len; i++)
-            {
-                if (index >= cou)
-                    return;
-                UpdateItem(index, force);
-                index++;
-            }
-        }
-        void UpdateItem(int index, bool force)
+        void UpdateItem(int index, bool force,float ox, float oy)
         {
             for (int i = 0; i < Items.Count; i++)
             {
                 var item = Items[i];
                 if (item.index == index)
                 {
-                    SetItemPostion(item);
+                    SetItemPostion(item,ox,oy);
                     if (force)
                        ItemUpdate(item.obj,item.datacontext, index);
                     return;
@@ -190,20 +206,21 @@ namespace huqiang.UIComposite
             Items.Add(it);
             it.index = index;
             it.datacontext = GetData(index);//dataList[index];
-            SetItemPostion(it);
+            SetItemPostion(it,ox,oy);
             ItemUpdate(it.obj,it.datacontext, index);
         }
-        void SetItemPostion(ScrollItem item)
+        void SetItemPostion(ScrollItem item,float ox,float oy)
         {
             int r = item.index / Column;
             int c = item.index % Column;
-            float x = (c + 0.5f) * ItemSize.x;
-            float y = (r + 0.5f) * ItemSize.y;
-            x -= Position.x;
-            x -= Size.x * 0.5f;
-            y = Position.y - y;
-            y += Size.y * 0.5f;
-            item.target.localPosition = new Vector3(x, y, 0);
+            float sx = c * ItemActualSize.x;
+            float sy = r * ItemActualSize.y;
+            sx -= _pos.x - ox;
+            sy -= _pos.y - oy;
+            var p = ItemOffset;
+            p.x += sx;
+            p.y -= sy;
+            item.target.localPosition = p;
         }
         /// <summary>
         /// 刷新到指定位置
@@ -223,67 +240,19 @@ namespace huqiang.UIComposite
             Calcul();
             Order(true);
         }
-        void OnScrollEndX(UserEvent back)
+        public override void DurScroll(Vector2 v)
         {
-            if (scrollType == ScrollType.BounceBack)
+            _pos += v;
+            if(scrollType==ScrollType.Loop)
             {
-                if (Position.x < -Tolerance)
-                {
-                    back.DecayRateX = 0.988f;
-                    float d =  - Position.x;
-                    back.ScrollDistanceX = -d * eventCall.Context.transform.localScale.x;
-                }
-                else
-                {
-                    float max = ActualSize.x+Tolerance;
-                    if (max < Size.x)
-                        max = Size.x + Tolerance;
-                    if (Position.x + Size.x >max)
-                    {
-                        back.DecayRateX = 0.988f;
-                        float d = ActualSize.x - Position.x - Size.x;
-                        back.ScrollDistanceX = -d * eventCall.Context.transform.localScale.x;
-                    }
-                    else
-                    {
-                        if (ScrollEnd != null)
-                            ScrollEnd(this);
-                    }
-                }
+                if (_pos.x < 0)
+                    _pos.x += _contentSize.x;
+                else _pos.x %= _contentSize.x;
+                if (_pos.y < 0)
+                    _pos.y += _contentSize.y;
+                else _pos.y %= _contentSize.y;
             }
-            else if (ScrollEnd != null)
-                ScrollEnd(this);
-        }
-        void OnScrollEndY(UserEvent back)
-        {
-            if (scrollType == ScrollType.BounceBack)
-            {
-                if (Position.y < -Tolerance)
-                {
-                    back.DecayRateY = 0.988f;
-                    float d = - Position.y;
-                    back.ScrollDistanceY = d * eventCall.Context.transform.localScale.y;
-                }
-                else
-                {
-                    float max = ActualSize.y+Tolerance;
-                    if (max < Size.y)
-                        max = Size.y + Tolerance;
-                    if (Position.y + Size.y > max)
-                    {
-                        back.DecayRateY = 0.988f;
-                        float d = ActualSize.y - Position.y - Size.y ;
-                        back.ScrollDistanceY = d * eventCall.Context.transform.localScale.y;
-                    }
-                    else
-                    {
-                        if (ScrollEnd != null)
-                            ScrollEnd(this);
-                    }
-                }
-            }
-            else if (ScrollEnd != null)
-                ScrollEnd(this);
+            Order();
         }
     }
 }

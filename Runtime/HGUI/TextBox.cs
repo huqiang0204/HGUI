@@ -1,4 +1,5 @@
-﻿using System;
+﻿using huqiang.UIEvent;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,328 +7,930 @@ using UnityEngine;
 
 namespace huqiang.Core.HGUI
 {
+    public struct PressInfo
+    {
+        public int Row;
+        public int Offset;
+    }
     public class TextBox:HText
     {
-        List<TextVertex> verts = new List<TextVertex>();
-        List<LineInfo> lines = new List<LineInfo>();
-        List<UICharInfo> chars = new List<UICharInfo>();
+        public override string TypeName { get => "TextBox"; }
+        static List<int> TrisA = new List<int>();
+        static List<int> TrisB = new List<int>();
+        static List<int> TrisC = new List<int>();
+        /// <summary>
+        /// 不会产生网格的字符
+        /// </summary>
+        protected static char[] key_noMesh = new char[] { ' ', '\n' };//排除\r
+        List<HVertex> verts = new List<HVertex>();
+        List<TextLineInfo> lines = new List<TextLineInfo>();
+        List<CharacterInfoEx> chars = new List<CharacterInfoEx>();
+        List<TextLineInfo> showlines = new List<TextLineInfo>();
+        List<HVertex> showverts = new List<HVertex>();
+        /// <summary>
+        /// 开启此项配合Mask效果较好,但是Mask会增加合批材质
+        /// </summary>
+        public bool SmoothX = true;
+        public bool SmoothY = true;
         int startLine;
+        int endLine;
+        int topLine;
         float StartX;
-        float EndX;
-        float offsetX;
         float StartY;
-        float EndY;
+        /// <summary>
+        /// 最左边的顶点
+        /// </summary>
+        float vertxstart;
+        /// <summary>
+        /// 文字最大宽度
+        /// </summary>
         float cw;
+        /// <summary>
+        /// 文字总计高度
+        /// </summary>
         float ch;
+        public int ShowStartChar { get; private set; }
         public float PercentageX
         {
-            get 
+            get
             {
                 if (cw <= m_sizeDelta.x)
                     return 0;
-                return offsetX / (cw - m_sizeDelta.x);
-            }
-            set 
-            {
-                if(cw>m_sizeDelta.x)
-                {
-                    if (value < 0)
-                        value = 0;
-                    else if (value > 1)
-                        value = 1;
-                    offsetX = value * (cw - m_sizeDelta.x);
-                    m_vertexChange = true;
-                }
-            }
-        }
-        public float PercentageY {
-            get
-            {
-                if (AllLine == 0)
-                    return 0;
-                if (AllLine <= ShowRow)
-                    return 0;
-                float a = startLine;
-                float b = AllLine;
-                float c = ShowRow;
-                return a/ (b - c);
+                float r = cw - m_sizeDelta.x;
+                return StartX / r;
             }
             set
             {
-                if (AllLine > 0)
+                if (cw <= m_sizeDelta.x)
                 {
-                    if (AllLine > ShowRow)
-                    {
-                        if (value < 0)
-                            value = 0;
-                        else if (value > 1)
-                            value = 1;
-                        int r = AllLine - ShowRow;
-                        float s = value * r;
-                        startLine = (int)s;
-                        m_vertexChange = true;
-                    }
+                    if (StartX == 0)
+                        return;
+                    StartX = 0;
+                    m_vertexChange = true;
+                    return;
                 }
+                float r = cw - m_sizeDelta.x;
+                if (value > 1)
+                    value = 1;
+                else if (value < 0)
+                    value = 0;
+                value *= r;
+                if (StartX == value)
+                    return;
+                StartX = value;
+                m_vertexChange = true;
             }
         }
-        public int StartLine { get => startLine;set {
-                if (value < 0)
-                    value = 0;
-                else if (value+ ShowRow > AllLine)
-                    value = AllLine - ShowRow;
-                if(value!=startLine)
+        public float PercentageY
+        {
+            get
+            {
+                if (ch <= m_sizeDelta.y)
+                    return 0;
+                float r = ch - m_sizeDelta.y;
+                return StartY / r;
+            }
+            set
+            {
+                if (ch <= m_sizeDelta.y)
                 {
-                    startLine = value;
+                    if (StartY == 0)
+                        return;
+                    StartY = 0;
                     m_vertexChange = true;
+                    return;
                 }
-            } }
+                float r = ch - m_sizeDelta.y;
+                if (value > 1)
+                    value = 1;
+                else if (value < 0)
+                    value = 0;
+                value *= r;
+                if (StartY == value)
+                    return;
+                StartY = value;
+                m_vertexChange = true;
+            }
+        }
+        public int StartLine
+        {
+            get => startLine; set
+            {
+                if (value < 0)
+                {
+                    if (startLine == 0)
+                        return;
+                    startLine = 0;
+                    StartY = 0;
+                    PopulateVertex();
+                    return;
+                }
+                if (value > topLine)
+                    value = topLine;
+                if (startLine == value)
+                    return;
+                startLine = value;
+                float sy = lines[0].topY - lines[startLine].topY + 1;
+                if (sy + m_sizeDelta.y > ch)
+                {
+                    sy = ch - m_sizeDelta.y;
+                    if (sy < 0)
+                        sy = 0;
+                }
+                if (sy == StartY)
+                    return;
+                StartY = sy;
+                PopulateVertex();
+            }
+        }
+        public int TopLine
+        {
+            get => topLine;
+        }
         public int AllLine { get; private set; }
-        public int ShowRow { get; private set; }
         public float ContentWidth { get => cw; }
         public float ContentHeight { get => ch; }
-        public void Apply()
+        void LayoutAnalysis()
         {
-            if(m_dirty)
+            vertxstart = cw = m_sizeDelta.x;
+            ch = m_sizeDelta.y;
+            float h = 0;
+            int c = lines.Count - 1;
+            topLine = 0;
+            bool top = false;
+            for (int i = c; i >= 0; i--)
             {
-                GetGenerationSettings(ref m_sizeDelta, ref settings);
-                var g = Generator;
-                g.Populate(m_text, settings);
+                if (lines[i].Width > cw)
+                    cw = lines[i].Width;
+                if (lines[i].Left < vertxstart)
+                    vertxstart = lines[i].Left;
+                h += lines[i].High;
+                if (!top)
+                    if (h >= ch)
+                    {
+                        topLine = i + 1;
+                        top = true;
+                    }
+            }
+            if (h > ch)
+                ch = h;
+        }
+        void GetShowContent()
+        {
+            showlines.Clear();
+            showverts.Clear();
+            TrisA.Clear();
+            TrisB.Clear();
+            TrisC.Clear();
+            bool frist = false;
+            if (lines.Count > 0)
+            {
+                float sx = vertxstart;
+                float ox = StartX + vertxstart - m_sizeDelta.x * -0.5f;
+                float sy = lines[0].topY;
+                float ey = StartY + m_sizeDelta.y;
+                for (int i = 0; i < lines.Count; i++)
+                {
+                    if (SmoothY)
+                    {
+                        float dy = sy - lines[i].downY;
+                        if (dy >= StartY)
+                        {
+                            if (!frist)
+                            {
+                                startLine = i;
+                                frist = true;
+                            }
+                            dy = sy - lines[i].topY;
+                            if (dy > ey)//超过下边界
+                            {
+                                break;
+                            }
+                            endLine = i;
+                            GetShowLine(i, ox);
+                        }
+                    }
+                    else
+                    {
+                        float dy = sy - lines[i].topY + 1;
+                        if (dy >= StartY)
+                        {
+                            if (!frist)
+                            {
+                                startLine = i;
+                                frist = true;
+                            }
+                            dy = sy - lines[i].downY;
+                            if (dy > ey)//超过下边界
+                            {
+                                break;
+                            }
+                            endLine = i;
+                            GetShowLine(i, ox);
+                        }
+                    }
+                }
             }
         }
-        protected void GetTempVertex(IList<UIVertex> v, List<TextVertex> vert, string filterStr)
+        void GetShowLine(int index, float ox)
         {
-            TextVertex tv = new TextVertex();
-            int o = 0;
-            for (int i = 0; i < filterStr.Length; i++)
+            showlines.Add(lines[index]);
+            for (int j = lines[index].CharStart; j <= lines[index].CharEnd; j++)
             {
-                var ch = filterStr[i];
-                bool mesh = true;
-                for (int j = 0; j < key_noMesh.Length; j++)
+                if (SmoothX)
                 {
-                    if (key_noMesh[j] == ch)
+                    if (chars[j].Right - vertxstart > StartX)
                     {
-                        mesh = false;
-                        break;
+                        if (chars[j].Left - vertxstart > StartX + m_sizeDelta.x)//超过右边界
+                            break;
+                        int vi = chars[j].VertexIndex;
+                        if (vi >= 0)
+                        {
+                            GetShowChar(j, vi, ox);
+                        }
                     }
                 }
-                if (mesh)
+                else
                 {
-                    for (int j = 0; j < 4; j++)
+                    if (chars[j].Left - vertxstart > StartX)
                     {
-                        tv.position = v[o].position;
-                        tv.uv = v[o].uv0;
-                        tv.color = v[o].color;
-                        tv.Index = i;
-                        vert.Add(tv);
-                        o++;
+                        if (chars[j].Right - vertxstart > StartX + m_sizeDelta.x)//超过右边界
+                            break;
+                        int vi = chars[j].VertexIndex;
+                        if (vi >= 0)
+                        {
+                            GetShowChar(j, vi, ox);
+                        }
                     }
-                    if (o >= v.Count)
-                        break;
                 }
             }
+        }
+        void GetShowChar(int index, int vi, float ox)
+        {
+            HVertex vertex = new HVertex();
+            int c = showverts.Count;
+            int t = chars[index].type;
+            if (t == -1)//表情符
+            {
+                HTextGenerator.AddTris(TrisB, c);
+            }
+            else if (t == 1)
+            {
+                HTextGenerator.AddTris(TrisC, c);
+            }
+            else
+            {
+                HTextGenerator.AddTris(TrisA, c);
+            }
+            vi *= 4;
+            vertex = verts[vi];
+            vertex.position.x -= ox;
+            vertex.position.y += StartY;
+            showverts.Add(vertex);
+            vi++;
+            vertex = verts[vi];
+            vertex.position.x -= ox;
+            vertex.position.y += StartY;
+            showverts.Add(vertex);
+            vi++;
+            vertex = verts[vi];
+            vertex.position.x -= ox;
+            vertex.position.y += StartY;
+            showverts.Add(vertex);
+            vi++;
+            vertex = verts[vi];
+            vertex.position.x -= ox;
+            vertex.position.y += StartY;
+            showverts.Add(vertex);
         }
         public override void Populate()
         {
-            GetGenerationSettings(ref m_sizeDelta, ref settings);
-            settings.horizontalOverflow = HorizontalWrapMode.Overflow;
-            settings.verticalOverflow = VerticalWrapMode.Overflow;
-            emojiString.FullString = m_text;
-            string str = emojiString.FilterString;
-            var g = Generator;
-            g.Populate(str, settings);
-            verts.Clear();
-            lines.Clear();
-            chars.Clear();
-            chars.AddRange(g.characters);
-            LineInfo line = new LineInfo();
-            int c = g.lineCount;
-            AllLine = c;
-            cw = m_sizeDelta.x;
-            EndX = m_sizeDelta.x * 0.5f;
-            StartX = -EndX;
-            if (g.characterCountVisible > 0)
+            HTextGenerator.AddContext(this, Font);
+            if (m_dirty | m_colorChanged)
             {
-                if (m_richText)
-                {
-                    emojiString.FullString = RichTextHelper.DeleteLabel(m_text);
-                    str = emojiString.FilterString;
-                }
-                GetTempVertex(g.verts,verts,str);
-                int s = c - 1;
-                StartY = g.lines[0].topY;
-                EndY = g.lines[s].topY - g.lines[s].height - g.lines[s].leading;
-                ch = StartY- EndY;
-                float per = ch / g.lines.Count;
-                ShowRow = (int)(m_sizeDelta.y / per);
-                var l = g.lines[0];
-                for (int i = 1; i < c ; i++)
-                {
-                    var n = g.lines[i];
-                    line.startCharIdx = l.startCharIdx;
-                    line.endIdx = n.startCharIdx - 1;
-                    line.topY = l.topY;
-                    line.endY = n.topY;
-                    l = n;
-                    lines.Add(line);
-                    float lx = chars[line.startCharIdx].cursorPos.x;
-                    float rx = chars[line.endIdx].cursorPos.x;
-                    float w = rx - lx + chars[line.endIdx].charWidth;
-                    if (w > cw)
-                    { 
-                        cw = w;
-                        StartX = lx;
-                        EndX = lx + w;
-                    }
-                }
-                l = g.lines[s];
-                line.startCharIdx = l.startCharIdx;
-                line.endIdx = g.characterCountVisible - 1;
-                line.topY = l.topY;
-                line.endY = EndY;
-                lines.Add(line);
-                float olx = chars[line.startCharIdx].cursorPos.x;
-                float orx = chars[line.endIdx].cursorPos.x;
-                float ow = orx - olx + chars[line.endIdx].charWidth;
-                if (ow > cw)
-                {
-                    cw = ow;
-                    StartX = olx;
-                    EndX = olx + ow;
-                }
+                if (stringEx == null)
+                    stringEx = new StringEx(m_text, m_richText);
+                else stringEx.Reset(m_text, m_richText);
+                GetGenerationSettings(ref m_sizeDelta, ref settings);
+                settings.verticalOverflow = VerticalWrapMode.Overflow;
+
+                verts.Clear();
+                lines.Clear();
+                chars.Clear();
+                HTextGenerator.customFont = customFont;
+                HTextGenerator.Populate(stringEx, ref settings);
+                HTextGenerator.CopyLinesInfo(lines);
+                HTextGenerator.CopyCharsInfo(chars);
+                verts.AddRange(HTextGenerator.vertices);
+                LayoutAnalysis();
+                AllLine = lines.Count;
+
+                m_dirty = false;
+                m_vertexChange = true;
+                //fillColors[0] = true;
+                m_colorChanged = false;
+                MainTexture = Font.material.mainTexture;
+                if (customFont != null)
+                    TTexture = customFont.texture;
+                else TTexture = null;
+                HTextGenerator.GetPopulateInfo(populates);
+               
             }
-            else
-            {
-                TmpVerts.DataCount = 0;
-                trisInfo.DataCount = 0;
-                trisInfo2.DataCount = 0;
-                ShowRow = (int)m_sizeDelta.y / FontSize;
-                ch = 0;
-                StartY = 0;
-                EndY = 0;
-            }
-            if (startLine + ShowRow >= AllLine)
-            {
-                startLine = AllLine - ShowRow;
-                if (startLine <= 0)
-                    startLine = 0;
-            }
-            if (cw < m_sizeDelta.x)
-            {
-                offsetX = 0;
-            }
-            else if(offsetX+m_sizeDelta.x>cw)
-            {
-                offsetX = cw - m_sizeDelta.x;
-            }
-            m_dirty = false;
-            m_vertexChange = true;
-            fillColors[0] = true;
-            m_colorChanged = false;
-            MainTexture = Font.material.mainTexture;
         }
         void PopulateVertex()
         {
-            int c = verts.Count;
+            GetShowContent();
+            int c = showverts.Count;
             if (c == 0)
             {
-                TmpVerts.DataCount = 0;
+                vertInfo.DataCount = 0;
                 trisInfo.DataCount = 0;
-                trisInfo2.DataCount = 0;
+                trisInfo1.DataCount = 0;
                 return;
             }
-            else
+            if (vertInfo.Size == 0)
             {
-                int s = lines[startLine].startCharIdx;
-                int e = startLine + ShowRow - 1;
-                if (e >= lines.Count)
-                    e = lines.Count - 1;
-                e = lines[e].endIdx + 1;
-                c = (e - s) * 4;
-                if (c > TmpVerts.Size | TmpVerts.Size > c + 32)
-                {
-                    TmpVerts.Release();
-                    TmpVerts = PopulateBuffer.RegNew(c);
-                }
-                float oy = 0;
-                float ox = offsetX;
-                if(cw>m_sizeDelta.x)
-                {
-                    ox = offsetX + StartX + m_sizeDelta.x * 0.5f;
-                }
-                if (ch > m_sizeDelta.y)
-                {
-                    oy = lines[startLine].topY - StartY+ StartY - m_sizeDelta.y * 0.5f ;
-                }
-                float rx = m_sizeDelta.x * 0.5f + m_fontSize;
-                float lx = -rx;
-                int ac = 0;
-                int max = verts.Count;
-                var chs = chars;
-                unsafe
-                {
-                    TextVertex* hv = TmpVerts.Addr;
-                    c = e - s;
-                    int l = startLine;
-                    int ol = ShowRow;
-                    if (ol > lines.Count)
-                        ol = lines.Count;
-                    int next = 0;
-                    for (int i = 0; i < ol; i++)
-                    {
-                        int start = lines[l].startCharIdx;
-                        int oc = lines[l].endIdx - start;
-                        for(int k=0;k<verts.Count;k+=4)
-                        {
-                            if(verts[k].Index>=start)
-                            {
-                                next = k;
-                                break;
-                            }
-                        }
-                        for (int k = 0; k < oc; k++)
-                        {
-                            if (next >= verts.Count)
-                                break;
-                            var ax = verts[next].position.x;
-                            var bx = verts[next + 1].position.x;
-                            float cx = (bx - ax) * 0.5f + ax - ox;
-                            if (cx < lx)
-                            {
-                                next += 4;
-                            }
-                            else if (cx > rx)
-                            {
-                                break;
-                            }
-                            else
-                            {
-                                for (int j = 0; j < 4; j++)
-                                {
-                                    hv[ac] = verts[next];
-                                    hv[ac].position.y -= oy;
-                                    hv[ac].position.x -= ox;
-                                    ac++;
-                                    next++;
-                                }
-                            }
-                            start++;
-                        }
-                        l++;
-                    }
-                }
-                TmpVerts.DataCount = ac;
+                vertInfo = VertexBuffer.RegNew(c);
             }
+            else
+            if (vertInfo.Size < c | vertInfo.Size > c + 32)
+            {
+                vertInfo.Release();
+                vertInfo = VertexBuffer.RegNew(c);
+            }
+            var vs = showverts;
+            unsafe
+            {
+                HVertex* hv = vertInfo.Addr;
+                for (int i = 0; i < c; i++)
+                {
+                    hv[i] = vs[i];
+                }
+            }
+            tris = null;
+            vertInfo.DataCount = c;
+            ApplyTris(this, TrisA, TrisB, null);
         }
         public override void UpdateMesh()
         {
             if (m_vertexChange)
             {
                 PopulateVertex();
-                CreateEmojiMesh(this);
                 if (OutLine > 0)
                     CreateOutLine(this);
                 m_vertexChange = false;
             }
+        }
+        public void CheckPoint(UserEvent user, UserAction action, ref PressInfo press)
+        {
+            if (showlines.Count > 0)
+            {
+                float ox = StartX + vertxstart - m_sizeDelta.x * -0.5f;
+                var offset = action.CanPosition;
+                offset.x -= user.GlobalPosition.x;//全局坐标
+                offset.y -= user.GlobalPosition.y;
+                var q = Quaternion.Inverse(user.GlobalRotation);
+                offset = q * offset;
+                var scale = user.GlobalScale;//全局尺寸
+                offset.x /= scale.x;
+                offset.x += ox;
+                offset.y /= scale.y;
+                offset.y -= StartY;
+                int row = 0;
+                if (showlines.Count > 0)
+                {
+                    for (int i = 0; i < showlines.Count; i++)
+                    {
+                        if (offset.y > showlines[i].topY)
+                        {
+                            break;
+                        }
+                        else row = i;
+                    }
+                }
+                int start = showlines[row].CharStart;
+                int col = showlines[row].CharEnd - start + 1;
+                if (chars[showlines[row].CharEnd].type == -3)//行尾是换行符
+                    col--;
+                for (int i = start; i < showlines[row].CharEnd + 1; i++)
+                {
+                    if (offset.x < chars[i].Center)
+                    {
+                        col = i - start;
+                        break;
+                    }
+                }
+                press.Row = showlines[row].Row;
+                press.Offset = col;
+            }
+        }
+        /// <summary>
+        /// 获取光标的显示网格
+        /// </summary>
+        /// <param name="tri">三角形列表</param>
+        /// <param name="vert">顶点列表</param>
+        /// <param name="color">填充颜色</param>
+        /// <param name="start">按压信息</param>
+        public void GetPointer(List<int> tri, List<HVertex> vert, ref Color32 color, ref PressInfo start)
+        {
+            int index = GetIndex(ref start);
+            if (lines.Count == 0)
+            {
+                if (index == 0)
+                {
+                    float h = m_fontSize * HTextGenerator.LineSpacing;
+                    float lx = -1.5f;
+                    float ty = h * 0.5f;
+                    switch (TextAnchor)
+                    {
+                        case TextAnchor.UpperLeft:
+                            lx = m_sizeDelta.x * -0.5f;
+                            ty = m_sizeDelta.y * 0.5f;
+                            break;
+                        case TextAnchor.MiddleLeft:
+                            lx = m_sizeDelta.x * -0.5f;
+                            break;
+                        case TextAnchor.LowerLeft:
+                            lx = m_sizeDelta.x * -0.5f;
+                            ty = m_sizeDelta.y * -0.5f + h;
+                            break;
+                    }
+                    float rx = lx + 3;
+                    float dy = ty - h;
+                    var hv = new HVertex();
+                    hv.position.x = lx;
+                    hv.position.y = dy;
+                    hv.color = color;
+                    vert.Add(hv);
+                    hv.position.x = rx;
+                    hv.position.y = dy;
+                    hv.color = color;
+                    vert.Add(hv);
+                    hv.position.x = lx;
+                    hv.position.y = ty;
+                    hv.color = color;
+                    vert.Add(hv);
+                    hv.position.x = rx;
+                    hv.position.y = ty;
+                    hv.color = color;
+                    vert.Add(hv);
+                    tri.Add(0);
+                    tri.Add(2);
+                    tri.Add(3);
+                    tri.Add(0);
+                    tri.Add(3);
+                    tri.Add(1);
+                }
+            }
+            if (start.Row < 0)
+                return;
+            if (start.Row >= lines.Count)
+                return;
+            if (index < 0)
+                return;
+            int row = start.Row;
+            float ox = StartX + vertxstart - m_sizeDelta.x * -0.5f;
+            float top = lines[row].topY + StartY;
+            float down = lines[row].downY + StartY;
+            float p;
+            if (index > lines[row].CharEnd)
+            {
+                index--;
+                if (index < 0)
+                    index = 0;
+                p = chars[index].Right;
+            }
+            else
+            {
+                p = chars[index].Left;
+            }
+            p -= ox;
+            float left = p - 1.5f;
+            float right = p + 1.5f;
+            var v = new HVertex();
+            v.position.x = left;
+            v.position.y = down;
+            v.color = color;
+            vert.Add(v);
+            v.position.x = right;
+            v.position.y = down;
+            v.color = color;
+            vert.Add(v);
+            v.position.x = left;
+            v.position.y = top;
+            v.color = color;
+            vert.Add(v);
+            v.position.x = right;
+            v.position.y = top;
+            v.color = color;
+            vert.Add(v);
+            tri.Add(0);
+            tri.Add(2);
+            tri.Add(3);
+            tri.Add(0);
+            tri.Add(3);
+            tri.Add(1);
+        }
+        /// <summary>
+        /// 获取选中区域的网格
+        /// </summary>
+        /// <param name="tri">三角形列表</param>
+        /// <param name="vert">顶点列表</param>
+        /// <param name="color">填充颜色</param>
+        /// <param name="start">开始按压位置信息</param>
+        /// <param name="end">结束按压位置信息</param>
+        public void GetSelectArea(List<int> tri, List<HVertex> vert, ref Color32 color, ref PressInfo start, ref PressInfo end)
+        {
+            if (lines.Count == 0)
+            {
+                return;
+            }
+            int sr = start.Row;
+            int er = end.Row + 1;
+            int st = 0;
+            int c = showlines.Count;
+            if (c > er)
+                c = er;
+            if (sr < 0)
+                sr = 0;
+            if (sr < showlines[0].Row)
+                sr = showlines[0].Row;
+            float ox = StartX + vertxstart - m_sizeDelta.x * -0.5f;
+            int startIndex = GetIndex(ref start);
+            int endIndex = GetIndex(ref end);
+            for (int i = 0; i < c; i++)
+            {
+                if (sr >= lines.Count)
+                    break;
+                TextLineInfo info = lines[sr];
+                int ls = info.CharStart;
+                if (ls > endIndex)
+                    break;
+                int le = lines[sr].CharEnd;
+                if (le <= startIndex)
+                    continue;
+                int si = startIndex;
+                int ei = endIndex;
+                float left;
+                if (si < ls)
+                    left = chars[ls].Left;
+                else left = chars[si].Left;
+                float right;
+                if (ei > le)
+                    right = chars[le].Right;
+                else right = chars[ei].Left;
+                left -= ox;
+                right -= ox;
+                float top = info.topY + StartY;
+                float down = info.downY + StartY;
+
+                var v = new HVertex();
+                v.position.x = left;
+                v.position.y = down;
+                v.color = color;
+                vert.Add(v);
+                v.position.x = right;
+                v.position.y = down;
+                v.color = color;
+                vert.Add(v);
+                v.position.x = left;
+                v.position.y = top;
+                v.color = color;
+                vert.Add(v);
+                v.position.x = right;
+                v.position.y = top;
+                v.color = color;
+                vert.Add(v);
+                tri.Add(st);
+                tri.Add(st + 2);
+                tri.Add(st + 3);
+                tri.Add(st);
+                tri.Add(st + 3);
+                tri.Add(st + 1);
+                st += 4;
+                sr++;
+            }
+        }
+        /// <summary>
+        /// 光标向上移动
+        /// </summary>
+        /// <param name="press">当前光标位置</param>
+        public void MoveUp(ref PressInfo press)
+        {
+            CorrectionPress(ref press);
+            if (press.Row > 0)
+            {
+                press.Row--;
+                int Index = GetIndex(ref press);
+                if (press.Row <= startLine)
+                {
+                    StartY = lines[0].topY - lines[press.Row].topY;
+                    if (StartY < 0)
+                        StartY = 0;
+                    JumpToChar(press.Row, Index - lines[press.Row].CharStart);
+                    PopulateVertex();
+                }
+                else
+                {
+                    if (JumpToChar(press.Row, Index - lines[press.Row].CharStart))
+                        PopulateVertex();
+                }
+            }
+        }
+        /// <summary>
+        /// 光标向下移动
+        /// </summary>
+        /// <param name="press">当前光标位置</param>
+        public void MoveDown(ref PressInfo press)
+        {
+            CorrectionPress(ref press);
+            if (press.Row < lines.Count - 1)
+            {
+                press.Row++;
+                int Index = GetIndex(ref press);
+                if (press.Row >= endLine)
+                {
+                    StartY = lines[0].topY - lines[press.Row].downY - m_sizeDelta.y;
+                    if (StartY < 0)
+                        StartY = 0;
+                    JumpToChar(press.Row, Index - lines[press.Row].CharStart);
+                    PopulateVertex();
+                }
+                else
+                {
+                    if (JumpToChar(press.Row, Index - lines[press.Row].CharStart))
+                        PopulateVertex();
+                }
+            }
+        }
+        /// <summary>
+        /// 光标向左移动
+        /// </summary>
+        /// <param name="press">当前光标位置</param>
+        public void MoveLeft(ref PressInfo press)
+        {
+            CorrectionPress(ref press);
+            int e = lines[press.Row].CharEnd - lines[press.Row].CharStart;
+            if (press.Offset > e)
+                press.Offset = e + 1;
+            press.Offset--;
+            if (press.Offset <= 0)
+            {
+                if (press.Row > 0)
+                {
+                    press.Row--;
+                    press.Offset = lines[press.Row].CharEnd - lines[press.Row].CharStart + 1;
+                }
+                else press.Offset = 0;
+            }
+            Move(ref press);
+        }
+        /// <summary>
+        /// 光标向右移动
+        /// </summary>
+        /// <param name="press">当前光标位置</param>
+        /// <param name="count">字符个数</param>
+        public void MoveRight(ref PressInfo press, int count)
+        {
+            CorrectionPress(ref press);
+            press.Offset += count;
+            if (press.Row >= lines.Count)
+                press.Row = lines.Count - 1;
+            int e = lines[press.Row].CharEnd - lines[press.Row].CharStart;
+            if (press.Offset > e)
+            {
+                int index = lines[press.Row].CharStart + press.Offset;
+                for (int i = press.Row; i < lines.Count; i++)
+                {
+                    if (lines[i].CharEnd >= index)
+                    {
+                        press.Row = i;
+                        press.Offset = index - lines[i].CharStart;
+                        Move(ref press);
+                        return;
+                    }
+                }
+                press.Row = lines.Count - 1;
+                press.Offset = lines[press.Row].CharEnd + 1;
+            }
+            Move(ref press);
+        }
+        /// <summary>
+        /// 光标移动到字符串尾部
+        /// </summary>
+        /// <param name="press">当前光标位置</param>
+        public void MoveEnd(ref PressInfo press)
+        {
+            press.Row = lines.Count - 1;
+            if (press.Row < 0)
+            {
+                press.Row = 0;
+                return;
+            }
+            press.Offset = lines[press.Row].CharEnd + 1;
+            Move(ref press);
+        }
+        /// <summary>
+        /// 获取字符串尾部信息
+        /// </summary>
+        /// <param name="press"></param>
+        public void GetEnd(ref PressInfo press)
+        {
+            if (lines.Count == 0)
+            {
+                press.Row = 0;
+                press.Offset = 0;
+                return;
+            }
+            press.Row = lines.Count - 1;
+            press.Offset = lines[press.Row].CharEnd + 1;
+        }
+        bool JumpToChar(int row, int offset)
+        {
+            float ox = StartX + vertxstart - m_sizeDelta.x * -0.5f;
+            int index = lines[row].CharStart + offset;
+            float x;
+            if (index > lines[row].CharEnd)//右边
+            {
+                index = lines[row].CharEnd;
+                x = chars[index].Right;
+            }
+            else
+            {
+                x = chars[index].Left;
+            }
+            x -= ox;
+            float hw = m_sizeDelta.x * 0.5f;
+            if (x > hw)
+            {
+                StartX += x - hw + 1;
+                return true;
+            }
+            else if (x < -hw)
+            {
+                StartX = x - m_sizeDelta.x;
+                if (StartX < 0)
+                    StartX = 0;
+                return true;
+            }
+            return false;
+        }
+        /// <summary>
+        /// 光标移动到指定按压信息
+        /// </summary>
+        /// <param name="press">按压信息</param>
+        public void Move(ref PressInfo press)
+        {
+            if (press.Row >= lines.Count)
+                return;
+            int index = lines[press.Row].CharStart + press.Offset;
+            float sy = lines[0].topY - lines[press.Row].downY;
+            float sx;
+            int e = lines[press.Row].CharEnd;
+            if (index > e)//右边
+            {
+                sx = chars[e].Right - vertxstart;
+            }
+            else
+            {
+                sx = chars[index].Left - vertxstart;
+            }
+            bool a = false;
+            if (sx < StartX)
+            {
+                StartX = sx - 1;
+                a = true;
+            }
+            else if (sx > StartX + m_sizeDelta.x)
+            {
+                StartX = sx - m_sizeDelta.x;
+                a = true;
+            }
+            if (StartX + m_sizeDelta.x > cw)
+            {
+                StartX = cw - m_sizeDelta.x;
+                a = true;
+            }
+            if (StartX < 0)
+                StartX = 0;
+            if (sy < StartY)
+            {
+                StartY = sy - 1;
+                a = true;
+            }
+            else if (sy > StartY + m_sizeDelta.y)
+            {
+                StartY = sy - m_sizeDelta.y;
+                a = true;
+            }
+            if (StartY + m_sizeDelta.y > ch)
+            {
+                StartY = ch - m_sizeDelta.y;
+                a = true;
+            }
+            if (StartY < 0)
+                StartY = 0;
+            if (a)
+                PopulateVertex();
+        }
+        /// <summary>
+        /// 使用按压信息获取字符索引
+        /// </summary>
+        /// <param name="press">按压信息</param>
+        /// <returns></returns>
+        public int GetIndex(ref PressInfo press)
+        {
+            if (press.Row < 0)
+                return 0;
+            if (press.Row >= lines.Count)
+                return chars.Count;
+            int index = lines[press.Row].CharStart + press.Offset;
+            if (index > lines[press.Row].CharEnd + 1)
+                index = lines[press.Row].CharEnd + 1;
+            if (index <= chars.Count)
+                return index;
+            return chars.Count;
+        }
+        /// <summary>
+        /// 使用索引获取按压信息
+        /// </summary>
+        /// <param name="index">索引</param>
+        /// <param name="press">按压信息</param>
+        public void GetPress(int index, ref PressInfo press)
+        {
+            for (int i = 0; i < lines.Count; i++)
+            {
+                if (index <= lines[i].CharEnd + 1)
+                {
+                    press.Row = i;
+                    press.Offset = index - lines[i].CharStart;
+                    return;
+                }
+            }
+            press.Row = 0;
+            press.Offset = 0;
+        }
+
+        /// <summary>
+        /// 设置输入法显示位置,win平台
+        /// </summary>
+        /// <param name="start">光标按压位置</param>
+        public void SetCursorPos(ref PressInfo start)
+        {
+            if (start.Row < 0)
+                return;
+            if (start.Row >= lines.Count)
+                return;
+            int index = GetIndex(ref start);
+            if (index < 0)
+                return;
+            if (index >= chars.Count)
+                return;
+            int row = start.Row;
+            for (int i = 0; i < lines.Count; i++)
+            {
+                if (index <= lines[i].CharEnd)
+                {
+                    row = i;
+                    break;
+                }
+            }
+            float p;
+            if (index > lines[row].CharEnd)
+            {
+                index--;
+                if (index < 0)
+                    index = 0;
+                p = chars[index].Right;
+            }
+            else
+            {
+                p = chars[index].Left;
+            }
+            float right = p + 1;
+            float down = lines[row].downY;
+            var gl = GetGlobaInfo(this, false);
+            float rx = gl.Scale.x * right;
+            float rd = gl.Scale.y * down;
+            gl.Postion.x += rx;
+            gl.Postion.y += rd;
+            gl.Postion *= UISystem.PhysicalScale;
+            gl.Postion.x += Screen.width / 2;
+            gl.Postion.y += Screen.height / 2;
+            Keyboard.CursorPos = new Vector2(gl.Postion.x, Screen.height - gl.Postion.y);
+        }
+        void CorrectionPress(ref PressInfo press)
+        {
+            if(lines.Count==0)
+            {
+                press.Row = 0;
+                press.Offset = 0;
+                return;
+            }
+            if (press.Row >= lines.Count)
+                press.Row = lines.Count - 1;
+            if (press.Row < 0)
+                press.Row = 0;
         }
     }
 }

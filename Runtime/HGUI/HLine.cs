@@ -1,8 +1,10 @@
 ﻿using huqiang.Core.Line;
 using huqiang.Data;
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace huqiang.Core.HGUI
@@ -10,8 +12,9 @@ namespace huqiang.Core.HGUI
     /// <summary>
     /// 画线UI,支持直线,弧线,贝塞尔曲线,二阶贝塞尔曲线
     /// </summary>
-    public class HLine:HGraphics
+    public class HLine : HGraphics
     {
+        public override string TypeName { get => "HLine"; }
         List<Beeline> beelines;
         List<ArcLine> arcLines;
         List<BzierLine> bzierLines;
@@ -80,27 +83,27 @@ namespace huqiang.Core.HGUI
             if (arcLines != null)
                 arcLines.Clear();
             if (bzierLines != null)
-               bzierLines.Clear();
+                bzierLines.Clear();
             if (bzierLines2 != null)
                 bzierLines2.Clear();
             vertInfo.DataCount = 0;
-            trisInfo.DataCount = 0;
+            trisInfo1.DataCount = 0;
         }
         int GetSize()
         {
             int c = 0;
             if (beelines != null)
                 c = beelines.Count * 4;
-            if(arcLines!=null)
+            if (arcLines != null)
             {
-                for(int i=0;i<arcLines.Count;i++)
+                for (int i = 0; i < arcLines.Count; i++)
                 {
                     float f = arcLines[i].Precision;
-                    int a =(int)( 1 / f)+2;
+                    int a = (int)(1 / f) + 2;
                     c += a * 4;
                 }
             }
-            if(bzierLines!=null)
+            if (bzierLines != null)
             {
                 for (int i = 0; i < bzierLines.Count; i++)
                 {
@@ -109,7 +112,7 @@ namespace huqiang.Core.HGUI
                     c += a * 4;
                 }
             }
-            if(bzierLines2!=null)
+            if (bzierLines2 != null)
             {
                 for (int i = 0; i < bzierLines2.Count; i++)
                 {
@@ -125,29 +128,29 @@ namespace huqiang.Core.HGUI
         /// </summary>
         public override void UpdateMesh()
         {
-            if(m_dirty)
+            if (m_dirty)
             {
                 int c = GetSize();
-                if (c > vertInfo.Size | c+32 < vertInfo.Size)
+                if (c > vertInfo.Size | c + 32 < vertInfo.Size)
                 {
                     vertInfo.Release();
                     vertInfo = HGUIMesh.blockBuffer.RegNew(c);
                     int tc = c / 4 * 6;
-                    trisInfo.Release();
-                    trisInfo = trisBuffer.RegNew(tc);
+                    trisInfo1.Release();
+                    trisInfo1 = HGUIMesh.trisBuffer.RegNew(tc);
                 }
                 vertInfo.DataCount = 0;
-                trisInfo.DataCount = 0;
+                trisInfo1.DataCount = 0;
                 m_dirty = false;
-                if(beelines!=null)
+                if (beelines != null)
                 {
                     for (int i = 0; i < beelines.Count; i++)
                     {
                         var tmp = beelines[i];
-                        CreateBeeLine(ref tmp); 
+                        CreateBeeLine(ref tmp);
                     }
                 }
-                if(arcLines!=null)
+                if (arcLines != null)
                 {
                     for (int i = 0; i < arcLines.Count; i++)
                     {
@@ -155,7 +158,7 @@ namespace huqiang.Core.HGUI
                         CreateArcLine(ref tmp);
                     }
                 }
-                if(bzierLines!=null)
+                if (bzierLines != null)
                 {
                     for (int i = 0; i < bzierLines.Count; i++)
                     {
@@ -163,7 +166,7 @@ namespace huqiang.Core.HGUI
                         CreateBzier(ref tmp);
                     }
                 }
-                if(bzierLines2!=null)
+                if (bzierLines2 != null)
                 {
                     for (int i = 0; i < bzierLines2.Count; i++)
                     {
@@ -173,7 +176,7 @@ namespace huqiang.Core.HGUI
                 }
             }
         }
-        static void CreateVert(ref Vector2 start, ref Vector2 end, ref BlockInfo<HVertex> vert, ref BlockInfo<int> tris,ref Color32 color, float lineWidth)
+        static void CreateVert(ref Vector2 start, ref Vector2 end, ref BlockInfo<HVertex> vert, ref BlockInfo<int> tris, ref Color32 color, float lineWidth)
         {
             float vx = end.x - start.x;
             float vy = end.y - start.y;
@@ -183,30 +186,34 @@ namespace huqiang.Core.HGUI
             int index = vert.DataCount;
             unsafe
             {
-                HVertex* p =vert.Addr;
+                HVertex* p = vert.Addr;
                 p[index].position.x = start.x + ny;
                 p[index].position.y = start.y - nx;
                 p[index].position.z = 0;
                 p[index].color = color;
                 p[index].picture = 0;
+                p[index].fillColor = 0.07f;
                 index++;
                 p[index].position.x = start.x - ny;
                 p[index].position.y = start.y + nx;
                 p[index].position.z = 0;
                 p[index].color = color;
                 p[index].picture = 0;
+                p[index].fillColor = 0.07f;
                 index++;
                 p[index].position.x = end.x - ny;
                 p[index].position.y = end.y + nx;
                 p[index].position.z = 0;
                 p[index].color = color;
                 p[index].picture = 0;
+                p[index].fillColor = 0.07f;
                 index++;
                 p[index].position.x = end.x + ny;
                 p[index].position.y = end.y - nx;
                 p[index].position.z = 0;
                 p[index].color = color;
                 p[index].picture = 0;
+                p[index].fillColor = 0.07f;
             }
             index = vert.DataCount;
             int t = tris.DataCount;
@@ -223,7 +230,7 @@ namespace huqiang.Core.HGUI
                 t++;
                 p[t] = index + 1;
                 t++;
-                p[t] = index+ 2;
+                p[t] = index + 2;
                 t++;
             }
             vert.DataCount += 4;
@@ -231,18 +238,18 @@ namespace huqiang.Core.HGUI
         }
         void CreateBeeLine(ref Beeline beeline)
         {
-            CreateVert(ref beeline.Start, ref beeline.End, ref vertInfo,ref trisInfo, ref beeline.lineBase.Color,beeline.lineBase.Width);
+            CreateVert(ref beeline.Start, ref beeline.End, ref vertInfo, ref trisInfo1, ref beeline.lineBase.Color, beeline.lineBase.Width);
         }
         void CreateArcLine(ref ArcLine line)
         {
-            int Part =(int)(1 / line.Precision);
+            int Part = (int)(1 / line.Precision);
             float p = line.Angle / Part;
             Part++;
             float sp = 0 - line.Angle / 2;
             Quaternion q = Quaternion.Euler(0, 0, line.Dic);
             bool start = false;
             Vector2 s = Vector2.zero;
-            Vector2 frist=Vector2.zero;
+            Vector2 frist = Vector2.zero;
             for (int i = 0; i < Part; i++)
             {
                 float a = sp;
@@ -256,9 +263,9 @@ namespace huqiang.Core.HGUI
                 v.x *= line.Scale.x;
                 v.y *= line.Scale.y;
                 Vector2 e = q * v;
-                if(start)
+                if (start)
                 {
-                    CreateVert(ref s, ref e, ref vertInfo, ref trisInfo, ref line.lineBase.Color, line.lineBase.Width);
+                    CreateVert(ref s, ref e, ref vertInfo, ref trisInfo1, ref line.lineBase.Color, line.lineBase.Width);
                 }
                 s = e;
                 sp += p;
@@ -266,9 +273,9 @@ namespace huqiang.Core.HGUI
                 if (i == 0)
                     frist = e;
             }
-            if(line.Closed)
+            if (line.Closed)
             {
-                CreateVert(ref s, ref frist, ref vertInfo, ref trisInfo, ref line.lineBase.Color,line.lineBase.Width);
+                CreateVert(ref s, ref frist, ref vertInfo, ref trisInfo1, ref line.lineBase.Color, line.lineBase.Width);
             }
         }
         void CreateBzier(ref BzierLine line)
@@ -278,12 +285,12 @@ namespace huqiang.Core.HGUI
             Vector2 s = line.A;
             for (int i = 0; i < Part; i++)
             {
-                var e = MathH.BezierPoint(t,ref line.A,ref line.B,ref line.C);
-                CreateVert(ref s, ref e, ref vertInfo, ref trisInfo, ref line.lineBase.Color, line.lineBase.Width);
+                var e = MathH.BezierPoint(t, ref line.A, ref line.B, ref line.C);
+                CreateVert(ref s, ref e, ref vertInfo, ref trisInfo1, ref line.lineBase.Color, line.lineBase.Width);
                 s = e;
                 t += line.Precision;
             }
-            CreateVert(ref s, ref line.C, ref vertInfo, ref trisInfo, ref line.lineBase.Color, line.lineBase.Width);
+            CreateVert(ref s, ref line.C, ref vertInfo, ref trisInfo1, ref line.lineBase.Color, line.lineBase.Width);
         }
         void CreateBzier2(ref BzierLine2 line)
         {
@@ -292,12 +299,12 @@ namespace huqiang.Core.HGUI
             Vector2 s = line.A;
             for (int i = 0; i < Part; i++)
             {
-                var e = MathH.BezierPoint(t, ref line.A, ref line.B, ref line.C,ref line.D);
-                CreateVert(ref s, ref e, ref vertInfo, ref trisInfo, ref line.lineBase.Color,line.lineBase.Width);
+                var e = MathH.BezierPoint(t, ref line.A, ref line.B, ref line.C, ref line.D);
+                CreateVert(ref s, ref e, ref vertInfo, ref trisInfo1, ref line.lineBase.Color, line.lineBase.Width);
                 s = e;
                 t += line.Precision;
             }
-            CreateVert(ref s, ref line.D, ref vertInfo, ref trisInfo, ref line.lineBase.Color, line.lineBase.Width);
+            CreateVert(ref s, ref line.D, ref vertInfo, ref trisInfo1, ref line.lineBase.Color, line.lineBase.Width);
         }
     }
 }

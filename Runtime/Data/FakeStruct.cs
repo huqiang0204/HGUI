@@ -16,7 +16,7 @@ namespace huqiang.Data
         public unsafe void ReadFromStruct(void* tar)
         {
             Int32* t = (Int32*)tar;
-            Int32* p = (Int32*)ptr;
+            Int32* p = (Int32*)ip;
             for (int i = 0; i < element; i++)
             {
                 *p = *t;
@@ -31,7 +31,7 @@ namespace huqiang.Data
         public unsafe void WitreToStruct(void* tar)
         {
             Int32* t = (Int32*)tar;
-            Int32* p = (Int32*)ptr;
+            Int32* p = (Int32*)ip;
             for (int i = 0; i < element; i++)
             {
                 *t = *p;
@@ -48,7 +48,7 @@ namespace huqiang.Data
         public unsafe void ReadFromStruct(void* tar, int start, int size)
         {
             Int32* t = (Int32*)tar;
-            Int32* p = (Int32*)(ptr);
+            Int32* p = (Int32*)ip;
             p += start;
             for (int i = 0; i < size; i++)
             {
@@ -66,7 +66,7 @@ namespace huqiang.Data
         public unsafe void WitreToStruct(void* tar, int start, int size)
         {
             Int32* t = (Int32*)tar;
-            Int32* p = (Int32*)ptr;
+            Int32* p = (Int32*)ip;
             p += start;
             for (int i = 0; i < size; i++)
             {
@@ -99,15 +99,18 @@ namespace huqiang.Data
         {
             element = size;
             msize = size * 4;
-            ptr = Marshal.AllocHGlobal(msize);
-            unsafe
+            if (size > 0)
             {
-                ip = (byte*)ptr;
-                Int32* p = (Int32*)ptr;
-                for (int i = 0; i < size; i++)
+                ptr = Marshal.AllocHGlobal(msize);
+                unsafe
                 {
-                    *p = 0;
-                    p++;
+                    ip = (byte*)ptr;
+                    Int32* p = (Int32*)ptr;
+                    for (int i = 0; i < size; i++)
+                    {
+                        *p = 0;
+                        p++;
+                    }
                 }
             }
             buffer = db;
@@ -118,23 +121,28 @@ namespace huqiang.Data
         /// <param name="db">数据缓存器</param>
         /// <param name="size">元素个数</param>
         /// <param name="point">源数据地址</param>
-        public unsafe FakeStruct(DataBuffer db, int size, Int32* point)
+        public unsafe FakeStruct(DataBuffer db, int size, void* point)
         {
             element = size;
             msize = size * 4;
             ptr = Marshal.AllocHGlobal(msize);
             unsafe
             {
-                ip = (byte*)ptr;
+                Int32* sp = (Int32*)point;
                 Int32* p = (Int32*)ptr;
                 for (int i = 0; i < size; i++)
                 {
-                    *p = *point;
-                    point++;
+                    *p = *sp;
+                    sp++;
                     p++;
                 }
             }
+            ip = (byte*)ptr;
             buffer = db;
+        }
+        public unsafe void SetPoint(byte* point)
+        {
+            ip = point;
         }
         ~FakeStruct()
         {
@@ -265,7 +273,7 @@ namespace huqiang.Data
         public unsafe void SetData(int* addr, object dat)
         {
             int a = (int)addr - (int)ip;
-            if (a < 0|a>=msize)//超过界限
+            if (a < 0 | a >= msize)//超过界限
                 return;
             buffer.RemoveData(*addr);
             *addr = buffer.AddData(dat);
@@ -279,7 +287,7 @@ namespace huqiang.Data
         public unsafe T GetData<T>(int* addr) where T : class
         {
             int a = (int)addr - (int)ip;
-            if (a < 0|a>=msize)//超过界限
+            if (a < 0 | a >= msize)//超过界限
                 return null;
             return buffer.GetData(*addr) as T;
         }
@@ -367,6 +375,24 @@ namespace huqiang.Data
             int o = index * 4;
             return *(double*)(ip + o);
         }
+        public unsafe void SetDecimal(int index, Decimal value)
+        {
+            if (index < 0)
+                return;
+            if (index >= element)
+                return;
+            int o = index * 4;
+            *(Decimal*)(ip + o) = value;
+        }
+        public unsafe Decimal GetDecimal(int index)
+        {
+            if (index < 0)
+                return 0;
+            if (index >= element)
+                return 0;
+            int o = index * 4;
+            return *(Decimal*)(ip + o);
+        }
         /// <summary>
         /// 将假结构体中的数据导出位byte[]
         /// </summary>
@@ -426,10 +452,10 @@ namespace huqiang.Data
         /// <returns></returns>
         public bool WriteInt(int value)
         {
-            if(offset<element)
+            if (offset < element)
             {
                 this[offset] = value;
-                offset ++;
+                offset++;
                 return true;
             }
             return false;
@@ -443,7 +469,7 @@ namespace huqiang.Data
         {
             if (offset < element)
             {
-                SetFloat(offset,value);
+                SetFloat(offset, value);
                 offset++;
                 return true;
             }
@@ -459,7 +485,7 @@ namespace huqiang.Data
             if (offset + 1 < element)
             {
                 SetInt64(offset, value);
-                offset+=2;
+                offset += 2;
                 return true;
             }
             return false;
@@ -500,7 +526,7 @@ namespace huqiang.Data
         /// <typeparam name="T">结构体类型</typeparam>
         /// <param name="value">值</param>
         /// <returns></returns>
-        public bool WriteArray<T>(T[] value)where T:unmanaged
+        public bool WriteArray<T>(T[] value) where T : unmanaged
         {
             if (offset < element)
             {
@@ -544,10 +570,10 @@ namespace huqiang.Data
         /// <returns></returns>
         public Int64 ReadInt64()
         {
-            if (offset+1 < element)
+            if (offset + 1 < element)
             {
                 var value = GetInt64(offset);
-                offset+=2;
+                offset += 2;
                 return value;
             }
             return 0;

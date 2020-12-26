@@ -34,21 +34,21 @@ namespace huqiang.Data
         /// </summary>
         public static int ElementSize = Size / 4;
     }
+    public struct SpriteInfo
+    {
+        public string Name;
+        public Rect rect;
+        /// <summary>
+        /// 精灵轴心
+        /// </summary>
+        public Vector2 pivot;
+        public Vector2[] uv;
+    }
     /// <summary>
     /// 精灵数据
     /// </summary>
     public class SpriteData
     {
-        struct SpriteInfo
-        {
-            public string Name;
-            public Rect rect;
-            /// <summary>
-            /// 精灵轴心
-            /// </summary>
-            public Vector2 pivot;
-            public Vector2[] uv;
-        }
         struct TextureInfo
         {
             public string Name;
@@ -105,6 +105,58 @@ namespace huqiang.Data
                 }
             }
             return spr;
+        }
+        public bool FindSpriteInfo(string tName, string sName,ref SpriteInfo info)
+        {
+            if (infos == null)
+                return false;
+            for (int i = 0; i < infos.Length; i++)
+            {
+                if (infos[i].Name == tName)
+                {
+                    var spr = infos[i].sprites;
+                    for (int j = 0; j < spr.Length; j++)
+                    {
+                        if (spr[j].Name == sName)
+                        {
+                            info=spr[j];
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+        public SpriteInfo[] FindSpriteInfos(string tName, string[] sName)
+        {
+            if (infos == null)
+                return null;
+            for (int i = 0; i < infos.Length; i++)
+            {
+                if (infos[i].Name == tName)
+                {
+                    var spr = infos[i].sprites;
+                    return FindSpriteInfos(spr, sName);
+                }
+            }
+            return null;
+        }
+        SpriteInfo[] FindSpriteInfos(SpriteInfo[] spr, string[] sName)
+        {
+            SpriteInfo[] uvs = new SpriteInfo[sName.Length];
+            for (int i = 0; i < sName.Length; i++)
+            {
+                string name = sName[i];
+                for (int j = 0; j < spr.Length; j++)
+                {
+                    if (spr[j].Name == name)
+                    {
+                        uvs[i] = spr[j];
+                        break;
+                    }
+                }
+            }
+            return uvs;
         }
         public Vector2[] FindSpriteUV(string tName, string sName)
         {

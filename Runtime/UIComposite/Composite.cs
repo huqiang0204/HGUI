@@ -27,7 +27,7 @@ namespace huqiang.UIComposite
         /// <param name="mod">模型数据</param>
         /// <param name="element">UI元素实例</param>
         /// <param name="initializer">初始化器</param>
-        public virtual void Initial(FakeStruct mod, UIElement element, Initializer initializer)
+        public virtual void Initial(FakeStruct mod, UIElement element, UIInitializer initializer)
         {
             BufferData = mod;
             Enity = element;

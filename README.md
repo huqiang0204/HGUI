@@ -1,28 +1,17 @@
 # HGUI
 
 #### 介绍
-从一开始的简单MeshRender UI，到UGUI，在到UGUI线程操作，在到此已经是我的第四版UI了。
-
-第二版 https://github.com/huqiang0204/huqiang.Unity/ 主线程
-
-第三版 https://github.com/huqiang0204/huqiang.UnitySubThreadUI
-
-因为是多线程，使用比较复杂，下属用得很头疼，虽然大部分计算都给了子线程，但是UGUI的合批性能不是很理性
-前两版都对UGUI做了扩充，比如Emoji输入，TreeView，数据模型绑定，UI高重复回收利用等等
-
-本工程不紧紧只是UI，里面还包含了很多模块，比如 LZ4解压缩，DataBuffer指针数据，多线程GIF解码，页面管理UIPage
-UDP，TCP，KCP，数据封包，线程池，等等
+HGUI升级版，UI元素移除MonoBehaviour
 
 #### 软件架构
 软件架构说明
-
 
 #### 安装教程
 
 1.  打开工程的下的文件Packages/manifest.json
 2.  添加对应的版本包，例如
     "dependencies": {
-    "com.huqiang.hguiframework": "https://gitee.com/huqiang0204/HGUI.git#1.0.9"
+    "com.huqiang.hguiframework": "https://gitee.com/huqiang0204/hgui2.git#1.1.7"
 	}
 3.  打包时注意事项，请确保ProjectSetting面板 Graphics中添加了Shader HGUI/UIDef，否则移动端会报错
 

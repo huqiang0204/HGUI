@@ -11,7 +11,7 @@ namespace huqiang.UIComposite
     {
         public UserEvent Item;
         public HText Text;
-        public Transform Check;
+        public UIElement Check;
         [NonSerialized]
         public object data;
         [NonSerialized]
@@ -37,7 +37,7 @@ namespace huqiang.UIComposite
                     return;
                 ItemSize = m_scroll.ItemSize;
                 MaxHeight = m_scroll.Enity.SizeDelta.y;
-                m_scroll.Enity.gameObject.SetActive(false);
+                m_scroll.Enity.activeSelf = false;
             }
         }
         //public bool down = true;
@@ -88,28 +88,23 @@ namespace huqiang.UIComposite
                 }
             }
         }
-        public override void Initial(FakeStruct mod, UIElement script,Initializer initializer)
+        public override void Initial(FakeStruct mod, UIElement script,UIInitializer initializer)
         {
             base.Initial(mod,script,initializer);
-            var trans = Enity.transform;
-            Label = trans.Find("Label").GetComponent<HText>();
+            Label = Enity.Find("Label") as HText;
             callBack = Enity.RegEvent<UserEvent>();
             callBack.Click = Show;
-            var scroll = trans.Find("Scroll");
+            var scroll = Enity.Find("Scroll");
             if(scroll!=null)
             {
-                scroll.gameObject.SetActive(false);
-                var ui = scroll.GetComponent<UIElement>();
-                if (ui != null)
+                scroll.activeSelf = false;
+                m_scroll = scroll.composite as ScrollY;
+                if (m_scroll != null)
                 {
-                    m_scroll = ui.composite as ScrollY;
-                    if (m_scroll != null)
-                    {
-                        m_scroll.SetItemUpdate<PopItemMod, object>(ItemUpdate);
-                        m_scroll.eventCall.LostFocus = LostFocus;
-                        m_scroll.eventCall.DataContext = this;
-                    }
-                }  
+                    m_scroll.SetItemUpdate<PopItemMod, object>(ItemUpdate);
+                    m_scroll.eventCall.LostFocus = LostFocus;
+                    m_scroll.eventCall.DataContext = this;
+                }
             }
         }
         int showAni;
@@ -119,9 +114,9 @@ namespace huqiang.UIComposite
         {
             if (m_scroll != null)
             {
-                if(!m_scroll.Enity.gameObject.activeSelf)
+                if(!m_scroll.Enity.activeSelf)
                 {
-                    m_scroll.Enity.gameObject.SetActive(true);
+                    m_scroll.Enity.activeSelf = true;
                     action.AddFocus(m_scroll.eventCall);
                     showAni = 1;
                     showTime = 0;
@@ -145,7 +140,7 @@ namespace huqiang.UIComposite
                 showTime = 0;
             }
         }
-        GameObject Checked;
+       UIElement Checked;
         /// <summary>
         /// 项更新函数
         /// </summary>
@@ -154,7 +149,7 @@ namespace huqiang.UIComposite
         /// <param name="index">数据索引</param>
         public void ItemUpdate(PopItemMod g,object o, int index)
         {
-            PopItemMod item = g as PopItemMod;
+            PopItemMod item = g;
             if (item == null)
                 return;
 
@@ -175,23 +170,23 @@ namespace huqiang.UIComposite
             {
                 if (index == SelectIndex)
                 {
-                    item.Check.gameObject.SetActive(true);
-                    Checked = item.Check.gameObject;
+                    item.Check.activeSelf = true;
+                    Checked = item.Check;
                 }
-                else item.Check.gameObject.SetActive(false);
+                else item.Check.activeSelf = false;
             }
         }
         void ItemClick(UserEvent eventCall, UserAction action)
         {
             if (Checked != null)
-                Checked.SetActive(false);
+                Checked.activeSelf = false;
             PopItemMod mod = eventCall.DataContext as PopItemMod;
             if (mod == null)
                 return;
             if (mod.Check != null)
-            { 
-                mod.Check.gameObject.SetActive(true);
-                Checked = mod.Check.gameObject;
+            {
+                mod.Check.activeSelf = true;
+                Checked = mod.Check;
             }
             SelectIndex = mod.Index;
             if (Label != null)
@@ -228,7 +223,7 @@ namespace huqiang.UIComposite
                 if (showTime >= 200)
                 {
                     showAni = 0;
-                    m_scroll.Enity.gameObject.SetActive(false);
+                    m_scroll.Enity.activeSelf = false;
                     m_scroll.Enity.SizeDelta = size;
                 }
                 else

@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using huqiang.Core.HGUI;
 using huqiang.Data;
+using huqiang.Helper.HGUI;
 using huqiang.UIComposite;
 using UnityEngine;
 
@@ -13,7 +12,7 @@ public class SliderHelper : UIHelper
     public float MaxScale=1;
     public UISlider.Direction direction;
     UISlider slider;
-    public unsafe override void ToBufferData(DataBuffer db, UITransfromData* data)
+    public unsafe override void ToBufferData(DataBuffer db, huqiang.Core.UIData.UIElementData* data)
     {
         FakeStruct fake = new FakeStruct(db, SliderInfo.ElementSize);
         SliderInfo* si = (SliderInfo*)fake.ip;
@@ -22,6 +21,17 @@ public class SliderHelper : UIHelper
         si->MinScale = MinScale;
         si->MaxScale = MaxScale;
         si->direction = direction;
-        data->composite = db.AddData(fake);
+        int type = db.AddData("SliderHelper");
+        int index = db.AddData(fake);
+        data->composite = type << 16 | index;
+    }
+    public unsafe override void LoadFromBuffer(FakeStruct fake, UIInitializer initializer)
+    {
+        SliderInfo* si = (SliderInfo*)fake.ip;
+        StartOffset = si->StartOffset;
+        EndOffset = si->EndOffset;
+        MinScale = si->MinScale;
+        MaxScale = si->MaxScale;
+        direction = si->direction;
     }
 }

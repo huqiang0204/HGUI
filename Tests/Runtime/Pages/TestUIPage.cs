@@ -20,7 +20,7 @@ namespace Assets.Scripts
         }
         View view;
 
-        public override void Initial(Transform parent, object dat = null)
+        public override void Initial(UIElement parent, object dat = null)
         {
             base.Initial(parent, dat);
             view = LoadUI<View>("baseUI", "test");

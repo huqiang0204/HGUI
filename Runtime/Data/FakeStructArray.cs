@@ -405,7 +405,7 @@ namespace huqiang.Data
         /// <param name="index">索引位置</param>
         /// <param name="os">子元素偏移</param>
         /// <returns></returns>
-        public bool Seek(int index ,int os = 0)
+        public bool Seek(int index, int os = 0)
         {
             if (index < 0)
                 return false;

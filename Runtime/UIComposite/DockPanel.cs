@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using huqiang.Core.HGUI;
 using huqiang.Data;
+using huqiang.Core.UIData;
 
 namespace huqiang.UIComposite
 {
@@ -51,7 +52,8 @@ namespace huqiang.UIComposite
             {
                 callBack = Enity.RegEvent<UserEvent>();
                 callBack.Drag = Drag;
-                callBack.DragEnd = (o, e, v) => {
+                callBack.DragEnd = (o, e, v) =>
+                {
 #if UNITY_EDITOR || UNITY_STANDALONE_WIN
                     Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
 #endif
@@ -62,26 +64,27 @@ namespace huqiang.UIComposite
 #if UNITY_EDITOR || UNITY_STANDALONE_WIN
                 callBack.PointerEntry = (o, e) =>
                 {
-                    if(direction==Direction.Horizontal)
+                    if (direction == Direction.Horizontal)
                     {
                         Cursor.SetCursor(CursorY, new Vector2(64, 64), CursorMode.Auto);
                     }
                     else
                     {
                         Cursor.SetCursor(CursorX, new Vector2(64, 64), CursorMode.Auto);
-                    } 
+                    }
                 };
-                callBack.PointerLeave = (o, e) => {
+                callBack.PointerLeave = (o, e) =>
+                {
                     if (!o.Pressed)
                         Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
                 };
 #endif
             }
-            else mod.gameObject.SetActive(false);
-            mod.transform.SetParent(layout.LineLevel);
-            mod.transform.localPosition = Vector3.zero;
-            mod.transform.localScale = Vector3.one;
-            mod.transform.localRotation = Quaternion.identity;
+            else mod.activeSelf = false;
+            mod.SetParent(layout.LineLevel);
+            mod.localPosition = Vector3.zero;
+            mod.localScale = Vector3.one;
+            mod.localRotation = Quaternion.identity;
         }
         void Drag(UserEvent callBack,UserAction action,Vector2 v)
         {
@@ -113,59 +116,55 @@ namespace huqiang.UIComposite
        
         void MoveLeft(float dis)
         {
-            var trans = Enity.transform;
-            Vector3 pos = trans.localPosition;
+            Vector3 pos = Enity.localPosition;
             pos.x += dis;
             for (int i = 0; i < Left.Count; i++)
             {
-                var lx = Left[i].Left.Enity.transform.localPosition.x;
+                var lx = Left[i].Left.Enity.localPosition.x;
                 if (pos.x <= lx + layout.AreaWidth)
                     pos.x = lx + layout.AreaWidth;
             }
-            trans.localPosition = pos;
+            Enity.localPosition = pos;
         }
         void MoveTop(float dis)
         {
-            var trans = Enity.transform;
-            Vector3 pos = trans.localPosition;
+            Vector3 pos = Enity.localPosition;
             pos.y += dis;
             for (int i = 0; i < Top.Count; i++)
             {
-                var ty = Top[i].Top.Enity.transform.localPosition.y;
+                var ty = Top[i].Top.Enity.localPosition.y;
                 if (pos.y >= ty - layout.AreaWidth)
                     pos.y = ty - layout.AreaWidth;
             }
-            trans.localPosition = pos;
+            Enity.localPosition = pos;
         }
         void MoveRight(float dis)
         {
-            var trans = Enity.transform;
-            Vector3 pos = trans.localPosition;
+            Vector3 pos = Enity.localPosition;
             pos.x += dis;
             for (int i = 0; i < Right.Count; i++)
             {
-                var rx = Right[i].Right.Enity.transform.localPosition.x;
+                var rx = Right[i].Right.Enity.localPosition.x;
                 if (pos.x >= rx- layout.AreaWidth)
                     pos.x = rx - layout.AreaWidth;
             }
-            trans.localPosition = pos;
+            Enity.localPosition = pos;
         }
         void MoveDown(float dis)
         {
-            var trans = Enity.transform;
-            Vector3 pos = trans.localPosition;
+            Vector3 pos = Enity.localPosition;
             pos.y += dis;
             for (int i = 0; i < Down.Count; i++)
             {
-                var ty = Down[i].Down.Enity.transform.localPosition.y;
+                var ty = Down[i].Down.Enity.localPosition.y;
                 if (pos.y <= ty + layout.AreaWidth)
                     pos.y = ty + layout.AreaWidth;
             }
-            trans.localPosition = pos;
+            Enity.localPosition = pos;
         }
         public void SetSize(Vector3 pos,Vector2 size)
         {
-            Enity.transform.localPosition = pos;
+            Enity.localPosition = pos;
             Enity.SizeDelta = size;
         }
     
@@ -200,13 +199,12 @@ namespace huqiang.UIComposite
             {
                 if(direction==Direction.Horizontal)
                 {
-                    float sx = LineStart.Enity.transform.localPosition.x;
-                    float ex = LineEnd.Enity.transform.localPosition.x;
+                    float sx = LineStart.Enity.localPosition.x;
+                    float ex = LineEnd.Enity.localPosition.x;
                     float w= ex - sx;
-                    var trans = Enity.transform;
-                    var pos = trans.localPosition;
+                    var pos = Enity.localPosition;
                     pos.x = sx + 0.5f * w;
-                    trans.localPosition = pos;
+                    Enity.localPosition = pos;
                     if (w < 0)
                         w = -w;
                     var size = Enity.SizeDelta;
@@ -215,13 +213,12 @@ namespace huqiang.UIComposite
                 }
                 else
                 {
-                    float sx = LineStart.Enity.transform.localPosition.y;
-                    float ex = LineEnd.Enity.transform.localPosition.y;
+                    float sx = LineStart.Enity.localPosition.y;
+                    float ex = LineEnd.Enity.localPosition.y;
                     float w = ex - sx;
-                    var trans = Enity.transform;
-                    var pos = trans.localPosition;
+                    var pos = Enity.localPosition;
                     pos.y = sx + 0.5f * w;
-                    trans.localPosition= pos;
+                    Enity.localPosition= pos;
                     if (w < 0)
                         w = -w;
                     var size = Enity.SizeDelta;
@@ -270,7 +267,7 @@ namespace huqiang.UIComposite
             if (LineEnd != null)
                 LineEnd.AdjacentLines.Remove(this);
             layout.lines.Remove(this);
-            HGUIManager.GameBuffer.RecycleGameObject(Enity.gameObject);
+            HGUIManager.RecycleUI(Enity);
         }
         void Release()
         {
@@ -292,10 +289,9 @@ namespace huqiang.UIComposite
             var areas = line.Left;
             for (int i = 0; i < areas.Count; i++)
                 areas[i].Right = this;
-            var trans = Enity.transform;
-            var pos = trans.localPosition;
-            pos.y = line.Enity.transform.localPosition.y;
-            trans.localPosition = pos;
+            var pos = Enity.localPosition;
+            pos.y = line.Enity.localPosition.y;
+            Enity.localPosition = pos;
             var al = line.AdjacentLines;
             int c = al.Count - 1;
             for (; c >= 0; c--)
@@ -315,10 +311,9 @@ namespace huqiang.UIComposite
             var areas = line.Right;
             for (int i = 0; i < areas.Count; i++)
                 areas[i].Left = this;
-            var trans = Enity.transform;
-            var pos = trans.localPosition;
-            pos.y = line.Enity.transform.localPosition.y;
-            trans.localPosition = pos;
+            var pos = Enity.localPosition;
+            pos.y = line.Enity.localPosition.y;
+            Enity.localPosition = pos;
             var al = line.AdjacentLines;
             int c = al.Count - 1;
             for (; c >= 0; c--)
@@ -338,10 +333,9 @@ namespace huqiang.UIComposite
             var areas = line.Top;
             for (int i = 0; i < areas.Count; i++)
                 areas[i].Down = this;
-            var trans = Enity.transform;
-            var pos = trans.localPosition;
-            pos.x = line.Enity.transform.localPosition.x;
-            trans.localPosition = pos;
+            var pos = Enity.localPosition;
+            pos.x = line.Enity.localPosition.x;
+            Enity.localPosition = pos;
             var al = line.AdjacentLines;
             int c = al.Count - 1;
             for (; c >= 0; c--)
@@ -361,13 +355,12 @@ namespace huqiang.UIComposite
             var areas = line.Down;
             for (int i = 0; i < areas.Count; i++)
                 areas[i].Top = this;
-            var trans = Enity.transform;
-            var pos = trans.localPosition;
-            pos.x = line.Enity.transform.localPosition.x;
-            trans.localPosition = pos;
+            var pos = Enity.localPosition;
+            pos.x = line.Enity.localPosition.x;
+            Enity.localPosition = pos;
             var al = line.AdjacentLines;
-            int c = al.Count-1;
-            for (; c>=0;c--)
+            int c = al.Count - 1;
+            for (; c >= 0; c--)
             {
                 var l = al[c];
                 l.SetLineEnd(this);
@@ -383,8 +376,8 @@ namespace huqiang.UIComposite
             fake[index,0] = (int)direction;
             fake.SetFloat(index, 1,Enity.m_sizeDelta.x);
             fake.SetFloat(index,2, Enity.m_sizeDelta.y);
-            fake.SetFloat(index,3,Enity.transform.localPosition.x);
-            fake.SetFloat(index,4, Enity.transform.localPosition.y);
+            fake.SetFloat(index,3,Enity.localPosition.x);
+            fake.SetFloat(index,4, Enity.localPosition.y);
             fake[index,5] = layout.GetLineID(LineStart);
             fake[index,6] = layout.GetLineID(LineEnd);
             fake.SetData(index,7,SaveAdjacentArea(Left));
@@ -420,7 +413,7 @@ namespace huqiang.UIComposite
             direction =(Direction)fake[index,0];
             Enity.m_sizeDelta.x = fake.GetFloat(index,1);
             Enity.m_sizeDelta.y = fake.GetFloat(index,2);
-            Enity.transform.localPosition = new Vector3(fake.GetFloat(index,3),fake.GetFloat(index,4),0);
+            Enity.localPosition = new Vector3(fake.GetFloat(index,3),fake.GetFloat(index,4),0);
             LineStart = layout.GetLine(fake[index,5]);
             LineEnd = layout.GetLine(fake[index,6]);
             LoadAdjacentArea(Left, fake.GetData<int[]>(index,7));
@@ -467,12 +460,12 @@ namespace huqiang.UIComposite
         public DockpanelArea(DockPanel lay)
         {
             layout = lay;
-            model= HGUIManager.GameBuffer.Clone(layout.AreaMod).GetComponent<UIElement>();
+            model= HGUIManager.Clone(layout.AreaMod);
             layout = lay;
-            model.transform.SetParent(layout.AreaLevel);
-            model.transform.localPosition = Vector3.zero;
-            model.transform.localScale = Vector3.one;
-            model.transform.localRotation = Quaternion.identity;
+            model.SetParent(layout.AreaLevel);
+            model.localPosition = Vector3.zero;
+            model.localScale = Vector3.one;
+            model.localRotation = Quaternion.identity;
             layout.areas.Add(this);
         }
         /// <summary>
@@ -541,16 +534,16 @@ namespace huqiang.UIComposite
         public void SizeChanged()
         {
             float hl = DockPanel.LineWidth * 0.5f;
-            float rx = Right.Enity.transform.localPosition.x;
+            float rx = Right.Enity.localPosition.x;
             if (Right.realLine)
                 rx -= hl;
-            float lx = Left.Enity.transform.localPosition.x;
+            float lx = Left.Enity.localPosition.x;
             if (Left.realLine)
                 lx += hl;
-            float ty = Top.Enity.transform.localPosition.y;
+            float ty = Top.Enity.localPosition.y;
             if (Top.realLine)
                 ty -= hl;
-            float dy = Down.Enity.transform.localPosition.y;
+            float dy = Down.Enity.localPosition.y;
             if (Down.realLine)
                 dy += hl;
             float w = rx - lx;
@@ -563,7 +556,7 @@ namespace huqiang.UIComposite
             model.SizeDelta = new Vector2(w,h);
             float x = lx + w * 0.5f;
             float y = dy + h * 0.5f;
-            model.transform.localPosition = new Vector3(x,y,0);
+            model.localPosition = new Vector3(x,y,0);
             if (c)
             {
                 UIElement.ResizeChild(model);//触发SizeChange事件
@@ -580,26 +573,26 @@ namespace huqiang.UIComposite
             switch (dock)
             {
                 case Dock.Left:
-                    float dx = Left.Enity.transform.localPosition.x;
-                    float x = Right.Enity.transform.localPosition.x - dx;
+                    float dx = Left.Enity.localPosition.x;
+                    float x = Right.Enity.localPosition.x - dx;
                     x *= r;
                     x += dx;
                     return AddLeftArea(x);
                 case Dock.Top:
-                    float dy = Down.Enity.transform.localPosition.y;
-                    float y = Top.Enity.transform.localPosition.y - dy;
+                    float dy = Down.Enity.localPosition.y;
+                    float y = Top.Enity.localPosition.y - dy;
                     y *=(1- r);
                     y += dy;
                     return AddTopArea(y);
                 case Dock.Right:
-                    dx = Left.Enity.transform.localPosition.x;
-                    x = Right.Enity.transform.localPosition.x - dx;
+                    dx = Left.Enity.localPosition.x;
+                    x = Right.Enity.localPosition.x - dx;
                     x *= (1 - r);
                     x += dx;
                     return AddRightArea(x);
                 case Dock.Down:
-                    dy = Down.Enity.transform.localPosition.y;
-                    y = Top.Enity.transform.localPosition.y - dy;
+                    dy = Down.Enity.localPosition.y;
+                    y = Top.Enity.localPosition.y - dy;
                     y *= r;
                     y += dy;
                     return AddDownArea(y);
@@ -617,26 +610,26 @@ namespace huqiang.UIComposite
             switch (dock)
             {
                 case Dock.Left:
-                    return AddLeftArea(Left.Enity.transform.localPosition.x + w);
+                    return AddLeftArea(Left.Enity.localPosition.x + w);
                 case Dock.Top:
-                    return AddTopArea(Top.Enity.transform.localPosition.y - w);
+                    return AddTopArea(Top.Enity.localPosition.y - w);
                 case Dock.Right:
-                    return AddRightArea(Right.Enity.transform.localPosition.x - w);
+                    return AddRightArea(Right.Enity.localPosition.x - w);
                 case Dock.Down:
-                    return AddDownArea(Down.Enity.transform.localPosition.y + w);
+                    return AddDownArea(Down.Enity.localPosition.y + w);
             }
             return this;
         }
         DockPanelLine AddHLine(float y)
         {
-            var m = HGUIManager.GameBuffer.Clone(layout.LineMod).GetComponent<UIElement>();
-            float ex = Right.Enity.transform.localPosition.x;
-            float sx = Left.Enity.transform.localPosition.x;
+            var m = HGUIManager.Clone(layout.LineMod);
+            float ex = Right.Enity.localPosition.x;
+            float sx = Left.Enity.localPosition.x;
             float w = ex - sx;
             if (w < 0)
                 w = -w;
             DockPanelLine line = new DockPanelLine(layout, m, Direction.Horizontal);
-            var pos = model.transform.localPosition;
+            var pos = model.localPosition;
             pos.y = y;
             line.SetSize(pos, new Vector2(w, DockPanel.LineWidth));
             line.SetLineStart(Left);
@@ -645,14 +638,14 @@ namespace huqiang.UIComposite
         }
         DockPanelLine AddVLine(float x)
         {
-            var m = HGUIManager.GameBuffer.Clone(layout.LineMod).GetComponent<UIElement>();
-            float ex = Top.Enity.transform.localPosition.y;
-            float sx = Down.Enity.transform.localPosition.y;
+            var m = HGUIManager.Clone(layout.LineMod);
+            float ex = Top.Enity.localPosition.y;
+            float sx = Down.Enity.localPosition.y;
             float w = ex - sx;
             if (w < 0)
                 w = -w;
             DockPanelLine line = new DockPanelLine(layout, m, Direction.Vertical);
-            var pos = model.transform.localPosition;
+            var pos = model.localPosition;
             pos.x = x;
             line.SetSize(pos, new Vector2(DockPanel.LineWidth, w));
             line.SetLineStart(Down);
@@ -715,7 +708,7 @@ namespace huqiang.UIComposite
                 Top.Down.Remove(this);
                 Down.Top.Remove(this);
                 MergeArea();
-                HGUIManager.GameBuffer.RecycleGameObject(model.gameObject);
+                HGUIManager.RecycleUI(model);
                 layout.areas.Remove(this);
             }
         }
@@ -831,11 +824,11 @@ namespace huqiang.UIComposite
         /// <summary>
         /// 管理线的父物体
         /// </summary>
-        public Transform LineLevel;
+        public UIElement LineLevel;
         /// <summary>
         /// 管理区域的父物体
         /// </summary>
-        public Transform AreaLevel;
+        public UIElement AreaLevel;
         /// <summary>
         /// 当布局被改变时回调
         /// </summary>
@@ -849,20 +842,19 @@ namespace huqiang.UIComposite
         /// </summary>
         /// <param name="fake">数据模型</param>
         /// <param name="element">元素主体</param>
-        public override void Initial(FakeStruct fake,UIElement element,Initializer initializer)
+        public override void Initial(FakeStruct fake,UIElement element,UIInitializer initializer)
         {
             base.Initial(fake,element,initializer);
-            var mod = Enity.transform;
-            LineLevel = mod.Find("LineLevel");
-            AreaLevel= mod.Find("AreaLevel");
+            LineLevel = Enity.Find("LineLevel");
+            AreaLevel= Enity.Find("AreaLevel");
             LineMod = HGUIManager.FindChild(fake, "Line");
             AreaMod = HGUIManager.FindChild(fake,"Area");
-            HGUIManager.GameBuffer.RecycleGameObject(mod.Find("Line").gameObject);
-            HGUIManager.GameBuffer.RecycleGameObject(mod.Find("Area").gameObject);
+            HGUIManager.RecycleUI(Enity.Find("Line"));
+            HGUIManager.RecycleUI(Enity.Find("Area"));
             InitialFixLine();
             InitialArea();
             Enity.SizeChanged = SizeChanged;
-            var ex = UITransfromLoader.GetCompositeData(fake);
+            var ex = UIElementLoader.GetCompositeData(fake);
             if (ex != null)
             {
                 LoadFromBuffer(ex);
@@ -870,16 +862,16 @@ namespace huqiang.UIComposite
         }
         void InitialFixLine()
         {
-            var m = HGUIManager.GameBuffer.Clone(LineMod).GetComponent<UIElement>();
+            var m = HGUIManager.Clone(LineMod);
             Left = new DockPanelLine(this,m,Direction.Vertical,false);
 
-            m = HGUIManager.GameBuffer.Clone(LineMod).GetComponent<UIElement>();
+            m = HGUIManager.Clone(LineMod);
             Right = new DockPanelLine(this, m, Direction.Vertical, false);
 
-            m = HGUIManager.GameBuffer.Clone(LineMod).GetComponent<UIElement>();
+            m = HGUIManager.Clone(LineMod);
             Top = new DockPanelLine(this, m, Direction.Vertical, false);
 
-            m = HGUIManager.GameBuffer.Clone(LineMod).GetComponent<UIElement>();
+            m = HGUIManager.Clone(LineMod);
             Down = new DockPanelLine(this, m, Direction.Vertical, false);
 
             Vector2 size = Enity.SizeDelta;

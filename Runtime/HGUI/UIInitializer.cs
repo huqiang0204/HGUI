@@ -3,15 +3,27 @@ using huqiang.UIComposite;
 using huqiang.UIEvent;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace huqiang.Core.HGUI
 {
     /// <summary>
     /// ui初始化器
     /// </summary>
-    public class UIInitializer:Initializer
+    public class UIInitializer : Initializer
     {
+        protected struct ContextUIAction
+        {
+            public Action<UIElement> CallBack;
+            public int InsID;
+        }
+        protected struct ContextUI
+        {
+            public UIElement Ins;
+            public int InsID;
+        }
         TempReflection reflections;
         object target;
         int feildLenth;
@@ -43,13 +55,15 @@ namespace huqiang.Core.HGUI
         {
             target = obj;
             reflections.Top = feildLenth;
+            uicontexts.Clear();
+            uiobjects.Clear();
         }
         /// <summary>
         /// 初始化
         /// </summary>
         /// <param name="fake">模型数据</param>
         /// <param name="com">组件实体</param>
-        public override void Initialiezd(FakeStruct fake, Component com)
+        public void Initialiezd(FakeStruct fake, UIElement com)
         {
             if (reflections == null)
                 return;
@@ -58,41 +72,31 @@ namespace huqiang.Core.HGUI
                 var m = reflections.All[i];
                 if (m.name == com.name)
                 {
-                    if (m.FieldType == typeof(GameObject))
-                        m.Value = com.gameObject;
-                    else if (typeof(Component).IsAssignableFrom(m.FieldType))
-                        m.Value = com.GetComponent(m.FieldType);
+                    if (typeof(UIElement).IsAssignableFrom(m.FieldType))
+                        m.Value = com;
                     else if (typeof(Composite).IsAssignableFrom(m.FieldType))
                     {
-                        var scr = com.GetComponent<UIElement>();
-                        if (scr != null)
+                        if (com.composite == null)
                         {
-                            if (scr.composite == null)
-                            {
-                                var obj = Activator.CreateInstance(m.FieldType) as Composite;
-                                obj.Initial(fake, scr, this);
-                                m.Value = obj;
-                            }
-                            else
-                                m.Value = scr.composite;
+                            var obj = Activator.CreateInstance(m.FieldType) as Composite;
+                            obj.Initial(fake, com, this);
+                            m.Value = obj;
                         }
+                        else
+                            m.Value = com.composite;
                     }
                     else if (m.FieldType == typeof(FakeStruct))
                         m.Value = fake;
-                    else
+                    else if (typeof(UserEvent).IsAssignableFrom(m.FieldType))
                     {
-                        var scr = com.GetComponent<UIElement>();
-                        if (scr != null)
+                        if (com.userEvent == null)
                         {
-                            if (scr.userEvent == null)
-                            {
-                                scr.userEvent = Activator.CreateInstance(m.FieldType) as UserEvent;
-                                scr.userEvent.Context = scr;
-                                scr.userEvent.g_color = scr.MainColor;
-                                scr.userEvent.Initial(fake);
-                            }
-                            m.Value = scr.userEvent;
+                            com.userEvent = Activator.CreateInstance(m.FieldType) as UserEvent;
+                            com.userEvent.Context = com;
+                            com.userEvent.g_color = com.MainColor;
+                            com.userEvent.Initial(fake);
                         }
+                        m.Value = com.userEvent;
                     }
                     reflections.Top--;
                     var j = reflections.Top;
@@ -108,7 +112,26 @@ namespace huqiang.Core.HGUI
         /// </summary>
         public override void Done()
         {
-            base.Done();
+            int c = uicontexts.Count;
+            int m = uiobjects.Count;
+            for (int i = 0; i < c; i++)
+            {
+                var act = uicontexts[i].CallBack;
+                int id = uicontexts[i].InsID;
+                if (act != null)
+                {
+                    for (int j = 0; j < m; j++)
+                    {
+                        if (uiobjects[j].InsID == id)
+                        {
+                            act(uiobjects[j].Ins);
+                            break;
+                        }
+                    }
+                }
+            }
+            uiobjects.Clear();
+            uicontexts.Clear();
             if (target == null)
                 return;
             ReflectionModel[] all = reflections.All;
@@ -120,7 +143,7 @@ namespace huqiang.Core.HGUI
         /// </summary>
         /// <param name="obj">载体实例对象</param>
         /// <param name="com">ui组件实例</param>
-        public void ReflectionEnity(object obj, Transform com)
+        public void ReflectionEnity(object obj,UIElement com)
         {
             target = obj;
             reflections.Top = feildLenth;
@@ -129,26 +152,22 @@ namespace huqiang.Core.HGUI
             for (int i = 0; i < all.Length; i++)
                 all[i].field.SetValue(target, all[i].Value);
         }
-        void ReflectionEnity(Transform com)
+        void ReflectionEnity(UIElement com)
         {
             for (int i = 0; i < reflections.Top; i++)
             {
                 var m = reflections.All[i];
                 if (m.name == com.name)
                 {
-                    if (typeof(Component).IsAssignableFrom(m.FieldType))
-                        m.Value = com.GetComponent(m.FieldType);
+                    if (typeof(UIElement).IsAssignableFrom(m.FieldType))
+                        m.Value = com;
                     else if (typeof(Composite).IsAssignableFrom(m.FieldType))
                     {
-                        var scr = com.GetComponent<UIElement>();
-                        if (scr != null)
-                            m.Value = scr.composite;
+                            m.Value = com.composite;
                     }
                     else
                     {
-                        var scr = com.GetComponent<UIElement>();
-                        if (scr != null)
-                            m.Value = scr.userEvent;
+                            m.Value = com.userEvent;
                     }
                     reflections.Top--;
                     var j = reflections.Top;
@@ -158,9 +177,9 @@ namespace huqiang.Core.HGUI
                     break;
                 }
             }
-            int c = com.childCount;
+            int c = com.child.Count;
             for (int i = 0; i < c; i++)
-                ReflectionEnity(com.GetChild(i));
+                ReflectionEnity(com.child[i]);
         }
         /// <summary>
         /// 更换使用语言,将配置文件中的语言反射到UI组件上
@@ -187,7 +206,7 @@ namespace huqiang.Core.HGUI
                 else
                 {
                     InputBox box = all[i].Value as InputBox;
-                    if(box!=null)
+                    if (box != null)
                     {
                         var str = section.GetValue(all[i].name);
                         if (str != null)
@@ -200,6 +219,26 @@ namespace huqiang.Core.HGUI
                 }
             }
         }
-
+        /// <summary>
+        /// 添加联系上下文
+        /// </summary>
+        /// <param name="trans"></param>
+        /// <param name="insID"></param>
+        public void AddContext(UIElement trans, int insID)
+        {
+            ContextUI co = new ContextUI();
+            co.Ins = trans;
+            co.InsID = insID;
+            uiobjects.Add(co);
+        }
+        protected List<ContextUI> uiobjects = new List<ContextUI>();
+        protected List<ContextUIAction> uicontexts = new List<ContextUIAction>();
+        public void AddContextAction(Action<UIElement> action, int insID)
+        {
+            ContextUIAction ca = new ContextUIAction();
+            ca.CallBack = action;
+            ca.InsID = insID;
+            uicontexts.Add(ca);
+        }
     }
 }

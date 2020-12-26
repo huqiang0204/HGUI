@@ -20,7 +20,7 @@ namespace huqiang.UIModel
         public virtual void Show(object obj = null)
         {
             if (Main != null)
-                Main.gameObject.SetActive(true);
+                Main.activeSelf = true;
         }
         /// <summary>
         /// 显示
@@ -31,7 +31,7 @@ namespace huqiang.UIModel
         {
             UIContext = context;
             if (Main != null)
-                Main.gameObject.SetActive(true);
+                Main.activeSelf = true;
         }
         /// <summary>
         /// 隐藏窗口
@@ -39,7 +39,7 @@ namespace huqiang.UIModel
         public virtual void Hide()
         {
             if (Main != null)
-                Main.gameObject.SetActive(false);
+                Main.activeSelf = false;
         }
         /// <summary>
         /// 处理消息

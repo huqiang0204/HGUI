@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using huqiang.Core.HGUI;
+using huqiang.Core.UIData;
 
 namespace huqiang.UIComposite
 {
@@ -97,27 +98,26 @@ namespace huqiang.UIComposite
                 }
             }
         }
-        public override void Initial(FakeStruct mod,UIElement element,Initializer initializer)
+        public override void Initial(FakeStruct mod,UIElement element,UIInitializer initializer)
         {
             base.Initial(mod,element,initializer);
-            var mui = Enity.GetComponent<UIElement>();
+            var mui = Enity;
             mui.userEvent.CutRect = true;
-            var mask = Enity.transform;
-            Year = mask.Find("Year").GetComponent<UIElement>().composite as ScrollY;
+            Year = Enity.Find("Year").composite as ScrollY;
             Year.SetItemUpdate<ItemView, int>((o, e, i) => { o.Item.Text = e.ToString(); });
             Year.Scroll = Scrolling;
             Year.ScrollEnd = YearScrollToEnd;
             Year.ItemDockCenter = true;
             Year.scrollType = ScrollType.Loop;
 
-            Month = mask.Find("Month").GetComponent<UIElement>().composite as ScrollY;
+            Month = Enity.Find("Month").composite as ScrollY;
             Month.SetItemUpdate<ItemView, string>((o, e, i) => { o.Item.Text = e; });
             Month.Scroll = Scrolling;
             Month.ScrollEnd = MonthScrollToEnd;
             Month.ItemDockCenter = true;
             Month.scrollType = ScrollType.Loop;
 
-            Day = mask.Find("Day").GetComponent<UIElement>().composite as ScrollY;
+            Day = Enity.Find("Day").composite as ScrollY;
             Day.SetItemUpdate<ItemView, string>((o, e, i) => { o.Item.Text = e ; });
             Day.Scroll = Scrolling;
             Day.ScrollEnd = DayScrollToEnd;
@@ -125,7 +125,7 @@ namespace huqiang.UIComposite
             Day.ScrollEnd = DayScrollToEnd;
             Day.scrollType = ScrollType.Loop;
 
-            var ex = UITransfromLoader.GetCompositeData(mod);
+            var ex = UIElementLoader.GetCompositeData(mod);
             if (ex != null)
             {
                 StartYear = ex[0];

@@ -30,7 +30,7 @@ public class TreeViewPage:UIPage
     }
     View view;
     GameObject TreeModel;
-    public override void Initial(Transform parent, object dat = null)
+    public override void Initial(UIElement parent, object dat = null)
     {
         base.Initial(parent, dat);
         view = LoadUI<View>("baseUI", "treeview");//"baseUI"创建的bytes文件名,"page"为创建的页面名

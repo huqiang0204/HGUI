@@ -14,7 +14,7 @@ namespace huqiang.UIComposite
         /// <summary>
         /// 握柄坐标变换
         /// </summary>
-        public Transform Nob;
+        public UIElement Nob;
         /// <summary>
         /// 主体事件
         /// </summary>
@@ -59,7 +59,7 @@ namespace huqiang.UIComposite
         /// 握柄转动事件
         /// </summary>
         public Action<UIRocker> Rocking;
-        public override void Initial(FakeStruct fake,UIElement script,Initializer initializer)
+        public override void Initial(FakeStruct fake,UIElement script,UIInitializer initializer)
         {
             base.Initial(fake,script,initializer);
             callBack = script.RegEvent<UserEvent>(new UICircleCollider());
@@ -70,7 +70,7 @@ namespace huqiang.UIComposite
             if (_r <= 0)
                 _r = 0.01f;
             _s = _r * _r;
-            Nob = Enity.transform.Find("Nob");
+            Nob = Enity.Find("Nob");
         }
         void Draging(UserEvent back, UserAction action, Vector2 v)
         {
@@ -107,7 +107,7 @@ namespace huqiang.UIComposite
         {
             if (Nob != null)
             {
-                Nob.transform.localPosition = Vector3.zero;
+                Nob.localPosition = Vector3.zero;
             }
             _angle = 0;
             _dir = Direction.None;

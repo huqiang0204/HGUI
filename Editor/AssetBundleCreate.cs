@@ -6,9 +6,9 @@ using huqiang;
 using huqiang.Data;
 using System.IO;
 using System.Runtime.InteropServices;
-using huqiang.Core.HGUI;
 using SevenZip.Compression.LZMA;
 using System.Threading.Tasks;
+using huqiang.Core.HGUI;
 
 public class AssetBundleCreate : Editor {
 

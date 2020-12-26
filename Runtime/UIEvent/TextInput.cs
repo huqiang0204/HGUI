@@ -1,5 +1,4 @@
-﻿using huqiang.Core.HGUI;
-using huqiang.Data;
+﻿using huqiang.Data;
 using huqiang.Data2D;
 using System;
 using System.Collections.Generic;

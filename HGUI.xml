@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <doc>
     <assembly>
-        <name>HGUIHelper</name>
+        <name>HGUIXML</name>
     </assembly>
     <members>
         <member name="T:SevenZip.LzmaBench">
@@ -683,7 +683,7 @@
         </member>
         <member name="F:huqiang.MsgInfo.MsgID">
             <summary>
-            此消息的id
+            此消息的id 
             </summary>
         </member>
         <member name="F:huqiang.MsgInfo.CurPart">
@@ -741,6 +741,34 @@
             数据
             </summary>
         </member>
+        <member name="F:huqiang.KcpData.RecvTime">
+            <summary>
+            最后一次接受到数据的时钟周期
+            </summary>
+        </member>
+        <member name="F:huqiang.KcpData.FragmentSize">
+            <summary>
+            包头4字节,包尾4字节,数据头21字节,12个节点,每个节点4字节=1399
+            </summary>
+        </member>
+        <member name="M:huqiang.KcpData.SetChecked(System.Int32*,System.Int32)">
+            <summary>
+            设置分包分卷状态
+            </summary>
+            <param name="checks">状态缓存</param>
+            <param name="part">当前分卷</param>
+            <returns>如果已经缓存过了返回假</returns>
+        </member>
+        <member name="T:huqiang.KcpData.MsgCache">
+            <summary>
+            接受到的消息缓存信息
+            </summary>
+        </member>
+        <member name="F:huqiang.KcpData.caches">
+            <summary>
+            接受到的消息缓存
+            </summary>
+        </member>
         <member name="F:huqiang.KcpData.RecvBuffer">
             <summary>
             接收到缓存数据
@@ -770,10 +798,10 @@
             <summary>
             添加一个接收到的消息分卷
             </summary>
-            <param name="dat"></param>
-            <param name="len"></param>
-            <param name="kcp"></param>
-            <param name="time"></param>
+            <param name="dat">数据缓存</param>
+            <param name="len">数据长度</param>
+            <param name="kcp">封包器</param>
+            <param name="time">数据接收时间,单位毫秒</param>
         </member>
         <member name="P:huqiang.KcpData.Delay">
             <summary>
@@ -1075,12 +1103,6 @@
             管理当前的用户连接
             </summary>
         </member>
-        <member name="T:huqiang.KcpThread`1">
-            <summary>
-            管理kcp连接的线程
-            </summary>
-            <typeparam name="T"></typeparam>
-        </member>
         <member name="F:huqiang.KcpThread`1.thread">
             <summary>
             本线程任务只负责派发解包后的消息与逻辑，用户的添加和释放由kcpserver的recvThread线程统一管理
@@ -1126,6 +1148,11 @@
             线程缓存
             </summary>
             <typeparam name="T"></typeparam>
+        </member>
+        <member name="F:huqiang.ThreadBuffer`1.queue">
+            <summary>
+            内容缓存
+            </summary>
         </member>
         <member name="M:huqiang.ThreadBuffer`1.#ctor(System.Int32)">
             <summary>
@@ -1215,11 +1242,6 @@
         <member name="F:huqiang.NetworkLink.port">
             <summary>
             远程端口
-            </summary>
-        </member>
-        <member name="F:huqiang.NetworkLink.Index">
-            <summary>
-            所在线程中的索引
             </summary>
         </member>
         <member name="F:huqiang.NetworkLink.buffIndex">
@@ -1785,6 +1807,57 @@
             name
             </summary>
         </member>
+        <member name="F:huqiang.Data2D.TransfromData.type">
+            <summary>
+            对象类型, 所有组件的位或值
+            </summary>
+        </member>
+        <member name="F:huqiang.Data2D.TransfromData.insID">
+            <summary>
+            实例ID
+            </summary>
+        </member>
+        <member name="F:huqiang.Data2D.TransfromData.name">
+            <summary>
+            名称
+            </summary>
+        </member>
+        <member name="F:huqiang.Data2D.TransfromData.tag">
+            <summary>
+            标记
+            </summary>
+        </member>
+        <member name="F:huqiang.Data2D.TransfromData.coms">
+            <summary>
+            int32数组,高16位为索引,低16位为类型
+            </summary>
+        </member>
+        <member name="F:huqiang.Data2D.TransfromData.child">
+            <summary>
+            int16数组
+            </summary>
+        </member>
+        <member name="F:huqiang.Data2D.TransfromData.ex">
+            <summary>
+            附加信息,用于存储helper中写入的数据
+            </summary>
+        </member>
+        <member name="M:huqiang.Data2D.TransfromLoader.LoadToObject(huqiang.Data.FakeStruct,UnityEngine.Component,huqiang.Data.Initializer)">
+            <summary>
+            将假结构体中的数据载入到组件实体中
+            </summary>
+            <param name="fake">假结构体数据</param>
+            <param name="com">unity组件</param>
+            <param name="initializer">初始化器,用于反射</param>
+        </member>
+        <member name="M:huqiang.Data2D.TransfromLoader.LoadFromObject(UnityEngine.Component,huqiang.Data.DataBuffer)">
+            <summary>
+             将到组件实体中的数据载入假结构体中
+            </summary>
+            <param name="com">unity组件</param>
+            <param name="buffer">数据缓存器</param>
+            <returns></returns>
+        </member>
         <member name="T:huqiang.Data.AuxiliaryLine">
             <summary>
             辅助线
@@ -1807,15 +1880,6 @@
             <param name="lines">线的索引</param>
             <param name="lineWidth">线宽</param>
             <returns></returns>
-        </member>
-        <member name="M:huqiang.Data.AuxiliaryLine.GetLineVert(UnityEngine.Vector3[],System.Collections.Generic.List{UnityEngine.UIVertex},System.Collections.Generic.List{System.Int32},UnityEngine.Color)">
-            <summary>
-            将网格线的顶点填充到ui的顶点
-            </summary>
-            <param name="vectors">顶点</param>
-            <param name="vert">UI顶点</param>
-            <param name="tris">三角形</param>
-            <param name="color">颜色</param>
         </member>
         <member name="F:huqiang.Data.AuxiliaryLine.BoxLine">
             <summary>
@@ -1940,6 +2004,11 @@
             </summary>
             <param name="offset">偏移位置</param>
             <param name="size">尺寸</param>
+        </member>
+        <member name="M:huqiang.Data.BlockBuffer`1.Clear">
+            <summary>
+            清除所有注册信息
+            </summary>
         </member>
         <member name="M:huqiang.Data.BlockBuffer`1.Zero(System.Int32,System.Int32)">
             <summary>
@@ -2254,6 +2323,21 @@
             </summary>
             <param name="com">比较a,b返回真则b排在前面</param>
         </member>
+        <member name="F:huqiang.Data.DataType.ClassArray">
+            <summary>
+            类对象数组
+            </summary>
+        </member>
+        <member name="F:huqiang.Data.DataType.TwoDArray">
+            <summary>
+            Two-dimensional array
+            </summary>
+        </member>
+        <member name="F:huqiang.Data.DataType.TwoDList">
+            <summary>
+            Two-dimensional array
+            </summary>
+        </member>
         <member name="T:huqiang.Data.DataBuffer">
             <summary>
             C#的这些类型不能被继承：System.ValueType, System.Enum, System.Delegate, System.Array, etc.
@@ -2376,6 +2460,13 @@
             初始化完毕
             </summary>
         </member>
+        <member name="M:huqiang.Data.Initializer.AddContext(UnityEngine.Transform,System.Int32)">
+            <summary>
+            添加联系上下文
+            </summary>
+            <param name="trans"></param>
+            <param name="insID"></param>
+        </member>
         <member name="T:huqiang.Data.DataLoader">
             <summary>
             数据对象载入器
@@ -2384,6 +2475,11 @@
         <member name="F:huqiang.Data.DataLoader.gameobjectBuffer">
             <summary>
             游戏对象管理缓存器
+            </summary>
+        </member>
+        <member name="F:huqiang.Data.DataLoader.initializer">
+            <summary>
+            初始化器
             </summary>
         </member>
         <member name="M:huqiang.Data.DataLoader.LoadToComponent(huqiang.Data.FakeStruct,UnityEngine.Component,huqiang.Data.FakeStruct)">
@@ -2409,6 +2505,122 @@
             <param name="com">unity组件</param>
             <param name="buffer">DataBuffer</param>
             <returns></returns>
+        </member>
+        <member name="T:huqiang.Data.DisorderlyQueue`1">
+            <summary>
+            用于两个线程无锁交互,a线程写入内容,b线程可以乱序移除内容
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="P:huqiang.Data.DisorderlyQueue`1.Item(System.Int32)">
+            <summary>
+            索引器
+            </summary>
+            <param name="index"></param>
+            <returns></returns>
+        </member>
+        <member name="M:huqiang.Data.DisorderlyQueue`1.#ctor(System.Int32)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="len"></param>
+        </member>
+        <member name="P:huqiang.Data.DisorderlyQueue`1.BufferLenth">
+            <summary>
+            缓存大小
+            </summary>
+        </member>
+        <member name="P:huqiang.Data.DisorderlyQueue`1.Count">
+            <summary>
+            有效内容个数
+            </summary>
+        </member>
+        <member name="M:huqiang.Data.DisorderlyQueue`1.Add(`0)">
+            <summary>
+            添加一个内容
+            </summary>
+            <param name="t"></param>
+            <returns></returns>
+        </member>
+        <member name="M:huqiang.Data.DisorderlyQueue`1.AddRange(`0[])">
+            <summary>
+            添加一组内容
+            </summary>
+            <param name="t"></param>
+            <returns></returns>
+        </member>
+        <member name="M:huqiang.Data.DisorderlyQueue`1.Remove(`0)">
+            <summary>
+            移除某个内容
+            </summary>
+            <param name="obj">实列对象</param>
+        </member>
+        <member name="M:huqiang.Data.DisorderlyQueue`1.RemoveAt(System.Int32)">
+            <summary>
+            移除某个内容
+            </summary>
+            <param name="index">索引</param>
+        </member>
+        <member name="M:huqiang.Data.DisorderlyQueue`1.Find(System.Func{`0,System.Boolean})">
+            <summary>
+            查询某个实例
+            </summary>
+            <param name="func"></param>
+            <returns></returns>
+        </member>
+        <member name="M:huqiang.Data.DisorderlyQueue`1.Clear">
+            <summary>
+            清除所有内容
+            </summary>
+        </member>
+        <member name="T:huqiang.Data.DisorderlyQueueS`1">
+            <summary>
+            用于两个线程无锁交互,a线程写入内容,b线程可以乱序移除内容
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="P:huqiang.Data.DisorderlyQueueS`1.Item(System.Int32)">
+            <summary>
+            索引器
+            </summary>
+            <param name="index"></param>
+            <returns></returns>
+        </member>
+        <member name="M:huqiang.Data.DisorderlyQueueS`1.#ctor(System.Int32)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="len"></param>
+        </member>
+        <member name="P:huqiang.Data.DisorderlyQueueS`1.Count">
+            <summary>
+            有效内容个数
+            </summary>
+        </member>
+        <member name="M:huqiang.Data.DisorderlyQueueS`1.Add(`0)">
+            <summary>
+            添加一个内容
+            </summary>
+            <param name="t"></param>
+            <returns></returns>
+        </member>
+        <member name="M:huqiang.Data.DisorderlyQueueS`1.AddRange(`0[])">
+            <summary>
+            添加一组内容
+            </summary>
+            <param name="t"></param>
+            <returns></returns>
+        </member>
+        <member name="M:huqiang.Data.DisorderlyQueueS`1.RemoveAt(System.Int32)">
+            <summary>
+            移除某个内容
+            </summary>
+            <param name="index">索引</param>
+        </member>
+        <member name="M:huqiang.Data.DisorderlyQueueS`1.Clear">
+            <summary>
+            清除所有内容
+            </summary>
         </member>
         <member name="T:huqiang.Data.DownloadManager">
             <summary>
@@ -2492,26 +2704,6 @@
         <member name="F:huqiang.Data.DownLoadMission.OnDone">
             <summary>
             下载完成的回调
-            </summary>
-        </member>
-        <member name="T:huqiang.Data.SpriteRectInfo">
-            <summary>
-            精灵矩形信息
-            </summary>
-        </member>
-        <member name="F:huqiang.Data.SpriteRectInfo.txtSize">
-            <summary>
-            纹理尺寸
-            </summary>
-        </member>
-        <member name="F:huqiang.Data.SpriteRectInfo.rect">
-            <summary>
-            矩形
-            </summary>
-        </member>
-        <member name="F:huqiang.Data.SpriteRectInfo.pivot">
-            <summary>
-            轴心
             </summary>
         </member>
         <member name="M:huqiang.Data.ElementAsset.LoadAssetsAsync(System.String,System.Action{huqiang.Progress,UnityEngine.AssetBundleCreateRequest})">
@@ -2616,15 +2808,12 @@
             清除所有精灵包数据
             </summary>
         </member>
-        <member name="M:huqiang.Data.ElementAsset.FindSpriteUV(System.String,System.String,UnityEngine.Rect@,UnityEngine.Vector2@,UnityEngine.Vector2@)">
+        <member name="M:huqiang.Data.ElementAsset.FindSpriteUV(System.String,System.String)">
             <summary>
             查询精灵的uv
             </summary>
             <param name="tName">纹理名</param>
             <param name="sName">精灵名</param>
-            <param name="rect">精灵矩形</param>
-            <param name="txtSize">纹理尺寸</param>
-            <param name="pivot">精灵轴心</param>
         </member>
         <member name="M:huqiang.Data.ElementAsset.FindSpriteUVs(System.String,System.String[])">
             <summary>
@@ -2723,7 +2912,7 @@
             <param name="db">数据缓存器</param>
             <param name="size">元素个数</param>
         </member>
-        <member name="M:huqiang.Data.FakeStruct.#ctor(huqiang.Data.DataBuffer,System.Int32,System.Int32*)">
+        <member name="M:huqiang.Data.FakeStruct.#ctor(huqiang.Data.DataBuffer,System.Int32,System.Void*)">
             <summary>
             构造函数,复制目标地址的数据
             </summary>
@@ -3240,12 +3429,39 @@
             <param name="value">值</param>
             <returns></returns>
         </member>
+        <!-- Badly formed XML comment ignored for member "M:huqiang.Data.StringPoint.op_Implicit(huqiang.Data.StringPoint)~System.Int32" -->
+        <!-- Badly formed XML comment ignored for member "M:huqiang.Data.FakeStrcutPoint.op_Implicit(huqiang.Data.FakeStrcutPoint)~System.Int32" -->
+        <!-- Badly formed XML comment ignored for member "M:huqiang.Data.FakeStrcutArrayPoint.op_Implicit(huqiang.Data.FakeStrcutArrayPoint)~System.Int32" -->
+        <!-- Badly formed XML comment ignored for member "M:huqiang.Data.FakeStringArrayPoint.op_Implicit(huqiang.Data.FakeStringArrayPoint)~System.Int32" -->
+        <member name="T:huqiang.Data.ByteArrayPoint">
+            <summary>
+            用于ByteArray
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:huqiang.Data.ByteArrayPoint.op_Implicit(huqiang.Data.ByteArrayPoint)~System.Int32" -->
+        <!-- Badly formed XML comment ignored for member "M:huqiang.Data.Int16ArrayPoint.op_Implicit(huqiang.Data.Int16ArrayPoint)~System.Int32" -->
+        <!-- Badly formed XML comment ignored for member "M:huqiang.Data.IntArrayPoint.op_Implicit(huqiang.Data.IntArrayPoint)~System.Int32" -->
+        <!-- Badly formed XML comment ignored for member "M:huqiang.Data.Int64ArrayPoint.op_Implicit(huqiang.Data.Int64ArrayPoint)~System.Int32" -->
+        <!-- Badly formed XML comment ignored for member "M:huqiang.Data.FloatArrayPoint.op_Implicit(huqiang.Data.FloatArrayPoint)~System.Int32" -->
+        <!-- Badly formed XML comment ignored for member "M:huqiang.Data.DoubleArrayPoint.op_Implicit(huqiang.Data.DoubleArrayPoint)~System.Int32" -->
+        <member name="F:huqiang.Data.FakeStructHelper.same">
+            <summary>
+            两张表的排列相同
+            </summary>
+        </member>
         <member name="T:huqiang.Data.TypeInfo">
             <summary>
             类型信息
             </summary>
         </member>
         <member name="M:huqiang.Data.TypeInfo.Compare(System.Object)">
+            <summary>
+            类型比较
+            </summary>
+            <param name="obj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:huqiang.Data.TypeInfo.IsSubType(System.String)">
             <summary>
             类型比较
             </summary>
@@ -3338,6 +3554,13 @@
             <param name="com">组件实例</param>
             <returns></returns>
         </member>
+        <member name="M:huqiang.Data.GameobjectBuffer.GetTypeInfo(System.Int32)">
+            <summary>
+            获取组件索引
+            </summary>
+            <param name="name">组件名称</param>
+            <returns></returns>
+        </member>
         <member name="M:huqiang.Data.GameobjectBuffer.GetTypeIndex(System.String)">
             <summary>
             获取组件索引
@@ -3412,14 +3635,6 @@
             获取数据载入器
             </summary>
             <param name="Index">索引id</param>
-            <returns></returns>
-        </member>
-        <member name="M:huqiang.Data.GameobjectBuffer.FindChild(huqiang.Data.FakeStruct,System.String)">
-            <summary>
-            查询transform的子物体
-            </summary>
-            <param name="fake"></param>
-            <param name="childName"></param>
             <returns></returns>
         </member>
         <member name="M:huqiang.Data.GameobjectBuffer.Clone(huqiang.Data.FakeStruct)">
@@ -3827,55 +4042,6 @@
             有效内容个数
             </summary>
         </member>
-        <member name="T:huqiang.Data.DisorderlyQueueS`1">
-            <summary>
-            用于两个线程无锁交互,a线程写入内容,b线程可以乱序移除内容
-            </summary>
-            <typeparam name="T"></typeparam>
-        </member>
-        <member name="P:huqiang.Data.DisorderlyQueueS`1.Item(System.Int32)">
-            <summary>
-            索引器
-            </summary>
-            <param name="index"></param>
-            <returns></returns>
-        </member>
-        <member name="M:huqiang.Data.DisorderlyQueueS`1.#ctor(System.Int32)">
-            <summary>
-            构造函数
-            </summary>
-            <param name="len"></param>
-        </member>
-        <member name="P:huqiang.Data.DisorderlyQueueS`1.Count">
-            <summary>
-            有效内容个数
-            </summary>
-        </member>
-        <member name="M:huqiang.Data.DisorderlyQueueS`1.Add(`0)">
-            <summary>
-            添加一个内容
-            </summary>
-            <param name="t"></param>
-            <returns></returns>
-        </member>
-        <member name="M:huqiang.Data.DisorderlyQueueS`1.AddRange(`0[])">
-            <summary>
-            添加一组内容
-            </summary>
-            <param name="t"></param>
-            <returns></returns>
-        </member>
-        <member name="M:huqiang.Data.DisorderlyQueueS`1.RemoveAt(System.Int32)">
-            <summary>
-            移除某个内容
-            </summary>
-            <param name="index">索引</param>
-        </member>
-        <member name="M:huqiang.Data.DisorderlyQueueS`1.Clear">
-            <summary>
-            清除所有内容
-            </summary>
-        </member>
         <member name="T:huqiang.Data.RecordManager">
             <summary>
             日志记录器
@@ -3928,11 +4094,6 @@
             精灵名称
             </summary>
         </member>
-        <member name="F:huqiang.Data.SpriteDataS.txtSize">
-            <summary>
-            纹理名称
-            </summary>
-        </member>
         <member name="F:huqiang.Data.SpriteDataS.rect">
             <summary>
             精灵矩形
@@ -3953,27 +4114,14 @@
             此结构体元素个数
             </summary>
         </member>
+        <member name="F:huqiang.Data.SpriteInfo.pivot">
+            <summary>
+            精灵轴心
+            </summary>
+        </member>
         <member name="T:huqiang.Data.SpriteData">
             <summary>
             精灵数据
-            </summary>
-        </member>
-        <member name="M:huqiang.Data.SpriteData.AddSprite(UnityEngine.Sprite)">
-            <summary>
-            添加精灵
-            </summary>
-            <param name="sprite">精灵</param>
-        </member>
-        <member name="M:huqiang.Data.SpriteData.Save(System.String,System.String)">
-            <summary>
-            保存精灵信息为二进制数据
-            </summary>
-            <param name="name">数据包名</param>
-            <param name="path">文件路径</param>
-        </member>
-        <member name="M:huqiang.Data.SpriteData.Clear">
-            <summary>
-            清除缓存
             </summary>
         </member>
         <member name="M:huqiang.Data.SpriteData.LoadSpriteData(System.Byte[])">
@@ -4024,135 +4172,13 @@
             <param name="index"></param>
             <returns></returns>
         </member>
-        <member name="F:huqiang.Data.TransfromData.type">
+        <!-- Badly formed XML comment ignored for member "T:huqiang.Data.TypeAnalysis" -->
+        <member name="M:huqiang.Data.TypeAnalysis.Analysis(System.Type)">
             <summary>
-            对象类型, 所有组件的位或值
+            
             </summary>
-        </member>
-        <member name="F:huqiang.Data.TransfromData.size">
-            <summary>
-            UI元素尺寸
-            </summary>
-        </member>
-        <member name="F:huqiang.Data.TransfromData.pivot">
-            <summary>
-            轴心
-            </summary>
-        </member>
-        <member name="F:huqiang.Data.TransfromData.name">
-            <summary>
-            名称
-            </summary>
-        </member>
-        <member name="F:huqiang.Data.TransfromData.tag">
-            <summary>
-            标记
-            </summary>
-        </member>
-        <member name="F:huqiang.Data.TransfromData.coms">
-            <summary>
-            int32数组,高16位为索引,低16位为类型
-            </summary>
-        </member>
-        <member name="F:huqiang.Data.TransfromData.child">
-            <summary>
-            int16数组
-            </summary>
-        </member>
-        <member name="F:huqiang.Data.TransfromData.ex">
-            <summary>
-            附加信息,用于存储helper中写入的数据
-            </summary>
-        </member>
-        <member name="M:huqiang.Data.TransfromLoader.GetComponent(huqiang.Data.FakeStruct,System.String)">
-            <summary>
-            从假结构体中找到该类型的数据
-            </summary>
-            <param name="fake">Tranfrom的假结构体</param>
-            <param name="type">数据类型</param>
-            <returns></returns>
-        </member>
-        <member name="M:huqiang.Data.TransfromLoader.LoadToObject(huqiang.Data.FakeStruct,UnityEngine.Component,huqiang.Data.Initializer)">
-            <summary>
-            将假结构体中的数据载入到组件实体中
-            </summary>
-            <param name="fake">假结构体数据</param>
-            <param name="com">unity组件</param>
-            <param name="initializer">初始化器,用于反射</param>
-        </member>
-        <member name="M:huqiang.Data.TransfromLoader.LoadFromObject(UnityEngine.Component,huqiang.Data.DataBuffer)">
-            <summary>
-             将到组件实体中的数据载入假结构体中
-            </summary>
-            <param name="com">unity组件</param>
-            <param name="buffer">数据缓存器</param>
-            <returns></returns>
-        </member>
-        <member name="T:huqiang.Core.HGUI.CustomText">
-            <summary>
-            自定义文字
-            </summary>
-        </member>
-        <member name="F:huqiang.Core.HGUI.CustomText.UVRect.uv0">
-            <summary>
-            左下
-            </summary>
-        </member>
-        <member name="F:huqiang.Core.HGUI.CustomText.UVRect.uv1">
-            <summary>
-            左上
-            </summary>
-        </member>
-        <member name="F:huqiang.Core.HGUI.CustomText.UVRect.uv2">
-            <summary>
-            右下
-            </summary>
-        </member>
-        <member name="F:huqiang.Core.HGUI.CustomText.UVRect.uv3">
-            <summary>
-            右上
-            </summary>
-        </member>
-        <member name="F:huqiang.Core.HGUI.CustomText.UVRect.Scale">
-            <summary>
-            比例
-            </summary>
-        </member>
-        <member name="M:huqiang.Core.HGUI.CustomText.#ctor(UnityEngine.Texture)">
-            <summary>
-            构造函数
-            </summary>
-            <param name="t2d">包含字符精灵的纹理</param>
-        </member>
-        <member name="M:huqiang.Core.HGUI.CustomText.AddCharMap(System.Char,UnityEngine.Rect)">
-            <summary>
-            添加字符图
-            </summary>
-            <param name="key">字符</param>
-            <param name="rect">精灵矩形</param>
-        </member>
-        <member name="M:huqiang.Core.HGUI.CustomText.AddCharMap(System.Char,UnityEngine.Sprite)">
-            <summary>
-            添加字符图
-            </summary>
-            <param name="key">字符</param>
-            <param name="sprite">精灵</param>
-        </member>
-        <member name="F:huqiang.Core.HGUI.CustomText.text">
-            <summary>
-            文字
-            </summary>
-        </member>
-        <member name="M:huqiang.Core.HGUI.CustomText.Refresh">
-            <summary>
-            刷新顶点
-            </summary>
-        </member>
-        <member name="M:huqiang.Core.HGUI.CustomText.Apply(huqiang.Core.HGUI.HImage)">
-            <summary>
-            应用到HImage中
-            </summary>
-            <param name="image">实例目标</param>
+            <param name="type"></param>
+            <returns>数据类占用内存长度</returns>
         </member>
         <member name="T:huqiang.Core.HGUI.EmojiMap">
             <summary>
@@ -4216,54 +4242,6 @@
             <param name="str"></param>
             <param name="builder"></param>
         </member>
-        <member name="T:huqiang.Core.HGUI.EmojiString">
-            <summary>
-            带表情符的字符串
-            </summary>
-        </member>
-        <member name="P:huqiang.Core.HGUI.EmojiString.FilterString">
-            <summary>
-            过滤表情符后的字符串
-            </summary>
-        </member>
-        <member name="F:huqiang.Core.HGUI.EmojiString.emojis">
-            <summary>
-            表情符信息
-            </summary>
-        </member>
-        <member name="P:huqiang.Core.HGUI.EmojiString.FullString">
-            <summary>
-            完整字符串
-            </summary>
-        </member>
-        <member name="P:huqiang.Core.HGUI.EmojiString.Length">
-            <summary>
-            过滤表情符后字符串长度
-            </summary>
-        </member>
-        <member name="M:huqiang.Core.HGUI.EmojiString.Remove(System.Int32,System.Int32)">
-            <summary>
-            移除某个字符
-            </summary>
-            <param name="index">字符索引</param>
-            <param name="count">字符数量</param>
-            <returns></returns>
-        </member>
-        <member name="M:huqiang.Core.HGUI.EmojiString.SubString(System.Int32,System.Int32)">
-            <summary>
-            切割字符串
-            </summary>
-            <param name="index">字符索引</param>
-            <param name="count">字符数量</param>
-            <returns></returns>
-        </member>
-        <member name="M:huqiang.Core.HGUI.EmojiString.Insert(System.Int32,huqiang.Core.HGUI.EmojiString)">
-            <summary>
-            插入字符
-            </summary>
-            <param name="index">字符索引</param>
-            <param name="emoji">字符数量</param>
-        </member>
         <member name="T:huqiang.Core.HGUI.HBatch">
             <summary>
             HGUI图像合批处理
@@ -4276,7 +4254,7 @@
             <param name="canvas">画布实例</param>
             <param name="pipeLine">UI流水线</param>
         </member>
-        <member name="M:huqiang.Core.HGUI.HBatch.AddShadow(huqiang.Core.HGUI.HGraphics,huqiang.Core.HGUI.HCanvas,UnityEngine.Quaternion@,UnityEngine.Vector3@,UnityEngine.Vector3@,UnityEngine.Vector4@)">
+        <member name="M:huqiang.Core.HGUI.HBatch.AddShadow(huqiang.Core.HGUI.HGraphics,huqiang.Core.HGUI.HCanvas,UnityEngine.Quaternion@,UnityEngine.Vector3@,UnityEngine.Vector3@,UnityEngine.Vector4@,UnityEngine.Vector2@,UnityEngine.Vector2@)">
             <summary>
             添加阴影
             </summary>
@@ -4287,7 +4265,7 @@
             <param name="o"></param>
             <param name="clip"></param>
         </member>
-        <member name="M:huqiang.Core.HGUI.HBatch.AddUV1(huqiang.Core.HGUI.HCanvas,System.Int32,System.Int32)">
+        <member name="M:huqiang.Core.HGUI.HBatch.AddUV1(huqiang.Core.HGUI.HCanvas,System.Int32,huqiang.Data.BlockInfo{huqiang.Core.HGUI.HVertex}@)">
             <summary>
             添加UV
             </summary>
@@ -4308,34 +4286,14 @@
             ui画布
             </summary>
         </member>
-        <member name="F:huqiang.Core.HGUI.HCanvas.camera">
+        <member name="F:huqiang.Core.HGUI.HCanvas.CurrentCanvas">
             <summary>
-            目标相机,如果为空则使用主相机
+            主画布实例
             </summary>
         </member>
         <member name="F:huqiang.Core.HGUI.HCanvas.DesignSize">
             <summary>
             默认设计尺寸
-            </summary>
-        </member>
-        <member name="F:huqiang.Core.HGUI.HCanvas.PhysicalScale">
-            <summary>
-            物理尺寸缩放,主要用于ppi
-            </summary>
-        </member>
-        <member name="F:huqiang.Core.HGUI.HCanvas.NearPlane">
-            <summary>
-            距离相机镜头的距离
-            </summary>
-        </member>
-        <member name="F:huqiang.Core.HGUI.HCanvas.A">
-            <summary>
-            物理尺寸缩放的贝塞尔曲线,x=英寸,y=比例
-            </summary>
-        </member>
-        <member name="F:huqiang.Core.HGUI.HCanvas.MainCanvas">
-            <summary>
-            主画布实例
             </summary>
         </member>
         <member name="F:huqiang.Core.HGUI.HCanvas.PipeLine">
@@ -4368,20 +4326,15 @@
             暂停所有更新
             </summary>
         </member>
-        <member name="M:huqiang.Core.HGUI.HCanvas.Collection(UnityEngine.Transform,System.Int32,System.Int32)">
+        <member name="M:huqiang.Core.HGUI.HCanvas.Collection(huqiang.Core.HGUI.UIElement,System.Int32,System.Int32)">
             <summary>
             信息采集
             </summary>
-            <param name="trans"></param>
+            <param name="script"></param>
         </member>
-        <member name="M:huqiang.Core.HGUI.HCanvas.Update">
+        <member name="M:huqiang.Core.HGUI.HCanvas.UpdateMesh">
             <summary>
-            更新内容包含:UI动画,UI页面更新,UI通知页更新,用户事件采集,键盘信息采集,事件派发,屏幕尺寸监测,执行分线程的委托任务
-            </summary>
-        </member>
-        <member name="M:huqiang.Core.HGUI.HCanvas.LateUpdate">
-            <summary>
-            更新内容包含:UI流水线采集,UI MainUpdate函数执行,UI Populate函数执行,文本更新,合批处理,应用网格,投递到相机
+            更新内容包含:UI流水线采集,UI MainUpdate函数执行,UI Populate函数执行,文本更新,合批处理,应用网格
             </summary>
         </member>
         <member name="M:huqiang.Core.HGUI.HCanvas.DispatchUserAction">
@@ -4472,9 +4425,19 @@
             三角形块级内存
             </summary>
         </member>
-        <member name="F:huqiang.Core.HGUI.HGraphics.trisInfo2">
+        <member name="F:huqiang.Core.HGUI.HGraphics.trisInfo1">
             <summary>
             三角形块级内存2
+            </summary>
+        </member>
+        <member name="F:huqiang.Core.HGUI.HGraphics.trisInfo2">
+            <summary>
+            三角形块级内存3
+            </summary>
+        </member>
+        <member name="F:huqiang.Core.HGUI.HGraphics.trisInfo3">
+            <summary>
+            三角形块级内存4
             </summary>
         </member>
         <member name="F:huqiang.Core.HGUI.HGraphics.m_dirty">
@@ -4490,21 +4453,6 @@
         <member name="F:huqiang.Core.HGUI.HGraphics.m_colorChanged">
             <summary>
             颜色改变后,需要重新填色
-            </summary>
-        </member>
-        <member name="F:huqiang.Core.HGUI.HGraphics.textures">
-            <summary>
-            支持4张纹理
-            </summary>
-        </member>
-        <member name="F:huqiang.Core.HGUI.HGraphics.texIds">
-            <summary>
-            纹理id
-            </summary>
-        </member>
-        <member name="F:huqiang.Core.HGUI.HGraphics.fillColors">
-            <summary>
-            是否使用填充色,即不使用纹理颜色
             </summary>
         </member>
         <member name="F:huqiang.Core.HGUI.HGraphics.Shadow">
@@ -4525,11 +4473,6 @@
         <member name="M:huqiang.Core.HGUI.HGraphics.UpdateMesh">
             <summary>
             更新网格
-            </summary>
-        </member>
-        <member name="M:huqiang.Core.HGUI.HGraphics.OnDestroy">
-            <summary>
-            销毁时释放非托管的块级内存
             </summary>
         </member>
         <member name="M:huqiang.Core.HGUI.HGraphics.LoadFromMesh(System.Collections.Generic.List{huqiang.Core.HGUI.HVertex},System.Collections.Generic.List{System.Int32})">
@@ -4625,16 +4568,28 @@
             模型数据
             </summary>
         </member>
+        <member name="F:huqiang.Core.HGUI.PrefabAsset.tables">
+            <summary>
+            结构体声明
+            </summary>
+        </member>
         <member name="F:huqiang.Core.HGUI.HGUIManager.GameBuffer">
             <summary>
             游戏对象缓存
             </summary>
         </member>
-        <member name="M:huqiang.Core.HGUI.HGUIManager.Initial(UnityEngine.Transform)">
+        <member name="M:huqiang.Core.HGUI.HGUIManager.Initial">
             <summary>
             初始化UI组件,包含有:Transform,HImage,TextBox,HText,HLine,UIElement
             </summary>
             <param name="buff">回收站的父物体</param>
+        </member>
+        <member name="M:huqiang.Core.HGUI.HGUIManager.GetPrefab(UnityEngine.Transform)">
+            <summary>
+            
+            </summary>
+            <param name="uiRoot"></param>
+            <returns></returns>
         </member>
         <member name="M:huqiang.Core.HGUI.HGUIManager.SavePrefab(UnityEngine.Transform,System.String)">
             <summary>
@@ -4647,6 +4602,14 @@
             <summary>
             所有预制体资源列表
             </summary>
+        </member>
+        <member name="M:huqiang.Core.HGUI.HGUIManager.LoadModels(huqiang.Data.DataBuffer,System.String)">
+            <summary>
+            载入一个预制体资源
+            </summary>
+            <param name="db">资源数据</param>
+            <param name="name">资源名</param>
+            <returns></returns>
         </member>
         <member name="M:huqiang.Core.HGUI.HGUIManager.LoadModels(System.Byte[],System.String)">
             <summary>
@@ -4672,6 +4635,14 @@
             <param name="childName">模型名称</param>
             <returns></returns>
         </member>
+        <member name="M:huqiang.Core.HGUI.HGUIManager.FindModelAndSetAssets(System.String,System.String)">
+            <summary>
+            查询一个模型
+            </summary>
+            <param name="assetName">资源包名</param>
+            <param name="childName">模型名称</param>
+            <returns></returns>
+        </member>
         <member name="M:huqiang.Core.HGUI.HGUIManager.GetAllChild(huqiang.Data.FakeStruct)">
             <summary>
             获取transform的所有子物体
@@ -4687,9 +4658,9 @@
             <param name="asset"></param>
             <returns></returns>
         </member>
-        <member name="T:huqiang.Core.HGUI.HGUIMesh">
+        <member name="F:huqiang.Core.HGUI.HGUIMesh.trisBuffer">
             <summary>
-            HImage的网格处理类
+            三角形块级缓存
             </summary>
         </member>
         <member name="M:huqiang.Core.HGUI.HGUIMesh.CreateMesh(huqiang.Core.HGUI.HImage)">
@@ -4703,6 +4674,36 @@
             此模式使用较少,后面有空再补
             </summary>
             <param name="image"></param>
+        </member>
+        <member name="T:huqiang.Core.HGUI.HGUIRender">
+            <summary>
+            HGUI呈现器
+            </summary>
+        </member>
+        <member name="F:huqiang.Core.HGUI.HGUIRender.camera">
+            <summary>
+            目标相机,如果为空则使用主相机
+            </summary>
+        </member>
+        <member name="F:huqiang.Core.HGUI.HGUIRender.DesignSize">
+            <summary>
+            默认设计尺寸
+            </summary>
+        </member>
+        <member name="F:huqiang.Core.HGUI.HGUIRender.NearPlane">
+            <summary>
+            距离相机镜头的距离
+            </summary>
+        </member>
+        <member name="F:huqiang.Core.HGUI.HGUIRender.PauseEvent">
+            <summary>
+            暂停用户事件
+            </summary>
+        </member>
+        <member name="F:huqiang.Core.HGUI.HGUIRender.Pause">
+            <summary>
+            暂停所有更新
+            </summary>
         </member>
         <member name="F:huqiang.Core.HGUI.HImage.m_fillClockwise">
             <summary>
@@ -4778,21 +4779,10 @@
             临时顶点缓存
             </summary>
         </member>
-        <member name="F:huqiang.Core.HGUI.HText.key_noMesh">
-            <summary>
-            不会产生网格的字符
-            </summary>
-        </member>
         <member name="M:huqiang.Core.HGUI.HText.DirtyAll">
             <summary>
             将所有文本设置为被污染
             </summary>
-        </member>
-        <member name="M:huqiang.Core.HGUI.HText.CreateEmojiMesh(huqiang.Core.HGUI.HText)">
-            <summary>
-            创建带有表情符的网格
-            </summary>
-            <param name="text"></param>
         </member>
         <member name="M:huqiang.Core.HGUI.HText.CreateOutLine(huqiang.Core.HGUI.HText)">
             <summary>
@@ -4816,14 +4806,6 @@
             </summary>
             <param name="size">参考尺寸</param>
             <param name="sett">参数载体</param>
-        </member>
-        <member name="M:huqiang.Core.HGUI.HText.GetTempVertex(System.Collections.Generic.IList{UnityEngine.UIVertex},huqiang.Data.BlockInfo{huqiang.Core.HGUI.TextVertex}@,System.String)">
-            <summary>
-            获取临时顶点
-            </summary>
-            <param name="v"></param>
-            <param name="vert">临时顶点</param>
-            <param name="filterStr">过滤表情符后的字符串</param>
         </member>
         <member name="M:huqiang.Core.HGUI.HText.Populate">
             <summary>
@@ -4861,6 +4843,161 @@
             UI尺寸本改变,设置污染
             </summary>
         </member>
+        <member name="M:huqiang.Core.HGUI.HTextGenerator.GetPopulateInfo(System.Collections.Generic.List{huqiang.Core.HGUI.PopulateStringInfo})">
+            <summary>
+            获取计算后的字符信息
+            </summary>
+            <param name="infos"></param>
+        </member>
+        <member name="F:huqiang.Core.HGUI.HTextGenerator.LineSpacing">
+            <summary>
+            默认行间隔
+            </summary>
+        </member>
+        <member name="F:huqiang.Core.HGUI.HTextGenerator.vertices">
+            <summary>
+            当前字符串计算的顶点
+            </summary>
+        </member>
+        <member name="F:huqiang.Core.HGUI.HTextGenerator.Triangle1">
+            <summary>
+            当前字符串计算的字体纹理三角形
+            </summary>
+        </member>
+        <member name="F:huqiang.Core.HGUI.HTextGenerator.Triangle2">
+            <summary>
+            当前字符串计算的表情符纹理三角形
+            </summary>
+        </member>
+        <member name="F:huqiang.Core.HGUI.HTextGenerator.Triangle3">
+            <summary>
+            当前字符串计算的自定义纹理三角形
+            </summary>
+        </member>
+        <member name="P:huqiang.Core.HGUI.HTextGenerator.MaxChar">
+            <summary>
+            总计字符数
+            </summary>
+        </member>
+        <member name="F:huqiang.Core.HGUI.HTextGenerator.customFont">
+            <summary>
+            挡墙自定义字体信息
+            </summary>
+        </member>
+        <member name="M:huqiang.Core.HGUI.HTextGenerator.CopyLinesInfo(System.Collections.Generic.List{huqiang.Core.HGUI.TextLineInfo})">
+            <summary>
+            复制文本行信息
+            </summary>
+            <param name="target"></param>
+        </member>
+        <member name="M:huqiang.Core.HGUI.HTextGenerator.CopyCharsInfo(System.Collections.Generic.List{huqiang.Core.HGUI.CharacterInfoEx})">
+            <summary>
+            复制字符信息
+            </summary>
+            <param name="target"></param>
+        </member>
+        <member name="P:huqiang.Core.HGUI.HTextGenerator.MaxLine">
+            <summary>
+            当前计算的字符串最大行数
+            </summary>
+        </member>
+        <member name="M:huqiang.Core.HGUI.HTextGenerator.Populate(huqiang.Core.HGUI.StringEx,UnityEngine.TextGenerationSettings@)">
+            <summary>
+            单次计算字符串长度不得超过8000
+            </summary>
+            <param name="str"></param>
+            <param name="setting"></param>
+        </member>
+        <member name="M:huqiang.Core.HGUI.HTextGenerator.LayoutText(huqiang.Core.HGUI.StringEx,UnityEngine.TextGenerationSettings@)">
+            <summary>
+            字符布局
+            </summary>
+        </member>
+        <member name="M:huqiang.Core.HGUI.HTextGenerator.CreateVertex(huqiang.Core.HGUI.StringEx,UnityEngine.TextGenerationSettings@)">
+            <summary>
+            创建顶点
+            </summary>
+            <param name="str"></param>
+            <param name="setting"></param>
+        </member>
+        <member name="M:huqiang.Core.HGUI.HTextGenerator.AddTris(System.Collections.Generic.List{System.Int32},System.Int32)">
+            <summary>
+            添加三角形索引
+            </summary>
+            <param name="tris"></param>
+            <param name="s"></param>
+        </member>
+        <member name="M:huqiang.Core.HGUI.HTextGenerator.GetPreferredWidth(huqiang.Core.HGUI.StringEx,UnityEngine.TextGenerationSettings@)">
+            <summary>
+            获取文本的宽度
+            </summary>
+            <param name="str"></param>
+            <param name="setting"></param>
+            <returns></returns>
+        </member>
+        <member name="M:huqiang.Core.HGUI.HTextGenerator.GetPreferredHeight(huqiang.Core.HGUI.StringEx,UnityEngine.TextGenerationSettings@)">
+            <summary>
+            获取文本的高度
+            </summary>
+            <param name="str"></param>
+            <param name="setting"></param>
+            <returns></returns>
+        </member>
+        <member name="M:huqiang.Core.HGUI.HTextGenerator.GetPreferredSize(huqiang.Core.HGUI.StringEx,UnityEngine.TextGenerationSettings@)">
+            <summary>
+            获取文本的尺寸
+            </summary>
+            <param name="str"></param>
+            <param name="setting"></param>
+            <returns></returns>
+        </member>
+        <member name="M:huqiang.Core.HGUI.HTextGenerator.GetPreferredWidth(System.String,UnityEngine.TextGenerationSettings@)">
+            <summary>
+            获取文本的宽度
+            </summary>
+            <param name="str"></param>
+            <param name="setting"></param>
+            <returns></returns>
+        </member>
+        <member name="M:huqiang.Core.HGUI.HTextGenerator.GetPreferredHeight(System.String,UnityEngine.TextGenerationSettings@)">
+            <summary>
+            获取文本的高度
+            </summary>
+            <param name="str"></param>
+            <param name="setting"></param>
+            <returns></returns>
+        </member>
+        <member name="M:huqiang.Core.HGUI.HTextGenerator.GetPreferredSize(System.String,UnityEngine.TextGenerationSettings@)">
+            <summary>
+            获取文本尺寸
+            </summary>
+            <param name="str"></param>
+            <param name="setting"></param>
+            <returns></returns>
+        </member>
+        <member name="M:huqiang.Core.HGUI.HTextGenerator.RebuildUV">
+            <summary>
+            当纹理被重建后重建纹理UV
+            </summary>
+        </member>
+        <member name="M:huqiang.Core.HGUI.HTextGenerator.AddContext(huqiang.Core.HGUI.HText,UnityEngine.Font)">
+            <summary>
+            添加当前帧文本与字体的关联
+            </summary>
+            <param name="text"></param>
+            <param name="font"></param>
+        </member>
+        <member name="M:huqiang.Core.HGUI.HTextGenerator.End">
+            <summary>
+            当前帧字体绘制结束
+            </summary>
+        </member>
+        <member name="M:huqiang.Core.HGUI.HTextGenerator.FontTextureRebuilt(UnityEngine.Font)">
+            <summary>
+            字体纹理重建
+            </summary>
+            <param name="font"></param>
+        </member>
         <member name="T:huqiang.Core.HGUI.MaterialCollector">
             <summary>
             材质球收集器
@@ -4892,7 +5029,7 @@
             开始新一轮的收集
             </summary>
         </member>
-        <member name="M:huqiang.Core.HGUI.MaterialCollector.CombinationMaterial(UnityEngine.Material,System.Int32,UnityEngine.Vector4@)">
+        <member name="M:huqiang.Core.HGUI.MaterialCollector.CombinationMaterial(UnityEngine.Material,System.Int32)">
             <summary>
             添加自定义材质球,无法合批
             </summary>
@@ -4900,7 +5037,7 @@
             <param name="matID"></param>
             <returns></returns>
         </member>
-        <member name="M:huqiang.Core.HGUI.MaterialCollector.CombinationMaterial(UnityEngine.Texture,System.Int32,System.Boolean,System.Int32@,UnityEngine.Vector4@,System.Boolean)">
+        <member name="M:huqiang.Core.HGUI.MaterialCollector.CombinationMaterial(UnityEngine.Texture,System.Int32@)">
             <summary>
             组合默认材质球
             </summary>
@@ -4909,17 +5046,17 @@
             <param name="offset"></param>
             <returns></returns>
         </member>
-        <member name="M:huqiang.Core.HGUI.MaterialCollector.CombinationMaterial(huqiang.Core.HGUI.HGraphics,System.Int32[],System.Int32,System.Int32@,UnityEngine.Vector4@)">
+        <member name="M:huqiang.Core.HGUI.MaterialCollector.CombinationMaterial(huqiang.Core.HGUI.HGraphics,UnityEngine.Texture,System.Int32[],System.Int32,System.Int32@)">
             <summary>
             组合材质球
             </summary>
             <param name="graphics"></param>
+            <param name="t2d"></param>
             <param name="tris"></param>
             <param name="len"></param>
             <param name="offset"></param>
-            <param name="clip"></param>
         </member>
-        <member name="M:huqiang.Core.HGUI.MaterialCollector.CombinationMaterial(huqiang.Core.HGUI.HGraphics,System.Int32[],huqiang.Core.HGUI.ArrayInfo[],System.Int32[],System.Int32,UnityEngine.Vector4@)">
+        <member name="M:huqiang.Core.HGUI.MaterialCollector.CombinationMaterial(huqiang.Core.HGUI.HGraphics,System.Int32[],huqiang.Core.HGUI.ArrayInfo[],System.Int32[],System.Int32)">
             <summary>
             组合材质球
             </summary>
@@ -4928,7 +5065,6 @@
             <param name="address"></param>
             <param name="offsets"></param>
             <param name="len"></param>
-            <param name="clip"></param>
         </member>
         <member name="M:huqiang.Core.HGUI.MaterialCollector.CompeleteSub">
             <summary>
@@ -4946,17 +5082,12 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="T:huqiang.Core.HGUI.MaterialManager">
-            <summary>
-            材质管理器
-            </summary>
-        </member>
-        <member name="P:huqiang.Core.HGUI.MaterialManager.DefShader">
+        <member name="P:huqiang.Core.HGUI.MaterialCollector.DefShader">
             <summary>
             默认着色器
             </summary>
         </member>
-        <member name="M:huqiang.Core.HGUI.MaterialManager.GetNextMaterial">
+        <member name="M:huqiang.Core.HGUI.MaterialCollector.GetNextMaterial">
             <summary>
             获取下一个材质球,如果没有则重新创建
             </summary>
@@ -4974,159 +5105,200 @@
             <param name="str">富文本</param>
             <returns></returns>
         </member>
-        <member name="T:huqiang.Core.HGUI.TextOperation">
+        <member name="F:huqiang.Core.HGUI.StringEx.key_noMesh">
             <summary>
-            文本操作类
+            不会产生网格的字符
             </summary>
         </member>
-        <member name="M:huqiang.Core.HGUI.TextOperation.ContentMoveUp">
+        <member name="P:huqiang.Core.HGUI.StringEx.noEmoji">
             <summary>
-            展示内容向上移动
+            剔除表情符的字符串,用于TextGenerator生成网格
             </summary>
+        </member>
+        <member name="F:huqiang.Core.HGUI.StringEx.noLable">
+            <summary>
+            剔除标签的字符串
+            </summary>
+        </member>
+        <member name="M:huqiang.Core.HGUI.StringEx.Reset(System.String,System.Boolean)">
+            <summary>
+            
+            </summary>
+            <param name="str"></param>
+            <param name="richText"></param>
+        </member>
+        <member name="M:huqiang.Core.HGUI.StringEx.DeleteLabel(System.String)">
+            <summary>
+            删除富文本中的标签
+            </summary>
+            <param name="str">富文本</param>
             <returns></returns>
         </member>
-        <member name="M:huqiang.Core.HGUI.TextOperation.ContentMoveDown">
+        <member name="F:huqiang.Core.HGUI.TextBox.key_noMesh">
             <summary>
-            展示内容向下移动
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:huqiang.Core.HGUI.TextOperation.GetShowContent">
-            <summary>
-            获取当前可以展示的文本内容
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:huqiang.Core.HGUI.TextOperation.SelectAll">
-            <summary>
-            全选
+            不会产生网格的字符
             </summary>
         </member>
-        <member name="M:huqiang.Core.HGUI.TextOperation.GetSelectString">
+        <member name="F:huqiang.Core.HGUI.TextBox.SmoothX">
             <summary>
-            获取选中的文本
+            开启此项配合Mask效果较好,但是Mask会增加合批材质
             </summary>
-            <returns></returns>
         </member>
-        <member name="M:huqiang.Core.HGUI.TextOperation.DeleteSelectString">
+        <member name="F:huqiang.Core.HGUI.TextBox.vertxstart">
             <summary>
-            删除选中的文本
+            最左边的顶点
             </summary>
-            <returns></returns>
         </member>
-        <member name="M:huqiang.Core.HGUI.TextOperation.SetPressIndex(System.Int32,huqiang.Core.HGUI.PressInfo@)">
+        <member name="F:huqiang.Core.HGUI.TextBox.cw">
             <summary>
-            设置光标位置
+            文字最大宽度
             </summary>
-            <param name="index"></param>
-            <param name="press"></param>
-            <returns></returns>
         </member>
-        <member name="M:huqiang.Core.HGUI.TextOperation.SetPressIndex(System.Int32,System.Boolean@)">
+        <member name="F:huqiang.Core.HGUI.TextBox.ch">
             <summary>
-            设置光标位置
+            文字总计高度
             </summary>
-            <param name="index">光标位置</param>
-            <param name="LineChanged">是否改变的行号</param>
-            <returns>是否改变成功</returns>
         </member>
-        <member name="M:huqiang.Core.HGUI.TextOperation.SetStartPressIndex(System.Int32)">
+        <member name="M:huqiang.Core.HGUI.TextBox.GetPointer(System.Collections.Generic.List{System.Int32},System.Collections.Generic.List{huqiang.Core.HGUI.HVertex},UnityEngine.Color32@,huqiang.Core.HGUI.PressInfo@)">
             <summary>
-            设置光标开始的位置
+            获取光标的显示网格
             </summary>
-            <param name="index">光标位置</param>
+            <param name="tri">三角形列表</param>
+            <param name="vert">顶点列表</param>
+            <param name="color">填充颜色</param>
+            <param name="start">按压信息</param>
         </member>
-        <member name="M:huqiang.Core.HGUI.TextOperation.SetEndPressIndex(System.Int32)">
+        <member name="M:huqiang.Core.HGUI.TextBox.GetSelectArea(System.Collections.Generic.List{System.Int32},System.Collections.Generic.List{huqiang.Core.HGUI.HVertex},UnityEngine.Color32@,huqiang.Core.HGUI.PressInfo@,huqiang.Core.HGUI.PressInfo@)">
             <summary>
-            设置光标结束的位置
+            获取选中区域的网格
             </summary>
-            <param name="index">光标位置</param>
+            <param name="tri">三角形列表</param>
+            <param name="vert">顶点列表</param>
+            <param name="color">填充颜色</param>
+            <param name="start">开始按压位置信息</param>
+            <param name="end">结束按压位置信息</param>
         </member>
-        <member name="M:huqiang.Core.HGUI.TextOperation.PointerMoveUp(System.Boolean@)">
+        <member name="M:huqiang.Core.HGUI.TextBox.MoveUp(huqiang.Core.HGUI.PressInfo@)">
             <summary>
             光标向上移动
             </summary>
-            <param name="LineChanged">是否改变了行号</param>
-            <returns>是否移动成功</returns>
+            <param name="press">当前光标位置</param>
         </member>
-        <member name="M:huqiang.Core.HGUI.TextOperation.PointerMoveDown(System.Boolean@)">
+        <member name="M:huqiang.Core.HGUI.TextBox.MoveDown(huqiang.Core.HGUI.PressInfo@)">
             <summary>
             光标向下移动
             </summary>
-            <param name="LineChanged">是否改变了行号</param>
-            <returns>是否移动成功</returns>
+            <param name="press">当前光标位置</param>
         </member>
-        <member name="M:huqiang.Core.HGUI.TextOperation.PointerMoveLeft(System.Boolean@)">
+        <member name="M:huqiang.Core.HGUI.TextBox.MoveLeft(huqiang.Core.HGUI.PressInfo@)">
             <summary>
             光标向左移动
             </summary>
-            <param name="LineChanged">是否改变了行号</param>
-            <returns>是否移动成功</returns>
+            <param name="press">当前光标位置</param>
         </member>
-        <member name="M:huqiang.Core.HGUI.TextOperation.PointerMoveRight(System.Boolean@)">
+        <member name="M:huqiang.Core.HGUI.TextBox.MoveRight(huqiang.Core.HGUI.PressInfo@,System.Int32)">
             <summary>
             光标向右移动
             </summary>
-            <param name="LineChanged">是否改变了行号</param>
-            <returns>是否移动成功</returns>
+            <param name="press">当前光标位置</param>
+            <param name="count">字符个数</param>
         </member>
-        <member name="M:huqiang.Core.HGUI.TextOperation.DeleteLast">
+        <member name="M:huqiang.Core.HGUI.TextBox.MoveEnd(huqiang.Core.HGUI.PressInfo@)">
             <summary>
-            删除光标后面的一个字符
+            光标移动到字符串尾部
             </summary>
-            <returns>是否删除成功</returns>
+            <param name="press">当前光标位置</param>
         </member>
-        <member name="M:huqiang.Core.HGUI.TextOperation.DeleteNext">
+        <member name="M:huqiang.Core.HGUI.TextBox.GetEnd(huqiang.Core.HGUI.PressInfo@)">
             <summary>
-            删除光标前面的一个字符
-            </summary>
-            <returns>是否删除成功</returns>
-        </member>
-        <member name="M:huqiang.Core.HGUI.TextOperation.InsertContent(huqiang.Core.HGUI.EmojiString)">
-            <summary>
-            插入字符串
-            </summary>
-            <param name="con">表情符字符串</param>
-        </member>
-        <member name="M:huqiang.Core.HGUI.TextOperation.SetShowStart(System.Int32)">
-            <summary>
-            设置显示内容开始行号
-            </summary>
-            <param name="start">行号</param>
-        </member>
-        <member name="M:huqiang.Core.HGUI.TextOperation.SetPress(huqiang.Core.HGUI.PressInfo@)">
-            <summary>
-            设置按压信息
+            获取字符串尾部信息
             </summary>
             <param name="press"></param>
         </member>
-        <member name="M:huqiang.Core.HGUI.TextOperation.SetStartPress(huqiang.Core.HGUI.PressInfo@)">
+        <member name="M:huqiang.Core.HGUI.TextBox.Move(huqiang.Core.HGUI.PressInfo@)">
             <summary>
-            设置开始按压信息
+            光标移动到指定按压信息
             </summary>
-            <param name="press"></param>
+            <param name="press">按压信息</param>
         </member>
-        <member name="M:huqiang.Core.HGUI.TextOperation.SetEndPress(huqiang.Core.HGUI.PressInfo@)">
+        <member name="M:huqiang.Core.HGUI.TextBox.GetIndex(huqiang.Core.HGUI.PressInfo@)">
             <summary>
-            设置结束按压信息
+            使用按压信息获取字符索引
             </summary>
-            <param name="press"></param>
-        </member>
-        <member name="M:huqiang.Core.HGUI.TextOperation.GetStartPress">
-            <summary>
-            获取开始按压信息
-            </summary>
+            <param name="press">按压信息</param>
             <returns></returns>
         </member>
-        <member name="M:huqiang.Core.HGUI.TextOperation.GetEndPress">
+        <member name="M:huqiang.Core.HGUI.TextBox.GetPress(System.Int32,huqiang.Core.HGUI.PressInfo@)">
             <summary>
-            获取结束按压信息
+            使用索引获取按压信息
             </summary>
+            <param name="index">索引</param>
+            <param name="press">按压信息</param>
+        </member>
+        <member name="M:huqiang.Core.HGUI.TextBox.SetCursorPos(huqiang.Core.HGUI.PressInfo@)">
+            <summary>
+            设置输入法显示位置,win平台
+            </summary>
+            <param name="start">光标按压位置</param>
+        </member>
+        <member name="M:huqiang.Core.HGUI.UICreator.CreateElement(UnityEngine.Vector3,UnityEngine.Vector2,System.String,huqiang.Core.HGUI.UIElement)">
+            <summary>
+            创建一个元素
+            </summary>
+            <param name="pos">位置</param>
+            <param name="size">尺寸</param>
+            <param name="name">名称</param>
+            <param name="parent">父坐标变换</param>
             <returns></returns>
         </member>
-        <member name="T:huqiang.Core.HGUI.UIElement">
+        <member name="M:huqiang.Core.HGUI.UICreator.CreateHImage(UnityEngine.Vector3,UnityEngine.Vector2,System.String,huqiang.Core.HGUI.UIElement)">
             <summary>
-            UI基本元素组件
+            创建一个图像
+            </summary>
+            <param name="pos">位置</param>
+            <param name="size">尺寸</param>
+            <param name="name">名称</param>
+            <param name="parent">父坐标变换</param>
+            <returns></returns>
+        </member>
+        <member name="M:huqiang.Core.HGUI.UICreator.CreateHText(UnityEngine.Vector3,UnityEngine.Vector2,System.String,huqiang.Core.HGUI.UIElement)">
+            <summary>
+            创建一个文本
+            </summary>
+            <param name="pos">位置</param>
+            <param name="size">尺寸</param>
+            <param name="name">名称</param>
+            <param name="parent">父坐标变换</param>
+            <returns></returns>
+        </member>
+        <member name="M:huqiang.Core.HGUI.UICreator.CreateTextBox(UnityEngine.Vector3,UnityEngine.Vector2,System.String,huqiang.Core.HGUI.UIElement)">
+            <summary>
+            创建一个文本
+            </summary>
+            <param name="pos">位置</param>
+            <param name="size">尺寸</param>
+            <param name="name">名称</param>
+            <param name="parent">父坐标变换</param>
+            <returns></returns>
+        </member>
+        <member name="M:huqiang.Core.HGUI.UICreator.CreateHLine(UnityEngine.Vector3,UnityEngine.Vector2,System.String,huqiang.Core.HGUI.UIElement)">
+            <summary>
+            创建一个画线面板
+            </summary>
+            <param name="pos">位置</param>
+            <param name="size">尺寸</param>
+            <param name="name">名称</param>
+            <param name="parent">父坐标变换</param>
+            <returns></returns>
+        </member>
+        <member name="P:huqiang.Core.HGUI.UIElement.TypeName">
+            <summary>
+            请勿更改,用于回收时的标记
+            </summary>
+        </member>
+        <member name="M:huqiang.Core.HGUI.UIElement.Clear">
+            <summary>
+            清除资源
             </summary>
         </member>
         <member name="F:huqiang.Core.HGUI.UIElement.LateFrame">
@@ -5204,26 +5376,6 @@
             是否开启遮罩
             </summary>
         </member>
-        <member name="F:huqiang.Core.HGUI.UIElement.userEvent">
-            <summary>
-            用户事件
-            </summary>
-        </member>
-        <member name="F:huqiang.Core.HGUI.UIElement.composite">
-            <summary>
-            复合ui组件实体
-            </summary>
-        </member>
-        <member name="F:huqiang.Core.HGUI.UIElement.mod">
-            <summary>
-            数据模型
-            </summary>
-        </member>
-        <member name="F:huqiang.Core.HGUI.UIElement.DataContext">
-            <summary>
-            联系上下文
-            </summary>
-        </member>
         <member name="F:huqiang.Core.HGUI.UIElement.PipelineIndex">
             <summary>
             在流水线中的位置
@@ -5255,23 +5407,78 @@
             当UI尺寸被改变时,执行此委托
             </summary>
         </member>
-        <member name="M:huqiang.Core.HGUI.UIElement.Initial(huqiang.Data.FakeStruct)">
+        <member name="M:huqiang.Core.HGUI.UIElement.Initial(huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIInitializer)">
             <summary>
             初始化数据
             </summary>
             <param name="ex">数据模型</param>
         </member>
-        <member name="M:huqiang.Core.HGUI.UIElement.CreateUIComposite(huqiang.Core.HGUI.UIElement,huqiang.Data.FakeStruct)">
+        <member name="M:huqiang.Core.HGUI.UIElement.CreateUIComposite(huqiang.Core.HGUI.UIElement,huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIInitializer)">
             <summary>
             创建复合型UI实体
             </summary>
             <param name="script">ui元素实体</param>
             <param name="ex">数据模型</param>
         </member>
-        <member name="M:huqiang.Core.HGUI.UIElement.Clear">
+        <member name="T:huqiang.Core.HGUI.UIelementBuffer.UITypeInfo">
             <summary>
-            清除资源
+            类型信息
             </summary>
+        </member>
+        <member name="M:huqiang.Core.HGUI.UIelementBuffer.RegDataLoader``1(huqiang.Core.UIData.UIDataLoader)">
+            <summary>
+            注册一个组件
+            </summary>
+            <param name="info"></param>
+        </member>
+        <member name="M:huqiang.Core.HGUI.UIelementBuffer.CreateNew(System.String)">
+            <summary>
+            通过类型创建一个对象
+            </summary>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:huqiang.Core.HGUI.UIelementBuffer.RecycleUI(huqiang.Core.HGUI.UIElement)">
+            <summary>
+            回收游戏对象
+            </summary>
+            <param name="ui"></param>
+        </member>
+        <member name="M:huqiang.Core.HGUI.UIelementBuffer.RecycleChild(huqiang.Core.HGUI.UIElement)">
+            <summary>
+            回收对象的子物体
+            </summary>
+            <param name="ui"></param>
+        </member>
+        <member name="M:huqiang.Core.HGUI.UIelementBuffer.RecycleChild(huqiang.Core.HGUI.UIElement,System.String[])">
+            <summary>
+            回收除开相应名称意外的对象的子物体
+            </summary>
+            <param name="ui">游戏对象</param>
+            <param name="keep">要保留子对象的名称数组</param>
+        </member>
+        <member name="M:huqiang.Core.HGUI.UIelementBuffer.FindDataLoader(System.String)">
+            <summary>
+            查询数据载入器
+            </summary>
+            <param name="typeName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:huqiang.Core.HGUI.UIelementBuffer.FindChild(huqiang.Data.FakeStruct,System.String)">
+            <summary>
+            查询transform的子物体
+            </summary>
+            <param name="fake"></param>
+            <param name="childName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:huqiang.Core.HGUI.UIelementBuffer.Clone(huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIInitializer)">
+            <summary>
+            克隆某个游戏对象
+            </summary>
+            <param name="fake">假结构体数据</param>
+            <param name="initializer">初始化器</param>
+            <returns></returns>
         </member>
         <member name="T:huqiang.Core.HGUI.UIInitializer">
             <summary>
@@ -5296,7 +5503,7 @@
             </summary>
             <param name="obj">对象实例</param>
         </member>
-        <member name="M:huqiang.Core.HGUI.UIInitializer.Initialiezd(huqiang.Data.FakeStruct,UnityEngine.Component)">
+        <member name="M:huqiang.Core.HGUI.UIInitializer.Initialiezd(huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIElement)">
             <summary>
             初始化
             </summary>
@@ -5308,7 +5515,7 @@
             初始化完毕
             </summary>
         </member>
-        <member name="M:huqiang.Core.HGUI.UIInitializer.ReflectionEnity(System.Object,UnityEngine.Transform)">
+        <member name="M:huqiang.Core.HGUI.UIInitializer.ReflectionEnity(System.Object,huqiang.Core.HGUI.UIElement)">
             <summary>
             反射实体到目标载体
             </summary>
@@ -5320,6 +5527,28 @@
             更换使用语言,将配置文件中的语言反射到UI组件上
             </summary>
             <param name="section"></param>
+        </member>
+        <member name="M:huqiang.Core.HGUI.UIInitializer.AddContext(huqiang.Core.HGUI.UIElement,System.Int32)">
+            <summary>
+            添加联系上下文
+            </summary>
+            <param name="trans"></param>
+            <param name="insID"></param>
+        </member>
+        <member name="F:huqiang.Core.HGUI.UISystem.A">
+            <summary>
+            物理尺寸缩放的贝塞尔曲线,x=英寸,y=比例
+            </summary>
+        </member>
+        <member name="F:huqiang.Core.HGUI.UISystem.Pause">
+            <summary>
+            暂停所有更新
+            </summary>
+        </member>
+        <member name="F:huqiang.Core.HGUI.UISystem.DesignSize">
+            <summary>
+            默认设计尺寸
+            </summary>
         </member>
         <member name="T:huqiang.Core.Line.ArcLine">
             <summary>
@@ -5394,6 +5623,124 @@
         <member name="F:huqiang.Core.Line.ParabolaLine.Precision">
             <summary>
             精度
+            </summary>
+        </member>
+        <member name="T:huqiang.Core.UIData.CustomFont">
+            <summary>
+            自定义文字
+            </summary>
+        </member>
+        <member name="F:huqiang.Core.UIData.CustomFont.UVRect.uv0">
+            <summary>
+            左下
+            </summary>
+        </member>
+        <member name="F:huqiang.Core.UIData.CustomFont.UVRect.uv1">
+            <summary>
+            左上
+            </summary>
+        </member>
+        <member name="F:huqiang.Core.UIData.CustomFont.UVRect.uv2">
+            <summary>
+            右上
+            </summary>
+        </member>
+        <member name="F:huqiang.Core.UIData.CustomFont.UVRect.uv3">
+            <summary>
+            右下
+            </summary>
+        </member>
+        <member name="F:huqiang.Core.UIData.CustomFont.UVRect.Scale">
+            <summary>
+            比例
+            </summary>
+        </member>
+        <member name="M:huqiang.Core.UIData.CustomFont.#ctor(UnityEngine.Texture)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="t2d">包含字符精灵的纹理</param>
+        </member>
+        <member name="M:huqiang.Core.UIData.CustomFont.AddCharMap(System.Char,UnityEngine.Rect,System.Single)">
+            <summary>
+            添加字符图
+            </summary>
+            <param name="key">字符</param>
+            <param name="rect">精灵矩形</param>
+        </member>
+        <member name="M:huqiang.Core.UIData.CustomFont.AddCharMap(System.Char,huqiang.Data.SpriteInfo@,System.Single)">
+            <summary>
+            添加字符图
+            </summary>
+            <param name="key">字符</param>
+            <param name="spi">精灵矩形</param>
+            <param name="fontSize">此精灵的参考尺寸</param>
+        </member>
+        <member name="M:huqiang.Core.UIData.CustomFont.AddCharMap(System.Char,UnityEngine.Sprite,System.Single)">
+            <summary>
+            添加字符图
+            </summary>
+            <param name="key">字符</param>
+            <param name="sprite">精灵</param>
+                /// <param name="fontSize">此精灵的参考尺寸</param>
+        </member>
+        <member name="F:huqiang.Core.UIData.UIDataLoader.uiBuffer">
+            <summary>
+            游戏对象管理缓存器
+            </summary>
+        </member>
+        <member name="F:huqiang.Core.UIData.UIDataLoader.initializer">
+            <summary>
+            初始化器
+            </summary>
+        </member>
+        <member name="M:huqiang.Core.UIData.UIDataLoader.SaveUI(UnityEngine.Component,huqiang.Data.DataBuffer)">
+            <summary>
+            将游戏对象数据写入假结构体
+            </summary>
+            <param name="com">unity组件</param>
+            <param name="buffer">DataBuffer</param>
+            <returns></returns>
+        </member>
+        <member name="M:huqiang.Core.UIData.UIDataLoader.SaveUI(huqiang.Core.HGUI.UIElement,huqiang.Data.DataBuffer)">
+            <summary>
+            将游戏对象数据写入假结构体
+            </summary>
+            <param name="com">unity组件</param>
+            <param name="buffer">DataBuffer</param>
+            <returns></returns>
+        </member>
+        <member name="M:huqiang.Core.UIData.UIDataLoader.LoadUI(huqiang.Core.HGUI.UIElement,huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIInitializer)">
+            <summary>
+            将游戏对象数据写入假结构体
+            </summary>
+            <param name="com">unity组件</param>
+            <param name="buffer">DataBuffer</param>
+            <returns></returns>
+        </member>
+        <member name="F:huqiang.Core.UIData.UIElementData.type">
+            <summary>
+            对象类型, 所有组件的位或值
+            </summary>
+        </member>
+        <member name="F:huqiang.Core.UIData.UIElementData.insID">
+            <summary>
+            实例ID
+            </summary>
+        </member>
+        <member name="F:huqiang.Core.UIData.UIElementData.eve">
+            <summary>
+            用户事件的附加信息
+            </summary>
+        </member>
+        <member name="F:huqiang.Core.UIData.UIElementData.composite">
+            <summary>
+            复合型UI附加信息
+            </summary>
+        </member>
+        <member name="F:huqiang.Core.UIData.UIElementData.ex">
+            <summary>
+            附加信息,用于存储helper中写入的数据
             </summary>
         </member>
         <member name="M:huqiang.MathH.#cctor">
@@ -5592,6 +5939,40 @@
             <param name="r">AttenuationRate</param>
             <param name="d">Distance</param>
             <returns>行驶到指定位置所需的最大速率</returns>
+        </member>
+        <member name="M:huqiang.MathH.GetDistance(System.Single,System.Single,System.Single)">
+            <summary>
+            匀减速 位移公式 S=vt-（at^2）/2
+            </summary>
+            <param name="v0">初速度，国际单位为米每秒（m/s)</param>
+            <param name="a">加速度，单位是米每二次方秒（m/s^2）</param>
+            <param name="t">时间，国际单位为秒（s)</param>
+            <returns></returns>
+        </member>
+        <member name="M:huqiang.MathH.GetStartSpeed(System.Single,System.Single)">
+            <summary>
+            根据距离和加速度求初始速度
+            </summary>
+            <param name="distance">初速度，国际单位为米每秒（m/s)</param>
+            <param name="a">加速度，单位是米每二次方秒（m/s^2）</param>
+            <returns></returns>
+        </member>
+        <member name="M:huqiang.MathH.GetSpeed(System.Single,System.Single,System.Single)">
+            <summary>
+             匀减速  速度公式 v = V0 - at
+            </summary>
+            <param name="v0">初速度，国际单位为米每秒（m/s)</param>
+            <param name="a">加速度，单位是米每二次方秒（m/s^2）</param>
+            <param name="t">时间，国际单位为秒（s)</param>
+            <returns></returns>
+        </member>
+        <member name="M:huqiang.MathH.GetTime(System.Single,System.Single)">
+            <summary>
+             匀减速 速度减缓到0所需时间
+            </summary>
+            <param name="v0">初速度，国际单位为米每秒（m/s)</param>
+            <param name="a">加速度，单位是米每二次方秒（m/s^2）</param>
+            <returns></returns>
         </member>
         <member name="T:huqiang.Complex">
             <summary>
@@ -5898,7 +6279,7 @@
             根节点
             </summary>
         </member>
-        <member name="M:huqiang.App.Initial(UnityEngine.Transform)">
+        <member name="M:huqiang.App.Initial(huqiang.Core.HGUI.UIElement)">
             <summary>
             初始化UI布局
             </summary>
@@ -6319,22 +6700,6 @@
             <param name="b"></param>
             <returns></returns>
         </member>
-        <member name="M:huqiang.Tool.CalculUV(UnityEngine.Rect,System.Single,System.Single)">
-            <summary>
-            创建纹理UV
-            </summary>
-            <param name="sr">精灵矩形区域</param>
-            <param name="w">纹理宽度</param>
-            <param name="h">纹理高度</param>
-            <returns></returns>
-        </member>
-        <member name="M:huqiang.Tool.CalculUVS(huqiang.Data.SpriteRectInfo[])">
-            <summary>
-            创建纹理UV数组
-            </summary>
-            <param name="sprites">精灵信息数组</param>
-            <returns></returns>
-        </member>
         <member name="T:huqiang.Pool.InstanceContext">
             <summary>
             实例联系上下文
@@ -6539,14 +6904,14 @@
             动画函数式编写扩展
             </summary>
         </member>
-        <member name="M:huqiang.AnimationExtand.FindMoveAni(UnityEngine.Transform)">
+        <member name="M:huqiang.AnimationExtand.FindMoveAni(huqiang.Core.HGUI.UIElement)">
             <summary>
             查询一个位移动画
             </summary>
             <param name="trans">实例目标</param>
             <returns></returns>
         </member>
-        <member name="M:huqiang.AnimationExtand.MoveTo(UnityEngine.Transform,UnityEngine.Vector3,System.Single,System.Boolean,System.Single,System.Action{huqiang.MoveAnimat},System.Boolean)">
+        <member name="M:huqiang.AnimationExtand.MoveTo(huqiang.Core.HGUI.UIElement,UnityEngine.Vector3,System.Single,System.Boolean,System.Single,System.Action{huqiang.MoveAnimat},System.Boolean)">
             <summary>
             移动到某个位置
             </summary>
@@ -6558,14 +6923,14 @@
             <param name="over">完毕后的回调函数</param>
             <param name="cover">是否覆盖已有的动画</param>
         </member>
-        <member name="M:huqiang.AnimationExtand.FindRotateAni(UnityEngine.Transform)">
+        <member name="M:huqiang.AnimationExtand.FindRotateAni(huqiang.Core.HGUI.UIElement)">
             <summary>
             查询一个旋转动画
             </summary>
             <param name="trans">实例目标</param>
             <returns></returns>
         </member>
-        <member name="M:huqiang.AnimationExtand.RotateTo(UnityEngine.Transform,UnityEngine.Vector3,System.Single,System.Boolean,System.Single,System.Action{huqiang.RotateAnimat},System.Boolean)">
+        <member name="M:huqiang.AnimationExtand.RotateTo(huqiang.Core.HGUI.UIElement,UnityEngine.Vector3,System.Single,System.Boolean,System.Single,System.Action{huqiang.RotateAnimat},System.Boolean)">
             <summary>
             旋转到某个位置
             </summary>
@@ -6577,14 +6942,14 @@
             <param name="over">完毕后的回调函数</param>
             <param name="cover">是否覆盖已有的动画</param>
         </member>
-        <member name="M:huqiang.AnimationExtand.FindScaleAni(UnityEngine.Transform)">
+        <member name="M:huqiang.AnimationExtand.FindScaleAni(huqiang.Core.HGUI.UIElement)">
             <summary>
             查询一个缩放动画
             </summary>
             <param name="trans">实例目标</param>
             <returns></returns>
         </member>
-        <member name="M:huqiang.AnimationExtand.ScaleTo(UnityEngine.Transform,UnityEngine.Vector3,System.Single,System.Boolean,System.Single,System.Action{huqiang.ScaleAnimat},System.Boolean)">
+        <member name="M:huqiang.AnimationExtand.ScaleTo(huqiang.Core.HGUI.UIElement,UnityEngine.Vector3,System.Single,System.Boolean,System.Single,System.Action{huqiang.ScaleAnimat},System.Boolean)">
             <summary>
             旋转到某个比例
             </summary>
@@ -7024,7 +7389,7 @@
             位移动画
             </summary>
         </member>
-        <member name="M:huqiang.MoveAnimat.#ctor(UnityEngine.Transform)">
+        <member name="M:huqiang.MoveAnimat.#ctor(huqiang.Core.HGUI.UIElement)">
             <summary>
             构造函数
             </summary>
@@ -7168,7 +7533,7 @@
             旋转动画
             </summary>
         </member>
-        <member name="M:huqiang.RotateAnimat.#ctor(UnityEngine.Transform)">
+        <member name="M:huqiang.RotateAnimat.#ctor(huqiang.Core.HGUI.UIElement)">
             <summary>
             构造函数
             </summary>
@@ -7215,7 +7580,7 @@
             尺寸缩放动画
             </summary>
         </member>
-        <member name="M:huqiang.ScaleAnimat.#ctor(UnityEngine.Transform)">
+        <member name="M:huqiang.ScaleAnimat.#ctor(huqiang.Core.HGUI.UIElement)">
             <summary>
             构造函数
             </summary>
@@ -7427,12 +7792,13 @@
             当前更新帧,防止每帧重复更新
             </summary>
         </member>
-        <member name="M:huqiang.UIComposite.Composite.Initial(huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIElement)">
+        <member name="M:huqiang.UIComposite.Composite.Initial(huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIElement,huqiang.Core.HGUI.UIInitializer)">
             <summary>
             初始化
             </summary>
             <param name="mod">模型数据</param>
             <param name="element">UI元素实例</param>
+            <param name="initializer">初始化器</param>
         </member>
         <member name="M:huqiang.UIComposite.Composite.Update(System.Single)">
             <summary>
@@ -7572,7 +7938,7 @@
             构造函数
             </summary>
         </member>
-        <member name="M:huqiang.UIComposite.DataGrid.Initial(huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIElement)">
+        <member name="M:huqiang.UIComposite.DataGrid.Initial(huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIElement,huqiang.Core.HGUI.UIInitializer)">
             <summary>
             初始化布局
             </summary>
@@ -7634,19 +8000,24 @@
             <typeparam name="U">数据模型</typeparam>
             <param name="action">更新回调</param>
         </member>
-        <member name="M:huqiang.UIComposite.DataGrid.LimitX(huqiang.UIEvent.UserEvent,System.Single)">
+        <member name="M:huqiang.UIComposite.DataGrid.LimitX(System.Single)">
             <summary>
             X轴向的滚动限制
             </summary>
             <param name="callBack">用户事件</param>
             <param name="x">移动距离</param>
         </member>
-        <member name="M:huqiang.UIComposite.DataGrid.LimitY(huqiang.UIEvent.UserEvent,System.Single)">
+        <member name="M:huqiang.UIComposite.DataGrid.LimitY(System.Single)">
             <summary>
             Y轴向的滚动限制
             </summary>
             <param name="callBack">用户事件</param>
             <param name="y">移动距离</param>
+        </member>
+        <member name="F:huqiang.UIComposite.DataGrid.startVelocity">
+            <summary>
+            初始速率
+            </summary>
         </member>
         <member name="T:huqiang.UIComposite.DesignedDockPanel">
             <summary>
@@ -7668,7 +8039,7 @@
             辅助停靠内容列表
             </summary>
         </member>
-        <member name="M:huqiang.UIComposite.DesignedDockPanel.Initial(huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIElement)">
+        <member name="M:huqiang.UIComposite.DesignedDockPanel.Initial(huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIElement,huqiang.Core.HGUI.UIInitializer)">
             <summary>
             初始化函数
             </summary>
@@ -8139,7 +8510,7 @@
             主区域
             </summary>
         </member>
-        <member name="M:huqiang.UIComposite.DockPanel.Initial(huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIElement)">
+        <member name="M:huqiang.UIComposite.DockPanel.Initial(huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIElement,huqiang.Core.HGUI.UIInitializer)">
             <summary>
             初始化
             </summary>
@@ -8207,26 +8578,6 @@
             冻结方向
             </summary>
         </member>
-        <member name="M:huqiang.UIComposite.DragContent.ScrollNone(huqiang.UIEvent.UserEvent,UnityEngine.Vector2@,System.Single@,System.Single@)">
-            <summary>
-            固定滚动,撞到边界立马停止
-            </summary>
-            <param name="eventCall">用户事件</param>
-            <param name="v">参考移动量</param>
-            <param name="x">限定移动量x</param>
-            <param name="y">限定移动量y</param>
-            <returns></returns>
-        </member>
-        <member name="M:huqiang.UIComposite.DragContent.BounceBack(huqiang.UIEvent.UserEvent,UnityEngine.Vector2@,System.Single@,System.Single@)">
-            <summary>
-            回弹滚动,撞到边界会有减速回弹效果
-            </summary>
-            <param name="eventCall">用户事件</param>
-            <param name="v">参考移动量</param>
-            <param name="x">衰减移动量x</param>
-            <param name="y">衰减移动量y</param>
-            <returns></returns>
-        </member>
         <member name="F:huqiang.UIComposite.DragContent.Size">
             <summary>
             滚动框尺寸
@@ -8240,6 +8591,11 @@
         <member name="F:huqiang.UIComposite.DragContent.ContentSize">
             <summary>
             内容尺寸
+            </summary>
+        </member>
+        <member name="F:huqiang.UIComposite.DragContent.ContentOffset">
+            <summary>
+            内容的起始位置从坐上角计算,与UI载体的偏移位置
             </summary>
         </member>
         <member name="F:huqiang.UIComposite.DragContent.freeze">
@@ -8272,7 +8628,7 @@
             滚动完毕事件
             </summary>
         </member>
-        <member name="M:huqiang.UIComposite.DragContent.Initial(huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIElement)">
+        <member name="M:huqiang.UIComposite.DragContent.Initial(huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIElement,huqiang.Core.HGUI.UIInitializer)">
             <summary>
             初始化
             </summary>
@@ -8288,6 +8644,11 @@
         <member name="P:huqiang.UIComposite.DragContent.Pos">
             <summary>
             y轴位置,范围0-1
+            </summary>
+        </member>
+        <member name="F:huqiang.UIComposite.DragContent.startVelocity">
+            <summary>
+            初始速率
             </summary>
         </member>
         <member name="T:huqiang.UIComposite.DropdownEx">
@@ -8320,13 +8681,6 @@
             <summary>
             选中项的索引
             </summary>
-        </member>
-        <member name="M:huqiang.UIComposite.DropdownEx.Initial(huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIElement)">
-            <summary>
-            初始化
-            </summary>
-            <param name="mod">模式数据</param>
-            <param name="script">主体元素</param>
         </member>
         <member name="F:huqiang.UIComposite.DropdownEx.OnSelectChanged">
             <summary>
@@ -8362,11 +8716,6 @@
             行数
             </summary>
         </member>
-        <member name="F:huqiang.UIComposite.GridScroll.Position">
-            <summary>
-            当前滚动的位置
-            </summary>
-        </member>
         <member name="F:huqiang.UIComposite.GridScroll.eventCall">
             <summary>
             事件
@@ -8381,13 +8730,6 @@
             <summary>
             滚动结束事件
             </summary>
-        </member>
-        <member name="M:huqiang.UIComposite.GridScroll.Initial(huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIElement)">
-            <summary>
-            初始化
-            </summary>
-            <param name="fake">数据模型</param>
-            <param name="script">主体元素</param>
         </member>
         <member name="M:huqiang.UIComposite.GridScroll.Order(System.Boolean)">
             <summary>
@@ -8432,11 +8774,6 @@
             输入文本
             </summary>
         </member>
-        <member name="P:huqiang.UIComposite.InputBox.ShowString">
-            <summary>
-            显示文本
-            </summary>
-        </member>
         <member name="P:huqiang.UIComposite.InputBox.SelectString">
             <summary>
             选中文本
@@ -8477,14 +8814,7 @@
             验证新输入的字符
             </summary>
         </member>
-        <member name="M:huqiang.UIComposite.InputBox.Initial(huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIElement)">
-            <summary>
-            初始化
-            </summary>
-            <param name="mod">模型数据</param>
-            <param name="element">元素主体</param>
-        </member>
-        <member name="M:huqiang.UIComposite.InputBox.OnMouseDown(huqiang.UIEvent.UserAction,huqiang.Core.HGUI.PressInfo@)">
+        <member name="M:huqiang.UIComposite.InputBox.OnMouseDown(huqiang.UIEvent.UserAction)">
             <summary>
             鼠标按压
             </summary>
@@ -8503,7 +8833,7 @@
             </summary>
             <param name="action">用户事件</param>
         </member>
-        <member name="M:huqiang.UIComposite.InputBox.OnDrag(huqiang.UIEvent.UserAction,huqiang.Core.HGUI.PressInfo@)">
+        <member name="M:huqiang.UIComposite.InputBox.OnDrag(huqiang.UIEvent.UserAction)">
             <summary>
             拖动选择
             </summary>
@@ -8532,12 +8862,6 @@
             删除光标后面的字符
             </summary>
             <returns></returns>
-        </member>
-        <member name="M:huqiang.UIComposite.InputBox.InsertString(System.String)">
-            <summary>
-            插入字符串
-            </summary>
-            <param name="str">字符串</param>
         </member>
         <member name="M:huqiang.UIComposite.InputBox.PointerMoveLeft">
             <summary>
@@ -8579,19 +8903,6 @@
             <summary>
             更新光标
             </summary>
-        </member>
-        <member name="P:huqiang.UIComposite.InputBox.ReplaceTarget">
-            <summary>
-            更换的目标载体
-            </summary>
-        </member>
-        <member name="M:huqiang.UIComposite.InputBox.Replace(huqiang.Core.HGUI.HText,huqiang.UIEvent.UserEvent,huqiang.UIEvent.UserAction)">
-            <summary>
-            更换目标载体
-            </summary>
-            <param name="text">目标实例</param>
-            <param name="user">用户事件</param>
-            <param name="action">用户动作</param>
         </member>
         <member name="F:huqiang.UIComposite.OptionsType.Radio">
             <summary>
@@ -8680,13 +8991,6 @@
             当前绘制状态
             </summary>
         </member>
-        <member name="M:huqiang.UIComposite.Paint.Initial(huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIElement)">
-            <summary>
-            初始化
-            </summary>
-            <param name="fake">数据模型</param>
-            <param name="script">主体元素</param>
-        </member>
         <member name="T:huqiang.UIComposite.DrawArea">
             <summary>
             绘制区域
@@ -8740,6 +9044,11 @@
         <member name="F:huqiang.UIComposite.ScrollInfo.minBox">
             <summary>
             最小尺寸
+            </summary>
+        </member>
+        <member name="F:huqiang.UIComposite.ScrollInfo.Slider">
+            <summary>
+            滑块条的实例ID
             </summary>
         </member>
         <member name="T:huqiang.UIComposite.Constructor">
@@ -8866,14 +9175,24 @@
             滚动框的尺寸
             </summary>
         </member>
-        <member name="P:huqiang.UIComposite.ScrollContent.ActualSize">
+        <member name="P:huqiang.UIComposite.ScrollContent.ContentSize">
             <summary>
             内容的实际尺寸
+            </summary>
+        </member>
+        <member name="F:huqiang.UIComposite.ScrollContent.ItemOffset">
+            <summary>
+            项目其实偏移位置
             </summary>
         </member>
         <member name="F:huqiang.UIComposite.ScrollContent.ItemSize">
             <summary>
             项目尺寸
+            </summary>
+        </member>
+        <member name="F:huqiang.UIComposite.ScrollContent.ItemActualSize">
+            <summary>
+            尺寸自适应后的尺寸
             </summary>
         </member>
         <member name="P:huqiang.UIComposite.ScrollContent.ItemMod">
@@ -8897,11 +9216,6 @@
             </summary>
             <param name="index">数据索引</param>
             <returns></returns>
-        </member>
-        <member name="F:huqiang.UIComposite.ScrollContent.ItemOffset">
-            <summary>
-            项目其实偏移位置
-            </summary>
         </member>
         <member name="F:huqiang.UIComposite.ScrollContent.MinBox">
             <summary>
@@ -8954,7 +9268,7 @@
             </summary>
             <param name="name">模型名称</param>
         </member>
-        <member name="M:huqiang.UIComposite.ScrollContent.Initial(huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIElement)">
+        <member name="M:huqiang.UIComposite.ScrollContent.Initial(huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIElement,huqiang.Core.HGUI.UIInitializer)">
             <summary>
             初始化
             </summary>
@@ -9039,36 +9353,6 @@
             </summary>
             <param name="it"></param>
         </member>
-        <member name="M:huqiang.UIComposite.ScrollContent.ScrollNone(huqiang.UIEvent.UserEvent,UnityEngine.Vector2@,System.Single@,System.Single@)">
-            <summary>
-            固定滚动,撞到边界立马停止
-            </summary>
-            <param name="eventCall">用户事件</param>
-            <param name="v">参考移动量</param>
-            <param name="x">限定移动量x</param>
-            <param name="y">限定移动量y</param>
-            <returns></returns>
-        </member>
-        <member name="M:huqiang.UIComposite.ScrollContent.ScrollLoop(huqiang.UIEvent.UserEvent,UnityEngine.Vector2@,System.Single@,System.Single@)">
-            <summary>
-            无限滚动
-            </summary>
-            <param name="eventCall">用户事件</param>
-            <param name="v">参考移动量</param>
-            <param name="x">修正移动量x</param>
-            <param name="y">修正移动量y</param>
-            <returns></returns>
-        </member>
-        <member name="M:huqiang.UIComposite.ScrollContent.BounceBack(huqiang.UIEvent.UserEvent,UnityEngine.Vector2@,System.Single@,System.Single@)">
-            <summary>
-            回弹滚动,撞到边界会有减速回弹效果
-            </summary>
-            <param name="eventCall">用户事件</param>
-            <param name="v">参考移动量</param>
-            <param name="x">衰减移动量x</param>
-            <param name="y">衰减移动量y</param>
-            <returns></returns>
-        </member>
         <member name="M:huqiang.UIComposite.ScrollContent.ItemUpdate(System.Object,System.Object,System.Int32)">
             <summary>
             更新项目
@@ -9076,6 +9360,16 @@
             <param name="obj">UI实例</param>
             <param name="dat">数据实例</param>
             <param name="index">数据索引</param>
+        </member>
+        <member name="F:huqiang.UIComposite.ScrollContent.startVelocity">
+            <summary>
+            初始速率
+            </summary>
+        </member>
+        <member name="F:huqiang.UIComposite.ScrollContent.mVelocity">
+            <summary>
+            当前速率
+            </summary>
         </member>
         <member name="T:huqiang.UIComposite.ScrollItem">
             <summary>
@@ -9107,19 +9401,6 @@
             横向滚动框
             </summary>
         </member>
-        <member name="M:huqiang.UIComposite.ScrollX.CenterScroll(huqiang.UIComposite.ScrollX)">
-            <summary>
-            滚动项目居中
-            </summary>
-            <param name="scroll"></param>
-        </member>
-        <member name="M:huqiang.UIComposite.ScrollX.CenterScrollByIndex(huqiang.UIComposite.ScrollX,System.Int32)">
-            <summary>
-            滚动居中
-            </summary>
-            <param name="scroll">横向滚动框</param>
-            <param name="index">索引</param>
-        </member>
         <member name="F:huqiang.UIComposite.ScrollX.eventCall">
             <summary>
             主体事件
@@ -9145,11 +9426,6 @@
             项目每次滚动居中
             </summary>
         </member>
-        <member name="P:huqiang.UIComposite.ScrollX.ContentSize">
-            <summary>
-            内容占用尺寸
-            </summary>
-        </member>
         <member name="F:huqiang.UIComposite.ScrollX.DynamicSize">
             <summary>
             动态尺寸,自动对齐
@@ -9160,7 +9436,7 @@
             滑块条,可以为空
             </summary>
         </member>
-        <member name="M:huqiang.UIComposite.ScrollX.Initial(huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIElement)">
+        <member name="M:huqiang.UIComposite.ScrollX.Initial(huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIElement,huqiang.Core.HGUI.UIInitializer)">
             <summary>
             初始化
             </summary>
@@ -9180,11 +9456,6 @@
         <member name="F:huqiang.UIComposite.ScrollX.ScrollEnd">
             <summary>
             滚动结束事件
-            </summary>
-        </member>
-        <member name="F:huqiang.UIComposite.ScrollX.DecayRate">
-            <summary>
-            滚动衰减率,越接近1衰减越慢
             </summary>
         </member>
         <member name="M:huqiang.UIComposite.ScrollX.Scrolling(huqiang.UIEvent.UserEvent,UnityEngine.Vector2)">
@@ -9224,12 +9495,6 @@
             纵向滚动框
             </summary>
         </member>
-        <member name="M:huqiang.UIComposite.ScrollY.CenterScroll(huqiang.UIComposite.ScrollY)">
-            <summary>
-            滚动项目居中
-            </summary>
-            <param name="scroll"></param>
-        </member>
         <member name="F:huqiang.UIComposite.ScrollY.eventCall">
             <summary>
             主体事件
@@ -9255,11 +9520,6 @@
             项目每次滚动居中
             </summary>
         </member>
-        <member name="P:huqiang.UIComposite.ScrollY.ContentSize">
-            <summary>
-            内容总尺寸
-            </summary>
-        </member>
         <member name="F:huqiang.UIComposite.ScrollY.DynamicSize">
             <summary>
             动态尺寸,用以适应宽度
@@ -9270,7 +9530,7 @@
             滑块条,可以为空
             </summary>
         </member>
-        <member name="M:huqiang.UIComposite.ScrollY.Initial(huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIElement)">
+        <member name="M:huqiang.UIComposite.ScrollY.Initial(huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIElement,huqiang.Core.HGUI.UIInitializer)">
             <summary>
             初始化
             </summary>
@@ -9295,11 +9555,6 @@
         <member name="F:huqiang.UIComposite.ScrollY.DragEnd">
             <summary>
             光标拖拽完毕
-            </summary>
-        </member>
-        <member name="F:huqiang.UIComposite.ScrollY.DecayRate">
-            <summary>
-            滚动衰减率,越接近1衰减越慢
             </summary>
         </member>
         <member name="M:huqiang.UIComposite.ScrollY.Scrolling(huqiang.UIEvent.UserEvent,UnityEngine.Vector2)">
@@ -9394,7 +9649,7 @@
             滚动事件
             </summary>
         </member>
-        <member name="M:huqiang.UIComposite.ScrollYExtand.Initial(huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIElement)">
+        <member name="M:huqiang.UIComposite.ScrollYExtand.Initial(huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIElement,huqiang.Core.HGUI.UIInitializer)">
             <summary>
             初始化
             </summary>
@@ -9533,7 +9788,7 @@
             <param name="index">数据索引</param>
             <param name="con">构造器</param>
         </member>
-        <member name="M:huqiang.UIComposite.ScrollYExtand.CreateItem(System.Collections.Generic.List{huqiang.UIComposite.ScrollItem},huqiang.UIComposite.Constructor,huqiang.Data.FakeStruct,UnityEngine.Transform)">
+        <member name="M:huqiang.UIComposite.ScrollYExtand.CreateItem(System.Collections.Generic.List{huqiang.UIComposite.ScrollItem},huqiang.UIComposite.Constructor,huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIElement)">
             <summary>
             创建项目
             </summary>
@@ -9568,16 +9823,6 @@
             <param name="index">数据索引</param>
             <returns></returns>
         </member>
-        <member name="M:huqiang.UIComposite.ScrollYExtand.BounceBack(huqiang.UIEvent.UserEvent,UnityEngine.Vector2@,System.Single@,System.Single@)">
-            <summary>
-            回弹滚动
-            </summary>
-            <param name="eventCall">用户事件</param>
-            <param name="v">参考移动量</param>
-            <param name="x"></param>
-            <param name="y"></param>
-            <returns></returns>
-        </member>
         <member name="M:huqiang.UIComposite.ScrollYExtand.HideSection(huqiang.UIComposite.ScrollYExtand.DataTemplate)">
             <summary>
             隐藏节点,带动画
@@ -9589,6 +9834,16 @@
             展开节点,带动画
             </summary>
             <param name="template"></param>
+        </member>
+        <member name="M:huqiang.UIComposite.ScrollYExtand.CalculSizeA">
+            <summary>
+            计算动画中的尺寸
+            </summary>
+        </member>
+        <member name="F:huqiang.UIComposite.ScrollYExtand.startVelocity">
+            <summary>
+            初始速率
+            </summary>
         </member>
         <member name="M:huqiang.UIComposite.ScrollYExtand.Update(System.Single)">
             <summary>
@@ -9636,7 +9891,7 @@
             项目偏移位置
             </summary>
         </member>
-        <member name="M:huqiang.UIComposite.StackPanel.Initial(huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIElement)">
+        <member name="M:huqiang.UIComposite.StackPanel.Initial(huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIElement,huqiang.Core.HGUI.UIInitializer)">
             <summary>
             初始化
             </summary>
@@ -9759,7 +10014,7 @@
             鼠标停靠时的背景色
             </summary>
         </member>
-        <member name="M:huqiang.UIComposite.TabControl.Initial(huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIElement)">
+        <member name="M:huqiang.UIComposite.TabControl.Initial(huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIElement,huqiang.Core.HGUI.UIInitializer)">
             <summary>
             初始化
             </summary>
@@ -10064,13 +10319,6 @@
             构造函数,初始化缓存
             </summary>
         </member>
-        <member name="M:huqiang.UIComposite.TreeView.Initial(huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIElement)">
-            <summary>
-            初始化
-            </summary>
-            <param name="fake">数据模型</param>
-            <param name="script">元素主体</param>
-        </member>
         <member name="M:huqiang.UIComposite.TreeView.Scrolling(huqiang.UIEvent.UserEvent,UnityEngine.Vector2)">
             <summary>
             
@@ -10094,14 +10342,14 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:huqiang.UIComposite.TreeView.LimitX(huqiang.UIEvent.UserEvent,System.Single)">
+        <member name="M:huqiang.UIComposite.TreeView.LimitX(System.Single)">
             <summary>
             限制横向滚动
             </summary>
             <param name="callBack">用户事件</param>
             <param name="x">参考移动距离</param>
         </member>
-        <member name="M:huqiang.UIComposite.TreeView.LimitY(huqiang.UIEvent.UserEvent,System.Single)">
+        <member name="M:huqiang.UIComposite.TreeView.LimitY(System.Single)">
             <summary>
             限制纵向滚动
             </summary>
@@ -10144,6 +10392,11 @@
             清除缓存资源
             </summary>
         </member>
+        <member name="F:huqiang.UIComposite.TreeView.startVelocity">
+            <summary>
+            初始速率
+            </summary>
+        </member>
         <member name="F:huqiang.UIComposite.Linker.enityModel">
             <summary>
             实体模型,用于计算实体尺寸
@@ -10165,7 +10418,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:huqiang.UIComposite.Linker.GetItemSize(System.Object)">
+        <member name="M:huqiang.UIComposite.Linker.LayoutItem(System.Object)">
             <summary>
             获取项目尺寸,如果没有则返回默认高度40
             </summary>
@@ -10198,7 +10451,7 @@
             清除索引
             </summary>
         </member>
-        <member name="M:huqiang.UIComposite.Linker.GetElementCount(UnityEngine.Transform)">
+        <member name="M:huqiang.UIComposite.Linker.GetElementCount(huqiang.Core.HGUI.UIElement)">
             <summary>
             获取子元素计数
             </summary>
@@ -10211,14 +10464,7 @@
             <typeparam name="T">模型</typeparam>
             <typeparam name="U">数据</typeparam>
         </member>
-        <member name="M:huqiang.UIComposite.UILinker`2.#ctor(huqiang.UIComposite.UIContainer,System.String)">
-            <summary>
-            构造函数
-            </summary>
-            <param name="container">容器实例</param>
-            <param name="mod">模型名称</param>
-        </member>
-        <member name="M:huqiang.UIComposite.UILinker`2.#ctor(huqiang.UIComposite.UIContainer,huqiang.Data.FakeStruct)">
+        <member name="M:huqiang.UIComposite.UILinker`2.#ctor(huqiang.UIComposite.UIContainer,huqiang.Core.HGUI.UIElement)">
             <summary>
             构造函数
             </summary>
@@ -10257,7 +10503,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:huqiang.UIComposite.UILinker`2.GetItemSize(System.Object)">
+        <member name="M:huqiang.UIComposite.UILinker`2.LayoutItem(System.Object)">
             <summary>
             获取项目尺寸
             </summary>
@@ -10287,12 +10533,12 @@
             项目连接器创建委托
             </summary>
         </member>
-        <member name="F:huqiang.UIComposite.ObjectLinker.CalculItemHigh">
+        <member name="F:huqiang.UIComposite.ObjectLinker.LayoutCallback">
             <summary>
             项目高度计算委托
             </summary>
         </member>
-        <member name="M:huqiang.UIComposite.ObjectLinker.#ctor(huqiang.UIComposite.UIContainer)">
+        <member name="M:huqiang.UIComposite.ObjectLinker.#ctor(huqiang.UIComposite.UIContainer,huqiang.Core.HGUI.UIElement)">
             <summary>
             构造函数
             </summary>
@@ -10317,6 +10563,13 @@
             <param name="t">项目实例</param>
             <param name="u">数据实例</param>
             <param name="index">数据索引</param>
+        </member>
+        <member name="M:huqiang.UIComposite.ObjectLinker.LayoutItem(System.Object)">
+            <summary>
+            获取项目尺寸
+            </summary>
+            <param name="u">项目实例</param>
+            <returns></returns>
         </member>
         <member name="T:huqiang.UIComposite.BindingData">
             <summary>
@@ -10353,13 +10606,13 @@
             布局数据缓存
             </summary>
         </member>
-        <member name="M:huqiang.UIComposite.BindingData.ApplayLayout(UnityEngine.Transform)">
+        <member name="M:huqiang.UIComposite.BindingData.LoadLayout(huqiang.Core.HGUI.UIElement)">
             <summary>
-            应用布局数据
+            载入布局数据
             </summary>
             <param name="trans"></param>
         </member>
-        <member name="M:huqiang.UIComposite.BindingData.LoadLayout(UnityEngine.Transform)">
+        <member name="M:huqiang.UIComposite.BindingData.SaveLayout(huqiang.Core.HGUI.UIElement)">
             <summary>
             保存实例的布局数据
             </summary>
@@ -10455,7 +10708,7 @@
             连接器列表
             </summary>
         </member>
-        <member name="M:huqiang.UIComposite.UIContainer.Initial(huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIElement)">
+        <member name="M:huqiang.UIComposite.UIContainer.Initial(huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIElement,huqiang.Core.HGUI.UIInitializer)">
             <summary>
             初始化
             </summary>
@@ -10511,52 +10764,17 @@
             </summary>
             <param name="y"></param>
         </member>
-        <member name="M:huqiang.UIComposite.UIContainer.BounceBack(huqiang.UIEvent.UserEvent,UnityEngine.Vector2@)">
+        <member name="M:huqiang.UIComposite.UIContainer.BounceBack(UnityEngine.Vector2@)">
             <summary>
             滚动回弹限定
             </summary>
             <param name="eventCall">用户事件</param>
             <param name="v">参考移动量</param>
         </member>
-        <member name="M:huqiang.UIComposite.UICreator.CreateElement(UnityEngine.Vector3,UnityEngine.Vector2,System.String,UnityEngine.Transform)">
+        <member name="F:huqiang.UIComposite.UIContainer.startVelocity">
             <summary>
-            创建一个元素
+            初始速率
             </summary>
-            <param name="pos">位置</param>
-            <param name="size">尺寸</param>
-            <param name="name">名称</param>
-            <param name="parent">父坐标变换</param>
-            <returns></returns>
-        </member>
-        <member name="M:huqiang.UIComposite.UICreator.CreateHImage(UnityEngine.Vector3,UnityEngine.Vector2,System.String,UnityEngine.Transform)">
-            <summary>
-            创建一个图像
-            </summary>
-            <param name="pos">位置</param>
-            <param name="size">尺寸</param>
-            <param name="name">名称</param>
-            <param name="parent">父坐标变换</param>
-            <returns></returns>
-        </member>
-        <member name="M:huqiang.UIComposite.UICreator.CreateHText(UnityEngine.Vector3,UnityEngine.Vector2,System.String,UnityEngine.Transform)">
-            <summary>
-            创建一个文本
-            </summary>
-            <param name="pos">位置</param>
-            <param name="size">尺寸</param>
-            <param name="name">名称</param>
-            <param name="parent">父坐标变换</param>
-            <returns></returns>
-        </member>
-        <member name="M:huqiang.UIComposite.UICreator.CreateHLine(UnityEngine.Vector3,UnityEngine.Vector2,System.String,UnityEngine.Transform)">
-            <summary>
-            创建一个画线面板
-            </summary>
-            <param name="pos">位置</param>
-            <param name="size">尺寸</param>
-            <param name="name">名称</param>
-            <param name="parent">父坐标变换</param>
-            <returns></returns>
         </member>
         <member name="T:huqiang.UIComposite.UIDate">
             <summary>
@@ -10587,13 +10805,6 @@
             <summary>
             日的单位
             </summary>
-        </member>
-        <member name="M:huqiang.UIComposite.UIDate.Initial(huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIElement)">
-            <summary>
-            初始化
-            </summary>
-            <param name="mod">数据模型</param>
-            <param name="element">元素主体</param>
         </member>
         <member name="F:huqiang.UIComposite.UIDate.year">
             <summary>
@@ -10629,13 +10840,6 @@
             <summary>
             模板改变事件
             </summary>
-        </member>
-        <member name="M:huqiang.UIComposite.UIPalette.Initial(huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIElement)">
-            <summary>
-            初始化
-            </summary>
-            <param name="fake">模型数据</param>
-            <param name="element">元素主体</param>
         </member>
         <member name="T:huqiang.UIComposite.UIRocker">
             <summary>
@@ -10681,13 +10885,6 @@
             <summary>
             握柄转动事件
             </summary>
-        </member>
-        <member name="M:huqiang.UIComposite.UIRocker.Initial(huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIElement)">
-            <summary>
-            初始化
-            </summary>
-            <param name="fake">模型数据</param>
-            <param name="script">元素主体</param>
         </member>
         <member name="T:huqiang.UIComposite.SliderInfo">
             <summary>
@@ -10759,13 +10956,6 @@
             <summary>
             构造函数
             </summary>
-        </member>
-        <member name="M:huqiang.UIComposite.UISlider.Initial(huqiang.Data.FakeStruct,huqiang.Core.HGUI.UIElement)">
-            <summary>
-            初始化
-            </summary>
-            <param name="mod">模型数据</param>
-            <param name="script">元素主体</param>
         </member>
         <member name="T:huqiang.UIEvent.EventCollider">
             <summary>
@@ -10957,54 +11147,11 @@
             输入框复合组件实例
             </summary>
         </member>
-        <member name="F:huqiang.UIEvent.InputBoxEvent.InputString">
-            <summary>
-            输入字符串
-            </summary>
-        </member>
         <member name="M:huqiang.UIEvent.InputBoxEvent.Initial(huqiang.Data.FakeStruct)">
             <summary>
             初始化
             </summary>
             <param name="mod">数据缓存</param>
-        </member>
-        <member name="M:huqiang.UIEvent.InputBoxEvent.ChangeText(System.String)">
-            <summary>
-            替换字符串
-            </summary>
-            <param name="str">字符串</param>
-        </member>
-        <member name="M:huqiang.UIEvent.InputBoxEvent.CheckPointer(huqiang.UIEvent.UserAction,huqiang.Core.HGUI.PressInfo@)">
-            <summary>
-            检测当前光标按在哪两个字符中间了
-            </summary>
-            <param name="action"></param>
-            <param name="press"></param>
-        </member>
-        <member name="M:huqiang.UIEvent.InputBoxEvent.GetPointer(System.Collections.Generic.List{System.Int32},System.Collections.Generic.List{huqiang.Core.HGUI.HVertex},UnityEngine.Color32@,huqiang.Core.HGUI.PressInfo@)">
-            <summary>
-            获取光标的显示网格
-            </summary>
-            <param name="tri">三角形列表</param>
-            <param name="vert">顶点列表</param>
-            <param name="color">填充颜色</param>
-            <param name="start">按压信息</param>
-        </member>
-        <member name="M:huqiang.UIEvent.InputBoxEvent.SetCursorPos(huqiang.Core.HGUI.PressInfo@)">
-            <summary>
-            设置输入法显示位置,win平台
-            </summary>
-            <param name="start">光标按压位置</param>
-        </member>
-        <member name="M:huqiang.UIEvent.InputBoxEvent.GetSelectArea(System.Collections.Generic.List{System.Int32},System.Collections.Generic.List{huqiang.Core.HGUI.HVertex},UnityEngine.Color32@,huqiang.Core.HGUI.PressInfo@,huqiang.Core.HGUI.PressInfo@)">
-            <summary>
-            获取选中区域的网格
-            </summary>
-            <param name="tri">三角形列表</param>
-            <param name="vert">顶点列表</param>
-            <param name="color">填充颜色</param>
-            <param name="start">开始按压位置信息</param>
-            <param name="end">结束按压位置信息</param>
         </member>
         <member name="F:huqiang.UIEvent.Keyboard.KeyPress">
             <summary>
@@ -11375,6 +11522,11 @@
             按压状态
             </summary>
         </member>
+        <member name="P:huqiang.UIEvent.UserEvent.Focus">
+            <summary>
+            焦点状态
+            </summary>
+        </member>
         <member name="P:huqiang.UIEvent.UserEvent.VelocityX">
             <summary>
             用户拖拽造成的速率X
@@ -11470,21 +11622,6 @@
             光标拖拽完毕
             </summary>
         </member>
-        <member name="F:huqiang.UIEvent.UserEvent.Scrolling">
-            <summary>
-            拖拽后造成的持续滚动
-            </summary>
-        </member>
-        <member name="F:huqiang.UIEvent.UserEvent.ScrollEndX">
-            <summary>
-            当X轴滚动完毕
-            </summary>
-        </member>
-        <member name="F:huqiang.UIEvent.UserEvent.ScrollEndY">
-            <summary>
-            Y轴滚动完毕
-            </summary>
-        </member>
         <member name="F:huqiang.UIEvent.UserEvent.LostFocus">
             <summary>
             失去焦点
@@ -11511,6 +11648,441 @@
             <summary>
             获取与UI坐标表的相对位置
             </summary>
+            <returns></returns>
+        </member>
+        <member name="T:huqiang.Helper.HGUI.HCanvas">
+            <summary>
+            ui画布
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.HCanvas.camera">
+            <summary>
+            目标相机,如果为空则使用主相机
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.HCanvas.DesignSize">
+            <summary>
+            默认设计尺寸
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.HCanvas.NearPlane">
+            <summary>
+            距离相机镜头的距离
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.HCanvas.PauseEvent">
+            <summary>
+            暂停用户事件
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.HCanvas.Pause">
+            <summary>
+            暂停所有更新
+            </summary>
+        </member>
+        <member name="T:huqiang.Helper.HGUI.HVertex">
+            <summary>
+            UI顶点
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.HVertex.picture">
+            <summary>
+            纹理索引0-3
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.HGraphics.shader">
+            <summary>
+            获取或设置默认着色器
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.HGraphics.m_dirty">
+            <summary>
+            材质污染,需要重新计算uv
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.HGraphics.m_vertexChange">
+            <summary>
+            网格污染,网格需要重新计算
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.HGraphics.m_colorChanged">
+            <summary>
+            颜色改变后,需要重新填色
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.HGraphics.Shadow">
+            <summary>
+            开启阴影
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.HGraphics.shadowOffsset">
+            <summary>
+            阴影偏移
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.HGraphics.shadowColor">
+            <summary>
+            阴影颜色
+            </summary>
+        </member>
+        <member name="T:huqiang.Helper.HGUI.PrefabAsset">
+            <summary>
+            预制体资源
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.PrefabAsset.name">
+            <summary>
+            资源名称
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.PrefabAsset.models">
+            <summary>
+            模型数据
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.PrefabAsset.tables">
+            <summary>
+            结构体声明
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.HGUIManager.GameBuffer">
+            <summary>
+            游戏对象缓存
+            </summary>
+        </member>
+        <member name="M:huqiang.Helper.HGUI.HGUIManager.Initial(UnityEngine.Transform)">
+            <summary>
+            初始化UI组件,包含有:Transform,HImage,TextBox,HText,HLine,UIElement
+            </summary>
+            <param name="buff">回收站的父物体</param>
+        </member>
+        <member name="M:huqiang.Helper.HGUI.HGUIManager.GetPrefab(UnityEngine.Transform)">
+            <summary>
+            
+            </summary>
+            <param name="uiRoot"></param>
+            <returns></returns>
+        </member>
+        <member name="M:huqiang.Helper.HGUI.HGUIManager.SavePrefab(UnityEngine.Transform,System.String)">
+            <summary>
+            将场景内的对象保存到文件
+            </summary>
+            <param name="uiRoot"></param>
+            <param name="path"></param>
+        </member>
+        <member name="M:huqiang.Helper.HGUI.HGUIManager.GetFakeData(UnityEngine.Transform)">
+            <summary>
+            将实例对象数据模型导入
+            </summary>
+            <param name="uiRoot"></param>
+            <returns></returns>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.HGUIManager.prefabAssets">
+            <summary>
+            所有预制体资源列表
+            </summary>
+        </member>
+        <member name="M:huqiang.Helper.HGUI.HGUIManager.LoadModels(huqiang.Data.DataBuffer,System.String)">
+            <summary>
+            载入一个预制体资源
+            </summary>
+            <param name="db">资源数据</param>
+            <param name="name">资源名</param>
+            <returns></returns>
+        </member>
+        <member name="M:huqiang.Helper.HGUI.HGUIManager.LoadModels(System.Byte[],System.String)">
+            <summary>
+            载入一个预制体资源
+            </summary>
+            <param name="dat">资源数据</param>
+            <param name="name">资源名</param>
+            <returns></returns>
+        </member>
+        <member name="M:huqiang.Helper.HGUI.HGUIManager.FindChild(huqiang.Data.FakeStruct,System.String)">
+            <summary>
+            查询transform的子物体
+            </summary>
+            <param name="fake"></param>
+            <param name="childName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:huqiang.Helper.HGUI.HGUIManager.FindModel(System.String,System.String)">
+            <summary>
+            查询一个模型
+            </summary>
+            <param name="assetName">资源包名</param>
+            <param name="childName">模型名称</param>
+            <returns></returns>
+        </member>
+        <member name="M:huqiang.Helper.HGUI.HGUIManager.FindModelAndSetAssets(System.String,System.String)">
+            <summary>
+            查询一个模型
+            </summary>
+            <param name="assetName">资源包名</param>
+            <param name="childName">模型名称</param>
+            <returns></returns>
+        </member>
+        <member name="M:huqiang.Helper.HGUI.HGUIManager.GetAllChild(huqiang.Data.FakeStruct)">
+            <summary>
+            获取transform的所有子物体
+            </summary>
+            <param name="fake"></param>
+            <param name="childName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:huqiang.Helper.HGUI.HGUIManager.GetAllChild(System.String)">
+            <summary>
+            获取资源包下的所有子模型
+            </summary>
+            <param name="asset"></param>
+            <returns></returns>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.HImage.m_fillClockwise">
+            <summary>
+            逆时针填充
+            </summary>
+        </member>
+        <member name="P:huqiang.Helper.HGUI.HImage.FillAmount">
+            <summary>
+            填充比例
+            </summary>
+        </member>
+        <member name="P:huqiang.Helper.HGUI.HImage.PreserveAspect">
+            <summary>
+            开启此项,按弧度填充,否则按矩形四个角填充
+            </summary>
+        </member>
+        <member name="M:huqiang.Helper.HGUI.HImage.SetNativeSize">
+            <summary>
+            使用纹理尺寸
+            </summary>
+        </member>
+        <member name="T:huqiang.Helper.HGUI.HLine">
+            <summary>
+            画线UI,支持直线,弧线,贝塞尔曲线,二阶贝塞尔曲线
+            </summary>
+        </member>
+        <member name="P:huqiang.Helper.HGUI.HText.DefaultFont">
+            <summary>
+            默认字体
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.HText.OutLine">
+            <summary>
+            慎用,顶点占用较多
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.UIElement.Pivot">
+            <summary>
+            轴心
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.UIElement.scaleType">
+            <summary>
+            缩放类型
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.UIElement.anchorType">
+            <summary>
+            停靠类型
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.UIElement.anchorPointType">
+            <summary>
+            停靠的点类型
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.UIElement.anchorOffset">
+            <summary>
+            停靠的偏移位置
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.UIElement.marginType">
+            <summary>
+            相对与父物体的剔除尺寸的类型
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.UIElement.parentType">
+            <summary>
+            父物体类型
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.UIElement.margin">
+            <summary>
+            相对与父物体的剔除尺寸
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.UIElement.eventType">
+            <summary>
+            用户事件类型
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.UIElement.compositeType">
+            <summary>
+            复合型UI类型
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.UIElement.Mask">
+            <summary>
+            是否开启遮罩
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.UIElement.userEvent">
+            <summary>
+            用户事件
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.UIElement.composite">
+            <summary>
+            复合ui组件实体
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.UIElement.mod">
+            <summary>
+            数据模型
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.UIElement.DataContext">
+            <summary>
+            联系上下文
+            </summary>
+        </member>
+        <member name="P:huqiang.Helper.HGUI.UIElement.MainColor">
+            <summary>
+            主颜色
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.UIElement.SizeChanged">
+            <summary>
+            当UI尺寸被改变时,执行此委托
+            </summary>
+        </member>
+        <member name="T:huqiang.Helper.HGUI.UIInitializer">
+            <summary>
+            ui初始化器
+            </summary>
+        </member>
+        <member name="M:huqiang.Helper.HGUI.UIInitializer.#ctor(System.Object)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="obj">对象实例</param>
+        </member>
+        <member name="M:huqiang.Helper.HGUI.UIInitializer.#ctor(huqiang.Data.TempReflection)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="temp">对象反射信息</param>
+        </member>
+        <member name="M:huqiang.Helper.HGUI.UIInitializer.Reset(System.Object)">
+            <summary>
+            设置一个新的目标实例
+            </summary>
+            <param name="obj">对象实例</param>
+        </member>
+        <member name="M:huqiang.Helper.HGUI.UIInitializer.Initialiezd(huqiang.Data.FakeStruct,UnityEngine.Component)">
+            <summary>
+            初始化
+            </summary>
+            <param name="fake">模型数据</param>
+            <param name="com">组件实体</param>
+        </member>
+        <member name="M:huqiang.Helper.HGUI.UIInitializer.Done">
+            <summary>
+            初始化完毕
+            </summary>
+        </member>
+        <member name="M:huqiang.Helper.HGUI.UIInitializer.ReflectionEnity(System.Object,UnityEngine.Transform)">
+            <summary>
+            反射实体到目标载体
+            </summary>
+            <param name="obj">载体实例对象</param>
+            <param name="com">ui组件实例</param>
+        </member>
+        <member name="M:huqiang.Helper.HGUI.UIInitializer.AddContext(UnityEngine.Transform,System.Int32)">
+            <summary>
+            添加联系上下文
+            </summary>
+            <param name="trans"></param>
+            <param name="insID"></param>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.UITransfromData.type">
+            <summary>
+            对象类型, 所有组件的位或值
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.UITransfromData.insID">
+            <summary>
+            实例ID
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.UITransfromData.size">
+            <summary>
+            UI元素尺寸
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.UITransfromData.pivot">
+            <summary>
+            轴心
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.UITransfromData.name">
+            <summary>
+            名称
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.UITransfromData.tag">
+            <summary>
+            标记
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.UITransfromData.coms">
+            <summary>
+            int32数组,高16位为索引,低16位为类型
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.UITransfromData.child">
+            <summary>
+            int16数组
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.UITransfromData.eve">
+            <summary>
+            用户事件的附加信息
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.UITransfromData.composite">
+            <summary>
+            复合型UI附加信息
+            </summary>
+        </member>
+        <member name="F:huqiang.Helper.HGUI.UITransfromData.ex">
+            <summary>
+            附加信息,用于存储helper中写入的数据
+            </summary>
+        </member>
+        <member name="M:huqiang.Helper.HGUI.UITransfromLoader.GetComponent(huqiang.Data.FakeStruct,System.String)">
+            <summary>
+            从假结构体中找到该类型的数据
+            </summary>
+            <param name="fake">Tranfrom的假结构体</param>
+            <param name="type">数据类型</param>
+            <returns></returns>
+        </member>
+        <member name="M:huqiang.Helper.HGUI.UITransfromLoader.LoadToObject(huqiang.Data.FakeStruct,UnityEngine.Component,huqiang.Data.Initializer)">
+            <summary>
+            将假结构体中的数据载入到组件实体中
+            </summary>
+            <param name="fake">假结构体数据</param>
+            <param name="com">unity组件</param>
+            <param name="initializer">初始化器,用于反射</param>
+        </member>
+        <member name="M:huqiang.Helper.HGUI.UITransfromLoader.LoadFromObject(UnityEngine.Component,huqiang.Data.DataBuffer)">
+            <summary>
+             将到组件实体中的数据载入假结构体中
+            </summary>
+            <param name="com">unity组件</param>
+            <param name="buffer">数据缓存器</param>
             <returns></returns>
         </member>
         <member name="T:huqiang.UIModel.HotConstructor`2">
@@ -11603,12 +12175,12 @@
             项更新委托
             </summary>
         </member>
-        <member name="F:huqiang.UIModel.HotUILinker`2.CalculItemHigh">
+        <member name="F:huqiang.UIModel.HotUILinker`2.LayoutCallback">
             <summary>
             计算内容高度的委托
             </summary>
         </member>
-        <member name="M:huqiang.UIModel.HotUILinker`2.#ctor(huqiang.UIComposite.UIContainer,System.String)">
+        <member name="M:huqiang.UIModel.HotUILinker`2.#ctor(huqiang.UIComposite.UIContainer,huqiang.Core.HGUI.UIElement)">
             <summary>
             构造函数
             </summary>
@@ -11785,7 +12357,7 @@
             <param name="name">UI名</param>
             <returns></returns>
         </member>
-        <member name="M:huqiang.UIModel.UIBase.Initial(UnityEngine.Transform,huqiang.UIModel.UIBase,System.Object)">
+        <member name="M:huqiang.UIModel.UIBase.Initial(huqiang.Core.HGUI.UIElement,huqiang.UIModel.UIBase,System.Object)">
             <summary>
             初始化UI
             </summary>
@@ -11851,11 +12423,6 @@
             弹出式菜单,位于Window上层
             </summary>
         </member>
-        <member name="P:huqiang.UIModel.UIMenu.Root">
-            <summary>
-            根节点
-            </summary>
-        </member>
         <member name="P:huqiang.UIModel.UIMenu.UIRoot">
             <summary>
             根元素
@@ -11866,7 +12433,7 @@
             当前菜单实例
             </summary>
         </member>
-        <member name="M:huqiang.UIModel.UIMenu.Initial(UnityEngine.Transform)">
+        <member name="M:huqiang.UIModel.UIMenu.Initial(huqiang.Core.HGUI.UIElement)">
             <summary>
             初始化
             </summary>
@@ -11934,11 +12501,6 @@
             通知UI,位于所有UI的顶层
             </summary>
         </member>
-        <member name="P:huqiang.UIModel.UINotify.Root">
-            <summary>
-            根节点
-            </summary>
-        </member>
         <member name="P:huqiang.UIModel.UINotify.UIRoot">
             <summary>
             根元素
@@ -11949,7 +12511,7 @@
             当前通知栏
             </summary>
         </member>
-        <member name="M:huqiang.UIModel.UINotify.Initial(UnityEngine.Transform)">
+        <member name="M:huqiang.UIModel.UINotify.Initial(huqiang.Core.HGUI.UIElement)">
             <summary>
             初始化
             </summary>
@@ -12002,17 +12564,12 @@
             UI页面,位于UI最下层
             </summary>
         </member>
-        <member name="P:huqiang.UIModel.UIPage.Root">
-            <summary>
-            根节点
-            </summary>
-        </member>
         <member name="F:huqiang.UIModel.UIPage.UIRoot">
             <summary>
             根元素
             </summary>
         </member>
-        <member name="M:huqiang.UIModel.UIPage.Initial(UnityEngine.Transform)">
+        <member name="M:huqiang.UIModel.UIPage.Initial(huqiang.Core.HGUI.UIElement)">
             <summary>
             初始化
             </summary>
@@ -12049,7 +12606,7 @@
             当前显示的窗口
             </summary>
         </member>
-        <member name="M:huqiang.UIModel.UIPage.Initial(UnityEngine.Transform,System.Object)">
+        <member name="M:huqiang.UIModel.UIPage.Initial(huqiang.Core.HGUI.UIElement,System.Object)">
             <summary>
             初始化
             </summary>
@@ -12077,7 +12634,7 @@
             隐藏当前窗口
             </summary>
         </member>
-        <member name="M:huqiang.UIModel.UIPage.ShowPopWindow``1(System.Object,UnityEngine.Transform)">
+        <member name="M:huqiang.UIModel.UIPage.ShowPopWindow``1(System.Object,huqiang.Core.HGUI.UIElement)">
             <summary>
             显示一个窗口
             </summary>
@@ -12086,7 +12643,7 @@
             <param name="parent">父坐标变换,为空则默认为当前页的父坐标变换</param>
             <returns></returns>
         </member>
-        <member name="M:huqiang.UIModel.UIPage.ShowPopWindow(System.Type,System.Object,UnityEngine.Transform)">
+        <member name="M:huqiang.UIModel.UIPage.ShowPopWindow(System.Type,System.Object,huqiang.Core.HGUI.UIElement)">
             <summary>
             显示一个窗口
             </summary>
@@ -12486,24 +13043,38 @@
             挂载在Canvas下
             </summary>
         </member>
-        <member name="T:UICompositeHelp">
+        <member name="T:UIHelper">
             <summary>
             ui帮助类,只存在Editor模式
             </summary>
         </member>
-        <member name="M:UICompositeHelp.ToBufferData(huqiang.Data.DataBuffer)">
+        <member name="M:UIHelper.ToBufferData(huqiang.Data.DataBuffer,huqiang.Helper.HGUI.UITransfromData*)">
             <summary>
             将数据存储到FakeStrcut中
             </summary>
             <param name="data">数据缓存</param>
             <returns>FakeStruct数据</returns>
         </member>
-        <member name="M:UICompositeHelp.Refresh">
+        <member name="M:UIHelper.ToBufferData(huqiang.Data.DataBuffer,huqiang.Core.UIData.UIElementData*)">
+            <summary>
+            将数据存储到FakeStrcut中
+            </summary>
+            <param name="data">数据缓存</param>
+            <returns>FakeStruct数据</returns>
+        </member>
+        <member name="M:UIHelper.LoadFromBuffer(huqiang.Data.FakeStruct,huqiang.Helper.HGUI.UIInitializer)">
+            <summary>
+            将数据存储到FakeStrcut中
+            </summary>
+            <param name="data">数据缓存</param>
+            <returns>FakeStruct数据</returns>
+        </member>
+        <member name="M:UIHelper.Refresh">
             <summary>
             刷新
             </summary>
         </member>
-        <member name="M:UICompositeHelp.ReSize">
+        <member name="M:UIHelper.ReSize">
             <summary>
             重新设置尺寸
             </summary>

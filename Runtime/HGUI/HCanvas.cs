@@ -1,9 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using huqiang;
-using huqiang.Data;
-using huqiang.UIEvent;
+﻿using huqiang.UIEvent;
 using huqiang.UIModel;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace huqiang.Core.HGUI
@@ -11,39 +12,63 @@ namespace huqiang.Core.HGUI
     /// <summary>
     /// ui画布
     /// </summary>
-    public class HCanvas:UIElement
+    public class HCanvas : UIElement
     {
-        protected static ThreadMission thread;// = new ThreadMission("UI");
+        public static List<HCanvas> AllCanvas = new List<HCanvas>();
+        public static void RegCanvas(HGUIRender render)
+        {
+            for (int i = 0; i < AllCanvas.Count; i++)
+            {
+                if (AllCanvas[i].render == render)
+                {
+                    render.canvas = AllCanvas[i];
+                    return;
+                }
+            }
+            var can = render.canvas;
+            if (can == null)
+            { 
+                can = new HCanvas();
+                can.m_sizeDelta = render.DesignSize;
+                can.DesignSize = render.DesignSize;
+                can.Pause = render.Pause;
+                can.name = render.name;
+            }
+            can.render = render;
+            render.canvas = can;
+            AllCanvas.Add(can);
+        }
+        public static void ReleaseCanvas(HGUIRender render)
+        {
+            for (int i = 0; i < AllCanvas.Count; i++)
+            {
+                var can = AllCanvas[i];
+                if (can.render == render)
+                {
+                    can.Dispose();
+                    return;
+                }
+            }
+        }
+        public override void Dispose()
+        {
+            base.Dispose();
+            AllCanvas.Remove(this);
+        }
+        public override string TypeName =>"HCanvas";
+        [HideInInspector]
+        public HGUIRender render;
+#if UNITY_EDITOR
+        public Vector3 WorldPosition;
+#endif
         /// <summary>
         /// 主画布实例
         /// </summary>
-        public static HCanvas MainCanvas;
-        /// <summary>
-        /// 目标相机,如果为空则使用主相机
-        /// </summary>
-        public Camera camera;
+        public static HCanvas CurrentCanvas;
         /// <summary>
         /// 默认设计尺寸
         /// </summary>
         public Vector2 DesignSize = new Vector2(1920, 1080);
-        /// <summary>
-        /// 物理尺寸缩放,主要用于ppi
-        /// </summary>
-        [Range(0.1f, 3)]
-        public float PhysicalScale = 1;
-        /// <summary>
-        /// 距离相机镜头的距离
-        /// </summary>
-        public float NearPlane = 0f;
-        /// <summary>
-        /// 物理尺寸缩放的贝塞尔曲线,x=英寸,y=比例
-        /// </summary>
-        public Vector2 A = new Vector2(4,0.9f);//贝塞尔曲线起点
-        public Vector2 B = new Vector2(6,1f);
-        public Vector2 C = new Vector2(8,1.2f);
-        public Vector2 D = new Vector2(10,1.3f);//贝塞尔曲线终点
-        public RenderMode renderMode;
-        public bool SubBatch;//是否开启子线程合批处理,开启后画面会延迟一帧
         /// <summary>
         /// UI元素流水线缓存
         /// </summary>
@@ -58,7 +83,7 @@ namespace huqiang.Core.HGUI
         HText[] texts = new HText[2048];
         int point = 0;
         int max;
-        int top_txt=0;
+        int top_txt = 0;
         /// <summary>
         /// 用户输入事件
         /// </summary>
@@ -72,34 +97,26 @@ namespace huqiang.Core.HGUI
         /// </summary>
         public bool Pause;
         public int renderQueue = 3100;
-        protected override void Start()
+        public float PhysicalScale = 1;
+        public HCanvas()
         {
-            MainCanvas = this;
-            Font.textureRebuilt += FontTextureRebuilt;         
+            CurrentCanvas = this;
         }
         bool ftr;
-        void FontTextureRebuilt(Font font)
-        {
-            ftr = true;
-        }
-        protected virtual void OnDestroy()
-        {
-            Font.textureRebuilt -= FontTextureRebuilt;
-        }
         /// <summary>
         /// 信息采集
         /// </summary>
-        /// <param name="trans"></param>
-        void Collection(Transform trans, int parent, int index)
+        /// <param name="script"></param>
+        void Collection(UIElement script, int parent, int index)
         {
-            var act = PipeLine[index].active = trans.gameObject.activeSelf;
+            var act = PipeLine[index].active = script.activeSelf;
             if (!act)
                 return;
             PipeLine[index].parentIndex = parent;
-            var lp = PipeLine[index].localPosition = trans.localPosition;
-            var lr = PipeLine[index].localRotation = trans.localRotation;
-            var ls = PipeLine[index].localScale = trans.localScale;
-            if(parent>=0)
+            var lp = PipeLine[index].localPosition = script.localPosition;
+            var lr = PipeLine[index].localRotation = script.localRotation;
+            var ls = PipeLine[index].localScale = script.localScale;
+            if (parent >= 0)
             {
                 var ps = PipeLine[parent].Scale;
                 lp.x *= ps.x;
@@ -118,8 +135,6 @@ namespace huqiang.Core.HGUI
                 PipeLine[index].Rotation = Quaternion.identity;
                 PipeLine[index].Scale = Vector3.one;
             }
-            PipeLine[index].trans = trans;
-            var script = trans.GetComponent<UIElement>();
             PipeLine[index].script = script;
             if (script != null)
             {
@@ -134,77 +149,44 @@ namespace huqiang.Core.HGUI
                 }
             }
             PipeLine[index].script = script;
-            int c = trans.childCount;
+            int c = script.child.Count;
             PipeLine[index].childCount = c;
             int s = point;
             point += c;
             PipeLine[index].childOffset = s;
             for (int i = 0; i < c; i++)
             {
-                Collection(trans.GetChild(i), index, s);
+                Collection(script.child[i], index, s);
                 s++;
             }
         }
         /// <summary>
-        /// 更新内容包含:UI动画,UI页面更新,UI通知页更新,用户事件采集,键盘信息采集,事件派发,屏幕尺寸监测,执行分线程的委托任务
+        /// 更新内容包含:UI流水线采集,UI MainUpdate函数执行,UI Populate函数执行,文本更新,合批处理,应用网格
         /// </summary>
-        protected virtual void Update()
+        public void UpdateMesh()
         {
             if (Pause)
                 return;
-            MainCanvas = this;
-            AnimationManage.Manage.Update();
-            if (UIPage.CurrentPage != null)
-                UIPage.CurrentPage.Update(UserAction.TimeSlice);
-            UINotify.UpdateAll(UserAction.TimeSlice);
-            UserAction.Update();
-            Keyboard.InfoCollection();
-            DispatchUserAction();
-            CheckSize();
-            ThreadMission.ExtcuteMain();
-        }
-        float ScreenWidth = 1920;
-        float ScreenHeight = 1080;
-        void CheckSize()
-        {
-            float w = m_sizeDelta.x;
-            float h = m_sizeDelta.y;
-            if (ScreenWidth != w | ScreenHeight != h)
-            {
-                ScreenWidth = w;
-                ScreenHeight = h;
-                if (UIPage.CurrentPage != null)
-                    UIPage.CurrentPage.ReSize();
-                if (UIMenu.CurrentMenu != null)
-                    UIMenu.CurrentMenu.ReSize();
-            }
-        }
-   
-        /// <summary>
-        /// 更新内容包含:UI流水线采集,UI MainUpdate函数执行,UI Populate函数执行,文本更新,合批处理,应用网格,投递到相机
-        /// </summary>
-        private void LateUpdate()
-        {
-            if (Pause)
-                return;
-            if(SubBatch)
-            {
-                Batch2();
-                return;
-            }
             MatCollector.renderQueue = renderQueue;
             LateFrame++;
             point = 1;
             max = 0;
             top_txt = 0;
-            Collection(transform, -1, 0);
-            //MainUpdate();
+            Collection(this, -1, 0);
             for (int i = 1; i < max; i++)//跳过HCanvas
             {
                 var scr = scripts[i];
-                if(scr.LateFrame!=LateFrame)
+                if (scr.LateFrame != LateFrame)
                 {
                     scr.LateFrame = LateFrame;
+#if UNITY_EDITOR
+                    if (!Application.isPlaying)
+                    { 
+                        var grap = scr as HGraphics;
+                        if (grap != null)
+                            grap.m_dirty = true;
+                    }
+#endif
                     scr.MainUpdate();
                 }
                 else
@@ -212,80 +194,26 @@ namespace huqiang.Core.HGUI
                     Debug.Log("脚本重复更新");
                 }
             }
-            Collection(transform, -1, 0);
+            Collection(this, -1, 0);
             for (int i = 0; i < top_txt; i++)
             {
-                texts[i].Populate(); 
-            }
-            if (ftr)//纹理被改变了,需要重新计算
-            {
-                ftr = false;
-                HText.DirtyAll();
-                for (int i = 0; i < top_txt; i++)
-                    texts[i].Populate();
-            }
-            Batch();
-            ApplyMeshRenderer();
-            ApplyToCamera();
-        }
-        int mainFrame = 0;
-        int subFrame = 0;
-        void Batch2()
-        {
-            if (subFrame == mainFrame)
-            {
-                MatCollector.renderQueue = renderQueue;
-                LateFrame++;
-                point = 1;
-                max = 0;
-                top_txt = 0;
-                Collection(transform, -1, 0);
-                //MainUpdate();
-                for (int i = 1; i < max; i++)//跳过HCanvas
-                {
-                    var scr = scripts[i];
-                    if (scr.LateFrame != LateFrame)
-                    {
-                        scr.LateFrame = LateFrame;
-                        scr.MainUpdate();
-                    }
-                    else
-                    {
-                        Debug.Log("脚本重复更新");
-                    }
-                }
-                Collection(transform, -1, 0);
-                for (int i = 0; i < top_txt; i++)
-                {
-                    texts[i].Populate();
-                }
-                if (ftr)//纹理被改变了,需要重新计算
-                {
-                    ftr = false;
-                    HText.DirtyAll();
-                    for (int i = 0; i < top_txt; i++)
-                        texts[i].Populate();
-                }
-                ApplyMeshRenderer();
-                ApplyToCamera();
-                mainFrame++;
-                if (thread == null)
-                    thread = new ThreadMission("UI");
-                thread.AddSubMission((o) => {
-                    Batch();
-                    subFrame++;
-                }, this);
+                texts[i].Populate();
             }
         }
-        MeshFilter meshFilter;
-        MeshRenderer renderer;
-        void ApplyMeshRenderer()
+        public void ApplyMeshRenderer(MeshFilter meshFilter, MeshRenderer renderer)
         {
             if (meshFilter == null)
-                meshFilter = GetComponent<MeshFilter>();
+                return;
             if (meshFilter != null)
             {
-                var mesh = meshFilter.mesh;
+                Mesh mesh;
+#if UNITY_EDITOR
+                if (Application.isPlaying)
+                    mesh = meshFilter.mesh;
+                else mesh = meshFilter.sharedMesh;
+#else
+               mesh = meshFilter.mesh;
+#endif
                 if (mesh == null)
                 {
                     mesh = new Mesh();
@@ -302,104 +230,33 @@ namespace huqiang.Core.HGUI
                     mesh.SetUVs(4, uv4);
                     mesh.SetColors(colors);
 
-                    var submesh= MatCollector.submesh;
+                    var submesh = MatCollector.submesh;
                     if (submesh != null)
                     {
                         mesh.subMeshCount = submesh.Count;
                         for (int i = 0; i < submesh.Count; i++)
-                            mesh.SetTriangles(submesh[i], i);
+                        {
+                            var tri = submesh[i];
+                            //for (int k = 0; k < tri.Length; k++)
+                            //    if (tri[k] > vertex.Count)
+                            //    {
+                            //        Debug.LogError(k + ":" + tri[k]);
+                            //        tri[k] = 0;
+                            //    }
+                            mesh.SetTriangles(tri, i);
+                        }
                     }
                 }
             }
-            if (renderer == null)
-                renderer = GetComponent<MeshRenderer>();
             if (renderer != null)
-                renderer.materials = MatCollector.GenerateMaterial();   //这里会产生一次GC
-           
-        }
-        void ApplyToCamera()
-        {
-            switch (renderMode)
             {
-                case RenderMode.ScreenSpaceOverlay:
-                    OverCamera(Camera.main);
-                    break;
-                case RenderMode.ScreenSpaceCamera:
-                    OverCamera(camera);
-                    break;
-                case RenderMode.WorldSpace:
-                    break;
-            }
-        }
-        void OverCamera(Camera cam)
-        {
-            if(cam!=null)
-            {
-                int w = cam.pixelWidth;
-                int h = cam.pixelHeight;
-
-
-#if UNITY_IPHONE || UNITY_ANDROID
-                float ss = Mathf.Sqrt(w * w + h * h);
 #if UNITY_EDITOR
-                ss /= 334;
+                if(Application.isPlaying)
+                    renderer.materials = MatCollector.GenerateMaterial();   //这里会产生一次GC
+                else renderer.sharedMaterials = MatCollector.GenerateMaterial();   //这里会产生一次GC
 #else
-               ss/=Screen.dpi;
+                renderer.materials = MatCollector.GenerateMaterial();   //这里会产生一次GC
 #endif
-                float ps = 1;
-                float r = (ss - A.x) / (D.x - A.x);
-                if (r < 0)
-                {
-                    ps = A.y;
-                }
-                else if (r > 1)
-                {
-                    ps = D.y;
-                }
-                else
-                {
-                    ps = MathH.BezierPoint(r,ref A,ref B,ref C,ref D).y;
-                }
-                PhysicalScale = ps;
-#else
-                if(scaleType==ScaleType.FillX)
-                {
-                    PhysicalScale = w / DesignSize.x;
-                }else if(scaleType==ScaleType.FillY)
-                {
-                    PhysicalScale = h / DesignSize.y;
-                }
-                float ps = PhysicalScale;
-                if (ps < 0.01f)
-                    ps = 0.01f;
-#endif
-                m_sizeDelta.x = w / ps;
-                m_sizeDelta.y = h / ps;
-                float near = cam.nearClipPlane + NearPlane;
-                if (cam.orthographic)
-                {
-                    float os = cam.orthographicSize * 2;
-                    float s = os / (float)h;
-                    s *= ps;
-                    transform.localScale = new Vector3(s, s, s);
-                    Vector3 pos = cam.transform.position;
-                    Vector3 forward = cam.transform.forward;
-                    transform.position = pos + forward * near;
-                    transform.forward = forward;
-                }
-                else
-                {
-                    float s = 2 / (float)h;
-                    float o = MathH.Tan(cam.fieldOfView) / near;
-                    s /= o;
-                    s *= ps;
-                    transform.localScale = new Vector3(s, s, s);
-                    Vector3 pos = cam.transform.position;
-                    Vector3 forward = cam.transform.forward;
-                    transform.position = pos + forward * near;
-                    transform.forward = forward;
-                }
-                transform.rotation = cam.transform.rotation;
             }
         }
 
@@ -407,7 +264,7 @@ namespace huqiang.Core.HGUI
         /// <summary>
         /// 派发用户输入指令信息
         /// </summary>
-        void DispatchUserAction()
+        public void DispatchUserAction()
         {
 #if UNITY_STANDALONE_WIN
             DispatchWin();
@@ -420,6 +277,10 @@ namespace huqiang.Core.HGUI
 #endif
             if (PauseEvent)
                 return;
+            PhysicalScale = UISystem.PhysicalScale;
+            if (render != null)
+                if (render.renderMode == RenderMode.WorldSpace)
+                    PhysicalScale = 1;
             for (int i = 0; i < inputs.Length; i++)
             {
                 if (inputs[i] != null)
@@ -428,13 +289,14 @@ namespace huqiang.Core.HGUI
                     try
                     {
 #endif
+                        inputs[i].PhysicalScale = PhysicalScale;
                         if (inputs[i].IsActive)
                             inputs[i].Dispatch(PipeLine);
 #if DEBUG
                     }
                     catch (Exception ex)
                     {
-                        Debug.Log(ex.StackTrace);
+                        Debug.LogError(ex.StackTrace);
                     }
 #endif
                 }
@@ -546,9 +408,9 @@ namespace huqiang.Core.HGUI
         {
             Pause = !focus;
         }
-        #endregion
-        #region UI绘制与合批
-        void Batch()
+#endregion
+#region UI绘制与合批
+        public void Batch()
         {
             int len = max;
             if (scripts != null)
@@ -560,7 +422,13 @@ namespace huqiang.Core.HGUI
                         grap.UpdateMesh();
                 }
             }
-            ClearMesh();
+            vertex.Clear();
+            uv.Clear();
+            uv1.Clear();
+            uv2.Clear();
+            uv3.Clear();
+            uv4.Clear();
+            colors.Clear();
             HBatch.Batch(this, PipeLine);
         }
         internal List<Vector3> vertex = new List<Vector3>();
@@ -584,16 +452,6 @@ namespace huqiang.Core.HGUI
         internal List<Color32> colors = new List<Color32>();
 
         internal MaterialCollector MatCollector = new MaterialCollector();
-        void ClearMesh()
-        {
-            vertex.Clear();
-            uv.Clear();
-            uv1.Clear();
-            uv2.Clear();
-            uv3.Clear();
-            uv4.Clear();
-            colors.Clear();
-        }
         /// <summary>
         /// 将屏幕坐标转换为画布坐标
         /// </summary>
@@ -601,13 +459,16 @@ namespace huqiang.Core.HGUI
         /// <returns></returns>
         public Vector2 ScreenToCanvasPos(Vector2 mPos)
         {
-            if (renderMode == RenderMode.WorldSpace)
+            if (render == null)
+                return new Vector2(-100000, -100000);
+            if (render.renderMode == RenderMode.WorldSpace)
             {
                 Vector3 a = new Vector3(-10000f, -10000f, 0);
                 Vector3 b = new Vector3(0, 10000f, 0);
                 Vector3 c = new Vector3(10000, -10000, 0);
-                var pos = transform.position;
-                var qt = transform.rotation;
+                var trans = render.trans;
+                var pos = trans.position;
+                var qt = trans.rotation;
                 a = qt * a + pos;
                 b = qt * b + pos;
                 c = qt * c + pos;//得到世界坐标的三角面
@@ -620,7 +481,7 @@ namespace huqiang.Core.HGUI
                     var iq = Quaternion.Inverse(qt);
                     p -= pos;
                     p = iq * p;
-                    var ls = transform.localScale;
+                    var ls = trans.localScale;
                     p.x /= ls.x;
                     p.y /= ls.y;
                     return new Vector2(p.x, p.y);
@@ -636,89 +497,12 @@ namespace huqiang.Core.HGUI
                 var cPos = Vector2.zero;
                 cPos.x = mPos.x - w;
                 cPos.y = mPos.y - h;
-                float ps = PhysicalScale;
+                float ps = UISystem.PhysicalScale;
                 cPos.x /= ps;
                 cPos.y /= ps;
                 return cPos;
             }
         }
 #endregion
-#region 编辑器状态刷新网格
-#if UNITY_EDITOR
-        public void Refresh()
-        {
-            if (Application.isPlaying)
-            {
-                return;
-            }
-            MatCollector.renderQueue = renderQueue;
-            MainCanvas = this;
-            point = 1;
-            max = 0;
-            top_txt = 0;
-            Collection(transform, -1, 0);
-            int len = max;
-            for (int i = 0; i < len; i++)
-            {
-                var grap = scripts[i] as HGraphics;
-                if (grap != null)
-                {
-                    if (grap.m_material != null)
-                        grap.MatID = grap.m_material.GetInstanceID();
-                    else grap.MatID = 0;
-                    grap.m_dirty = true;
-                    grap.m_vertexChange = true;
-                }
-            }
-            for (int i = 0; i < max; i++)
-                Resize(scripts[i], false);
-            for (int i = 0; i < max; i++)
-                scripts[i].MainUpdate();
-            for (int i = 0; i < top_txt; i++)
-                texts[i].Populate();
-            Batch();
-            ApplyToCamera();
-            ApplyShareMesh();
-        }
-        void ApplyShareMesh()
-        {
-            var mf = GetComponent<MeshFilter>();
-            if (mf != null)
-            {
-                var mesh = mf.sharedMesh;
-                if (mesh == null)
-                {
-                    mesh = new Mesh();
-                    mf.mesh = mesh;
-                }
-                mesh.Clear();
-                if (vertex != null)
-                {
-                    mesh.SetVertices(vertex);
-                    mesh.SetUVs(0, uv);
-                    mesh.SetUVs(1, uv1);
-                    mesh.SetUVs(2, uv2);
-                    mesh.SetUVs(3, uv3);
-                    mesh.SetUVs(4, uv4);
-                    mesh.SetColors(colors);
-                    var submesh = MatCollector.submesh;
-                    if (submesh != null)
-                    {
-                        mesh.subMeshCount = submesh.Count;
-                        for (int i = 0; i < submesh.Count; i++)
-                            mesh.SetTriangles(submesh[i], i);
-                    }
-                }
-            }
-            var mr = GetComponent<MeshRenderer>();
-            if (mr != null)
-            {
-                //这里会产生一次GC
-                mr.sharedMaterials = MatCollector.GenerateMaterial();
-            }
-           
-        }
-#endif
-        #endregion
     }
 }

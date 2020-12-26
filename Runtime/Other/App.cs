@@ -17,21 +17,22 @@ namespace huqiang
             UIMenu.Initial(UIRoot);
             UINotify.Initial(UIRoot);
 
-            var buff = new GameObject("Buffer");
-            buff.transform.SetParent(UIRoot);
-            buff.SetActive(false);
-            buff.transform.localScale = Vector3.one;
-            HGUIManager.Initial(buff.transform);
+            var buff = new UIElement();
+            buff.name = "Buffer";
+            buff.SetParent(UIRoot);
+            buff.activeSelf = false;
+            buff.localScale = Vector3.one;
+            HGUIManager.Initial();
         }
         /// <summary>
         /// 根节点
         /// </summary>
-        public static Transform UIRoot;
+        public static UIElement UIRoot;
         /// <summary>
         /// 初始化UI布局
         /// </summary>
         /// <param name="uiRoot"></param>
-        public static void Initial(Transform uiRoot)
+        public static void Initial(UIElement uiRoot)
         {
             ThreadMission.SetMianId();
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR
@@ -59,7 +60,7 @@ namespace huqiang
         public static void Hide()
         {
             if (UIRoot != null)
-                UIRoot.gameObject.SetActive(false);
+                UIRoot.activeSelf = false;
         }
         /// <summary>
         /// 显示
@@ -67,7 +68,7 @@ namespace huqiang
         public static void Show()
         {
             if (UIRoot != null)
-                UIRoot.gameObject.SetActive(true);
+                UIRoot.activeSelf = true;
         }
     }
 }

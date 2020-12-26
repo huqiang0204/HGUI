@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using huqiang.Core.HGUI;
+using UnityEngine;
 
 namespace huqiang.UIComposite
 {
@@ -14,7 +15,7 @@ namespace huqiang.UIComposite
         /// <summary>
         /// 主体坐标变换
         /// </summary>
-        public Transform target;
+        public UIElement target;
         /// <summary>
         /// 联系上下文
         /// </summary>

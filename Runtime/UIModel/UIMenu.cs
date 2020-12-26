@@ -20,10 +20,6 @@ namespace huqiang.UIModel
         public const int LeftDown = 6;
         public const int Left = 7;
         /// <summary>
-        /// 根节点
-        /// </summary>
-        public static Transform Root { get;private set; }
-        /// <summary>
         /// 根元素
         /// </summary>
         public static UIElement UIRoot { get;private set; }
@@ -35,28 +31,28 @@ namespace huqiang.UIModel
         /// 初始化
         /// </summary>
         /// <param name="Canvas">主画布</param>
-        public static void Initial(Transform Canvas)
+        public static void Initial(UIElement Canvas)
         {
-            var menu = new GameObject("Menu");
-            var ele = UIRoot = menu.AddComponent<UIElement>();
-            ele.marginType = MarginType.Margin;
+            var ele = new UIElement();
+            ele.name = "Menu";
+            UIRoot = ele;
+            //ele.marginType = MarginType.Margin;
             var act = ele.RegEvent<UserEvent>();
-            act.PointerDown = (o, e) => { o.Context.gameObject.SetActive(false); };
+            act.PointerDown = (o, e) => { o.Context.activeSelf = false; };
             act.Penetrate = true;
-            Root = menu.transform;
-            menu.transform.SetParent(Canvas);
-            Root.localPosition = Vector3.zero;
-            Root.localScale = Vector3.one;
-            Root.localRotation = Quaternion.identity;
-            menu.SetActive(false);
+            ele.SetParent(Canvas);
+            ele.localPosition = Vector3.zero;
+            ele.localScale = Vector3.one;
+            ele.localRotation = Quaternion.identity;
+            ele.activeSelf = false;
         }
         /// <summary>
         /// 隐藏菜单
         /// </summary>
         public static void HideMenu()
         {
-            if (Root != null)
-                Root.gameObject.SetActive(false);
+            if (UIRoot != null)
+                UIRoot.activeSelf = false;
             if (CurrentMenu != null)
                 CurrentMenu.Hide();
         }
@@ -66,8 +62,8 @@ namespace huqiang.UIModel
         public override void ReSize()
         {
             if (UIRoot != null)
-                if (HCanvas.MainCanvas != null)
-                    UIRoot.SizeDelta = HCanvas.MainCanvas.SizeDelta;
+                if (HCanvas.CurrentCanvas != null)
+                    UIRoot.SizeDelta = HCanvas.CurrentCanvas.SizeDelta;
             base.ReSize();
         }
         static List<UIMenu> menus=new List<UIMenu>();
@@ -89,7 +85,7 @@ namespace huqiang.UIModel
                     p.Dispose(); 
                 }
                 else
-                if (!p.Main.gameObject.activeSelf)
+                if (!p.Main.activeSelf)
                 {
                     p.Dispose(); 
                 }
@@ -106,7 +102,7 @@ namespace huqiang.UIModel
         /// <returns></returns>
         public static T ShowMenu<T>(UIBase context, Rect pos, int dic, object obj = null) where T : UIMenu, new()
         {
-            UIRoot.gameObject.SetActive(true);
+            UIRoot.activeSelf = true;
             if (CurrentMenu != null)
             { 
                 CurrentMenu.Hide(); 
@@ -123,7 +119,7 @@ namespace huqiang.UIModel
             var t = new T();
             menus.Add(t);
             CurrentMenu = t;
-            t.Initial(Root, context, obj);
+            t.Initial(UIRoot, context, obj);
             t.ChangeLanguage();
             t.Show(context, pos, dic, obj);
             t.ReSize();
@@ -131,7 +127,7 @@ namespace huqiang.UIModel
         }
         static Vector4 GetPointer(UIElement target)
         {
-            var coord = UIElement.GetGlobaInfo(target.transform,false);
+            var coord = UIElement.GetGlobaInfo(target,false);
             Vector2 tsize = target.m_sizeDelta;
             float left = tsize.x * (-target.Pivot.x);
             float right = left + tsize.x;
@@ -224,7 +220,7 @@ namespace huqiang.UIModel
         }
         public static T PopUpOrDown<T>(UIBase context, UIElement target, object obj = null) where T : UIMenu, new()
         {
-            var coord = UIElement.GetGlobaInfo(target.transform, false);
+            var coord = UIElement.GetGlobaInfo(target, false);
             Rect r = new Rect(coord.Postion.x, coord.Postion.y, target.m_sizeDelta.x * coord.Scale.x, target.m_sizeDelta.y * coord.Scale.y);
             if (coord.Postion.y< 0)
             {
@@ -252,7 +248,7 @@ namespace huqiang.UIModel
         }
         public static T PopLeftOrRight<T>(UIBase context, UIElement target, object obj = null) where T : UIMenu, new()
         {
-            var coord = UIElement.GetGlobaInfo(target.transform, false);
+            var coord = UIElement.GetGlobaInfo(target, false);
             Rect r = new Rect(coord.Postion.x, coord.Postion.y, target.m_sizeDelta.x * coord.Scale.x, target.m_sizeDelta.y * coord.Scale.y);
             if (coord.Postion.x < 0)
             {
@@ -282,9 +278,10 @@ namespace huqiang.UIModel
         /// <param name="obj">数据</param>
         public virtual void Show(UIBase context, Rect pos, int dic, object obj = null)
         {
+            if (Main == null)
+                return;
             Context = context;
-            var ui = Main.GetComponent<UIElement>();
-            var size = ui.SizeDelta;
+            var size = Main.m_sizeDelta;
             float hw = size.x * 0.5f;
             float hh = size.y * 0.5f;
             switch (dic)
@@ -318,9 +315,8 @@ namespace huqiang.UIModel
                     pos.x -= hw;
                     break;
             }
-            Main.transform.localPosition = new Vector3(pos.x,pos.y,0);
-            if (Main != null)
-                Main.SetActive(true);
+            Main.localPosition = new Vector3(pos.x,pos.y,0);
+            Main.activeSelf = true;
         }
         /// <summary>
         /// 隐藏
@@ -328,7 +324,7 @@ namespace huqiang.UIModel
         public virtual void Hide()
         {
             if (Main != null)
-                Main.SetActive(false);
+                Main.activeSelf = false;
         }
         /// <summary>
         /// 释放

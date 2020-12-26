@@ -1,8 +1,10 @@
 ﻿using huqiang.Core.HGUI;
+using huqiang.Core.UIData;
 using huqiang.Data;
 using huqiang.UIEvent;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using UnityEngine;
 
 namespace huqiang.UIComposite
@@ -12,15 +14,15 @@ namespace huqiang.UIComposite
     /// </summary>
     public class InputBox:Composite
     {
-        static float KeySpeed = 220;
-        static float MaxSpeed = 30;
+        static float KeySpeed = 420;
+        static float MaxSpeed = 100;
         static float KeyPressTime;
         static List<HVertex> hs = new List<HVertex>();
         static List<int> tris = new List<int>();
         Color32 textColor;
         Color32 m_tipColor;
-        Color32 PointColor;
-        Color32 SelectionColor;
+        Color32 PointColor = new Color32(255, 0, 0, 255);
+        Color32 SelectionColor = new Color32(168, 206, 255, 64);
         int CharacterLimit;
         /// <summary>
         /// 只读
@@ -32,8 +34,11 @@ namespace huqiang.UIComposite
         public LineType lineType = LineType.SingleLine;
         ContentType m_ctpye;
         bool Editing;
-        EmojiString FullString = new EmojiString();
+        StringEx FullString=new StringEx("",false);
+        public char PasswordCharacter = '●';
         HImage Caret;
+        public PressInfo startPress;
+        public PressInfo endPress;
         /// <summary>
         /// 联系上下文
         /// </summary>
@@ -51,26 +56,21 @@ namespace huqiang.UIComposite
         public string InputString { get { return FullString.FullString; } set {
                 if (value == null)
                     value = "";
-                FullString.FullString = value;
-                TextOperation.ChangeText(TextCom,FullString);
+                FullString.Reset(value,false);
                 SetShowText();
             } }
-        /// <summary>
-        /// 显示文本
-        /// </summary>
-        public string ShowString { get; private set; }
         /// <summary>
         /// 选中文本
         /// </summary>
         public string SelectString { get {
                 if (Editing)
-                    return TextOperation.GetSelectString();
+                    return GetSelectString();
                 return "";
             } }
         /// <summary>
         /// 文本显示载体
         /// </summary>
-        public HText TextCom;
+        public TextBox TextCom;
         /// <summary>
         /// 文本类型
         /// </summary>
@@ -190,16 +190,16 @@ namespace huqiang.UIComposite
         /// 验证新输入的字符
         /// </summary>
         public Func<InputBox, int, char, char> ValidateChar;
-        public override void Initial(FakeStruct mod, UIElement element,Initializer initializer)
+        public override void Initial(FakeStruct mod, UIElement element,UIInitializer initializer)
         {
             base.Initial(mod,element,initializer);
-            var txt = TextCom = element.GetComponentInChildren<HText>();
+            var txt = TextCom = element.GetComponentInChildren<TextBox>();
             textColor = txt.m_color;
             unsafe
             {
                 if(mod!=null)
                 {
-                    var ex = UITransfromLoader.GetEventData(mod);
+                    var ex = UIElementLoader.GetEventData(mod);
                     if (ex != null)
                     {
                         TextInputData* tp = (TextInputData*)ex.ip;
@@ -224,28 +224,37 @@ namespace huqiang.UIComposite
                     m_InputString = txt.Text;
                 }
             }
-            FullString.FullString = m_InputString;
+            FullString.Reset(m_InputString,false);
             InputEvent = txt.RegEvent<InputBoxEvent>();
             InputEvent.Initial(null);
             InputEvent.input = this;
             Caret = txt.GetComponentInChildren<HImage>();
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR
+            TextCom.HorizontalOverflow = HorizontalWrapMode.Overflow;
+#else
+            TextCom.HorizontalOverflow = HorizontalWrapMode.Wrap;
+#endif
+            TextCom.VerticalOverflow = VerticalWrapMode.Overflow;
+            SetShowText();
         }
         /// <summary>
         /// 鼠标按压
         /// </summary>
         /// <param name="action">用户事件</param>
         /// <param name="press">按压基本信息</param>
-        public void OnMouseDown(UserAction action, ref PressInfo press)
+        public void OnMouseDown(UserAction action)
         {
-            TextOperation.contentType = m_ctpye;
-            TextOperation.ChangeText(TextCom, FullString);
-            SetShowText();
-            TextOperation.SetPress(ref press);
+            if (InputString != "" & InputString != null)
+            {
+                TextCom.CheckPoint(InputEvent, action, ref startPress);
+                endPress = startPress;
+            }
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR
             if (!ReadOnly)
                 Editing = true;
-            //Input.imeCompositionMode = IMECompositionMode.On;
+            Input.imeCompositionMode = IMECompositionMode.On;
 #endif
+            SetShowText();
         }
         /// <summary>
         /// 用户单击
@@ -253,10 +262,10 @@ namespace huqiang.UIComposite
         /// <param name="action">用户事件</param>
         public void OnClick(UserAction action)
         {
-            TextOperation.contentType = m_ctpye;
+            endPress = startPress;
             if (!ReadOnly)
             {
-                //Input.imeCompositionMode = IMECompositionMode.On;
+                Input.imeCompositionMode = IMECompositionMode.On;
                 Editing = true;
                 if (!Keyboard.active)
                 {
@@ -277,16 +286,16 @@ namespace huqiang.UIComposite
             SetShowText();
             if (OnDone != null)
                 OnDone(this);
-            //Input.imeCompositionMode = IMECompositionMode.Auto;
+            Input.imeCompositionMode = IMECompositionMode.Auto;
         }
         /// <summary>
         /// 拖动选择
         /// </summary>
         /// <param name="action">用户事件</param>
         /// <param name="press">当前按压信息</param>
-        public void OnDrag(UserAction action, ref PressInfo press)
+        public void OnDrag(UserAction action)
         {
-            TextOperation.SetEndPress(ref press);
+            TextCom.CheckPoint(InputEvent, action, ref endPress);
         }
         string OnInputChanged(string input)
         {
@@ -294,50 +303,58 @@ namespace huqiang.UIComposite
                 return "";
             if (input == null | input == "")
                 return "";
-            EmojiString es = new EmojiString(input);
-            string str = FullString.FilterString;
+            input = CharOperation.Validate(characterValidation,input,input.Length);
+            if (input == null | input == "")
+                return "";
             if (CharacterLimit > 0)
             {
-                string fs = es.FilterString;
-                if (fs.Length + str.Length > CharacterLimit)
+                int c = CharacterLimit - FullString.Length;
+                if (c <= 0)
                 {
-                    int len = CharacterLimit - str.Length;
-                    if (len <= 0)
-                        return "";
-                    es.Remove(len,fs.Length - len);
+                    TextCom.stringEx.Reset(FullString.FullString, false);
+                    TextCom.Populate();
+                    TextCom.m_vertexChange = true;
+                    return ""; 
+                }
+                int[] o = StringInfo.ParseCombiningCharacters(input);
+                if (o.Length > c)
+                {
+                    input = new StringInfo(input).SubstringByTextElements(0, o[c - 1]);
                 }
             }
-            str = es.FullString;
-            int s = TextOperation.StartPress.Index;
-            if (CharOperation.Validate(characterValidation, str, s, str[0]) == 0)
-                return "";
-            if (ValidateChar != null)
-                if (ValidateChar(this, s, str[0]) == 0)
-                    return "";
-            InsertString(str);
+            
+           
+            DeleteSelectString();
+            int len = FullString.Length;
+            int index = TextCom.GetIndex(ref startPress);
+            FullString.InsertTextElements(index, input);
             SetShowText();
-            return str;
+            len = FullString.Length - len;
+            TextCom.Populate();
+            TextCom.MoveRight(ref startPress, len);
+            endPress = startPress;
+            return input;
         }
         void TouchInputChanged(string input)
         {
             if (Keyboard.InputChanged)
             {
-                FullString.FullString = input;
-                TextOperation.ChangeText(TextCom,FullString);
+                FullString.Reset(input, false);
                 var sel = Keyboard.selection;
                 int start = sel.start;
                 int end = sel.start + sel.length;
                 if (end != start)
                 {
-                    TextOperation.SetStartPressIndex(start);
-                    TextOperation.SetEndPressIndex(end);
+                    TextCom.GetPress(start,ref startPress);
+                    TextCom.GetPress(end, ref endPress);
                 }
                 else 
                 {
-                    bool lc = false;
-                    TextOperation.SetPressIndex(start,ref lc); 
+                    TextCom.GetPress(start, ref startPress);
+                    endPress = startPress;
                 }
                 SetShowText();
+                TextCom.Populate();
             }
             if (OnValueChanged != null)
                 OnValueChanged(this);
@@ -348,17 +365,37 @@ namespace huqiang.UIComposite
         public void SetShowText()
         {
             var str = FullString.FullString;
-            if (Editing)
+            if (InputEvent.Focus)
             {
                 if (TextCom == null)
                     return;
-                str = TextOperation.GetShowContent();//GetShowString();
+                string cs = Keyboard.CompositionString;
                 TextCom.MainColor = textColor;
                 if (contentType == ContentType.Password)
-                    str = new string('●', str.Length);
-                TextCom.Text = str;
-                InputEvent.ChangeText(str);
-                ShowString = str;
+                {
+                    int l = 0;
+                    if (str != null & str != "")
+                        l = str.Length;
+                    if (cs != null & cs != "")
+                        l += cs.Length;
+                    if (l > 0)
+                        TextCom.m_text = new string(PasswordCharacter, l);
+                    else TextCom.m_text = "";
+                }
+                else
+                {
+                    StringEx stringEx = TextCom.stringEx;
+                    if (stringEx == null)
+                        stringEx = TextCom.stringEx = new StringEx(str, false);
+                    else stringEx.Reset(str, false);
+                    if (cs != null & cs != "")
+                    {
+                        int index = TextCom.GetIndex(ref startPress);
+                        stringEx.InsertTextElements(index, cs);//str.Insert(ss, cs);
+                    }
+                    TextCom.m_text = stringEx.FullString;
+                }
+                TextCom.m_dirty = true;
             }
             else if (str != "" & str != null)
             {
@@ -366,18 +403,40 @@ namespace huqiang.UIComposite
                     return;
                 TextCom.MainColor = textColor;
                 if (contentType == ContentType.Password)
-                    str = new string('●', str.Length);
-                TextCom.Text = str;
-                ShowString = str;
-                InputEvent.ChangeText(str);
+                {
+                    TextCom.Text = new string(PasswordCharacter, str.Length);
+                }
+                else
+                {
+                    TextCom.Text = str;
+                }
             }
             else
             {
                 TextCom.MainColor = m_tipColor;
                 TextCom.Text = m_TipString;
-                ShowString = m_TipString;
-                InputEvent.ChangeText("");
             }
+        }
+        public void SelectAll()
+        {
+            startPress.Row = 0;
+            startPress.Offset = 0;
+            TextCom.GetEnd(ref endPress);
+        }
+        public string GetSelectString()
+        {
+            int si = TextCom.GetIndex(ref startPress);
+            int ei = TextCom.GetIndex(ref endPress);
+            if (si == ei)
+            {
+                return "";
+            }
+            else if (si > ei)
+            {
+                return FullString.SubstringByTextElements(ei, si-ei);
+            }
+            else
+                return FullString.SubstringByTextElements(si, ei-si);
         }
         /// <summary>
         /// 删除选中文本内容
@@ -385,9 +444,24 @@ namespace huqiang.UIComposite
         /// <returns></returns>
         public bool DeleteSelectString()
         {
-            if (TextOperation.DeleteSelectString())
+            int si = TextCom.GetIndex(ref startPress);
+            int ei = TextCom.GetIndex(ref endPress);
+            if (si > ei)
             {
+                FullString.RmoveTextElements(ei, si-ei);
+                startPress = endPress;
                 SetShowText();
+                TextCom.Populate();
+                TextCom.Move(ref startPress);
+                return true;
+            }
+            else if(si < ei)
+            {
+                FullString.RmoveTextElements(si, ei-si);
+                endPress = startPress;
+                SetShowText();
+                TextCom.Populate();
+                TextCom.Move(ref startPress);
                 return true;
             }
             return false;
@@ -398,9 +472,18 @@ namespace huqiang.UIComposite
         /// <returns></returns>
         public bool DeleteLast()
         {
-            if (TextOperation.DeleteLast())
+            if (DeleteSelectString())
+                return true;
+            int index = TextCom.GetIndex(ref startPress);
+            if (index>0)
             {
+                int row = startPress.Row;
+                TextCom.MoveLeft(ref startPress);
+                endPress = startPress;
+                FullString.RmoveTextElements(index - 1, 1);
                 SetShowText();
+                TextCom.Populate();
+                TextCom.Move(ref startPress);
                 return true;
             }
             return false;
@@ -411,94 +494,74 @@ namespace huqiang.UIComposite
         /// <returns></returns>
         public bool DeleteNext()
         {
-            if (TextOperation.DeleteNext())
+            if (DeleteSelectString())
+                return true;
+            int index = TextCom.GetIndex(ref startPress);
+            if(index<0)
             {
+                Debug.Log("error");
+            }
+            var lens = FullString.noEmojiInfo.lens;
+            if (lens == null)
+                return false;
+            if (index <lens.Length)
+            {
+                FullString.RmoveTextElements(index, 1);
                 SetShowText();
                 return true;
             }
             return false;
         }
         /// <summary>
-        /// 插入字符串
-        /// </summary>
-        /// <param name="str">字符串</param>
-        public void InsertString(string str)
-        {
-            var es = new EmojiString(str);
-            TextOperation.DeleteSelectString();
-            TextOperation.InsertContent(es);
-        }
-        /// <summary>
         /// 光标向左移动
         /// </summary>
         public void PointerMoveLeft()
         {
-            bool lc = false;
-            if (TextOperation.PointerMoveLeft(ref lc))
-            {
-                if (lc)
-                    SetShowText();
-            }
+            TextCom.MoveLeft(ref startPress);
+            endPress = startPress;
         }
         /// <summary>
         /// 光标向右移动
         /// </summary>
         public void PointerMoveRight()
         {
-            bool lc = false;
-            if (TextOperation.PointerMoveRight(ref lc))
-            {
-                if (lc)
-                    SetShowText();
-            }
+            TextCom.MoveRight(ref startPress, 1);
+            endPress = startPress;
         }
         /// <summary>
         /// 光标向上移动
         /// </summary>
         public void PointerMoveUp()
         {
-            bool lc = false;
-            if (TextOperation.PointerMoveUp(ref lc))
-            {
-                if (lc)
-                    SetShowText();
-            }
+            TextCom.MoveUp(ref startPress);
+            endPress = startPress;
         }
         /// <summary>
         /// 光标向下移动
         /// </summary>
         public void PointerMoveDown()
         {
-            bool lc = false;
-            if (TextOperation.PointerMoveDown(ref lc))
-            {
-                if (lc)
-                    SetShowText();
-            }
+            TextCom.MoveDown(ref startPress);
+            endPress = startPress;
         }
         /// <summary>
         /// 光标移动到文本开头
         /// </summary>
         public void PointerMoveStart()
         {
-            bool lc = false;
-            if (TextOperation.SetPressIndex(0, ref lc))
-            {
-                if (lc)
-                    SetShowText();
-            }
+            startPress.Row = 0;
+            startPress.Offset = 0;
+            endPress.Row = 0;
+            endPress.Offset = 0;
+            TextCom.Move(ref startPress);
         }
         /// <summary>
         /// 光标移动到文本结尾
         /// </summary>
         public void PointerMoveEnd()
         {
-            bool lc = false;
-            if (TextOperation.SetPressIndex(999999999, ref lc))
-            {
-                if (lc)
-                    SetShowText();
-            }
+            TextCom.MoveEnd(ref startPress);
+            endPress = startPress;
         }
         /// <summary>
         /// 更新显示内容
@@ -506,9 +569,9 @@ namespace huqiang.UIComposite
         /// <param name="time">时间片</param>
         public override void Update(float time)
         {
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR
             if (InputEvent.Focus)
             {
-#if UNITY_STANDALONE_WIN || UNITY_EDITOR
                 var state = KeyPressed();
                 if (state == EditState.Continue)
                 {
@@ -536,10 +599,12 @@ namespace huqiang.UIComposite
                             if (OnSubmit != null)
                                 OnSubmit(this);
                         }
-                        else OnInputChanged("\r\n");
+                        else OnInputChanged("\n");
                     }
                 }
 #else
+      if (Editing)
+      {
                         TouchInputChanged(Keyboard.TouchString);
                         if (Keyboard.status == TouchScreenKeyboard.Status.Done)
                         {
@@ -553,8 +618,9 @@ namespace huqiang.UIComposite
             else
             {
                 if (Caret != null)
-                    Caret.gameObject.SetActive(false);
+                    Caret.activeSelf = false;
             }
+        
         }
         float time;
         /// <summary>
@@ -566,48 +632,44 @@ namespace huqiang.UIComposite
             {
                 hs.Clear();
                 tris.Clear();
-                switch (TextOperation.Style)
+                if (startPress.Row == endPress.Row&startPress.Offset==endPress.Offset)
                 {
-                    case 1:
-                        if (!ReadOnly)
+                    if (!ReadOnly)
+                    {
+                        time += UserAction.TimeSlice;
+                        if (time > 1000f)
                         {
-                            time += UserAction.TimeSlice;
-                            if (time > 1000f)
-                            {
-                                time = 0;
-                            }
-                            else if (time > 400f)
-                            {
-                                Caret.gameObject.SetActive(false);
-                            }
-                            else
-                            {
-                                Caret.gameObject.SetActive(true);
-                                PressInfo start = TextOperation.GetStartPress();
-                                InputEvent.GetPointer(tris, hs, ref PointColor, ref start);
-                                Caret.LoadFromMesh(hs, tris);
-                                PressInfo end = TextOperation.GetEndPress();
-                                InputEvent.SetCursorPos(ref end);
-                            }
+                            time = 0;
                         }
-                        else Caret.gameObject.SetActive(false);
-                        break;
-                    case 2:
-                        Caret.gameObject.SetActive(true);
-                        PressInfo s = TextOperation.GetStartPress();
-                        PressInfo e = TextOperation.GetEndPress();
-                        InputEvent.GetSelectArea(tris, hs, ref SelectionColor, ref s,ref e);
-                        Caret.LoadFromMesh(hs, tris);
-                        break;
-                    default:
-                        Caret.gameObject.SetActive(false);
-                        break;
+                        else if (time > 400f)
+                        {
+                            Caret.activeSelf = false;
+                        }
+                        else
+                        {
+                            Caret.activeSelf = true;
+                            TextCom.GetPointer(tris, hs, ref PointColor, ref startPress);
+                            Caret.LoadFromMesh(hs, tris);
+                            TextCom.SetCursorPos(ref endPress);
+                        }
+                    }
+                    else Caret.activeSelf = false;
+                }
+                else
+                {
+                    Caret.activeSelf = true;
+                    int si = TextCom.GetIndex(ref startPress);
+                    int ei = TextCom.GetIndex(ref endPress);
+                    if (si > ei)
+                        TextCom.GetSelectArea(tris, hs, ref SelectionColor, ref endPress, ref startPress);
+                    else TextCom.GetSelectArea(tris, hs, ref SelectionColor, ref startPress, ref endPress);
+                    Caret.LoadFromMesh(hs, tris);
                 }
             }
         }
         void KeySpeedUp()
         {
-            KeySpeed *= 0.7f;
+            KeySpeed *= 0.8f;
             if (KeySpeed < MaxSpeed)
                 KeySpeed = MaxSpeed;
             KeyPressTime = KeySpeed;
@@ -686,7 +748,9 @@ namespace huqiang.UIComposite
             {
                 if (Keyboard.GetKey(KeyCode.LeftControl) | Keyboard.GetKey(KeyCode.RightControl))
                 {
-                    TextOperation.SelectAll();
+                    TextCom.GetEnd(ref endPress);
+                    startPress.Row = 0;
+                    startPress.Offset = 0;
                     return EditState.Done;
                 }
             }
@@ -694,10 +758,9 @@ namespace huqiang.UIComposite
             {
                 if (Keyboard.GetKey(KeyCode.LeftControl) | Keyboard.GetKey(KeyCode.RightControl))
                 {
-                    string str = TextOperation.GetSelectString();
+                    GUIUtility.systemCopyBuffer = GetSelectString();
                     if (!ReadOnly)
                         DeleteSelectString();
-                    GUIUtility.systemCopyBuffer = str;
                     return EditState.Done;
                 }
             }
@@ -705,8 +768,7 @@ namespace huqiang.UIComposite
             {
                 if (Keyboard.GetKey(KeyCode.LeftControl) | Keyboard.GetKey(KeyCode.RightControl))
                 {
-                    string str = TextOperation.GetSelectString();
-                    GUIUtility.systemCopyBuffer = str;
+                    GUIUtility.systemCopyBuffer = GetSelectString();
                     return EditState.Done;
                 }
             }

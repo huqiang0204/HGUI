@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace huqiang.Core.HGUI
@@ -36,7 +40,6 @@ namespace huqiang.Core.HGUI
         /// 是否是激活状态
         /// </summary>
         public bool active;
-        public Transform trans;
         public UIElement script;
     }
 }

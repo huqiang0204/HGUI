@@ -2,13 +2,15 @@
 {
 	Properties
 	{
-		 [PerRendererData]_MainTex("Sprite Texture", 2D) = "white" {}
-		 [PerRendererData]_STex("Sprite Texture", 2D) = "white" {}
-		 [PerRendererData]_TTex("Sprite Texture", 2D) = "white" {}
-		 [PerRendererData]_FTex("Sprite Texture", 2D) = "white" {}
+		 _MainTex("Sprite Texture", 2D) = "white" {}
+		 _t1("Sprite Texture", 2D) = "white" {}
+		 _t2("Sprite Texture", 2D) = "white" {}
+		 _t3("Sprite Texture", 2D) = "white" {}
+		 _t4("Sprite Texture", 2D) = "white" {}
+		 _t5("Sprite Texture", 2D) = "white" {}
+		 _t6("Sprite Texture", 2D) = "white" {}
+		 _t7("Sprite Texture", 2D) = "white" {}
 		 [PerRendererData]_Color("Tint", Color) = (1,1,1,1)
-		 [PerRendererData]_Rect("_ClipRect",Vector) = (0,0,1,1)
-		 [PerRendererData]_FillColor("Fill color", Vector) = (0,0,0,0)
 	}
 
 		SubShader
@@ -80,12 +82,14 @@
 				}
 
 				sampler2D _MainTex;
-				sampler2D _STex;
-				sampler2D _TTex;
-				sampler2D _FTex;
-				float4 _Rect;
+				sampler2D _t1;
+				sampler2D _t2;
+				sampler2D _t3;
+				sampler2D _t4;
+				sampler2D _t5;
+				sampler2D _t6;
+				sampler2D _t7;
 				float4 _Color;
-				float4 _FillColor;
 				fixed4 frag(v2f IN) : SV_Target
 				{
 					half4 color;
@@ -94,53 +98,62 @@
 					uv.y *= IN.uv4.y;
 					uv.x += IN.uv3.x;
 					uv.y += IN.uv3.y;
-					if (IN.uv1.x == 0)
+					if (IN.uv1.x < 0.09)
 					{
-						if (IN.uv1.y == 0)
-						{
-							color = tex2D(_MainTex, uv);
-							if(_FillColor.x==0)
-								color *= IN.color;
-							else { 
-								color.xyz = IN.color.xyz;
-								color.a *= IN.color.a;
-							}
-						}
-						else
-						{ 
-							color = tex2D(_STex, uv); 
-							if (_FillColor.y == 0)
-								color *= IN.color;
-							else {
-								color.xyz = IN.color.xyz;
-								color.a *= IN.color.a;
-							}
-						}
+						color = tex2D(_MainTex, uv);
 					}
-                   else
-                   {
-						if (IN.uv1.y == 0)
-						{
-							color = tex2D(_TTex, uv);
-							if (_FillColor.z == 0)
-								color *= IN.color;
-							else {
-								color.xyz = IN.color.xyz;
-								color.a *= IN.color.a;
-							}
-						}
-						else
-						{ 
-							color = tex2D(_FTex, uv); 
-							if (_FillColor.w == 0)
-								color *= IN.color;
-							else {
-								color.xyz = IN.color.xyz;
-								color.a *= IN.color.a;
-							}
-						}
-                   }
-					if (IN.uv2.x < _Rect.x || IN.uv2.x > _Rect.z || IN.uv2.y < _Rect.y || IN.uv2.y > _Rect.w)
+					else if (IN.uv1.x < 0.19)
+					{
+						color = tex2D(_t1, uv);
+					}
+					else  if (IN.uv1.x < 0.29)
+					{
+						color = tex2D(_t2, uv);
+					}
+					else  if (IN.uv1.x < 0.39)
+					{
+						color = tex2D(_t3, uv);
+					}
+					else if (IN.uv1.x < 0.49)
+					{
+						color = tex2D(_t4, uv);
+					}
+					else  if (IN.uv1.x < 0.59)
+					{
+						color = tex2D(_t5, uv);
+					}
+					else  if (IN.uv1.x < 0.69)
+					{
+						color = tex2D(_t6, uv);
+					}
+					else
+					{
+						color = tex2D(_t7, uv);
+					}
+					if (IN.uv1.y < 0.05)
+					{
+						color.x *= IN.color.x;
+						color.y *= IN.color.y;
+						color.z *= IN.color.z;
+						color.a *= IN.color.a;
+					}else if (IN.uv1.y < 0.09)
+					{
+						color = IN.color;
+					}
+					else if (IN.uv1.y < 0.19)
+					{
+						color.xyz = IN.color.xyz;
+						color.a *= IN.color.a;
+					}
+					else if (IN.uv1.y < 0.29)
+					{
+						color.a *= IN.color.a;
+					}
+					else//黑白
+					{
+					    color.rgb = dot(color.rgb, float3(0.22, 0.707, 0.071));
+					}
+					if (IN.uv2.x <0.499 || IN.uv2.x > 0.501|| IN.uv2.y <0.499 || IN.uv2.y > 0.501)
 						color.a = 0;
 					return color;
 				}

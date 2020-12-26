@@ -64,7 +64,7 @@ namespace huqiang.Data
         /// </summary>
         /// <param name="trans"></param>
         /// <param name="insID"></param>
-        public void AddContext(Transform trans, int insID)
+        public virtual void AddContext(Transform trans, int insID)
         {
             ContextObject co = new ContextObject();
             co.Ins = trans;

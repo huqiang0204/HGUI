@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using huqiang.Core.HGUI;
+using huqiang.Core.UIData;
 using huqiang.Data;
 using huqiang.UIEvent;
 using UnityEngine;
@@ -52,11 +53,11 @@ namespace huqiang.UIComposite
         /// </summary>
         /// <param name="mod">模型数据</param>
         /// <param name="script">元素主体</param>
-        public override void Initial(FakeStruct mod, UIElement script,Initializer initializer)
+        public override void Initial(FakeStruct mod, UIElement script,UIInitializer initializer)
         {
             base.Initial(mod, script, initializer);
             script.SizeChanged = (o) => Order();
-            var ex = UITransfromLoader.GetCompositeData(mod);
+            var ex = UIElementLoader.GetCompositeData(mod);
             if (ex != null)
             {
                 direction = (Direction)ex[0];
@@ -89,16 +90,14 @@ namespace huqiang.UIComposite
                 float sx = ps * -0.5f;
                 if (FixedSizeRatio > 0)
                     ps *= FixedSizeRatio;
-                var trans = Enity.transform;
-                var c = trans.childCount;
+                var c = Enity.childCount;
                 float ox = ItemOffset;
                 for (int i = 0; i < c; i++)
                 {
-                    var son = trans.GetChild(i);
-                    var ss = son.GetComponent<UIElement>();
+                    var son = Enity.GetChild(i);
                     float w = 0;
                     float p = 0.5f;
-                    if (ss != null)
+                    if (son != null)
                     {
                         if (FixedSize)
                         {
@@ -107,9 +106,9 @@ namespace huqiang.UIComposite
                         }
                         else
                         {
-                            w = ss.SizeDelta.x;
+                            w = son.SizeDelta.x;
                         }
-                        p = ss.Pivot.x;
+                        p = son.Pivot.x;
                     }
                     float os = sx - w * -p + ox;
                     son.localPosition = new Vector3(os, 0, 0);
@@ -126,16 +125,14 @@ namespace huqiang.UIComposite
                 float sy = ps * (1 - Enity.Pivot.y);
                 if (FixedSizeRatio > 0)
                     ps *= FixedSizeRatio;
-                var trans = Enity.transform;
-                var c = trans.childCount;
+                var c = Enity.childCount;
                 float oy = ItemOffset;
                 for (int i = 0; i < c; i++)
                 {
-                    var son = trans.GetChild(i);
-                    var ss = son.GetComponent<UIElement>();
+                    var son = Enity.GetChild(i);
                     float h = 0;
                     float p = 0.5f;
-                    if (ss != null)
+                    if (son != null)
                     {
                         if (FixedSize)
                         {
@@ -144,9 +141,9 @@ namespace huqiang.UIComposite
                         }
                         else
                         {
-                            h = ss.SizeDelta.y;
+                            h = son.SizeDelta.y;
                         }
-                        p = ss.Pivot.y;
+                        p = son.Pivot.y;
                     }
                     float os = sy + h * (p - 1) - oy;
                     son.localPosition = new Vector3(0, os, 0);
@@ -161,7 +158,7 @@ namespace huqiang.UIComposite
         /// <param name="time"></param>
         public override void Update(float time)
         {
-            var a = Enity.transform.childCount;
+            var a = Enity.childCount;
             if (a != c)
             {
                 c = a;

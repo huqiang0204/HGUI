@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace huqiang.Core.HGUI
@@ -25,30 +26,33 @@ namespace huqiang.Core.HGUI
         /// 纹理索引0-3
         /// </summary>
         public int picture;
+        public float fillColor;
     }
-    [DisallowMultipleComponent]
-    public class HGraphics:UIElement
+    public class HGraphics : UIElement
     {
+        public override string TypeName { get => "HGraphics"; }
         /// <summary>
         /// 三角形块级缓存
         /// </summary>
-        protected static BlockBuffer<int> trisBuffer = new BlockBuffer<int>(48, 1024);
+        public static BlockBuffer<int> trisBuffer = new BlockBuffer<int>(48, 1024);
         /// <summary>
         /// 默认的UIShader,当ui上的材质球为空时默认使用吃着色器
         /// </summary>
-        internal static Shader DefShader { get {
-                if(shader==null)
+        internal static Shader DefShader
+        {
+            get
+            {
+                if (shader == null)
                     shader = Shader.Find("HGUI/UIDef");//HGUI/UIDef
                 return shader;
-            } }
+            }
+        }
         /// <summary>
         /// 获取或设置默认着色器
         /// </summary>
         public static Shader shader;
-        [SerializeField]
-        internal Color32 m_color = Color.white;
-        public Vector4 uvrect = new Vector4(0,0,1,1);
-        public override Color32 MainColor { get => m_color; set { m_color = value; m_colorChanged = true;} }
+        public Vector4 uvrect = new Vector4(0, 0, 1, 1);
+        public override Color32 MainColor { get => m_color; set { m_color = value; m_colorChanged = true; } }
         public override Vector2 SizeDelta { get => m_sizeDelta; set { m_sizeDelta = value; m_vertexChange = true; } }
         internal int[] tris;
         /// <summary>
@@ -62,15 +66,27 @@ namespace huqiang.Core.HGUI
         /// <summary>
         /// 三角形块级内存2
         /// </summary>
+        internal BlockInfo<int> trisInfo1;
+        /// <summary>
+        /// 三角形块级内存3
+        /// </summary>
         internal BlockInfo<int> trisInfo2;
+        /// <summary>
+        /// 三角形块级内存4
+        /// </summary>
+        internal BlockInfo<int> trisInfo3;
         [SerializeField]
         internal Material m_material;
-        public Material Material { get => m_material; set {
+        public Material Material
+        {
+            get => m_material; set
+            {
                 m_material = value;
                 if (value == null)
                     MatID = 0;
                 else MatID = value.GetInstanceID();
-            } }
+            }
+        }
         internal int MatID;
         /// <summary>
         /// 材质污染,需要重新计算uv
@@ -87,71 +103,14 @@ namespace huqiang.Core.HGUI
         /// </summary>
         [HideInInspector]
         public bool m_colorChanged = true;
-        /// <summary>
-        /// 支持4张纹理
-        /// </summary>
         [HideInInspector]
-        [SerializeField]
-        internal Texture[] textures = new Texture[4];
-        /// <summary>
-        /// 纹理id
-        /// </summary>
+        public Texture MainTexture;
         [HideInInspector]
-        [SerializeField]
-        internal int[] texIds = new int[4];
-        /// <summary>
-        /// 是否使用填充色,即不使用纹理颜色
-        /// </summary>
+        public Texture STexture;
         [HideInInspector]
-        [SerializeField]
-        internal bool[] fillColors = new bool[4];
-        public Texture MainTexture
-        {
-            get => textures[0];
-            set {
-                textures[0] = value;
-                if (value != null)
-                    texIds[0] = value.GetInstanceID();
-                else
-                    texIds[0] = 0;
-            }
-        }
-        public Texture STexture
-        {
-            get => textures[1];
-            set
-            {
-                textures[1] = value;
-                if (value != null)
-                    texIds[1] = value.GetInstanceID();
-                else
-                    texIds[1] = 0;
-            }
-        }
-        public Texture TTexture
-        {
-            get => textures[2];
-            set
-            {
-                textures[2] = value;
-                if (value != null)
-                    texIds[2] = value.GetInstanceID();
-                else
-                    texIds[2] = 0;
-            }
-        }
-        public Texture FTexture
-        {
-            get => textures[3];
-            set
-            {
-                textures[3] = value;
-                if (value != null)
-                    texIds[3] = value.GetInstanceID();
-                else
-                    texIds[3] = 0;
-            }
-        }
+        public Texture TTexture;
+        [HideInInspector]
+        public Texture FTexture;
         /// <summary>
         /// 开启阴影
         /// </summary>
@@ -159,11 +118,11 @@ namespace huqiang.Core.HGUI
         /// <summary>
         /// 阴影偏移
         /// </summary>
-        public Vector2 shadowOffsset=new Vector2(1,-1);
+        public Vector2 shadowOffsset = new Vector2(1, -1);
         /// <summary>
         /// 阴影颜色
         /// </summary>
-        public Color32 shadowColor=new Color32(0,0,0,255);
+        public Color32 shadowColor = new Color32(0, 0, 0, 255);
         public override void ReSized()
         {
             base.ReSized();
@@ -174,9 +133,9 @@ namespace huqiang.Core.HGUI
         /// </summary>
         public virtual void UpdateMesh()
         {
-            if(m_colorChanged)
+            if (m_colorChanged)
             {
-                if (vertInfo.DataCount>0)
+                if (vertInfo.DataCount > 0)
                 {
                     unsafe
                     {
@@ -187,20 +146,6 @@ namespace huqiang.Core.HGUI
                 }
                 m_colorChanged = false;
             }
-        }
-        protected override void Start()
-        {
-            base.Start();
-            m_dirty = true;
-        }
-        /// <summary>
-        /// 销毁时释放非托管的块级内存
-        /// </summary>
-        protected virtual void OnDestroy()
-        {
-            vertInfo.Release();
-            trisInfo.Release();
-            trisInfo2.Release();
         }
         /// <summary>
         /// 载入网格,使用外部计算好的网格
@@ -257,7 +202,7 @@ namespace huqiang.Core.HGUI
                 }
                 vertInfo.DataCount = c;
             }
-        }    
+        }
         void LoadTris(int[] tri, ref BlockInfo<int> info)
         {
             tris = null;
@@ -265,7 +210,7 @@ namespace huqiang.Core.HGUI
             if (tc > info.Size | tc + 48 < info.Size)
             {
                 info.Release();
-                info = trisBuffer.RegNew(tc);
+                info = HGUIMesh.trisBuffer.RegNew(tc);
             }
             unsafe
             {
@@ -283,7 +228,7 @@ namespace huqiang.Core.HGUI
         /// <param name="tri"></param>
         public void LoadTris(int[] tri)
         {
-            LoadTris(tri,ref trisInfo);
+            LoadTris(tri, ref trisInfo);
         }
         /// <summary>
         /// 载入网格,使用外部计算好的三角形2
@@ -291,7 +236,7 @@ namespace huqiang.Core.HGUI
         /// <param name="tri"></param>
         public void LoadTris2(int[] tri)
         {
-            LoadTris(tri, ref trisInfo2);
+            LoadTris(tri, ref trisInfo1);
         }
         void LoadTris(List<int> tri, ref BlockInfo<int> info)
         {
@@ -300,7 +245,7 @@ namespace huqiang.Core.HGUI
             if (tc > info.Size | tc + 48 < info.Size)
             {
                 info.Release();
-                info = trisBuffer.RegNew(tc);
+                info = HGUIMesh.trisBuffer.RegNew(tc);
             }
             unsafe
             {
@@ -326,7 +271,15 @@ namespace huqiang.Core.HGUI
         /// <param name="tri"></param>
         public void LoadTris2(List<int> tri)
         {
-            LoadTris(tri, ref trisInfo2);
+            LoadTris(tri, ref trisInfo1);
+        }
+        public override void Dispose()
+        {
+            base.Dispose();
+            trisInfo.Release();
+            trisInfo1.Release();
+            trisInfo2.Release();
+            trisInfo3.Release();
         }
     }
 }

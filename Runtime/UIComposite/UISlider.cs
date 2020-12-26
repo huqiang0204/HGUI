@@ -1,4 +1,5 @@
 ﻿using huqiang.Core.HGUI;
+using huqiang.Core.UIData;
 using huqiang.Data;
 using huqiang.UIEvent;
 using System;
@@ -113,23 +114,19 @@ namespace huqiang.UIComposite
             info.MinScale = 1;
             info.MaxScale = 1;
         }
-        public override void Initial(FakeStruct mod, UIElement script,Initializer initializer)
+        public override void Initial(FakeStruct mod, UIElement script,UIInitializer initializer)
         {
             base.Initial(mod,script,initializer);
-            var trans = script.transform;
             callBack = Enity.RegEvent<UserEvent>();
             callBack.Drag  = Draging;
             callBack.DragEnd = DragEnd;
             callBack.PointerDown = PointDown;
             callBack.AutoColor = false;
-            var tmp = trans.Find("FillImage");
-            if (tmp != null)
-                FillImage = tmp.GetComponent<HImage>();
-            tmp = trans.Find("Nob");
-            Nob = tmp.GetComponent<HImage>();
+            FillImage = script.Find("FillImage") as HImage;
+            Nob = script.Find("Nob") as HImage;
             unsafe
             {
-                var ex = UITransfromLoader.GetCompositeData(mod);
+                var ex = UIElementLoader.GetCompositeData(mod);
                 if (ex != null)
                     info = *(SliderInfo*)ex.ip;
             }
@@ -201,13 +198,9 @@ namespace huqiang.UIComposite
                 float w = end.x - start.x;
                 ratio = (pos.x - start.x) / w;
                 pos = (end - start) * ratio + start;
-                if(Nob!=null)
-                {
-                    var trans = Nob.transform;
-                    trans.localPosition = pos;
-                    float s = (info.MaxScale - info.MinScale) * ratio + info.MinScale;
-                    trans.localScale = new Vector3(s, s, s);
-                }
+                Nob.localPosition = pos;
+                float s = (info.MaxScale - info.MinScale) * ratio + info.MinScale;
+                Nob.localScale = new Vector3(s, s, s);
             }
             else
             {
@@ -223,13 +216,9 @@ namespace huqiang.UIComposite
                 float w = end.y - start.y;
                 ratio = (pos.y - start.y) / w;
                 pos = (end - start) * ratio + start;
-                if (Nob != null)
-                {
-                    var trans = Nob.transform;
-                    trans.localPosition = pos;
-                    float s = (info.MaxScale - info.MinScale) * ratio + info.MinScale;
-                    trans.localScale = new Vector3(s, s, s);
-                }
+                Nob.localPosition = pos;
+                float s = (info.MaxScale - info.MinScale) * ratio + info.MinScale;
+                Nob.localScale = new Vector3(s, s, s);
             }
             if(FillImage!=null)
             {

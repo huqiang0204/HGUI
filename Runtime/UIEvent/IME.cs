@@ -10,6 +10,10 @@ using UnityEngine;
 namespace huqiang
 {
 #if UNITY_STANDALONE_WIN ||UNITY_EDITOR
+    internal class MonoPInvokeCallbackAttribute : Attribute
+    {
+        public MonoPInvokeCallbackAttribute() { }
+    }
     public class IME
     {
         private const int WH_KEYBOARD_LL = 13; //全局键盘钩子
@@ -55,17 +59,17 @@ namespace huqiang
         public static bool haveMainWindow = false;
         public  static IntPtr mainWindowHandle = IntPtr.Zero;
         private static IntPtr _hookID = IntPtr.Zero;
-        public int processId = 0;
+        public static int processId = 0;
         private delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
         public delegate bool EnumThreadWindowsCallback(IntPtr hWnd, IntPtr lParam);
 
-        public  IntPtr GetMainWindowHandle(int processId)
+        public static IntPtr GetMainWindowHandle(int procId)
         {
             if (!haveMainWindow)
             {
                 mainWindowHandle = IntPtr.Zero;
-                this.processId = processId;
-                EnumThreadWindowsCallback callback = new EnumThreadWindowsCallback(this.EnumWindowsCallback);
+                processId = procId;
+                EnumThreadWindowsCallback callback = new EnumThreadWindowsCallback(EnumWindowsCallback);
                 EnumWindows(callback, IntPtr.Zero);
                 GC.KeepAlive(callback);
 
@@ -73,12 +77,12 @@ namespace huqiang
             }
             return mainWindowHandle;
         }
-
-        private bool EnumWindowsCallback(IntPtr handle, IntPtr extraParameter)
+        [MonoPInvokeCallback]
+        private static bool EnumWindowsCallback(IntPtr handle, IntPtr extraParameter)
         {
             int num;
-            GetWindowThreadProcessId(new HandleRef(this, handle), out num);
-            if ((num == this.processId) && this.IsMainWindow(handle))
+            GetWindowThreadProcessId(new HandleRef(iME, handle), out num);
+            if ((num == processId) && IsMainWindow(handle))
             {
                 mainWindowHandle = handle;
                 return false;
@@ -86,9 +90,9 @@ namespace huqiang
             return true;
         }
 
-        private bool IsMainWindow(IntPtr handle)
+        private static bool IsMainWindow(IntPtr handle)
         {
-            return (!(GetWindow(new HandleRef(this, handle), 4) != IntPtr.Zero) && IsWindowVisible(new HandleRef(this, handle)));
+            return (!(GetWindow(new HandleRef(iME, handle), 4) != IntPtr.Zero) && IsWindowVisible(new HandleRef(iME, handle)));
         }
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
@@ -259,7 +263,7 @@ namespace huqiang
         {
              var pro = Process.GetCurrentProcess();
              iME = new IME();
-             mainWindowHandle = iME.GetMainWindowHandle(pro.Id);
+             mainWindowHandle = GetMainWindowHandle(pro.Id);
              hIMC = ImmGetContext(mainWindowHandle);
             //using (ProcessModule curModule = pro.MainModule)
             //{

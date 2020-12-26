@@ -9,15 +9,26 @@ using huqiang.Core.HGUI;
 
 public class UITest : TestPageHelper
 {
+    public HGUIRender GUIRender;
     public override void LoadTestPage()
     {
+        UIElement.DisposeAll();
+        HCanvas.RegCanvas(GUIRender);
+        UISystem.PhysicalScale =1f;
+        //HCanvas can = new HCanvas();
+        //can.DesignSize = GUIRender.DesignSize;
+        //can.SizeDelta = GUIRender.DesignSize;
+        //can.name = GUIRender.name;
+        //GUIRender.canvas = can;
+        HCanvas.CurrentCanvas = GUIRender.canvas;
+        App.Initial(GUIRender.canvas);
         //RemoteLog.Instance.Connection("192.168.0.144",8899);
         Application.targetFrameRate = 1000;
 #if UNITY_IPHONE || UNITY_ANDROID
         //Scale.DpiScale = true;
 #endif
 #if UNITY_EDITOR
-        UIPage.LoadPage<DataGridPage>();
+        UIPage.LoadPage<StartPage>();
 #else
         //ElementAsset.LoadAssetsAsync("base.unity3d",(o,e)=> { UIPage.LoadPage<ChatPage>(); });
 #endif

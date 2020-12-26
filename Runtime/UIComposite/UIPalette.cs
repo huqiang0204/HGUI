@@ -14,9 +14,9 @@ namespace huqiang.UIComposite
     {
         UserEvent callBackR;
         UserEvent callBackC;
-        Transform hc;
-        Transform NobA;
-        Transform NobB;
+        UIElement hc;
+        UIElement NobA;
+        UIElement NobB;
         HImage template;
         HImage htemp;
         HImage slider;
@@ -36,28 +36,27 @@ namespace huqiang.UIComposite
         public Action<UIPalette> TemplateChanged;
         UISlider uISlider;
   
-        public override void Initial(FakeStruct fake,UIElement element,Initializer initializer)
+        public override void Initial(FakeStruct fake,UIElement element,UIInitializer initializer)
         {
             base.Initial(fake,element,initializer);
             palette = new Palette();
             callBackR = element.RegEvent<UserEvent>(new UICircleCollider());
             callBackR.Drag = callBackR.DragEnd = DragingR;
             callBackR.PointerDown = PointDownR;
-            var mod = element.transform;
-            NobA = mod.Find("NobA");
-            NobB = mod.Find("NobB");
-            hc = mod.Find("HTemplate");
-            template = hc.GetComponent<HImage>();
+            NobA = element.Find("NobA");
+            NobB = element.Find("NobB");
+            hc = element.Find("HTemplate");
+            template = hc as HImage;
             callBackC = template.RegEvent<UserEvent>();
             callBackC.Drag = callBackC.DragEnd = DragingC;
             callBackC.PointerDown = PointDownC;
-            htemp = mod.GetComponent<HImage>();
+            htemp = element as HImage;
             htemp.MainTexture = Palette.LoadCTemplateAsync();
             template.MainTexture = palette.texture;
             palette.AwaitLoadHSVT(1);
             SelectColor.a = 1;
-            var son = mod.Find("Slider");
-            slider = son.GetComponent<HImage>();
+            var son = element.Find("Slider");
+            slider = son as HImage;
             slider.MainTexture = Palette.AlphaTemplate();
             uISlider =slider.composite as UISlider;
             uISlider.OnValueChanged = AlphaChanged;

@@ -27,6 +27,28 @@ namespace huqiang.Data
         public const short Int64Array = 7;
         public const short DoubleArray = 8;
         public const short FakeStringArray = 9;
+        public const short Int = 10;
+        public const short Float = 11;
+        public const short Long = 12;
+        public const short Double = 13;
+        public const short Decimal = 14;
+
+        public const short Struct = 32;
+
+        public const short Class = 64;
+        public const short StructArray = 33;
+        /// <summary>
+        /// 类对象数组
+        /// </summary>
+        public const short ClassArray = 65;
+        /// <summary>
+        /// Two-dimensional array
+        /// </summary>
+        public const short TwoDArray = 34;
+        /// <summary>
+        /// Two-dimensional array
+        /// </summary>
+        public const short TwoDList = 66;
     }
     /// <summary>
     /// C#的这些类型不能被继承：System.ValueType, System.Enum, System.Delegate, System.Array, etc.
@@ -102,7 +124,7 @@ namespace huqiang.Data
         /// <param name="obj">数据对象</param>
         /// <param name="type">数据类型</param>
         /// <returns></returns>
-        internal int AddData(object obj, Int32 type)
+        public int AddData(object obj, Int32 type)
         {
             if (obj is string[])
                 return 0;

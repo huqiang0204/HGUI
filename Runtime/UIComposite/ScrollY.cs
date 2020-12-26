@@ -15,24 +15,6 @@ namespace huqiang.UIComposite
     public class ScrollY : ScrollContent
     {
         /// <summary>
-        /// 滚动项目居中
-        /// </summary>
-        /// <param name="scroll"></param>
-        public static void CenterScroll(ScrollY scroll)
-        {
-            var eve = scroll.eventCall;
-            var tar = scroll.eventCall.ScrollDistanceY;
-            float ty = scroll.Size.y * 0.5f;
-            float v = scroll.Point + tar+ty;
-            float sy = scroll.ctSize.y;
-            float oy = v % sy;
-            tar -= oy;
-            if (oy > sy * 0.5f)
-                tar += sy;
-            tar += sy * 0.5f;
-            scroll.eventCall.ScrollDistanceY = tar;
-        }
-        /// <summary>
         /// 主体事件
         /// </summary>
         public UserEvent eventCall;
@@ -41,20 +23,19 @@ namespace huqiang.UIComposite
         /// </summary>
         protected float height;
         int Column = 1;
-        float m_point;
         /// <summary>
         /// 滚动的当前位置，从0开始
         /// </summary>
-        public float Point { get { return m_point; } set { Refresh(0,value - m_point); } }
+        public float Point { get { return _pos.y; } set { Refresh(0,value - _pos.y); } }
         /// <summary>
         /// 0-1之间
         /// </summary>
         public float Pos
         {
             get {
-                if (ActualSize.y <= Size.y)
+                if (base._contentSize.y <= Size.y)
                     return 0;
-                var p = m_point / (ActualSize.y - Size.y);
+                var p = _pos.y / (base._contentSize.y - Size.y);
                 if (p < 0)
                     p = 0;
                 else if (p > 1)
@@ -65,7 +46,7 @@ namespace huqiang.UIComposite
             {
                 if (value < 0 | value > 1)
                     return;
-                m_point = value * (ActualSize.y - Size.y);
+                _pos.y = value * (_contentSize.y - Size.y);
                 Order();
             }
         }
@@ -73,15 +54,14 @@ namespace huqiang.UIComposite
         /// 项目每次滚动居中
         /// </summary>
         public bool ItemDockCenter;
-        /// <summary>
-        /// 内容总尺寸
-        /// </summary>
-        public Vector2 ContentSize { get; private set; }
+        ///// <summary>
+        ///// 内容总尺寸
+        ///// </summary>
+        //public Vector2 ContentSize { get; private set; }
         /// <summary>
         /// 动态尺寸,用以适应宽度
         /// </summary>
         public bool DynamicSize = true;
-        Vector2 ctSize;
         float ctScale;
         /// <summary>
         /// 滑块条,可以为空
@@ -100,23 +80,22 @@ namespace huqiang.UIComposite
         /// </summary>
         /// <param name="mod">数据模型</param>
         /// <param name="script">主体元素</param>
-        public override void Initial(FakeStruct mod, UIElement script,Initializer initializer)
+        public override void Initial(FakeStruct mod, UIElement script,UIInitializer initializer)
         {
             base.Initial(mod,script,initializer);
             eventCall = Enity.RegEvent<UserEvent>();
+            eventCall.PointerDown = (o, e) => { UpdateVelocity = false; };
             eventCall.Drag = Draging;
             eventCall.DragEnd = OnDragEnd;
-            eventCall.MouseWheel = (o, e) => { Scrolling(o, new Vector2(0, e.MouseWheelDelta * 100)); };
-            eventCall.Scrolling = Scrolling;
-            eventCall.ScrollEndY = OnScrollEnd;
+            eventCall.MouseWheel = (o, e) => { Scrolling(o, new Vector2(0, e.MouseWheelDelta * 100)); UpdateVelocity = true; };
             eventCall.ForceEvent = true;
             eventCall.AutoColor = false;
             eventCall.CutRect = true;
             Size = Enity.SizeDelta;
             Enity.SizeChanged = (o) => {
-                if (ItemElement != null)
-                    ItemSize = UIElement.GetSize(Enity, ItemElement);
-                Refresh(0,m_point);
+                if (modData != null)
+                    ItemSize = UIElement.GetSize(Enity, modData);
+                Refresh(0,_pos.y);
             };
         }
         /// <summary>
@@ -135,26 +114,34 @@ namespace huqiang.UIComposite
         /// 光标拖拽完毕
         /// </summary>
         public Action<UserEvent, UserAction, Vector2> DragEnd;
-        /// <summary>
-        /// 滚动衰减率,越接近1衰减越慢
-        /// </summary>
-        public float DecayRate = 0.998f;
         void Draging(UserEvent back, UserAction action, Vector2 v)
         {
-            back.DecayRateY = DecayRate;
             Scrolling(back, v);
         }
         void OnDragEnd(UserEvent back, UserAction action, Vector2 v)
         {
             Scrolling(back, v);
-            if (ItemDockCenter)
-                CenterScroll(this);
+            if(scrollType==ScrollType.Loop)
+            {
+                if(ItemDockCenter)
+                {
+                    var y = back.VelocityY;
+                    var d = MathH.PowDistance(DecayRateY, y, 100000);
+                    float t = _pos.y + d;
+                    float o = (Size.y - ItemSize.y) * 0.5f;
+                    float r = o % ItemSize.y;
+                    float i = (int)(t / ItemSize.y) + 1;
+                    t = i * ItemSize.y - r;
+                    d = t - _pos.y;
+                    startVelocity.y = mVelocity.y = MathH.DistanceToVelocity(DecayRateY, d);
+                }
+            }else
+            {
+                startVelocity.y = mVelocity.y = back.VelocityY;
+            }
+            UpdateVelocity = true;
             if (ScrollStart != null)
                 ScrollStart(this);
-            if (eventCall.VelocityY == 0)
-                OnScrollEnd(back);
-            if (DragEnd != null)
-                DragEnd(back,action,v);
         }
         /// <summary>
         /// 
@@ -166,78 +153,39 @@ namespace huqiang.UIComposite
             if (Main == null)
                 return;
             Vector2 u = v;
-            v.y /= Enity.transform.localScale.y;
-            back.VelocityX = 0;
+            v.y /= Enity.localScale.y;
             v.x = 0;
-            float x = 0;
-            float y = 0;
             switch (scrollType)
             {
                 case ScrollType.None:
-                    y = ScrollNone(back, ref v, ref x, ref m_point).y;
+                    v = ScrollNone(v);
+                    _pos.y += v.y;
                     break;
                 case ScrollType.Loop:
-                    y = ScrollLoop(back, ref v, ref x, ref m_point).y;
+                    _pos.y += v.y;
+                    if (_pos.y < 0)
+                        _pos.y += _contentSize.y;
+                    else _pos.y %= _contentSize.y;
                     break;
                 case ScrollType.BounceBack:
-                    y = BounceBack(back, ref v, ref x, ref m_point).y;
+                    v = BounceBack(v);
+                    _pos.y += v.y;
                     break;
             }
             Order();
-            if (y != 0)
-            {
-                if (Scroll != null)
-                    Scroll(this, u);
-            }
-            else
-            {
-                if (ScrollEnd != null)
-                    ScrollEnd(this);
-            }
             if (m_slider != null)
             {
                 m_slider.Percentage = 1 - Pos;
             }
-        }
-        void OnScrollEnd(UserEvent back)
-        {
-            if (scrollType == ScrollType.BounceBack)
-            {
-                if (m_point < -Tolerance)
-                {
-                    back.DecayRateY = 0.988f;
-                    float d = - m_point;
-                    back.ScrollDistanceY = d * eventCall.Context.transform.localScale.y;
-                }
-                else
-                {
-                    float max = ActualSize.y + Tolerance;
-                    if (max < Size.y)
-                        max = Size.y + Tolerance;
-                    if (m_point + Size.y > max)
-                    {
-                        back.DecayRateY = 0.988f;
-                        float d = ActualSize.y - m_point - Size.y;
-                        back.ScrollDistanceY = d * eventCall.Context.transform.localScale.y;
-                    }
-                    else
-                    {
-                        if (ScrollEnd != null)
-                            ScrollEnd(this);
-                    }
-                }
-            }
-            else if (ScrollEnd != null)
-                ScrollEnd(this);
-            if (m_slider != null)
-                m_slider.Percentage = 1- Pos;
+            if (Scroll != null)
+                Scroll(this, u);
         }
         /// <summary>
         /// 内容尺寸计算
         /// </summary>
         public void Calcul()
         {
-            float w = Enity.m_sizeDelta.x - ItemOffset.x;
+            float w = Enity.m_sizeDelta.x;
             float dw = w / ItemSize.x;
             Column = (int)dw;
             if (Column < 1)
@@ -246,12 +194,12 @@ namespace huqiang.UIComposite
             {
                 float dx = w / Column;
                 ctScale = dx / ItemSize.x;
-                ctSize.x = dx;
-                ctSize.y = ItemSize.y * ctScale;
+                ItemActualSize.x = dx;
+                ItemActualSize.y = ItemSize.y * ctScale;
             }
             else
             {
-                ctSize = ItemSize;
+                ItemActualSize = ItemSize;
                 ctScale = 1;
             }
             int c = DataLength;
@@ -259,10 +207,11 @@ namespace huqiang.UIComposite
             c /= Column;
             if (a > 0)
                 c++;
-            height = c * ctSize.y;
+            height = c * ItemActualSize.y;
             if (height < Size.y)
                 height = Size.y;
-            ActualSize = new Vector2(Size.x, height);
+            base._contentSize = new Vector2(Size.x, height);
+            GetItemOffset();
         }
         /// <summary>
         /// 刷新
@@ -271,14 +220,14 @@ namespace huqiang.UIComposite
         /// <param name="y">纵向位置</param>
         public override void Refresh(float x = 0, float y = 0)
         {
-            m_point = y;
+            _pos.y = y;
             Size = Enity.SizeDelta;
-            ActualSize = Vector2.zero;
+            base._contentSize = Vector2.zero;
             if (DataLength == 0)
             {
                 for (int i = 0; i < Items.Count; i++)
                 {
-                    Items[i].target.gameObject.SetActive(false);
+                    Items[i].target.activeSelf = false;
                 }
                 return;
             }
@@ -291,9 +240,9 @@ namespace huqiang.UIComposite
             if (m_slider != null)
             {
                 m_slider.Percentage = 1 - Pos;
-                if (ActualSize.y <= Enity.SizeDelta.y)
-                    m_slider.Enity.gameObject.SetActive(false);
-                else m_slider.Enity.gameObject.SetActive(true);
+                if (base._contentSize.y <= Enity.SizeDelta.y)
+                    m_slider.Enity.activeSelf = false;
+                else m_slider.Enity.activeSelf = true;
             }
         }
         /// <summary>
@@ -302,11 +251,11 @@ namespace huqiang.UIComposite
         /// <param name="_index"></param>
         public void ShowByIndex(int _index)
         {
-            ActualSize = Vector2.zero;
+            base._contentSize = Vector2.zero;
             if (DataLength == 0)
             {
                 for (int i = 0; i < Items.Count; i++)
-                    Items[i].target.gameObject.SetActive(false);
+                    Items[i].target.activeSelf = false;
                 return;
             }
             if (ItemMod == null)
@@ -314,8 +263,8 @@ namespace huqiang.UIComposite
                 return;
             }
             Calcul();
-            float y = _index * ctSize.y;
-            m_point = y;
+            float y = _index * ItemActualSize.y;
+            _pos.y = y;
             Order(true);
         }
         void Order(bool force=false)
@@ -323,9 +272,9 @@ namespace huqiang.UIComposite
             int len = DataLength;
             if (len <= 0)
                 return;
-            float ly = ctSize.y;
-            int sr = (int)(m_point /ly);//起始索引
-            int er = (int)((m_point + Size.y) / ly)+1;
+            float ly = ItemActualSize.y;
+            int sr = (int)(_pos.y /ly);//起始索引
+            int er = (int)((_pos.y + Size.y) / ly)+1;
             sr *= Column;
             er *= Column;//结束索引
             int e = er - sr;//总计显示数据
@@ -355,30 +304,30 @@ namespace huqiang.UIComposite
             PushItems();//将未被回收的数据压入缓冲区
             int index = sr;
             float oy = 0;
-            for (int i=0;i<e;i++)
+            for (int i = 0; i < e; i++)
             {
-                UpdateItem(index,oy,force);
+                UpdateItem(index, oy, force);
                 index++;
                 if (index >= len)
                 {
                     index = 0;
-                    oy = ActualSize.y;
+                    oy = _contentSize.y;
                 }
             }
             RecycleRemain();
         }
         void UpdateItem(int index,float oy,bool force)
         {
-            float ly = ctSize.y;
             int row = index / Column;
-            float dy = ly * row + oy;
-            dy -= m_point;
-            float ss = (1 - Enity.Pivot.y) * Size.y;// + 0.5f * ly
-            dy = ss - dy;
-            float ox = (index%Column) * ctSize.x + ctSize.x * 0.5f + ItemOffset.x - Size.x * 0.5f;
+            int col = index % Column;
+            float sx = col * ItemActualSize.x;
+            float sy = row* ItemActualSize.y;
+            sy -=_pos.y - oy;
             var a = PopItem(index);
-            a.target.localPosition = new Vector3(ox, dy, 0);
-            a.target.localScale = new Vector3(ctScale,ctScale,ctScale);
+            var p = ItemOffset;
+            p.x += sx;
+            p.y -= sy;
+            a.target.localPosition = p;
             Items.Add(a);
             if (a.index < 0 | force)
             {
@@ -411,6 +360,28 @@ namespace huqiang.UIComposite
                 }
             }
             return item;
+        }
+        public override void Update(float time)
+        {
+            mVelocity.x = 0;
+            base.Update(time);
+        }
+        public override void DurScroll(Vector2 v)
+        {
+            _pos.y += v.y;
+            if (scrollType == ScrollType.Loop)
+            {
+                if (_pos.y < 0)
+                    _pos.y += _contentSize.y;
+                else _pos.y %= _contentSize.y;
+            }
+            Order();
+            if (m_slider != null)
+            {
+                m_slider.Percentage = 1 - Pos;
+            }
+            if (Scroll != null)
+                Scroll(this, v);
         }
     }
 }

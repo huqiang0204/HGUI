@@ -568,16 +568,55 @@ namespace huqiang
             result.y = (left.z * right.x) - (left.x * right.z);
             result.z = (left.x * right.y) - (left.y * right.x);
         }
-        [ThreadStatic]
-        static Vector3 E1;
-        [ThreadStatic]
-        static Vector3 E2;
-        [ThreadStatic]
-        static Vector3 P;
-        [ThreadStatic]
-        static Vector3 T;
-        [ThreadStatic]
-        static Vector3 Q;
+        /// <summary>
+        /// 匀减速 位移公式 S=vt-（at^2）/2
+        /// </summary>
+        /// <param name="v0">初速度，国际单位为米每秒（m/s)</param>
+        /// <param name="a">加速度，单位是米每二次方秒（m/s^2）</param>
+        /// <param name="t">时间，国际单位为秒（s)</param>
+        /// <returns></returns>
+        public static float GetDistance(float v0, float a, float t)
+        {
+            return v0 * t - a * t * t / 2;
+        }
+        /// <summary>
+        /// 根据距离和加速度求初始速度
+        /// </summary>
+        /// <param name="distance">初速度，国际单位为米每秒（m/s)</param>
+        /// <param name="a">加速度，单位是米每二次方秒（m/s^2）</param>
+        /// <returns></returns>
+        public static float GetStartSpeed(float distance, float a)
+        {
+            //distance = v0 * t - a * t * t / 2;
+            //distance + a * t * t / 2 = v0 * t;
+            //(distance + a * t * t / 2) / t = v0;
+            //t = v0 / a;使用二元解析式代入
+            return Mathf.Sqrt(2 * distance * a);
+        }
+        /// <summary>
+        ///  匀减速  速度公式 v = V0 - at
+        /// </summary>
+        /// <param name="v0">初速度，国际单位为米每秒（m/s)</param>
+        /// <param name="a">加速度，单位是米每二次方秒（m/s^2）</param>
+        /// <param name="t">时间，国际单位为秒（s)</param>
+        /// <returns></returns>
+        public static float GetSpeed(float v0, float a, float t)
+        {
+            return v0 - a * t;
+        }
+        /// <summary>
+        ///  匀减速 速度减缓到0所需时间
+        /// </summary>
+        /// <param name="v0">初速度，国际单位为米每秒（m/s)</param>
+        /// <param name="a">加速度，单位是米每二次方秒（m/s^2）</param>
+        /// <returns></returns>
+        public static float GetTime(float v0, float a)
+        {
+            //v0 - a * t = 0;
+            // -a * t = 0 - v0;
+            //t = -v0 / -a;
+            return v0 / a;
+        }
     }
     /// <summary>
     /// 表示一个复数

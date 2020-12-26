@@ -1,4 +1,5 @@
-﻿using System;
+﻿using huqiang.Core.HGUI;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,7 +16,7 @@ namespace huqiang
         /// 构造函数
         /// </summary>
         /// <param name="t">目标对象</param>
-        public RotateAnimat(Transform t)
+        public RotateAnimat(UIElement t)
         {
             Target = t;
             AnimationManage.Manage.AddAnimat(this);
@@ -23,7 +24,7 @@ namespace huqiang
         /// <summary>
         /// 目标对象
         /// </summary>
-        public Transform Target;
+        public UIElement Target;
         /// <summary>
         /// 开始角度
         /// </summary>
@@ -64,7 +65,7 @@ namespace huqiang
                     if (!Loop & c_time >= m_time)
                     {
                         playing = false;
-                        Target.localEulerAngles = EndAngle;
+                        Target.localRotation =Quaternion.Euler(EndAngle);
                         if (PlayOver != null)
                             PlayOver(this);
                     }
@@ -76,7 +77,7 @@ namespace huqiang
                         if (Linear != null)
                             r = Linear(this, r);
                         Vector3 v = EndAngle - StartAngle;
-                        Target.localEulerAngles= StartAngle + v * r;
+                        Target.localRotation = Quaternion.Euler(StartAngle + v * r);
                     }
                 }
             }
@@ -87,7 +88,7 @@ namespace huqiang
         public void Dispose()
         {
             if (AutoHide)
-                Target.gameObject.SetActive(false);
+                Target.activeSelf = false;
             AnimationManage.Manage.ReleaseAnimat(this);
         }
     }

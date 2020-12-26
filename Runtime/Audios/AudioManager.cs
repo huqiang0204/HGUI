@@ -116,6 +116,18 @@ namespace huqiang
             }
             return null;
         }
+        public static void ChangeVolume(int channel,float value)
+        {
+            for (int i = 0; i < lac.Count; i++)
+            {
+                if (lac[i].Channel == channel)
+                {
+                    var list = lac[i].audios;
+                    for (int j = 0; j < list.Count; j++)
+                        list[j].volume = value;
+                }
+            }
+        }
     }
     /// <summary>
     /// ui的音频管理器
@@ -152,14 +164,12 @@ namespace huqiang
         /// <param name="root"></param>
         public static void Initial(Transform root)
         {
-            GameObject a0 = new GameObject("UIAudio0");
+            GameObject a0 = new GameObject("UIAudio");
             a0.transform.SetParent(root);
-            var src = a0.AddComponent<AudioSource>();
-            AudioManager.AddAudioSource(AudioChannel.UI, src);
-            GameObject a1 = new GameObject("UIAudio1");
-            a1.transform.SetParent(root);
-            src = a1.AddComponent<AudioSource>();
-            AudioManager.AddAudioSource(AudioChannel.UI, src);
+            var src0 = a0.AddComponent<AudioSource>();
+            var src1 = a0.AddComponent<AudioSource>();
+            AudioManager.AddAudioSource(AudioChannel.UI, src0);
+            AudioManager.AddAudioSource(AudioChannel.UI, src1);
         }
         /// <summary>
         /// 播放声音
@@ -222,6 +232,10 @@ namespace huqiang
         {
             AudioManager.Stop(AudioChannel.UI);
         }
+        public static void ChangeVolume(float value)
+        {
+            AudioManager.ChangeVolume(AudioChannel.UI,value);
+        }
     }
     /// <summary>
     /// 背景音乐管理器
@@ -241,6 +255,7 @@ namespace huqiang
             GameObject a0 = new GameObject("BGMAudio");
             a0.transform.SetParent(root);
             var src = a0.AddComponent<AudioSource>();
+            src.loop = true;
             AudioManager.AddAudioSource(AudioChannel.BGM, src);
         }
         /// <summary>
@@ -250,7 +265,10 @@ namespace huqiang
         public static void Play(AudioClip clip)
         {
             if (Open)
+            {
+                AudioManager.Stop(AudioChannel.BGM);
                 AudioManager.Play(AudioChannel.BGM, clip, true);
+            }
         }
         /// <summary>
         /// 停止播放背景声音
@@ -258,6 +276,10 @@ namespace huqiang
         public static void Stop()
         {
              AudioManager.Stop(AudioChannel.BGM);
+        }
+        public static void ChangeVolume(float value)
+        {
+            AudioManager.ChangeVolume(AudioChannel.BGM, value);
         }
     }
 }

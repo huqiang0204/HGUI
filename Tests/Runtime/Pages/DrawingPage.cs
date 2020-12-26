@@ -22,7 +22,7 @@ public class DrawingPage:UIPage
         public UserEvent next;
     }
     View view;
-    public override void Initial(Transform parent, object dat = null)
+    public override void Initial(UIElement parent, object dat = null)
     {
         base.Initial(parent, dat);
         view = LoadUI<View>("baseUI", "drawing");//"baseUI"创建的bytes文件名,"page"为创建的页面名

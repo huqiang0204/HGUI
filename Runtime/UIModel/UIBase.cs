@@ -112,11 +112,11 @@ namespace huqiang.UIModel
         /// <summary>
         /// 父坐标变换
         /// </summary>
-        public Transform Parent { get; protected set; }
+        public UIElement Parent { get; protected set; }
         /// <summary>
         /// 主游戏对象
         /// </summary>
-        public GameObject Main { get; protected set; }
+        public UIElement Main { get; protected set; }
         /// <summary>
         /// UI模型
         /// </summary>
@@ -166,12 +166,13 @@ namespace huqiang.UIModel
             T t = new T();
             uiInitializer = new UIInitializer(ObjectFields(typeof(T)));
             uiInitializer.Reset(t);
-            Main = HGUIManager.GameBuffer.Clone(model, uiInitializer);
-            var trans = Main.transform;
-            trans.SetParent(Parent);
-            trans.localPosition = Vector3.zero;
-            trans.localScale = Vector3.one;
-            trans.localRotation = Quaternion.identity;
+            Main = HGUIManager.Clone(model, uiInitializer);
+            uiInitializer.Done();
+            Main.SetParent(Parent);
+            Main.localPosition = Vector3.zero;
+            Main.localScale = Vector3.one;
+            Main.localRotation = Quaternion.identity;
+            Main.activeSelf = true;
             return t;
         }
         /// <summary>
@@ -180,14 +181,14 @@ namespace huqiang.UIModel
         /// <param name="parent">父坐标变换</param>
         /// <param name="ui">父UI</param>
         /// <param name="obj">传递的数据</param>
-        public virtual void Initial(Transform parent, UIBase ui, object obj = null)
+        public virtual void Initial(UIElement parent, UIBase ui, object obj = null)
         {
             DataContext = obj;
             UIParent = ui;
             Parent = parent;
             if (parent != null)
                 if (Main != null)
-                    Main.transform.SetParent(parent);
+                    Main.SetParent(parent);
         }
         /// <summary>
         /// 释放资源
@@ -196,7 +197,7 @@ namespace huqiang.UIModel
         {
             if (Main != null)
             {
-                HGUIManager.GameBuffer.RecycleGameObject(Main);
+                HGUIManager.RecycleUI(Main);
             }
             point--;
             if (buff[point] != null)
@@ -246,9 +247,7 @@ namespace huqiang.UIModel
         {
             if (Main != null)
             {
-                var ele = Main.GetComponent<UIElement>();
-                if (ele != null)
-                    UIElement.Resize(ele);
+                    UIElement.Resize(Main);
             }
         }
         public virtual void Update(float time)

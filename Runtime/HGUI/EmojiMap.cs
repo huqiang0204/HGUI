@@ -67,6 +67,76 @@ namespace huqiang.Core.HGUI
                 }
                 return false;
             }
+            public int Find(char[] vs, int index)
+            {
+                if (dat == null)
+                    return -1;
+                if (index + len > vs.Length)
+                    return -1;
+                int c = dat.Length / len;
+                for (int i = 0; i < c; i++)
+                {
+                    int s = i * len;
+                    int t = index;
+                    for (int j = 0; j < len; j++)
+                    {
+                        if (vs[t] != dat[s])
+                            goto label;
+                        t++;
+                        s++;
+                    }
+                    return i;
+                    label:;
+                }
+                return -1;
+            }
+            public int Find(string vs, int index)
+            {
+                if (dat == null)
+                    return -1;
+                if (index + len > vs.Length)
+                    return -1;
+                int c = dat.Length / len;
+                for (int i = 0; i < c; i++)
+                {
+                    int s = i * len;
+                    int t = index;
+                    for (int j = 0; j < len; j++)
+                    {
+                        if (vs[t] != dat[s])
+                            goto label;
+                        t++;
+                        s++;
+                    }
+                    return i;
+                    label:;
+                }
+                return -1;
+            }
+            public int Find(string vs, int index, ref CharUV uV)
+            {
+                if (dat == null)
+                    return -1;
+                if (index + len > vs.Length)
+                    return -1;
+                int c = dat.Length / len;
+                for (int i = 0; i < c; i++)
+                {
+                    int s = i * len;
+                    int t = index;
+                    for (int j = 0; j < len; j++)
+                    {
+                        if (vs[t] != dat[s])
+                            goto label;
+                        t++;
+                        s++;
+                    }
+                    uV = uVs[i];
+                    return i;
+                    label:;
+                }
+                return -1;
+            }
         }
         static CharInfo[] charInfos;
         static EmojiMap()
@@ -286,6 +356,42 @@ namespace huqiang.Core.HGUI
                 pos++;
             }
             return max;
+        }
+        public static int FindEmoji(char[] buff, int index, int len)
+        {
+            len -= 1;
+            if (len > charInfos.Length)
+                return -1;
+            if (charInfos[len] == null)
+                return -1;
+            return charInfos[len].Find(buff, index);
+        }
+        public static int FindEmoji(string buff, int index, int len)
+        {
+            len -= 1;
+            if (len < 0)
+                return -1;
+            if (len > charInfos.Length)
+                return -1;
+            if (charInfos[len] == null)
+                return -1;
+            return charInfos[len].Find(buff, index);
+        }
+        public static CharUV GetUV(int len, int index)
+        {
+            len -= 1;
+            return charInfos[len].uVs[index];
+        }
+        public static int FindEmojiInfo(string buff, int index, int len,ref CharUV uV)
+        {
+            len -= 1;
+            if (len < 0)
+                return -1;
+            if (len > charInfos.Length)
+                return -1;
+            if (charInfos[len] == null)
+                return -1;
+            return charInfos[len].Find(buff, index,ref uV);
         }
     }
 }

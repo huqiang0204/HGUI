@@ -60,7 +60,7 @@ namespace huqiang.UIComposite
         /// <summary>
         /// 所有项目父坐标变换
         /// </summary>
-        public Transform Items;
+        public UIElement Items;
         /// <summary>
         /// 所有项目的父元素
         /// </summary>
@@ -124,17 +124,16 @@ namespace huqiang.UIComposite
         /// </summary>
         /// <param name="mod">数据模型</param>
         /// <param name="element">元素主体</param>
-        public override void Initial(FakeStruct mod,UIElement element,Initializer initializer)
+        public override void Initial(FakeStruct mod,UIElement element,UIInitializer initializer)
         {
             base.Initial(mod,element,initializer);
             contents = new List<TableContent>();
-            var trans = Enity.transform;
-            Head = trans.Find("Head").GetComponent<UIElement>();
-            Items = Head.transform.Find("Items");
-            stackPanel = Items.GetComponent<UIElement>().composite as StackPanel;
+            Head = Enity.Find("Head");
+            Items = Head.Find("Items");
+            stackPanel = Items.composite as StackPanel;
             Item= HGUIManager.FindChild(mod, "Item");
-            Content = trans.Find("Content").GetComponent<UIElement>();
-            HGUIManager.GameBuffer.RecycleGameObject(trans.Find("Item").gameObject);
+            Content = Enity.Find("Content");
+            HGUIManager.RecycleUI(Enity.Find("Item"));
         }
         /// <summary>
         /// 使用默认标签页
@@ -147,12 +146,12 @@ namespace huqiang.UIComposite
                 return null;
             TableContent content = new TableContent();
             content.Parent = this;
-            var mod = HGUIManager.GameBuffer.Clone(Item).transform;
+            var mod = HGUIManager.Clone(Item);
 
-            content.Item = mod.GetComponent<UIElement>();
-            content.Label = mod.Find("Text").GetComponent<HText>();
+            content.Item = mod;
+            content.Label = mod.Find("Text")as HText;
             content.Label.Text = label;
-            content.Back = mod.Find("Image").GetComponent<HImage>();
+            content.Back = mod.Find("Image")as HImage;
             content.Content = model;
 
             var eve = content.Item.RegEvent<UserEvent>();
@@ -163,12 +162,12 @@ namespace huqiang.UIComposite
             content.eventCall.DataContext = content;
             if (CurContent != null)
             {
-                CurContent.Content.gameObject.SetActive(false);
+                CurContent.Content.activeSelf = false;
                 if (CurContent.Back != null)
-                    CurContent.Back.gameObject.SetActive(false);
+                    CurContent.Back.activeSelf = false;
             }
-            model.transform.SetParent(Content.transform);
-            model.transform.localScale = Vector3.one;
+            model.SetParent(Content);
+            model.localScale = Vector3.one;
             UIElement.Resize(model);
             CurContent = content;
             CurContent.Back.MainColor = SelectColor;
@@ -187,19 +186,19 @@ namespace huqiang.UIComposite
         {
             if (CurContent != null)
             {
-                CurContent.Content.gameObject.SetActive(false);
+                CurContent.Content.activeSelf = false;
                 if (CurContent.Back != null)
-                    CurContent.Back.gameObject.SetActive(false);
+                    CurContent.Back.activeSelf = false;
             }
-            table.Item.transform.SetParent(Items);
+            table.Item.SetParent(Items);
             table.Item.userEvent.Click = ItemClick;
             table.Item.userEvent.PointerEntry = ItemPointEntry;
             table.Item.userEvent.PointerLeave = ItemPointLeave;
-            table.Content.transform.SetParent(Content.transform);
+            table.Content.SetParent(Content);
             CurContent = table;
-            CurContent.Content.gameObject.SetActive(true);
+            CurContent.Content.activeSelf = true;
             if (CurContent.Back != null)
-                CurContent.Back.gameObject.SetActive(true);
+                CurContent.Back.activeSelf = true;
             contents.Add(table);
         }
         /// <summary>
@@ -213,9 +212,9 @@ namespace huqiang.UIComposite
             {
                 CurContent = contents[0];
                 if (CurContent.Content != null)
-                    CurContent.Content.gameObject.SetActive(true);
+                    CurContent.Content.activeSelf = true;
                 if (CurContent.Back != null)
-                    CurContent.Back.gameObject.SetActive(true);
+                    CurContent.Back.activeSelf = true;
             }
         }
         /// <summary>
@@ -227,8 +226,8 @@ namespace huqiang.UIComposite
             contents.Remove(table);
             if (table == CurContent)
                 CurContent = null;
-            HGUIManager.GameBuffer.RecycleGameObject(table.Content.gameObject);
-            HGUIManager.GameBuffer.RecycleGameObject(table.Item.gameObject);
+            HGUIManager.RecycleUI(table.Content);
+            HGUIManager.RecycleUI(table.Item);
         }
         /// <summary>
         /// 添加一张表
@@ -239,8 +238,8 @@ namespace huqiang.UIComposite
             table.eventCall.Click = ItemClick;
             table.eventCall.PointerEntry = ItemPointEntry;
             table.eventCall.PointerLeave = ItemPointLeave;
-            table.Label.transform.SetParent(Head.transform);
-            table.Content.transform.SetParent(Content.transform);
+            table.Label.SetParent(Head);
+            table.Content.SetParent(Content);
         }
         /// <summary>
         /// 显示某张表
@@ -251,16 +250,16 @@ namespace huqiang.UIComposite
             if (CurContent != null)
             {
                 if (CurContent.Content != null)
-                    CurContent.Content.gameObject.SetActive(false);
+                    CurContent.Content.activeSelf = false;
                 if (CurContent.Back != null)
-                    CurContent.Back.gameObject.SetActive(false);
+                    CurContent.Back.activeSelf = false;
             }
             CurContent = content;
-            CurContent.Content.gameObject.SetActive(true);
+            CurContent.Content.activeSelf = true;
             if (CurContent.Back != null)
             {
                 CurContent.Back.MainColor = SelectColor;
-                CurContent.Back.gameObject.SetActive(true);
+                CurContent.Back.activeSelf = true;
             }
         }
         /// <summary>
@@ -301,7 +300,7 @@ namespace huqiang.UIComposite
                 if (c.Back != null)
                 {
                     c.Back.MainColor = HoverColor;
-                    c.Back.gameObject.SetActive(true);
+                    c.Back.activeSelf = true;
                 }
             }
         }
@@ -320,7 +319,7 @@ namespace huqiang.UIComposite
                 if (c != CurContent)
                     if (c.Back != null)
                     {
-                        c.Back.gameObject.SetActive(false);
+                        c.Back.activeSelf = false;
                     }
             }
         }

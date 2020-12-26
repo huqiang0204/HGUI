@@ -1,11 +1,7 @@
-﻿using huqiang.Core.HGUI;
-using huqiang.Data;
+﻿using huqiang.Data;
+using huqiang.Helper.HGUI;
 using huqiang.UIComposite;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
 using UnityEngine;
 
 public class StackPanelHelper:UIHelper
@@ -107,7 +103,7 @@ public class StackPanelHelper:UIHelper
     {
         Order();
     }
-    public unsafe override void ToBufferData(DataBuffer db, UITransfromData* data)
+    public unsafe override void ToBufferData(DataBuffer db, huqiang.Core.UIData.UIElementData* data)
     {
         FakeStruct fake = new FakeStruct(db,5);
         fake[0] = (int)direction;
@@ -115,6 +111,16 @@ public class StackPanelHelper:UIHelper
         fake[2] = FixedSize?1:0;
         fake.SetFloat(3,FixedSizeRatio);
         fake.SetFloat(4,ItemOffset);
-        data->composite = db.AddData(fake);
+        int type = db.AddData("StackPanelHelper");
+        int index = db.AddData(fake);
+        data->composite = type << 16 | index;
+    }
+    public override unsafe void LoadFromBuffer(FakeStruct fake,UIInitializer initializer)
+    {
+        direction = (Direction)fake[0];
+        spacing = fake.GetFloat(1);
+        FixedSize = fake[2] == 1;
+        FixedSizeRatio = fake.GetFloat(3);
+        ItemOffset = fake.GetFloat(4);
     }
 }

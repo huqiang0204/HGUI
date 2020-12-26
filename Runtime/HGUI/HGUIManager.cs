@@ -1,10 +1,12 @@
-﻿using huqiang.Data;
+﻿using huqiang.Core.UIData;
+using huqiang.Data;
 using huqiang.UIEvent;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace huqiang.Core.HGUI
@@ -33,40 +35,37 @@ namespace huqiang.Core.HGUI
         /// <summary>
         /// 游戏对象缓存
         /// </summary>
-        public static GameobjectBuffer GameBuffer;
+        public static UIelementBuffer GameBuffer;
         public static String Version = "1.0.30";
         /// <summary>
         /// 初始化UI组件,包含有:Transform,HImage,TextBox,HText,HLine,UIElement
         /// </summary>
         /// <param name="buff">回收站的父物体</param>
-        public static void Initial(Transform buff)
+        public static void Initial()
         {
-            GameBuffer = new GameobjectBuffer(buff);
-            var transHleper = GameBuffer.RegFakeStructHelper<UITransfromData>();
+            GameBuffer = new UIelementBuffer();
             var imgHelper = GameBuffer.RegFakeStructHelper<HImageData>();
-            var txtHelper= GameBuffer.RegFakeStructHelper<HTextData>();
+            var txtHelper = GameBuffer.RegFakeStructHelper<HTextData>();
             var graphHelper = GameBuffer.RegFakeStructHelper<HGraphicsData>();
             var eleHelper = GameBuffer.RegFakeStructHelper<UIElementData>();
             GameBuffer.RegFakeStructHelper<TextInputData>();
 
-            var transLoader = new UITransfromLoader();
             var imgLoader = new HImageLoader() { ImageHelper = imgHelper, GraphicsHelper = graphHelper, ElementHelper = eleHelper };
-            var txtLoader= new HTextLoader() { TextHelper = txtHelper, GraphicsHelper = graphHelper, ElementHelper = eleHelper };
+            var txtLoader = new HTextLoader() { TextHelper = txtHelper, GraphicsHelper = graphHelper, ElementHelper = eleHelper };
             var grapLoader = new HGraphicsLoader() { GraphicsHelper = graphHelper, ElementHelper = eleHelper };
             var eleLoader = new UIElementLoader() { ElementHelper = eleHelper };
 
-            GameBuffer.RegComponent(new ComponentInfo<Transform>() { loader = transLoader }); 
-            GameBuffer.RegComponent(new ComponentInfo<HImage>() { loader = imgLoader});
-            GameBuffer.RegComponent(new ComponentInfo<TextBox>() { loader =txtLoader });
-            GameBuffer.RegComponent(new ComponentInfo<HText>() { loader = txtLoader });
-            GameBuffer.RegComponent(new ComponentInfo<HLine>() { loader = grapLoader });
-            GameBuffer.RegComponent(new ComponentInfo<UIElement>() { loader = eleLoader });
-           
+            GameBuffer.RegDataLoader<UIElement>(eleLoader);
+            GameBuffer.RegDataLoader<HImage>(imgLoader);
+            GameBuffer.RegDataLoader<HText>(txtLoader);
+            GameBuffer.RegDataLoader<TextBox>(txtLoader);
+            GameBuffer.RegDataLoader<HLine>(grapLoader);
+            GameBuffer.RegDataLoader<HGraphics>(grapLoader);
+            GameBuffer.RegDataLoader<HCanvas>(eleLoader);
         }
         static List<FakeStruct> AddDataTable(DataBuffer db)
         {
             List<FakeStruct> list = new List<FakeStruct>();
-            list.Add(FakeStructHelper.CreateTable<UITransfromData>(db));
             list.Add(FakeStructHelper.CreateTable<UIElementData>(db));
             list.Add(FakeStructHelper.CreateTable<HGraphicsData>(db));
             list.Add(FakeStructHelper.CreateTable<HImageData>(db));
@@ -81,23 +80,28 @@ namespace huqiang.Core.HGUI
         /// <returns></returns>
         public static DataBuffer GetPrefab(Transform uiRoot)
         {
-            DataBuffer db = new DataBuffer(1024);
-            var loader = GameBuffer.GetDataLoader(0);
-            var root = loader.LoadFromObject(uiRoot, db);
-
-            FakeStruct fake = new FakeStruct(db, 3);
-            fake[0] = db.AddData(root);
-            var list = AddDataTable(db);
-            int c = list.Count;
-            Int16[] arr = new Int16[c];
-            for (int i = 0; i < arr.Length; i++)
+            var ui = uiRoot.GetComponent<Helper.HGUI.UIElement>();
+            if (ui != null)
             {
-                arr[i] = (Int16)db.AddData(list[i]);
+                DataBuffer db = new DataBuffer(1024);
+                string tn = ui.GetType().Name;
+                var loader = GameBuffer.FindDataLoader(tn);
+                var root = loader.SaveUI(ui, db);
+                FakeStruct fake = new FakeStruct(db, 3);
+                fake[0] = db.AddData(root);
+                var list = AddDataTable(db);
+                int c = list.Count;
+                Int16[] arr = new Int16[c];
+                for (int i = 0; i < arr.Length; i++)
+                {
+                    arr[i] = (Int16)db.AddData(list[i]);
+                }
+                fake[1] = db.AddData(arr);
+                fake[2] = db.AddData(Version);
+                db.fakeStruct = fake;
+                return db;
             }
-            fake[1] = db.AddData(arr);
-            fake[2] = db.AddData(Version);
-            db.fakeStruct = fake;
-            return db;
+            return null;
         }
         /// <summary>
         /// 将场景内的对象保存到文件
@@ -107,19 +111,6 @@ namespace huqiang.Core.HGUI
         public static void SavePrefab(Transform uiRoot, string path)
         {
             File.WriteAllBytes(path, GetPrefab(uiRoot).ToBytes());
-        }
-        /// <summary>
-        /// 将实例对象数据模型导入
-        /// </summary>
-        /// <param name="uiRoot"></param>
-        /// <returns></returns>
-        public static FakeStruct GetFakeData(Transform uiRoot)
-        {
-            DataBuffer db = new DataBuffer(1024);
-            if (GameBuffer == null)
-                Initial(null);
-            db.fakeStruct = GameBuffer.GetDataLoader(0).LoadFromObject(uiRoot, db);
-            return db.fakeStruct;
         }
         /// <summary>
         /// 所有预制体资源列表
@@ -153,6 +144,7 @@ namespace huqiang.Core.HGUI
                     break;
                 }
             prefabAssets.Add(asset);
+            GameBuffer.SetTables(asset.tables,name);
             return asset;
         }
         /// <summary>
@@ -164,7 +156,7 @@ namespace huqiang.Core.HGUI
         public unsafe static PrefabAsset LoadModels(byte[] dat, string name)
         {
             DataBuffer db = new DataBuffer(dat);
-            return LoadModels(db,name);
+            return LoadModels(db, name);
         }
         /// <summary>
         /// 查询transform的子物体
@@ -174,7 +166,7 @@ namespace huqiang.Core.HGUI
         /// <returns></returns>
         public static unsafe FakeStruct FindChild(FakeStruct fake, string childName)
         {
-            var data = (UITransfromData*)fake.ip;
+            var data = (UIElementData*)fake.ip;
             var buff = fake.buffer;
             Int16[] chi = fake.buffer.GetData(data->child) as Int16[];
             if (chi != null)
@@ -183,7 +175,7 @@ namespace huqiang.Core.HGUI
                     var fs = buff.GetData(chi[i]) as FakeStruct;
                     if (fs != null)
                     {
-                        var cd = (UITransfromData*)fs.ip;
+                        var cd = (UIElementData*)fs.ip;
                         string name = buff.GetData(cd->name) as string;
                         if (name == childName)
                             return fs;
@@ -197,7 +189,7 @@ namespace huqiang.Core.HGUI
         /// <param name="assetName">资源包名</param>
         /// <param name="childName">模型名称</param>
         /// <returns></returns>
-        public static unsafe FakeStruct FindModel(string assetName,string childName)
+        public static unsafe FakeStruct FindModel(string assetName, string childName)
         {
             for (int i = 0; i < prefabAssets.Count; i++)
             {
@@ -235,7 +227,7 @@ namespace huqiang.Core.HGUI
         /// <returns></returns>
         public static unsafe FakeStruct[] GetAllChild(FakeStruct fake)
         {
-            var data = (UITransfromData*)fake.ip;
+            var data = (UIElementData*)fake.ip;
             var buff = fake.buffer;
             Int16[] chi = fake.buffer.GetData(data->child) as Int16[];
             if (chi != null)
@@ -265,6 +257,41 @@ namespace huqiang.Core.HGUI
                 }
             }
             return null;
+        }
+        public static void RecycleChild(UIElement game)
+        {
+            if (game == null)
+                return;
+            GameBuffer.RecycleChild(game);
+        }
+        public static void RecycleUI(UIElement game)
+        {
+            GameBuffer.RecycleUI(game);
+        }
+        public static void RecycleChild(UIElement game, string[] keep)
+        {
+            var child = game.child;
+            var c = child.Count-1;
+            for(; c>=0;c--)
+            {
+                var son = child[c];
+                for (int i = 0; i < keep.Length; i++)
+                {
+                    if (keep[i] == son.name)
+                        goto label;
+                }
+                RecycleUI(son);
+            label:;
+            }
+        } 
+        public static UIElement Clone(FakeStruct fake, UIInitializer initializer = null)
+        {
+            if (fake == null)
+                return null;
+            var ui = GameBuffer.Clone(fake, initializer);
+            if (initializer != null)
+                initializer.Done();
+            return ui;
         }
     }
 }

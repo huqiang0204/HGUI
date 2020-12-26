@@ -1,4 +1,5 @@
 ﻿using huqiang.Core.HGUI;
+using huqiang.Core.UIData;
 using huqiang.Data;
 using huqiang.UIEvent;
 using System;
@@ -63,52 +64,49 @@ namespace huqiang.UIComposite
         /// 滚动事件
         /// </summary>
         public Action<ScrollYExtand, Vector2> Scroll;
-        Transform BodyParent;
-        Transform TitleParent;
+        UIElement BodyParent;
+        UIElement TitleParent;
         /// <summary>
         /// 初始化
         /// </summary>
         /// <param name="fake">数据模型</param>
         /// <param name="element">主体元素</param>
-        public override void Initial(FakeStruct fake,UIElement element,Initializer initializer)
+        public override void Initial(FakeStruct fake,UIElement element,UIInitializer initializer)
         {
             base.Initial(fake,element,initializer);
             element.SizeChanged = (o) => { Refresh(); };
             eventCall = Enity.RegEvent<UserEvent>();
+            eventCall.PointerDown = (o, e) => { UpdateVelocity = false; };
             eventCall.Drag = (o, e, s) => { Scrolling(o, s); };
-            eventCall.DragEnd = (o, e, s) => { Scrolling(o, s); };
-            eventCall.ScrollEndY = OnScrollEnd;
-            eventCall.Scrolling = Scrolling;
+            eventCall.DragEnd = OnDragEnd;
+            eventCall.MouseWheel = (o, e) => {
+                Point+=BounceBack((e.MouseWheelDelta * 100));
+                Order(); 
+                UpdateVelocity = true; 
+            };
             eventCall.ForceEvent = true;
             Size = Enity.SizeDelta;
             eventCall.CutRect = true;
-            var trans = element.transform;
-            BodyParent = trans.Find("Bodys");
-            TitleParent = trans.Find("Titles");
-            HGUIManager.GameBuffer.RecycleChild(Enity.gameObject,new string[]{ "Bodys", "Titles" });
+            BodyParent = element.Find("Bodys");
+            TitleParent = element.Find("Titles");
+            HGUIManager.RecycleChild(Enity,new string[]{ "Bodys", "Titles" });
            
             TitleMod =  HGUIManager.FindChild(fake,"Title");
             ItemMod = HGUIManager.FindChild(fake, "Item");
             TailMod = HGUIManager.FindChild(fake, "Tail");
             Body = HGUIManager.FindChild(fake, "Body");
-            unsafe
-            {
-                ItemSize = ((UITransfromData*)ItemMod.ip)->size;
-                TitleSize= ((UITransfromData*)TitleMod.ip)->size;
-                if(TailMod!=null)
-                    TailSize= ((UITransfromData*)TailMod.ip)->size;
-            }
+            ItemSize = UIElementLoader.GetSize(ItemMod);
+            TitleSize = UIElementLoader.GetSize(TitleMod);
+            if (TailMod != null)
+                TailSize = UIElementLoader.GetSize(TailMod);
         }
         void Scrolling(UserEvent back, Vector2 v)
         {
             if (Enity== null)
                 return;
-            v.y /= Enity.transform.localScale.y;
-            back.VelocityX = 0;
-            v.x = 0;
-            float x = 0;
-            float y = 0;
-            y = BounceBack(back, ref v, ref x, ref Point).y;
+            v.y /= Enity.localScale.y;
+            float y = BounceBack(v.y);
+            Point += y;
             Order();
             if (y != 0)
             {
@@ -116,26 +114,11 @@ namespace huqiang.UIComposite
                     Scroll(this, v);
             }
         }
-        void OnScrollEnd(UserEvent back)
+        void OnDragEnd(UserEvent back, UserAction action, Vector2 v)
         {
-            if (Point < -ScrollContent.Tolerance)
-            {
-                back.DecayRateY = 0.988f;
-                float d = -Point;
-                back.ScrollDistanceY = d * Enity.transform.localScale.y;
-            }
-            else
-            {
-                float max = height + ScrollContent.Tolerance;
-                if (max < Size.y)
-                    max = Size.y + ScrollContent.Tolerance;
-                if (Point + Size.y > max)
-                {
-                    back.DecayRateY = 0.988f;
-                    float d = ActualSize.y - Point - Size.y;
-                    back.ScrollDistanceY = d * Enity.transform.localScale.y;
-                }
-            }
+            Scrolling(back, v);
+            startVelocity = mVelocity = back.VelocityY;
+            UpdateVelocity = true;
         }
         public float Space = 0;
         /// <summary>
@@ -198,7 +181,6 @@ namespace huqiang.UIComposite
         List<ScrollItem> TailRecycler = new List<ScrollItem>();
         List<ScrollItem> BodyBuffer = new List<ScrollItem>();
         List<ScrollItem> BodyRecycler = new List<ScrollItem>();
-        int max_count;
         /// <summary>
         /// 所有设置完毕或更新数据时刷新
         /// </summary>
@@ -297,7 +279,7 @@ namespace huqiang.UIComposite
             }
             Titles.Add(t);
             t.target.localPosition = new Vector3(TitleOffset.x,  -os, 0);
-            t.target.gameObject.SetActive(true);
+            t.target.activeSelf = true;
             if(force|u)
             ItemUpdate(t.obj,dat,index,TitleCreator);
         }
@@ -317,16 +299,15 @@ namespace huqiang.UIComposite
             }
             Bodys.Add(t);
             t.target.localPosition = new Vector3(0, -os, 0);
-            var ui = t.target.GetComponent<UIElement>();
-            var size = ui.SizeDelta;
+            var size = t.target.SizeDelta;
             size.y = dat.ShowHeight;
-            ui.SizeDelta = size;
-            t.target.gameObject.SetActive(true);
+            t.target.SizeDelta = size;
+            t.target.activeSelf = true;
             if (dat.Data != null)
                 for (int i = 0; i < dat.Data.Count; i++)
                     OrderItem(os, dat.Data[i], i, force, t.target);
         }
-        void OrderItem(float os, object dat, int index, bool force,Transform parent)
+        void OrderItem(float os, object dat, int index, bool force,UIElement parent)
         {
             int r = index / wm;
             float oy = r * ItemSize.y;
@@ -343,7 +324,7 @@ namespace huqiang.UIComposite
             }
             Items.Add(t);
             t.target.localPosition = new Vector3(ItemOffset.x,  - oy , 0);
-            t.target.gameObject.SetActive(true);
+            t.target.activeSelf = true;
             t.target.SetParent(parent);
             ItemUpdate(t.obj, dat, index, ItemCreator);
         }
@@ -361,7 +342,7 @@ namespace huqiang.UIComposite
             }
             Tails.Add(t);
             t.target.localPosition = new Vector3(TailOffset.x, - os , 0);
-            t.target.gameObject.SetActive(true);
+            t.target.activeSelf = true;
             if (force | u)
                 ItemUpdate(t.obj, dat, index, TailCreator);
         }
@@ -380,11 +361,11 @@ namespace huqiang.UIComposite
         public void Dispose()
         {
             for (int i = 0; i < Titles.Count; i++)
-                HGUIManager.GameBuffer.RecycleGameObject(Titles[i].target.gameObject);
+                HGUIManager.RecycleUI(Titles[i].target);
             for (int i = 0; i < Items.Count; i++)
-                HGUIManager.GameBuffer.RecycleGameObject(Items[i].target.gameObject);
+                HGUIManager.RecycleUI(Items[i].target);
             for (int i = 0; i < Tails.Count; i++)
-                HGUIManager.GameBuffer.RecycleGameObject(Tails[i].target.gameObject);
+                HGUIManager.RecycleUI(Tails[i].target);
             Titles.Clear();
             Items.Clear();
             Tails.Clear();
@@ -401,7 +382,7 @@ namespace huqiang.UIComposite
         public void SetTitleUpdate<T, U>(Action<T, U, int> action) where T : class, new()
         {
             for (int i = 0; i < Titles.Count; i++)
-                HGUIManager.GameBuffer.RecycleGameObject(Titles[i].target.gameObject);
+                HGUIManager.RecycleUI(Titles[i].target);
             Titles.Clear();
             var m = new Middleware<T, U>();
             m.Invoke = action;
@@ -414,7 +395,7 @@ namespace huqiang.UIComposite
         public void SetTitleUpdate(HotMiddleware constructor)
         {
             for (int i = 0; i < Titles.Count; i++)
-                HGUIManager.GameBuffer.RecycleGameObject(Titles[i].target.gameObject);
+                HGUIManager.RecycleUI(Titles[i].target);
             Titles.Clear();
             TitleCreator = constructor;
         }
@@ -427,7 +408,7 @@ namespace huqiang.UIComposite
         public void SetItemUpdate<T, U>(Action<T, U, int> action) where T : class, new()
         {
             for (int i = 0; i < Items.Count; i++)
-                HGUIManager.GameBuffer.RecycleGameObject(Items[i].target.gameObject);
+                HGUIManager.RecycleUI(Items[i].target);
             Items.Clear();
             var m = new Middleware<T, U>();
             m.Invoke = action;
@@ -440,7 +421,7 @@ namespace huqiang.UIComposite
         public void SetItemUpdate(HotMiddleware constructor)
         {
             for (int i = 0; i < Items.Count; i++)
-                HGUIManager.GameBuffer.RecycleGameObject(Items[i].target.gameObject);
+                HGUIManager.RecycleUI(Items[i].target);
             Items.Clear();
             ItemCreator = constructor;
         }
@@ -453,7 +434,7 @@ namespace huqiang.UIComposite
         public void SetTailUpdate<T, U>(Action<T, U, int> action) where T : class, new()
         {
             for (int i = 0; i < Tails.Count; i++)
-                HGUIManager.GameBuffer.RecycleGameObject(Tails[i].target.gameObject);
+                HGUIManager.RecycleUI(Tails[i].target);
             Tails.Clear();
             var m = new Middleware<T, U>();
             m.Invoke = action;
@@ -466,7 +447,7 @@ namespace huqiang.UIComposite
         public void SetTailUpdate(HotMiddleware constructor)
         {
             for (int i = 0; i < Tails.Count; i++)
-                HGUIManager.GameBuffer.RecycleGameObject(Tails[i].target.gameObject);
+                HGUIManager.RecycleUI(Tails[i].target);
             Tails.Clear();
             TailCreator = constructor;
         }
@@ -492,12 +473,12 @@ namespace huqiang.UIComposite
         /// <param name="mod">UI模型数据</param>
         /// <param name="parent">父坐标变换</param>
         /// <returns></returns>
-        protected ScrollItem CreateItem(List<ScrollItem> buffer, Constructor con, FakeStruct mod, Transform parent)
+        protected ScrollItem CreateItem(List<ScrollItem> buffer, Constructor con, FakeStruct mod, UIElement parent)
         {
             if (buffer.Count > 0)
             {
                 var it = buffer[0];
-                it.target.gameObject.SetActive(true);
+                it.target.activeSelf = true;
                 it.index = -1;
                 buffer.RemoveAt(0);
                 return it;
@@ -505,12 +486,12 @@ namespace huqiang.UIComposite
             ScrollItem a = new ScrollItem();
             if (con == null)
             {
-                a.obj = a.target = HGUIManager.GameBuffer.Clone(mod).transform;
+                a.obj = a.target = HGUIManager.Clone(mod);
             }
             else
             {
                 a.obj = con.Create();
-                a.target = HGUIManager.GameBuffer.Clone(mod, con.initializer).transform;
+                a.target = HGUIManager.Clone(mod, con.initializer);
             }
             a.target.SetParent(parent);
             a.target.localScale = Vector3.one;
@@ -541,7 +522,7 @@ namespace huqiang.UIComposite
         protected void PushItems(List<ScrollItem> tar, List<ScrollItem> src)
         {
             for (int i = 0; i < src.Count; i++)
-                src[i].target.gameObject.SetActive(false);
+                src[i].target.activeSelf = false;
             tar.AddRange(src);
             src.Clear();
         }
@@ -579,91 +560,11 @@ namespace huqiang.UIComposite
                 if (t.index == index)
                 {
                     tar.RemoveAt(i);
-                    t.target.gameObject.SetActive(true);
+                    t.target.activeSelf = true;
                     return t;
                 }
             }
             return null;
-        }
-        /// <summary>
-        /// 回弹滚动
-        /// </summary>
-        /// <param name="eventCall">用户事件</param>
-        /// <param name="v">参考移动量</param>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
-        protected Vector2 BounceBack(UserEvent eventCall, ref Vector2 v, ref float x, ref float y)
-        {
-            if (eventCall.Pressed)
-            {
-                float r = 1;
-                if (y < 0)
-                {
-                    if (v.y < 0)
-                    {
-                        r += y / (Size.y * 0.5f);
-                        if (r < 0)
-                            r = 0;
-                        eventCall.VelocityY = 0;
-                    }
-                }
-                else if (y + Size.y > height)
-                {
-                    if (v.y > 0)
-                    {
-                        r = 1 - (y - height + Size.y) / (Size.y * 0.5f);
-                        if (r < 0)
-                            r = 0;
-                        else if (r > 1)
-                            r = 1;
-                        eventCall.VelocityY = 0;
-                    }
-                }
-                y += v.y * r;
-            }
-            else
-            {
-                x -= v.x;
-                y += v.y;
-                if (x < 0)
-                {
-                    if (v.x > 0)
-                        if (eventCall.DecayRateX >= 0.99f)
-                        {
-                            eventCall.DecayRateX = 0.9f;
-                            eventCall.VelocityX = eventCall.VelocityX;
-                        }
-                }
-                else if (x + Size.x > ActualSize.x)
-                {
-                    if (v.x < 0)
-                        if (eventCall.DecayRateX >= 0.95f)
-                        {
-                            eventCall.DecayRateX = 0.9f;
-                            eventCall.VelocityX = eventCall.VelocityX;
-                        }
-                }
-                if (y < 0)
-                {
-                    if (v.y < 0)
-                        if (eventCall.DecayRateY >= 0.95f)
-                        {
-                            eventCall.DecayRateY = 0.9f;
-                            eventCall.VelocityY = eventCall.VelocityY;
-                        }
-                }
-                else if (y + Size.y > ActualSize.y)
-                {
-                    if (v.y > 0)
-                        if (eventCall.DecayRateY >= 0.95f)
-                        {
-                            eventCall.DecayRateY = 0.9f;
-                            eventCall.VelocityY = eventCall.VelocityY;
-                        }
-                }
-            }
-            return v;
         }
         DataTemplate hideSect;
         DataTemplate showSect;
@@ -696,7 +597,10 @@ namespace huqiang.UIComposite
         public ScrollYExtand()
         {
         }
-        void CalculSizeD()
+        /// <summary>
+        /// 计算动画中的尺寸
+        /// </summary>
+        void CalculSizeA()
         {
             height = 0;
             wm = (int)(ItemSize.x / Size.x);
@@ -718,6 +622,13 @@ namespace huqiang.UIComposite
             ActualSize.y = height;
         }
         /// <summary>
+        /// 初始速率
+        /// </summary>
+        protected float startVelocity;
+        float mVelocity;
+        public float DecayRate = 0.997f;
+        protected bool UpdateVelocity = true;
+        /// <summary>
         /// 帧更新,包含展开收缩动画
         /// </summary>
         /// <param name="time">时间片</param>
@@ -727,7 +638,7 @@ namespace huqiang.UIComposite
             if (hideSect != null)
             {
                 up = true;
-                float a = hideSect.aniTime;
+                //float a = hideSect.aniTime;
                 hideSect.aniTime += time;
                 if (hideSect.aniTime > 400)
                     hideSect.aniTime = 400;
@@ -742,7 +653,7 @@ namespace huqiang.UIComposite
             if (showSect != null)
             {
                 up = true;
-                float a = showSect.aniTime;
+                //float a = showSect.aniTime;
                 showSect.aniTime += time;
                 if (showSect.aniTime > 400)
                     showSect.aniTime = 400;
@@ -755,16 +666,94 @@ namespace huqiang.UIComposite
             {
                 if (Point + Size.y > height)
                     Point = height - Size.y;
-                CalculSizeD();
+                CalculSizeA();
                 Order();
             }
-            if(eventCall!=null)
+            if(UpdateVelocity)
             {
-               if(eventCall.VelocityY==0)
+                int count = UserAction.TimeSlice;
+                float dr = DecayRate;
+                if (mVelocity < 0)
                 {
-                    OnScrollEnd(eventCall);
+                    if (Point<0)
+                    {
+                        dr *= 0.9f;
+                    }
+                }
+                else
+                {
+                    float max = height;
+                    if (max < Size.y)
+                        max = Size.y;
+                    if (Point + Size.y > max)
+                    {
+                        dr *= 0.9f;
+                    }
+                }
+                float y = 0;
+                for (int i = 0; i < count; i++)
+                {
+                    y += mVelocity;
+                    mVelocity *= dr;
+                }
+                Point += y;
+                Order();
+                if (mVelocity < 0.01f & mVelocity > -0.01f)
+                {
+                    mVelocity = 0;
+                }
+                if (mVelocity == 0)
+                {
+                    if (Point < -ScrollContent.Tolerance)
+                    {
+                        mVelocity = MathH.DistanceToVelocity(DecayRate, -Point);
+                    }
+                    else
+                    {
+                        float max = height + ScrollContent.Tolerance;
+                        if (max < Size.y)
+                            max = Size.y + ScrollContent.Tolerance;
+                        if (Point + Size.y > max)
+                        {
+                            float d = ActualSize.y - Point - Size.y;
+                            mVelocity = MathH.DistanceToVelocity(DecayRate, d * Enity.localScale.y);
+                        }
+                    }
+                    if (mVelocity < 0.01f & mVelocity > -0.01f)
+                    {
+                        mVelocity = 0;
+                        UpdateVelocity = false;
+                    }
                 }
             }
+        }
+        protected float BounceBack(float vy)
+        {
+            float r = 1;
+            if (Point < 0)
+            {
+                if (vy < 0)
+                {
+                    r += Point / (Size.y * 0.5f);
+                    if (r < 0)
+                        r = 0;
+                    mVelocity = 0;
+                }
+            }
+            else if (Point + Size.y > height)
+            {
+                if (vy > 0)
+                {
+                    r = 1 - (Point - height + Size.y) / (Size.y * 0.5f);
+                    if (r < 0)
+                        r = 0;
+                    else if (r > 1)
+                        r = 1;
+                    mVelocity = 0;
+                }
+            }
+            vy *= r;
+            return vy;
         }
     }
 }

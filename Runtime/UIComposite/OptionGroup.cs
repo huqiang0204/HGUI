@@ -1,4 +1,5 @@
 ﻿using huqiang.Core.HGUI;
+using huqiang.Core.UIData;
 using huqiang.UIEvent;
 using System;
 using System.Collections.Generic;
@@ -52,7 +53,7 @@ namespace huqiang.UIComposite
         {
             if (element.userEvent == null)
             {
-                element.eventType = huqiang.Core.HGUI.HEventType.UserEvent;
+                element.eventType = HEventType.UserEvent;
                 element.RegEvent<UserEvent>();
             }
             AddEvent(element.userEvent);

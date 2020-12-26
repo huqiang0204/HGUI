@@ -1,5 +1,6 @@
 ﻿using huqiang.Core.HGUI;
 using huqiang.Core.Line;
+using huqiang.Core.UIData;
 using huqiang.Data;
 using huqiang.UIEvent;
 using System;
@@ -11,7 +12,7 @@ namespace huqiang.UIComposite
     public class DataBaseItem
     {
         public int index =-1;
-        public GameObject target;
+        public UIElement target;
     }
     public class DataGridHead:DataBaseItem
     {
@@ -80,11 +81,11 @@ namespace huqiang.UIComposite
             DataGridItem it = buf.Dequeue();
             if (it != null)
             {
-                it.target.SetActive(true);
+                it.target.activeSelf = true;
                 return it;
             }
             var t = itemCreator.Create() as DataGridItem;
-            t.target = HGUIManager.GameBuffer.Clone(mod, itemCreator.initializer);
+            t.target = HGUIManager.Clone(mod, itemCreator.initializer);
             return t;
         }
     }
@@ -168,16 +169,16 @@ namespace huqiang.UIComposite
         FakeStruct ItemMod;
         FakeStruct HeadMod;
         FakeStruct DragMod;
-        Transform Heads;
-        Transform Grid;
-        Transform Items;
-        Transform Drags;
+        UIElement Heads;
+        UIElement Grid;
+        UIElement Items;
+        UIElement Drags;
         HLine lines;
-        Vector2 contentSize;
+        Vector2 ContentSize;
         Vector2 headSize;
         float itemY;
-        float m_pointY;
-        float m_pointX;
+        //float m_pointY;
+        //float m_pointX;
         float lineWidth;
         float lineHigh;
         List<DataGridColumn> columns = new List<DataGridColumn>();
@@ -216,35 +217,31 @@ namespace huqiang.UIComposite
         /// </summary>
         /// <param name="mod">数据模型</param>
         /// <param name="element">UI元素主体</param>
-        public override void Initial(FakeStruct mod, UIElement element,Initializer initializer)
+        public override void Initial(FakeStruct mod, UIElement element,UIInitializer initializer)
         {
             base.Initial(mod, element,initializer);
             HeadMod = HGUIManager.FindChild(mod, "Head");
             ItemMod = HGUIManager.FindChild(mod, "Item");
             DragMod = HGUIManager.FindChild(mod, "Drag");
-            var trans = element.transform;
-            Heads = trans.Find("Heads");
-            Grid = trans.Find("Grid");
+            Heads = element.Find("Heads");
+            Grid = element.Find("Grid");
             Items = Grid.Find("Items");
-            Drags = trans.Find("Drags");
-            lines = Grid.Find("Line").GetComponent<HLine>();
-            unsafe
-            {
-                headSize = ((UITransfromData*)HeadMod.ip)->size;
-                itemY = ((UITransfromData*)ItemMod.ip)->size.y;
-            }
-            HGUIManager.GameBuffer.RecycleGameObject(trans.Find("Head").gameObject);
-            HGUIManager.GameBuffer.RecycleGameObject(trans.Find("Item").gameObject);
-            HGUIManager.GameBuffer.RecycleGameObject(trans.Find("Drag").gameObject);
+            Drags = element.Find("Drags");
+            lines = Grid.Find("Line") as HLine;
+            headSize = UIElementLoader.GetSize(HeadMod);
+            itemY = UIElementLoader.GetSize(ItemMod).y;
+            HGUIManager.RecycleUI(element.Find("Head"));
+            HGUIManager.RecycleUI(element.Find("Item"));
+            HGUIManager.RecycleUI(element.Find("Drag"));
             eventCall = element.RegEvent<UserEvent>();
             eventCall.CutRect = true;
+            eventCall.PointerDown = (o, e) => { UpdateVelocity = false; };
             eventCall.Drag = (o, e, s) => { Scrolling(o, s); };
-            eventCall.DragEnd = (o, e, s) => { Scrolling(o, s); };
+            eventCall.DragEnd = OnDragEnd;
             eventCall.MouseWheel = (o, e) => { Scrolling(o, new Vector2(0, e.MouseWheelDelta * 100)); };
-            eventCall.Scrolling = Scrolling;
             eventCall.ForceEvent = true;
             eventCall.AutoColor = false;
-            var ue = Grid.GetComponent<UIElement>().RegEvent<UserEvent>();
+            var ue = Grid.RegEvent<UserEvent>();
             ue.CutRect = true;
             ue.Penetrate = true;
             Enity.SizeChanged = (o) => { Refresh(); };
@@ -253,12 +250,19 @@ namespace huqiang.UIComposite
         {
             if (Enity == null)
                 return;
-            var trans = back.Context.transform;
+            var trans = back.Context;
             v.x /= trans.localScale.x;
             v.y /= trans.localScale.y;
-            LimitX(back, -v.x);
-            LimitY(back, v.y);
+            LimitX(-v.x);
+            LimitY(v.y);
             Refresh();
+        }
+        void OnDragEnd(UserEvent back, UserAction action, Vector2 v)
+        {
+            Scrolling(back, v);
+            startVelocity.x = mVelocity.x = -action.Velocities.x / back.GlobalScale.x / action.PhysicalScale;
+            startVelocity.y = mVelocity.y = action.Velocities.y / back.GlobalScale.y / action.PhysicalScale;
+            UpdateVelocity = true;
         }
         /// <summary>
         /// 初始化设置和绑定数据后调用此函数,刷新显示内容
@@ -268,32 +272,31 @@ namespace huqiang.UIComposite
             float x = 0;
             for (int i = 0; i < columns.Count; i++)
                 x += columns[i].width;
-            contentSize.x = x;
+            ContentSize.x = x;
             if (columns.Count > 0)
-                contentSize.y = itemY * columns[0].datas.Count;
-            if (contentSize.x > Enity.m_sizeDelta.x)
+                ContentSize.y = itemY * columns[0].datas.Count;
+            if (ContentSize.x > Enity.m_sizeDelta.x)
                 lineWidth = Enity.m_sizeDelta.x;
-            else lineWidth = contentSize.x;
-            if (contentSize.y > Enity.m_sizeDelta.y)
+            else lineWidth = ContentSize.x;
+            if (ContentSize.y > Enity.m_sizeDelta.y)
                 lineHigh = Enity.m_sizeDelta.y;
-            else lineHigh = contentSize.y;
+            else lineHigh = ContentSize.y;
             Order();
         }
-        T CreateEnity<T>(QueueBuffer<T> buf, FakeStruct mod, ModelConstructor creator,Transform parent)
+        T CreateEnity<T>(QueueBuffer<T> buf, FakeStruct mod, ModelConstructor creator,UIElement parent)
             where T:DataBaseItem,new()
         {
             T it = buf.Dequeue();
             if (it != null)
             {
-                it.target.SetActive(true);
+                it.target.activeSelf = true;
                 return it;
             }
             var t = creator.Create() as T;
-            t.target = HGUIManager.GameBuffer.Clone(mod, creator.initializer);
-            var trans = t.target.transform;
-            trans.SetParent(parent);
-            trans.localScale = Vector3.one;
-            trans.localRotation = Quaternion.identity;
+            t.target = HGUIManager.Clone(mod, creator.initializer);
+            t.target.SetParent(parent);
+            t.target.localScale = Vector3.one;
+            t.target.localRotation = Quaternion.identity;
             return t;
         }
         void RecycleEnity<T,U>(SwapBuffer<T,U> swap, QueueBuffer<T> queue) where T:DataBaseItem
@@ -302,7 +305,7 @@ namespace huqiang.UIComposite
             for (int i = 0; i < len; i++)
             {
                 var it = swap.Pop();
-                it.target.SetActive(false);
+                it.target.activeSelf = false;
                 queue.Enqueue(it);
             }
             swap.Done();
@@ -314,10 +317,10 @@ namespace huqiang.UIComposite
             {
                 var it = ItemSwap.Pop();
                 var col = it.GridColumn;
-                it.target.SetActive(false);
+                it.target.activeSelf = false;
                 if (col == null)
                 {
-                    HGUIManager.GameBuffer.RecycleGameObject(it.target);
+                    HGUIManager.RecycleUI(it.target);
                 }
                 else col.buf.Enqueue(it);
             }
@@ -332,7 +335,7 @@ namespace huqiang.UIComposite
                 item.Context = col;
                 HeadSwap.Push(item);
             }
-            item.target.transform.localPosition = pos;
+            item.target.localPosition = pos;
             pos.x += col.width;
             UpdateDrag(pos,item);
             UpdateVerticalLine(pos.x);
@@ -357,8 +360,8 @@ namespace huqiang.UIComposite
                     item.Row = -1;
                     item.Column = -1;
                     if (item.Item == null)
-                        item.Item = item.target.GetComponent<UIElement>();
-                    var trans = item.target.transform;
+                        item.Item = item.target;
+                    var trans = item.target;
                     trans.SetParent(Items);
                     trans.localScale = Vector3.one;
                     trans.localRotation = Quaternion.identity;
@@ -380,7 +383,7 @@ namespace huqiang.UIComposite
                 item.Item.SizeDelta = size;
                 UIElement.ResizeChild(item.Item);
             }
-            item.target.transform.localPosition = pos;
+            item.target.localPosition = pos;
             if (item.Row != row | item.Column != col)
             {
                 item.Row = row;
@@ -396,8 +399,7 @@ namespace huqiang.UIComposite
             var item = dragSwap.Exchange((o, e) => { return (o.DataContext as DataGridHead) == e; }, col);
             if(item==null)
             {
-                var go = HGUIManager.GameBuffer.Clone(DragMod);
-                var ele = go.GetComponent<UIElement>();
+                var ele = HGUIManager.Clone(DragMod);
                 item = ele.RegEvent<UserEvent>();
                 item.DataContext = col;
                 dragSwap.Push(item);
@@ -413,19 +415,18 @@ namespace huqiang.UIComposite
                         Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
                 };
 #endif
-                var trans = go.transform;
-                trans.SetParent(Drags);
-                trans.localScale = Vector3.one;
-                trans.localRotation = Quaternion.identity;
+                ele.SetParent(Drags);
+                ele.localScale = Vector3.one;
+                ele.localRotation = Quaternion.identity;
             }
             pos.y = -0.5f * headSize.y;
-            item.Context.transform.localPosition = pos;
+            item.Context.localPosition = pos;
         }
         void Draging(UserEvent back,UserAction action,Vector2 v)
         {
             var head = back.DataContext as DataGridHead;
             var col = head.Context;
-            var trans = back.Context.transform;
+            var trans = back.Context;
             v.x /= trans.localScale.x;
             col.width += v.x;
             if (col.width < 80)
@@ -440,7 +441,7 @@ namespace huqiang.UIComposite
         {
             var head = back.DataContext as DataGridHead;
             var col = head.Context;
-            var trans = back.Context.transform;
+            var trans = back.Context;
             v.x /= trans.localScale.x;
             col.width += v.x;
             if (col.width < 80)
@@ -483,7 +484,7 @@ namespace huqiang.UIComposite
         void Order()
         {
             lines.Clear();
-            float x = m_pointX;
+            float x = Position.x;
             float os  = -x;
             for (int i = 0; i < columns.Count; i++)
             {
@@ -503,21 +504,21 @@ namespace huqiang.UIComposite
             for (int i = 0; i < len; i++)
             {
                 var it = dragSwap.Pop();
-                HGUIManager.GameBuffer.RecycleGameObject(it.Context.gameObject);
+                HGUIManager.RecycleUI(it.Context);
             }
             dragSwap.Done();
             OrderLine();
             for (int i = 0; i < temp.Count; i++)
-                temp[i].gameObject.SetActive(false);
+                temp[i].activeSelf = false;
         }
         void OrderItem(DataGridColumn column,float os,int col)
         {
-            int s = (int)(m_pointY / itemY)-1;
+            int s = (int)(Position.y / itemY)-1;
             if (s < 0)
                 s = 0;
             var data = column.datas;
             float end = Enity.m_sizeDelta.y;
-            float oy = s * itemY-m_pointY;
+            float oy = s * itemY-Position.y;
             for (int i = s; i < data.Count; i++)
             {
                 UpdateItem(new Vector3(os, oy, 0), data[i],i,col);
@@ -528,14 +529,14 @@ namespace huqiang.UIComposite
         }
         void OrderLine()
         {
-            int s = (int)(m_pointY / itemY) - 1;
+            int s = (int)(Position.y / itemY) - 1;
             if (s < 0)
                 s = 0;
             if(columns.Count>0)
             {
                 var data = columns[0].datas;
                 float end = Enity.m_sizeDelta.y;
-                float oy = s * itemY- m_pointY;
+                float oy = s * itemY- Position.y;
                 oy += itemY * 0.5f;
                 for (int i = s; i < data.Count; i++)
                 {
@@ -613,9 +614,9 @@ namespace huqiang.UIComposite
             dragSwap.Clear();
             headQueue.Clear();
             itemQueue.Clear();
-            HGUIManager.GameBuffer.RecycleChild(Items.gameObject);
-            HGUIManager.GameBuffer.RecycleChild(Heads.gameObject);
-            HGUIManager.GameBuffer.RecycleChild(Drags.gameObject);
+            HGUIManager.RecycleChild(Items);
+            HGUIManager.RecycleChild(Heads);
+            HGUIManager.RecycleChild(Drags);
         }
         /// <summary>
         /// 添加一行
@@ -702,61 +703,110 @@ namespace huqiang.UIComposite
         /// </summary>
         /// <param name="callBack">用户事件</param>
         /// <param name="x">移动距离</param>
-        protected void LimitX(UserEvent callBack, float x)
+        protected void LimitX(float x)
         {
             var size = Enity.m_sizeDelta;
-            if (size.x > contentSize.x)
+            if (size.x > ContentSize.x)
             {
-                m_pointX = 0;
+                Position.x = 0;
                 return;
             }
             if (x == 0)
                 return;
-            float vx = m_pointX + x;
+            float vx = Position.x + x;
             if (vx < 0)
             {
-                m_pointX = 0;
-                callBack.VelocityX = 0;
+                Position.x = 0;
+                mVelocity.x = 0;
                 return;
             }
-            else if (vx + size.x > contentSize.x)
+            else if (vx + size.x > ContentSize.x)
             {
-                m_pointX = contentSize.x - size.x;
-                callBack.VelocityX = 0;
+                Position.x = ContentSize.x - size.x;
+                mVelocity.x = 0;
                 return;
             }
-            m_pointX += x;
+            Position.x += x;
         }
         /// <summary>
         /// Y轴向的滚动限制
         /// </summary>
         /// <param name="callBack">用户事件</param>
         /// <param name="y">移动距离</param>
-        protected void LimitY(UserEvent callBack, float y)
+        protected void LimitY(float y)
         {
             var size = Enity.m_sizeDelta;
             size.y -= headSize.y;
-            if (size.y > contentSize.y)
+            if (size.y > ContentSize.y)
             {
-                m_pointY = 0;
+                Position.y = 0;
                 return;
             }
             if (y == 0)
                 return;
-            float vy = m_pointY + y;
+            float vy = Position.y + y;
             if (vy < 0)
             {
-                m_pointY = 0;
-                callBack.VelocityY = 0;
+                Position.y = 0;
+                mVelocity.y = 0;
                 return;
             }
-            else if (vy + size.y > contentSize.y)
+            else if (vy + size.y > ContentSize.y)
             {
-                m_pointY = contentSize.y - size.y;
-                callBack.VelocityY = 0;
+                Position.y = ContentSize.y - size.y;
+                mVelocity.y = 0;
                 return;
             }
-            m_pointY += y;
+            Position.y += y;
+        }
+        /// <summary>
+        /// 初始速率
+        /// </summary>
+        protected Vector2 startVelocity;
+        Vector2 mVelocity;
+        public float DecayRate = 0.997f;
+        protected bool UpdateVelocity = true;
+        public override void Update(float time)
+        {
+            if (!UpdateVelocity)
+                return;
+            float x = 0;
+            float y = 0;
+            int count = UserAction.TimeSlice;
+            if (mVelocity.x != 0)
+            {
+                float dr = DecayRate;
+                for (int i = 0; i < count; i++)
+                {
+                    mVelocity.x *= dr;
+                    x += mVelocity.x;
+                }
+                if (mVelocity.x < 0.01f & mVelocity.x > -0.01f)
+                {
+                    mVelocity.x = 0;
+                }
+            }
+            if (mVelocity.y != 0)
+            {
+                float dr = DecayRate;
+                for (int i = 0; i < count; i++)
+                {
+                    mVelocity.y *= dr;
+                    y += mVelocity.y;
+                }
+                if (mVelocity.y < 0.01f & mVelocity.y > -0.01f)
+                {
+                    mVelocity.y = 0;
+                }
+            }
+            LimitX(x);
+            LimitY(y);
+            Refresh();
+            //if (x != 0 | y != 0)
+            //    Move(new Vector2(x, y));
+
+            if (mVelocity.x == 0 & mVelocity.y == 0)
+                UpdateVelocity = false;
         }
     }
 }

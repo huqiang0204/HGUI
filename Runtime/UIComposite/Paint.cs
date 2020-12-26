@@ -49,7 +49,7 @@ namespace huqiang.UIComposite
         /// 当前绘制状态
         /// </summary>
         public DrawModel drawModel;
-        public override void Initial(FakeStruct fake,UIElement script,Initializer initializer)
+        public override void Initial(FakeStruct fake,UIElement script,UIInitializer initializer)
         {
             base.Initial(fake,script,initializer);
             raw = Enity as HImage;
@@ -100,12 +100,12 @@ namespace huqiang.UIComposite
             if(drawModel==DrawModel.Scale)
             {
                 float s = ges.CurScale;
-                Enity.transform.localScale = new Vector3(s, s, s);
+                Enity.localScale = new Vector3(s, s, s);
             }
             else if(drawModel==DrawModel.Rotate)
             {
                 float a = ges.DeltaAngle;
-                Enity.transform.localRotation *= Quaternion.Euler(0, 0, a);
+                Enity.localRotation *= Quaternion.Euler(0, 0, a);
             }
         }
         void DrawLine(Vector2 start, Vector2 end)

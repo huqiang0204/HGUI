@@ -17,7 +17,7 @@ namespace huqiang
         /// </summary>
         /// <param name="trans">实例目标</param>
         /// <returns></returns>
-        public static MoveAnimat FindMoveAni(this Transform trans)
+        public static MoveAnimat FindMoveAni(this UIElement trans)
         {
             if (trans == null)
                 return null;
@@ -33,11 +33,11 @@ namespace huqiang
         /// <param name="delay">延迟启动</param>
         /// <param name="over">完毕后的回调函数</param>
         /// <param name="cover">是否覆盖已有的动画</param>
-        public static void MoveTo(this Transform trans, Vector3 pos, float time,bool hide=false, float delay = 0, Action<MoveAnimat> over = null, bool cover = true)
+        public static void MoveTo(this UIElement trans, Vector3 pos, float time,bool hide=false, float delay = 0, Action<MoveAnimat> over = null, bool cover = true)
         {
             if (trans == null)
                 return;
-            trans.gameObject.SetActive(true);
+            trans.activeSelf = true;
             var ani = AnimationManage.Manage.FindAni<MoveAnimat>((o) => { return o.Target == trans ? true : false; });
             if (ani == null)
                 ani = new MoveAnimat(trans);
@@ -58,7 +58,7 @@ namespace huqiang
         /// </summary>
         /// <param name="trans">实例目标</param>
         /// <returns></returns>
-        public static RotateAnimat FindRotateAni(this Transform trans)
+        public static RotateAnimat FindRotateAni(this UIElement trans)
         {
             if (trans == null)
                 return null;
@@ -74,17 +74,17 @@ namespace huqiang
         /// <param name="delay">延迟启动</param>
         /// <param name="over">完毕后的回调函数</param>
         /// <param name="cover">是否覆盖已有的动画</param>
-        public static void RotateTo(this Transform trans, Vector3 angle, float time, bool hide = false, float delay = 0, Action<RotateAnimat> over = null, bool cover = true)
+        public static void RotateTo(this UIElement trans, Vector3 angle, float time, bool hide = false, float delay = 0, Action<RotateAnimat> over = null, bool cover = true)
         {
             if (trans == null)
                 return;
-            trans.gameObject.SetActive(true);
+            trans.activeSelf = true;
             var ani = AnimationManage.Manage.FindAni<RotateAnimat>((o) => { return o.Target == trans ? true : false; });
             if (ani == null)
                 ani = new RotateAnimat(trans);
             else if (!cover)
                 return;
-            ani.StartAngle = trans.localEulerAngles;
+            ani.StartAngle = trans.localRotation.eulerAngles;
             ani.EndAngle = angle;
             ani.Time = time;
             ani.Delay = delay;
@@ -99,7 +99,7 @@ namespace huqiang
         /// </summary>
         /// <param name="trans">实例目标</param>
         /// <returns></returns>
-        public static ScaleAnimat FindScaleAni(this Transform trans)
+        public static ScaleAnimat FindScaleAni(this UIElement trans)
         {
             if (trans == null)
                 return null;
@@ -115,11 +115,11 @@ namespace huqiang
         /// <param name="delay">延迟启动</param>
         /// <param name="over">完毕后的回调函数</param>
         /// <param name="cover">是否覆盖已有的动画</param>
-        public static void ScaleTo(this Transform trans, Vector3 scale, float time, bool hide = false, float delay=0, Action<ScaleAnimat> over = null, bool cover = true)
+        public static void ScaleTo(this UIElement trans, Vector3 scale, float time, bool hide = false, float delay=0, Action<ScaleAnimat> over = null, bool cover = true)
         {
             if (trans == null)
                 return;
-            trans.gameObject.SetActive(true);
+            trans.activeSelf = true;
             var ani = AnimationManage.Manage.FindAni<ScaleAnimat>((o) => { return o.Target == trans ? true : false; });
             if (ani == null)
                 ani = new ScaleAnimat(trans);
@@ -144,7 +144,7 @@ namespace huqiang
         {
             if (grap == null)
                 return null;
-            grap.gameObject.SetActive(true);
+            grap.activeSelf = true;
             return AnimationManage.Manage.FindAni<ColorAnimat>((o) => { return o.Target == grap ? true : false; });
         }
         /// <summary>
@@ -160,7 +160,7 @@ namespace huqiang
         {
             if (grap == null)
                 return;
-            grap.gameObject.SetActive(true);
+            grap.activeSelf = true;
             var ani = AnimationManage.Manage.FindAni<ColorAnimat>((o) => { return o.Target == grap ? true : false; });
             if (ani == null)
                 ani = new ColorAnimat(grap);
@@ -184,7 +184,7 @@ namespace huqiang
         {
             if (img == null)
                 return null;
-            img.gameObject.SetActive(true);
+            img.activeSelf = true;
             return AnimationManage.Manage.FindAni<ImageAnimat>((o) => { return o.image == img ? true : false; });
         }
         /// <summary>
@@ -196,7 +196,7 @@ namespace huqiang
         {
             if (img == null)
                 return null;
-            img.gameObject.SetActive(true);
+            img.activeSelf = true;
             var ani= AnimationManage.Manage.FindAni<ImageAnimat>((o) => { return o.image == img ? true : false; });
             if(ani==null)
                 ani = new ImageAnimat(img);
@@ -216,7 +216,7 @@ namespace huqiang
         {
             if (img == null)
                 return;
-            img.gameObject.SetActive(true);
+            img.activeSelf = true;
             var ani = AnimationManage.Manage.FindAni<ImageAnimat>((o) => { return o.image == img ? true : false; });
             if (ani == null)
                 ani = new ImageAnimat(img);

@@ -6,24 +6,6 @@ using UnityEngine;
 
 namespace huqiang.Data
 {
-    /// <summary>
-    /// 精灵矩形信息
-    /// </summary>
-    public struct SpriteRectInfo
-    {
-        /// <summary>
-        /// 纹理尺寸
-        /// </summary>
-        public Vector2 txtSize;
-        /// <summary>
-        /// 矩形
-        /// </summary>
-        public Rect rect;
-        /// <summary>
-        /// 轴心
-        /// </summary>
-        public Vector2 pivot;
-    }
     public class ElementAsset
     {
         /// <summary>
@@ -193,12 +175,21 @@ namespace huqiang.Data
         /// <returns></returns>
         public static Sprite[] FindSprites(string bundle, string tname, string[] names = null)
         {
-            var bun = FindBundle(bundle);
+            Sprite[] sp = null;
+              var bun = FindBundle(bundle);
             if (bun == null)
-                return null;
-            var sp = bun.LoadAssetWithSubAssets<Sprite>(tname);
+            {
+                sp = UnityEngine.Resources.LoadAll<Sprite>(tname);
+                if (sp != null)
+                {
+                    goto label;
+                }
+                return null; 
+            }
+            sp = bun.LoadAssetWithSubAssets<Sprite>(tname);
             if (sp == null)
                 return null;
+            label:;
             if (names == null)
                 return sp;
             int len = names.Length;

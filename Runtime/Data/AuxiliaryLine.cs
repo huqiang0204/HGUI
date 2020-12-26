@@ -1,4 +1,5 @@
-﻿using System;
+﻿using huqiang.Core.HGUI;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -70,12 +71,12 @@ namespace huqiang.Data
         /// <param name="vert">UI顶点</param>
         /// <param name="tris">三角形</param>
         /// <param name="color">颜色</param>
-        public static void GetLineVert(Vector3[] vectors, List<UIVertex> vert, List<int> tris, Color color)
+        public static void GetLineVert(Vector3[] vectors, List<HVertex> vert, List<int> tris, Color color)
         {
             int Start = vert.Count;
             for (int i = 0; i < vectors.Length; i++)
             {
-                UIVertex vertex = new UIVertex();
+                HVertex vertex = new HVertex();
                 vertex.position = vectors[i];
                 vertex.color = color;
                 vert.Add(vertex);

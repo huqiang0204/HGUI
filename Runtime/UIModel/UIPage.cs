@@ -13,10 +13,6 @@ namespace huqiang.UIModel
     public class UIPage : UIBase
     {
         /// <summary>
-        /// 根节点
-        /// </summary>
-        public static Transform Root { get;private set; }
-        /// <summary>
         /// 根元素
         /// </summary>
         public static UIElement UIRoot;
@@ -24,15 +20,15 @@ namespace huqiang.UIModel
         /// 初始化
         /// </summary>
         /// <param name="Canvas">主画布</param>
-        public static void Initial(Transform Canvas)
+        public static void Initial(UIElement Canvas)
         {
-            var page = new GameObject("Page");
-            UIRoot = page.AddComponent<UIElement>();
-            Root = page.transform;
-            page.transform.SetParent(Canvas);
-            Root.localPosition = Vector3.zero;
-            Root.localScale = Vector3.one;
-            Root.localRotation = Quaternion.identity;
+            var page = new UIElement();
+            page.name = "Page";
+            UIRoot = page;
+            page.SetParent(Canvas);
+            UIRoot.localPosition = Vector3.zero;
+            UIRoot.localScale = Vector3.one;
+            UIRoot.localRotation = Quaternion.identity;
         }
         /// <summary>
         /// 当前页面
@@ -53,15 +49,15 @@ namespace huqiang.UIModel
                 CurrentPage.Show(dat);
                 return p;
             }
-            if (HCanvas.MainCanvas != null)//释放当前页面所有事件
-                HCanvas.MainCanvas.ClearAllAction();
+            if (HCanvas.CurrentCanvas != null)//释放当前页面所有事件
+                HCanvas.CurrentCanvas.ClearAllAction();
             if (CurrentPage != null)
             {
                 CurrentPage.Dispose();
             }
             var t = new T();
             CurrentPage = t;
-            t.Initial(Root, dat);
+            t.Initial(UIRoot, dat);
             t.ChangeLanguage();
             t.ReSize();
             return t;
@@ -83,13 +79,13 @@ namespace huqiang.UIModel
                         CurrentPage.Show(dat);
                         return CurrentPage;
                     }
-                if (HCanvas.MainCanvas != null)//释放当前页面所有事件
-                    HCanvas.MainCanvas.ClearAllAction();
+                if (HCanvas.CurrentCanvas != null)//释放当前页面所有事件
+                    HCanvas.CurrentCanvas.ClearAllAction();
                 if (CurrentPage != null)
                     CurrentPage.Dispose();
                 var t = Activator.CreateInstance(type) as UIPage;
                 CurrentPage = t;
-                t.Initial(Root, dat);
+                t.Initial(UIRoot, dat);
                 t.ChangeLanguage();
                 t.ReSize();
                 return t;
@@ -112,7 +108,7 @@ namespace huqiang.UIModel
         /// </summary>
         /// <param name="parent">父坐标变换</param>
         /// <param name="dat">数据</param>
-        public virtual void Initial(Transform parent, object dat = null)
+        public virtual void Initial(UIElement parent, object dat = null)
         {
             Parent = parent;
             DataContext = dat;
@@ -130,8 +126,8 @@ namespace huqiang.UIModel
         public override void ReSize() 
         {
             if (UIRoot != null)
-                if(HCanvas.MainCanvas!=null)
-                UIRoot.SizeDelta = HCanvas.MainCanvas.SizeDelta;
+                if(HCanvas.CurrentCanvas!=null)
+                UIRoot.SizeDelta = HCanvas.CurrentCanvas.SizeDelta;
             base.ReSize(); 
             if (currentPop != null) 
                 currentPop.ReSize();
@@ -167,7 +163,7 @@ namespace huqiang.UIModel
         /// <param name="obj">数据</param>
         /// <param name="parent">父坐标变换,为空则默认为当前页的父坐标变换</param>
         /// <returns></returns>
-        protected T ShowPopWindow<T>(object obj = null, Transform parent = null) where T : PopWindow, new()
+        protected T ShowPopWindow<T>(object obj = null, UIElement parent = null) where T : PopWindow, new()
         {
             if (currentPop != null)
             {
@@ -200,7 +196,7 @@ namespace huqiang.UIModel
         /// <param name="obj">数据</param>
         /// <param name="parent">父坐标变换,为空则默认为当前页的父坐标变换</param>
         /// <returns></returns>
-        protected object ShowPopWindow(Type type, object obj = null, Transform parent = null)
+        protected object ShowPopWindow(Type type, object obj = null, UIElement parent = null)
         {
             if (currentPop != null)
             { 

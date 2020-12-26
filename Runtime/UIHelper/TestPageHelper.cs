@@ -11,6 +11,7 @@ using UnityEngine;
 /// </summary>
 public class TestPageHelper:UIHelper
 {
+    public Transform TargetCanvas;
     public virtual void LoadBundle()
     {
 #if UNITY_EDITOR
@@ -29,27 +30,22 @@ public class TestPageHelper:UIHelper
         } 
 #endif
     }
-    public TextAsset bytesUI;
     public string AssetName = "baseUI";
-    public string dicpath;
-    public string CloneName;
-    private void Awake()
+    private void Start()
     {
         Initital();
-        HCanvas.MainCanvas = GetComponent<HCanvas>();
         LoadTestPage();
     }
     public void Initital()
     {
         LoadBundle();
-        HGUIManager.Initial(transform);
-        var db = HGUIManager.GetPrefab(transform);
+        HGUIManager.Initial();
+        var db = HGUIManager.GetPrefab(TargetCanvas);
         HGUIManager.prefabAssets.Clear();
         HGUIManager.LoadModels(db, AssetName);
         var c = transform.childCount;
         for (int i = 0; i < c; i++)
             GameObject.Destroy(transform.GetChild(i).gameObject);
-        App.Initial(transform);
     }
     
     public virtual void LoadTestPage()

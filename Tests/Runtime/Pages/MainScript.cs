@@ -1,23 +1,24 @@
 ﻿using huqiang;
 using huqiang.Data;
 using UnityEngine;
-using huqiang.Core.HGUI;
 using Assets.Scripts;
 using System.Collections.Generic;
 using Assets.Net;
 using huqiang.UIModel;
 using huqiang.UIComposite;
+using huqiang.Core.HGUI;
 
-public class MainScript : HCanvas
+public class MainScript : MonoBehaviour
 {
     public TextAsset baseUI;
     // Start is called before the first frame update
-    protected override void Start()
+    protected  void Start()
     {
         KcpDataControll.Instance.Connection("192.168.0.134", 8899);
         KcpDataControll.Instance.OpenLog();
-        base.Start();
-        App.Initial(transform);
+
+        var can = GetComponent<HGUIRender>().canvas;
+        App.Initial(can);
         HGUIManager.LoadModels(baseUI.bytes, "baseUI");
 #if UNITY_EDITOR
         AssetBundle.UnloadAllAssetBundles(true);
@@ -31,14 +32,12 @@ public class MainScript : HCanvas
         DataGrid.CursorY = DockPanelLine.CursorY = Resources.Load<Texture2D>("StretchWY");
     }
 
-    protected override void Update()
+    protected  void Update()
     {
-        base.Update();
         KcpDataControll.Instance.DispatchMessage();
     }
-    protected override void OnDestroy()
+    protected  void OnDestroy()
     {
-        base.OnDestroy();
         App.Dispose();
     }
 }

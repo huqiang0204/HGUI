@@ -46,6 +46,16 @@ namespace huqiang
             byte* b = (byte*)&value;
             return new Color32(*(b + 3), *(b + 2), *(b + 1), *b);
         }
+        public unsafe static int ToInt(this Color32 value)
+        {
+            int a = 0;
+            byte* b = (byte*)&a;
+            b[0] = value.a;
+            b[1] = value.b;
+            b[2] = value.g;
+            b[3] = value.r;
+            return a;
+        }
         /// <summary>
         /// 短整数转bytes[]
         /// </summary>

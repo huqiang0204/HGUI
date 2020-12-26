@@ -19,108 +19,6 @@ namespace huqiang.UIComposite
             None,X,Y
         }
         /// <summary>
-        /// 固定滚动,撞到边界立马停止
-        /// </summary>
-        /// <param name="eventCall">用户事件</param>
-        /// <param name="v">参考移动量</param>
-        /// <param name="x">限定移动量x</param>
-        /// <param name="y">限定移动量y</param>
-        /// <returns></returns>
-        protected Vector2 ScrollNone(UserEvent eventCall, ref Vector2 v, ref float x, ref float y)
-        {
-            Vector2 v2 = Vector2.zero;
-            float vx = x - v.x;
-            if (vx < 0)
-            {
-                x = 0;
-                eventCall.VelocityX = 0;
-                v.x = 0;
-            }
-            else if (vx + Size.x > ContentSize.x)
-            {
-                x = ContentSize.x - Size.x;
-                eventCall.VelocityX = 0;
-                v.x = 0;
-            }
-            else
-            {
-                x -= v.x;
-                v2.x = v.x;
-            }
-            float vy = y + v.y;
-            if (vy < 0)
-            {
-                y = 0;
-                eventCall.VelocityY = 0;
-                v.y = 0;
-            }
-            else if (vy + Size.y > ContentSize.y)
-            {
-                y = ContentSize.y - Size.y;
-                eventCall.VelocityY = 0;
-                v.y = 0;
-            }
-            else
-            {
-                y += v.y;
-                v2.y = v.y;
-            }
-            return v2;
-        }
-        /// <summary>
-        /// 回弹滚动,撞到边界会有减速回弹效果
-        /// </summary>
-        /// <param name="eventCall">用户事件</param>
-        /// <param name="v">参考移动量</param>
-        /// <param name="x">衰减移动量x</param>
-        /// <param name="y">衰减移动量y</param>
-        /// <returns></returns>
-        protected Vector2 BounceBack(UserEvent eventCall, ref Vector2 v, ref float x, ref float y)
-        {
-            x -= v.x;
-            y += v.y;
-            if (!eventCall.Pressed)
-            {
-                if (x < 0)
-                {
-                    if (v.x > 0)
-                        if (eventCall.DecayRateX >= 0.99f)
-                        {
-                            eventCall.DecayRateX = 0.9f;
-                            eventCall.VelocityX = eventCall.VelocityX;
-                        }
-                }
-                else if (x + Size.x > ContentSize.x)
-                {
-                    if (v.x < 0)
-                        if (eventCall.DecayRateX >= 0.99f)
-                        {
-                            eventCall.DecayRateX = 0.9f;
-                            eventCall.VelocityX = eventCall.VelocityX;
-                        }
-                }
-                if (y < 0)
-                {
-                    if (v.y < 0)
-                        if (eventCall.DecayRateY >= 0.99f)
-                        {
-                            eventCall.DecayRateY = 0.9f;
-                            eventCall.VelocityY = eventCall.VelocityY;
-                        }
-                }
-                else if (y + Size.y > ContentSize.y)
-                {
-                    if (v.y > 0)
-                        if (eventCall.DecayRateY >= 0.99f)
-                        {
-                            eventCall.DecayRateY = 0.9f;
-                            eventCall.VelocityY = eventCall.VelocityY;
-                        }
-                }
-            }
-            return v;
-        }
-        /// <summary>
         /// 滚动框尺寸
         /// </summary>
         public Vector2 Size;
@@ -132,6 +30,10 @@ namespace huqiang.UIComposite
         /// 内容尺寸
         /// </summary>
         public Vector2 ContentSize;
+        /// <summary>
+        /// 内容的起始位置从坐上角计算,与UI载体的偏移位置
+        /// </summary>
+        Vector2 ContentOffset;
         /// <summary>
         /// 冻结方向
         /// </summary>
@@ -161,42 +63,68 @@ namespace huqiang.UIComposite
         /// </summary>
         /// <param name="fake">数据模型</param>
         /// <param name="script">元素主体</param>
-        public override void Initial(FakeStruct fake,UIElement script,Initializer initializer)
+        public override void Initial(FakeStruct fake,UIElement script,UIInitializer initializer)
         {
             base.Initial(fake,script,initializer);
-            Size = Enity.SizeDelta;
+            Size = Enity.m_sizeDelta;
             eventCall = Enity.RegEvent<UserEvent>();
+            eventCall.PointerDown = (o, e) => { UpdateVelocity = false; };
             eventCall.Drag = (o, e, s) =>
             {
+                Size = Enity.m_sizeDelta;
                 Scrolling(o, s);
             };
-            eventCall.DragEnd = (o, e, s) =>
-            {
-                Scrolling(o, s);
-                o.DecayRateX = 0.998f;
-                o.DecayRateY = 0.998f;
-            };
-            eventCall.ScrollEndX = OnScrollEndX;
-            eventCall.ScrollEndY = OnScrollEndY;
-            eventCall.Scrolling = Scrolling;
+            eventCall.DragEnd = OnDragEnd;
             eventCall.ForceEvent = true;
+            eventCall.AutoColor = false;
 
             eventCall.CutRect = true;
-            var chi = Enity.transform.Find("Content");
-            if(chi!=null)
+            Content = Enity.Find("Content");
+            if (Content != null)
             {
-                Content = chi.GetComponent<UIElement>();
-                if (Content != null)
-                    ContentSize = Content.SizeDelta;
+                Move(Vector2.zero);
             }
         }
 
         void Scrolling(UserEvent back, Vector2 v)
         {
-            var ls = Enity.transform.localScale;
+            var ls = Enity.localScale;
             v.x /= ls.x;
             v.y /= ls.y;
+            v.x = -v.x;
             Move(v);
+        }
+        void OnDragEnd(UserEvent back, UserAction action, Vector2 v)
+        {
+            Scrolling(back, v);
+            startVelocity.x = mVelocity.x = -back.VelocityX;
+            startVelocity.y = mVelocity.y = back.VelocityY;
+            UpdateVelocity = true;
+        }
+        void GetOffset()
+        {
+            float ax = Enity.m_sizeDelta.x;
+            float ay = Enity.m_sizeDelta.y;
+            float apx = Enity.Pivot.x;
+            float apy = Enity.Pivot.y;
+            float alx = ax * -apx;
+            float ady = ay * -apy;
+
+            var ls = Content.localScale;
+            float x = Content.m_sizeDelta.x;
+            x *= ls.x;
+            float y = Content.m_sizeDelta.y;
+            y *= ls.y;
+            ContentSize.x = x;
+            ContentSize.y = y;
+            float px = Content.Pivot.x;
+            float py = Content.Pivot.y;
+            float lx = x * -px;
+            float dy = y * -py;
+            x = alx - lx;
+            y = (ay + ady) - (y + dy);
+            ContentOffset.x = x;
+            ContentOffset.y = y;
         }
         /// <summary>
         /// 移动内容
@@ -206,102 +134,34 @@ namespace huqiang.UIComposite
         {
             if (Content == null)
                 return;
-            ContentSize = Content.SizeDelta;
-            var ls = Enity.transform.localScale;
-            v.x /= ls.x;
-            v.y /= ls.y;
-            switch (scrollType)
+            GetOffset();
+            if (scrollType == ScrollType.BounceBack)
             {
-                case ScrollType.None:
-                    v = ScrollNone(eventCall, ref v, ref Position.x, ref Position.y);
-                    break;
-                case ScrollType.BounceBack:
-                    v = BounceBack(eventCall, ref v, ref Position.x, ref Position.y);
-                    break;
+                v = BounceBack(v);
             }
-            var offset = ContentSize - Size;
-            offset *= 0.5f;
-            var p = Position;
+            else
+            {
+                v = ScrollNone(v);
+            }
             switch (freeze)
             {
                 case FreezeDirection.None:
-                    p.x = -p.x;
-                    p.x += offset.x;
-                    p.y -= offset.y;
+                    Position.x += v.x;
+                    Position.y += v.y;
                     break;
                 case FreezeDirection.X:
-                    p.y -= offset.y;
+                    Position.y += v.y;
                     break;
                 case FreezeDirection.Y:
-                    p.x = -p.x;
-                    p.x += offset.x;
+                    Position.x += v.x;
                     break;
             }
-            Content.transform.localPosition = p;
+            var p = ContentOffset;
+            p.x -= Position.x;
+            p.y += Position.y;
+            Content.localPosition = p;
             if (Scroll != null)
                 Scroll(this, v);
-        }
-        void OnScrollEndX(UserEvent back)
-        {
-            if (scrollType == ScrollType.BounceBack)
-            {
-                if (Position.x < -ScrollContent.Tolerance)
-                {
-                    back.DecayRateX = 0.988f;
-                    float d = -Position.x;
-                    back.ScrollDistanceX = -d * eventCall.Context.transform.localScale.x;
-                }
-                else
-                {
-                    float max = ContentSize.x + ScrollContent.Tolerance;
-                    if (max < Size.x)
-                        max = Size.x + ScrollContent.Tolerance;
-                    if (Position.x + Size.x > max)
-                    {
-                        back.DecayRateX = 0.988f;
-                        float d = ContentSize.x - Position.x - Size.x;
-                        back.ScrollDistanceX = -d * eventCall.Context.transform.localScale.x;
-                    }
-                    else
-                    {
-                        if (ScrollEnd != null)
-                            ScrollEnd(this);
-                    }
-                }
-            }
-            else if (ScrollEnd != null)
-                ScrollEnd(this);
-        }
-        void OnScrollEndY(UserEvent back)
-        {
-            if (scrollType == ScrollType.BounceBack)
-            {
-                if (Position.y < -ScrollContent.Tolerance)
-                {
-                    back.DecayRateY = 0.988f;
-                    float d = -Position.y;
-                    back.ScrollDistanceY = d * eventCall.Context.transform.localScale.y;
-                }
-                else
-                {
-                    float max = ContentSize.y + ScrollContent.Tolerance;
-                    if (max < Size.y)
-                        max = Size.y + ScrollContent.Tolerance;
-                    if (Position.y + Size.y > max)
-                    {
-                        back.DecayRateY = 0.988f;
-                        float d = ContentSize.y - Position.y - Size.y;
-                        back.ScrollDistanceY = d * eventCall.Context.transform.localScale.y;
-                    }
-                    else
-                    {
-                        if (ScrollEnd != null)
-                            ScrollEnd(this);
-                    }
-                }
-            }
-            else if (ScrollEnd != null)
-                ScrollEnd(this);
         }
         /// <summary>
         /// y轴位置,范围0-1
@@ -311,7 +171,7 @@ namespace huqiang.UIComposite
             get
             {
                 float y = Content.SizeDelta.y - Enity.SizeDelta.y;
-                float p = Content.transform.localPosition.y;
+                float p = Content.localPosition.y;
                 p += 0.5f * y;
                 p /= y;
                 if (p < 0)
@@ -330,8 +190,243 @@ namespace huqiang.UIComposite
                 if (y < 0)
                     y = 0;
                 y *= (value - 0.5f);
-                Content.transform.localPosition = new Vector3(0, y, 0);
+                Content.localPosition = new Vector3(0, y, 0);
             }
+        }
+        /// <summary>
+        /// 初始速率
+        /// </summary>
+        protected Vector2 startVelocity;
+        Vector2 mVelocity;
+        public float DecayRate = 0.997f;
+        protected bool UpdateVelocity = true;
+        public override void Update(float time)
+        {
+            if (!UpdateVelocity)
+                return;
+            float x = 0;
+            float y = 0;
+            int count = UserAction.TimeSlice;
+            if (mVelocity.x != 0)
+            {
+                float dr = DecayRate;
+                if (scrollType == ScrollType.BounceBack)
+                {
+                    if (mVelocity.x < 0)
+                    {
+                        if (Position.x < 0)
+                        {
+                            dr *= 0.9f;
+                        }
+                    }
+                    else
+                    {
+                        if (Position.x + Size.x > ContentSize.x)
+                        {
+                            dr *= 0.9f;
+                        }
+                    }
+                }
+                for (int i = 0; i < count; i++)
+                {
+                    mVelocity.x *= dr;
+                    x += mVelocity.x;
+                }
+                if (mVelocity.x < 0.01f & mVelocity.x > -0.01f)
+                {
+                    mVelocity.x = 0;
+                }
+            }
+            if (mVelocity.y != 0)
+            {
+                float dr = DecayRate;
+                if (scrollType == ScrollType.BounceBack)
+                {
+                    if (mVelocity.y < 0)
+                    {
+                        if (Position.y < 0)
+                        {
+                            dr *= 0.9f;
+                        }
+                    }
+                    else
+                    {
+                        if (Position.y + Size.y > ContentSize.y)
+                        {
+                            dr *= 0.9f;
+                        }
+                    }
+                }
+                for (int i = 0; i < count; i++)
+                {
+                    mVelocity.y *= dr;
+                    y += mVelocity.y;
+                }
+                if (mVelocity.y < 0.01f & mVelocity.y > -0.01f)
+                {
+                    mVelocity.y = 0;
+                }
+            }
+            if (x != 0 | y != 0)
+                Move(new Vector2(x, y));
+            if(scrollType==ScrollType.BounceBack)
+            {
+                if (mVelocity.x == 0)
+                {
+                    if (scrollType == ScrollType.BounceBack)
+                    {
+                        if (Position.x < -ScrollContent.Tolerance)
+                        {
+                            mVelocity.x = MathH.DistanceToVelocity(DecayRate, -Position.x);
+                        }
+                        else if (Position.x + Size.x > ContentSize.x + ScrollContent.Tolerance)
+                        {
+                            mVelocity.x = MathH.DistanceToVelocity(DecayRate, ContentSize.x - Position.x - Size.x);
+                        }
+                    }
+                }
+                if (mVelocity.y == 0)
+                {
+                    if (scrollType == ScrollType.BounceBack)
+                    {
+                        if (Position.y < -ScrollContent.Tolerance)
+                        {
+                            mVelocity.y = MathH.DistanceToVelocity(DecayRate, -Position.y);
+                        }
+                        else if (Position.y + Size.y > ContentSize.y + ScrollContent.Tolerance)
+                        {
+                            mVelocity.y = MathH.DistanceToVelocity(DecayRate, ContentSize.y - Position.y - Size.y);
+                        }
+                    }
+                }
+            }
+            if (mVelocity.x == 0 & mVelocity.y == 0)
+                UpdateVelocity = false;
+        }
+        protected Vector2 ScrollNone(Vector2 v)
+        {
+            if (ContentSize.x <= Enity.m_sizeDelta.x)
+            {
+                Position.x = 0;
+                v.x = 0;
+                mVelocity.x = 0;
+                if (ContentSize.y <= Enity.m_sizeDelta.y)
+                {
+                    Position.y = 0;
+                    v.y = 0;
+                    mVelocity.y = 0;
+                    return v;
+                }
+            }
+            else
+             if (ContentSize.y <= Enity.m_sizeDelta.y)
+            {
+                Position.y = 0;
+                v.y = 0;
+                mVelocity.y = 0;
+            }
+
+            if (v.x <= 0)
+            {
+                if (Position.x + v.x < 0)
+                {
+                    v.x = 0 - Position.x;
+                    mVelocity.x = 0;
+                }
+            }
+            else
+            {
+                if (Position.x + v.x + Enity.m_sizeDelta.x > ContentSize.x)
+                {
+                    v.x = ContentSize.x - Position.x - Enity.m_sizeDelta.x;
+                    mVelocity.y = 0;
+                }
+            }
+            if (v.y <= 0)
+            {
+                if (Position.y + v.y < 0)
+                {
+                    v.y = 0 - Position.y;
+                    mVelocity.y = 0;
+                }
+            }
+            else
+            {
+                if (Position.y + v.y + Enity.m_sizeDelta.y > ContentSize.y)
+                {
+                    v.y = ContentSize.y - Position.y - Enity.m_sizeDelta.y;
+                    mVelocity.y = 0;
+                }
+            }
+            return v;
+        }
+        protected Vector2 BounceBack(Vector2 v)
+        {
+            if (v.x < 0)
+            {
+                if (Position.x + v.x < 0)
+                {
+                    if (Position.x < 0)
+                    {
+                        float hx = Enity.m_sizeDelta.x * 0.5f;
+                        float r = Position.x / hx;
+                        r = -r;
+                        r = 1 - r;
+                        if (r < 0)
+                            r = 0;
+                        v.x *= r;
+                    }
+                }
+            }
+            else
+            {
+                if (Position.x + v.x + Enity.m_sizeDelta.x > ContentSize.x)
+                {
+                    float rx = Position.x + Enity.m_sizeDelta.x - ContentSize.x;
+                    if (rx > 0)
+                    {
+                        float hx = Enity.m_sizeDelta.x * 0.5f;
+                        float r = rx / hx;
+                        r = 1 - r;
+                        if (r < 0)
+                            r = 0;
+                        v.x *= r;
+                    }
+                }
+            }
+            if (v.y < 0)
+            {
+                if (Position.y + v.y < 0)
+                {
+                    if (Position.y < 0)
+                    {
+                        float hy = Enity.m_sizeDelta.y * 0.5f;
+                        float r = Position.y / hy;
+                        r = -r;
+                        r = 1 - r;
+                        if (r < 0)
+                            r = 0;
+                        v.y *= r;
+                    }
+                }
+            }
+            else
+            {
+                if (Position.y + v.y + Enity.m_sizeDelta.y > ContentSize.y)
+                {
+                    float ty = Position.y + Enity.m_sizeDelta.y - ContentSize.y;
+                    if (ty > 0)
+                    {
+                        float hy = Enity.m_sizeDelta.x * 0.5f;
+                        float r = ty / hy;
+                        r = 1 - r;
+                        if (r < 0)
+                            r = 0;
+                        v.y *= r;
+                    }
+                }
+            }
+            return v;
         }
     }
 }

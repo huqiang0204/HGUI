@@ -23,7 +23,7 @@ namespace huqiang.UIModel
         /// <summary>
         /// 计算内容高度的委托
         /// </summary>
-        public Func<U, float> CalculItemHigh;
+        public Func<UIElement, U, float> LayoutCallback;
         UIInitializer initializer;
         FakeStruct model;
         UIContainer con;
@@ -32,13 +32,13 @@ namespace huqiang.UIModel
         /// </summary>
         /// <param name="container">容器实例</param>
         /// <param name="mod">UI模型名称</param>
-        public HotUILinker(UIContainer container, string mod)
+        public HotUILinker(UIContainer container, UIElement mod)
         {
             con = container;
-            model = HGUIManager.FindChild(container.model, mod);
-            middle = new ObjectLinker(container);
+            model = mod.mod;
+            middle = new ObjectLinker(container,mod);
             middle.ItemUpdate = MItemUpdate;
-            middle.CalculItemHigh = MCalculItemHigh;
+            middle.LayoutCallback = MCalculItemHigh;
             middle.ItemCreate = MItemCreate;
             initializer = new UIInitializer(TempReflection.ObjectFields(typeof(T)));
         }
@@ -47,17 +47,17 @@ namespace huqiang.UIModel
             if (ItemUpdate != null)
                 ItemUpdate(obj as T, dat as U, index);
         }
-        float MCalculItemHigh(object dat)
+        float MCalculItemHigh(UIElement uI, object dat)
         {
-            if (CalculItemHigh != null)
-                return CalculItemHigh(dat as U);
+            if (LayoutCallback != null)
+                return LayoutCallback(uI, dat as U);
             return 0;
         }
         void MItemCreate(ObjectLinker obj, LinkerMod mod)
         {
             T t = new T();
             initializer.Reset(t);
-            mod.main = HGUIManager.GameBuffer.Clone(model, initializer);
+            mod.main = HGUIManager.Clone(model, initializer);
             mod.UI = t;
         }
         /// <summary>

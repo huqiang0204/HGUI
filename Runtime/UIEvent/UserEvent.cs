@@ -1,5 +1,6 @@
 ﻿using huqiang;
 using huqiang.Core.HGUI;
+using huqiang.Core.UIData;
 using huqiang.Data;
 using System;
 using UnityEngine;
@@ -32,7 +33,7 @@ namespace huqiang.UIEvent
         internal static bool DispatchEvent(UserAction action, HGUIElement[] pipeLine)
         {
             HGUIElement root = pipeLine[0];
-            float s = HCanvas.MainCanvas.PhysicalScale;
+            //float s =UISystem.PhysicalScale;
             if (root.script != null)
             {
                 int c = root.childCount;
@@ -188,12 +189,6 @@ namespace huqiang.UIEvent
             }
             return false;
         }
-        int xTime;
-        int yTime;
-        float lastX;
-        float lastY;
-        Vector2 maxVelocity;
-        Vector2 sDistance;
         Vector2 mVelocity;
         /// <summary>
         /// 父物体的全局缩放
@@ -211,38 +206,6 @@ namespace huqiang.UIEvent
         /// 全局旋转
         /// </summary>
         public Quaternion GlobalRotation;
-        public float ScrollDistanceX
-        {
-            get { return sDistance.x; }
-            set
-            {
-                if (value == 0)
-                    maxVelocity.x = 0;
-                else
-                    maxVelocity.x = MathH.DistanceToVelocity(DecayRateX, value);
-                mVelocity.x = maxVelocity.x;
-                sDistance.x = value;
-                xTime = 0;
-                lastX = 0;
-            }
-        }
-        public float ScrollDistanceY
-        {
-            get { return sDistance.y; }
-            set
-            {
-                if (value == 0)
-                    maxVelocity.y = 0;
-                else
-                    maxVelocity.y = MathH.DistanceToVelocity(DecayRateY, value);
-                mVelocity.y = maxVelocity.y;
-                sDistance.y = value;
-                yTime = 0;
-                lastY = 0;
-            }
-        }
-        public float DecayRateX = 0.998f;
-        public float DecayRateY = 0.998f;
         /// <summary>
         /// 按压时的初始位置
         /// </summary>
@@ -275,11 +238,11 @@ namespace huqiang.UIEvent
         /// <summary>
         /// 用户拖拽造成的速率X
         /// </summary>
-        public float VelocityX { get { return mVelocity.x; } set { maxVelocity.x = mVelocity.x = value; RefreshRateX(); } }
+        public float VelocityX { get { return mVelocity.x; } set { mVelocity.x = value; } }
         /// <summary>
         /// 用户拖拽造成的速率Y
         /// </summary>
-        public float VelocityY { get { return mVelocity.y; } set { maxVelocity.y = mVelocity.y = value; RefreshRateY(); } }
+        public float VelocityY { get { return mVelocity.y; } set { mVelocity.y = value; } }
         /// <summary>
         /// 禁止此用户事件
         /// </summary>
@@ -351,18 +314,6 @@ namespace huqiang.UIEvent
         /// </summary>
         public Action<UserEvent, UserAction, Vector2> DragEnd;
         /// <summary>
-        /// 拖拽后造成的持续滚动
-        /// </summary>
-        public Action<UserEvent, Vector2> Scrolling;
-        /// <summary>
-        /// 当X轴滚动完毕
-        /// </summary>
-        public Action<UserEvent> ScrollEndX;
-        /// <summary>
-        /// Y轴滚动完毕
-        /// </summary>
-        public Action<UserEvent> ScrollEndY;
-        /// <summary>
         /// 失去焦点
         /// </summary>
         public Action<UserEvent, UserAction> LostFocus;
@@ -379,24 +330,6 @@ namespace huqiang.UIEvent
         public UserEvent()
         {
             //Rectangular = new Vector3[4];
-        }
-        void RefreshRateX()
-        {
-            xTime = 0;
-            lastX = 0;
-            if (maxVelocity.x == 0)
-                sDistance.x = 0;
-            else
-                sDistance.x = (float)MathH.PowDistance(DecayRateX, maxVelocity.x, 1000000);
-        }
-        void RefreshRateY()
-        {
-            yTime = 0;
-            lastY = 0;
-            if (maxVelocity.y == 0)
-                sDistance.y = 0;
-            else
-                sDistance.y = (float)MathH.PowDistance(DecayRateY, maxVelocity.y, 1000000);
         }
         /// <summary>
         /// 屏幕坐标转换到局部坐标
@@ -526,26 +459,27 @@ namespace huqiang.UIEvent
                 {
                     var v = action.Motion;
                     v.x /= pgs.x;
+                    v.x /= action.PhysicalScale;
                     v.y /= pgs.y;
+                    v.y /= action.PhysicalScale;
                     Drag(this, action, v);
                 }
         }
         internal virtual void OnDragEnd(UserAction action)
         {
-            if (Scrolling != null)
-            {
-                var v = action.Velocities;
-                v.x /= GlobalScale.x;
-                v.y /= GlobalScale.y;
-                maxVelocity = mVelocity = v;
-                RefreshRateX();
-                RefreshRateY();
-            }
+            var v = action.Velocities;
+            v.x /= GlobalScale.x;
+            v.x /= action.PhysicalScale;
+            v.y /= GlobalScale.y;
+            v.y /= action.PhysicalScale;
+            mVelocity = v;
             if (DragEnd != null)
             {
-                var v = action.Motion;
+                v = action.Motion;
                 v.x /= pgs.x;
+                v.x /= action.PhysicalScale;
                 v.y /= pgs.y;
+                v.y /= action.PhysicalScale;
                 DragEnd(this, action, v);
             }
         }
@@ -576,7 +510,7 @@ namespace huqiang.UIEvent
             FakeStruct fs = null;
             unsafe
             {
-                fs = UITransfromLoader.GetEventData(mod);
+                fs = UIElementLoader.GetEventData(mod);
              }
             if(fs==null)
             {
@@ -616,52 +550,9 @@ namespace huqiang.UIEvent
         }
         internal virtual void Update()
         {
-            if (!forbid)
-                if (!Pressed)
-                    DuringSlide(this);
-        }
-        static void DuringSlide(UserEvent back)
-        {
-            if (back.mVelocity.x == 0 & back.mVelocity.y == 0)
-                return;
-            back.xTime += UserAction.TimeSlice;
-            back.yTime += UserAction.TimeSlice;
-            float x = 0, y = 0;
-            bool endx = false, endy = false;
-            if (back.mVelocity.x != 0)
-            {
-                float t = (float)MathH.PowDistance(back.DecayRateX, back.maxVelocity.x, back.xTime);
-                x = t - back.lastX;
-                back.lastX = t;
-                float vx = Mathf.Pow(back.DecayRateX, back.xTime) * back.maxVelocity.x;
-                if (vx < 0.001f & vx > -0.001f)
-                {
-                    back.mVelocity.x = 0;
-                    endx = true;
-                }
-                else back.mVelocity.x = vx;
-            }
-            if (back.mVelocity.y != 0)
-            {
-                float t = (float)MathH.PowDistance(back.DecayRateY, back.maxVelocity.y, back.yTime);
-                y = t - back.lastY;
-                back.lastY = t;
-                float vy = Mathf.Pow(back.DecayRateY, back.yTime) * back.maxVelocity.y;
-                if (vy < 0.001f & vy > -0.001f)
-                {
-                    back.mVelocity.y = 0;
-                    endy = true;
-                }
-                else back.mVelocity.y = vy;
-            }
-            if (back.Scrolling != null)
-                back.Scrolling(back, new Vector2(x, y));
-            if (endx)
-                if (back.ScrollEndX != null)
-                    back.ScrollEndX(back);
-            if (endy)
-                if (back.ScrollEndY != null)
-                    back.ScrollEndY(back);
+            //if (!forbid)
+            //    if (!Pressed)
+            //        DuringSlide(this);
         }
         /// <summary>
         /// 获取与UI坐标表的相对位置

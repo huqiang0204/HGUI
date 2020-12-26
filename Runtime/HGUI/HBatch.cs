@@ -1,4 +1,5 @@
-﻿using System;
+﻿using huqiang.Data;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -16,7 +17,7 @@ namespace huqiang.Core.HGUI
     {
         static int[] TriBuffer = new int[65536];
         static int[] IDBuffer = new int[32];
-        static ArrayInfo[] Arrays= new ArrayInfo[32];
+        static ArrayInfo[] Arrays = new ArrayInfo[8];
         /// <summary>
         /// 合批处理
         /// </summary>
@@ -30,16 +31,20 @@ namespace huqiang.Core.HGUI
                 canvas.MatCollector.Start();
                 int c = root.childCount;
                 int os = root.childOffset;
+                float hw = canvas.m_sizeDelta.x * 0.5f;
+                float hh = canvas.m_sizeDelta.y * 0.5f;
                 for (int i = 0; i < c; i++)
                 {
-                    if(pipeLine[os].active)
-                        Batch(pipeLine, os, canvas, new Vector4(0, 0, 1, 1));
+                    if (pipeLine[os].active)
+                    {
+                        Batch(pipeLine, os, canvas, new Vector4(-hw, -hh, hw, hh), Vector2.zero, new Vector2(hw, hh));
+                    }
                     os++;
                 }
                 canvas.MatCollector.End();
             }
         }
-        static void Batch(HGUIElement[] pipeLine, int index, HCanvas canvas, Vector4 clip)
+        static void Batch(HGUIElement[] pipeLine, int index, HCanvas canvas, Vector4 clip, Vector2 center, Vector2 half)
         {
             if (!pipeLine[index].active)
                 return;
@@ -68,25 +73,21 @@ namespace huqiang.Core.HGUI
                     dy *= scale.y;
                     ty *= scale.y;
                     Vector4 v = new Vector4(o.x + lx, o.y + dy, o.x + rx, o.y + ty);
-                    v.x += 10000;
-                    v.x /= 20000;
-                    v.y += 10000;
-                    v.y /= 20000;
-                    v.z += 10000;
-                    v.z /= 20000;
-                    v.w += 10000;
-                    v.w /= 20000;
                     clip = CutRect(clip, v);
+                    half.x = (clip.z - clip.x) * 0.5f;
+                    half.y = (clip.w - clip.y) * 0.5f;
+                    center.x = half.x + clip.x;
+                    center.y = half.y + clip.y;
                 }
                 var graphics = script as HGraphics;
                 if (graphics != null)//计算图形
                 {
                     if (graphics.Shadow)
-                        AddShadow(graphics,canvas,ref q,ref scale,ref o,ref clip);
+                        AddShadow(graphics, canvas, ref q, ref scale, ref o, ref clip, ref center, ref half);
                     var vs = canvas.vertex;
                     var vc = vs.Count;
                     int dc = graphics.vertInfo.DataCount;
-                    if (dc>0)
+                    if (dc > 0)
                     {
                         float px = (0.5f - script.Pivot.x) * script.m_sizeDelta.x;
                         float py = (0.5f - script.Pivot.y) * script.m_sizeDelta.y;
@@ -105,8 +106,8 @@ namespace huqiang.Core.HGUI
                                 var t = q * tp;
                                 t += o;
                                 t.z = 0;
-                                uv2.x = (t.x + 10000) / 20000;
-                                uv2.y = (t.y + 10000) / 20000;
+                                uv2.x = (t.x - center.x) / half.x * 0.001f + 0.5f;
+                                uv2.y = (t.y - center.y) / half.y * 0.001f + 0.5f;
                                 vs.Add(t);
                                 canvas.colors.Add(hv[j].color);
                                 canvas.uv.Add(hv[j].uv);
@@ -115,76 +116,103 @@ namespace huqiang.Core.HGUI
                                 canvas.uv4.Add(hv[j].uv4);
                             }
                         }
-                
-                        if (graphics.tris != null)
-                        {
-                            int tid = 0;
-                            var src = graphics.tris;
-                            int len = src.Length;
-                            if (len > 0)
-                            {
-                                for (int k = 0; k < len; k++)
-                                {
-                                    TriBuffer[k] = src[k] + vc;
-                                }
-                                canvas.MatCollector.CombinationMaterial(graphics, TriBuffer, len, ref tid, ref clip);
-                            }
-                            AddUV1(canvas, tid, dc);
-                        }
-                        else if(graphics.trisInfo.DataCount>0|graphics.trisInfo2.DataCount>0)
-                        {
-                            int l = 0;
-                            int tc = graphics.trisInfo.DataCount;
-                            if (tc>0)
-                            {
-                                unsafe {
-                                    int* ip = graphics.trisInfo.Addr;
-                                    for (int k = 0; k < tc; k++)
-                                    {
-                                        TriBuffer[k] = ip[k] + vc;
-                                    }
-                                }
-                                l = 1;
-                            }
-                            Arrays[0].Length = tc;
-                            int tc2 = graphics.trisInfo2.DataCount;
-                            if (tc2 > 0)
-                            {
-                                int ks = tc;
-                                unsafe
-                                {
-                                    int* ip = graphics.trisInfo2.Addr;
-                                    for (int k = 0; k < tc2; k++)
-                                    {
-                                        TriBuffer[ks] = ip[k] + vc;
-                                        ks++;
-                                    }
-                                }
-                                Arrays[1].Start = tc;
-                                Arrays[1].Length = tc2;
-                                l = 2;
-                            }
-                            canvas.MatCollector.CombinationMaterial(graphics, TriBuffer, Arrays, IDBuffer, l, ref clip);
-                            unsafe
-                            {
-                                HVertex* hv = graphics.vertInfo.Addr;
-                                AddUV1(canvas, IDBuffer, hv, dc, l);
-                            }
-                        }
-                        else
-                        {
-                            AddUV1(canvas, 0, dc);
-                        }
+                        AddTris(graphics, canvas, vc, dc);
                     }
                 }
             }
-        
+
             int c = pipeLine[index].childCount;
             int os = pipeLine[index].childOffset;
             for (int i = 0; i < c; i++)
             {
-                Batch(pipeLine, os, canvas,clip);
+                Batch(pipeLine, os, canvas, clip, center, half);
                 os++;
+            }
+        }
+        static void AddTris(HGraphics graphics, HCanvas canvas, int vc, int dc)
+        {
+            int max = vc + dc;
+            if (graphics.tris != null)
+            {
+                int tid = 0;
+                var src = graphics.tris;
+                int len = src.Length;
+                if (len > 0)
+                {
+                    for (int k = 0; k < len; k++)
+                    {
+                        int index = TriBuffer[k] = src[k] + vc;
+                        if (index >= max)
+                            Debug.LogError("数组超标");
+                    }
+                    canvas.MatCollector.CombinationMaterial(graphics, graphics.MainTexture, TriBuffer, len, ref tid);
+                }
+                AddUV1(canvas, tid, ref graphics.vertInfo);
+            }
+            else if (graphics.trisInfo.DataCount > 0 | graphics.trisInfo1.DataCount > 0 | graphics.trisInfo2.DataCount > 0)
+            {
+                Arrays[0].Length = 0;
+                Arrays[1].Length = 0;
+                Arrays[2].Length = 0;
+                int l = 0;
+                int tc = graphics.trisInfo.DataCount;
+                if (tc > 0)
+                {
+                    unsafe
+                    {
+                        int* ip = graphics.trisInfo.Addr;
+                        for (int k = 0; k < tc; k++)
+                        {
+                            TriBuffer[k] = ip[k] + vc;
+                        }
+                    }
+                    l = 1;
+                }
+                Arrays[0].Length = tc;
+                int tc2 = graphics.trisInfo1.DataCount;
+                if (tc2 > 0)
+                {
+                    int ks = tc;
+                    unsafe
+                    {
+                        int* ip = graphics.trisInfo1.Addr;
+                        for (int k = 0; k < tc2; k++)
+                        {
+                            TriBuffer[ks] = ip[k] + vc;
+                            ks++;
+                        }
+                    }
+                    Arrays[1].Start = tc;
+                    Arrays[1].Length = tc2;
+                    l = 2;
+                }
+                int tc3 = graphics.trisInfo2.DataCount;
+                if (tc3 > 0)
+                {
+                    int ks = tc + tc2;
+                    unsafe
+                    {
+                        int* ip = graphics.trisInfo2.Addr;
+                        for (int k = 0; k < tc3; k++)
+                        {
+                            TriBuffer[ks] = ip[k] + vc;
+                            ks++;
+                        }
+                    }
+                    Arrays[2].Start = tc + tc2;
+                    Arrays[2].Length = tc3;
+                    l = 3;
+                }
+                canvas.MatCollector.CombinationMaterial(graphics, TriBuffer, Arrays, IDBuffer, l);
+                unsafe
+                {
+                    HVertex* hv = graphics.vertInfo.Addr;
+                    AddUV1(canvas, IDBuffer, hv, dc, l);
+                }
+            }
+            else
+            {
+                AddUV1(canvas, 0, ref graphics.vertInfo);
             }
         }
         /// <summary>
@@ -196,16 +224,16 @@ namespace huqiang.Core.HGUI
         /// <param name="scale"></param>
         /// <param name="o"></param>
         /// <param name="clip"></param>
-        static void AddShadow(HGraphics graphics,HCanvas canvas, ref Quaternion q,ref Vector3 scale,ref Vector3 o, ref Vector4 clip)
+        static void AddShadow(HGraphics graphics, HCanvas canvas, ref Quaternion q, ref Vector3 scale, ref Vector3 o, ref Vector4 clip, ref Vector2 center, ref Vector2 half)
         {
             var vs = canvas.vertex;
             var vc = vs.Count;
             int dc = graphics.vertInfo.DataCount;
             var os = graphics.shadowOffsset;
-            if (dc>0)
+            if (dc > 0)
             {
-                float px = (0.5f - graphics.Pivot.x) * graphics.SizeDelta.x+os.x;
-                float py = (0.5f - graphics.Pivot.y) * graphics.SizeDelta.y+os.y;
+                float px = (0.5f - graphics.Pivot.x) * graphics.SizeDelta.x + os.x;
+                float py = (0.5f - graphics.Pivot.y) * graphics.SizeDelta.y + os.y;
                 Vector2 uv2 = Vector2.zero;
                 unsafe
                 {
@@ -220,8 +248,8 @@ namespace huqiang.Core.HGUI
                         t.y *= scale.y;
                         t += o;
                         t.z = 0;
-                        uv2.x = (t.x + 10000) / 20000;
-                        uv2.y = (t.y + 10000) / 20000;
+                        uv2.x = (t.x - center.x) / half.x * 0.001f + 0.5f;
+                        uv2.y = (t.y - center.y) / half.y * 0.001f + 0.5f;
                         vs.Add(t);
                         canvas.colors.Add(graphics.shadowColor);
                         canvas.uv.Add(vert[j].uv);
@@ -230,66 +258,7 @@ namespace huqiang.Core.HGUI
                         canvas.uv4.Add(vert[j].uv4);
                     }
                 }
-                if (graphics.tris != null)
-                {
-                    int tid = 0;
-                    var src = graphics.tris;
-                    int len = src.Length;
-                    if (len > 0)
-                    {
-                        for (int k = 0; k < len; k++)
-                        {
-                            TriBuffer[k] = src[k] + vc;
-                        }
-                        canvas.MatCollector.CombinationMaterial(graphics, TriBuffer, len, ref tid, ref clip);
-                    }
-                    AddUV1(canvas, tid, dc);
-                }
-                else if (graphics.trisInfo.DataCount > 0 | graphics.trisInfo2.DataCount > 0)
-                {
-                    int l = 0;
-                    int tc = graphics.trisInfo.DataCount;
-                    if (tc > 0)
-                    {
-                        unsafe
-                        {
-                            int* ip = graphics.trisInfo.Addr;
-                            for (int k = 0; k < tc; k++)
-                            {
-                                TriBuffer[k] = ip[k] + vc;
-                            }
-                        }
-                        l = 1;
-                    }
-                    Arrays[0].Length = tc;
-                    int tc2 = graphics.trisInfo2.DataCount;
-                    if (tc2 > 0)
-                    {
-                        int ks = tc;
-                        unsafe
-                        {
-                            int* ip = graphics.trisInfo2.Addr;
-                            for (int k = 0; k < tc2; k++)
-                            {
-                                TriBuffer[ks] = ip[k] + vc;
-                                ks++;
-                            }
-                        }
-                        Arrays[1].Start = tc;
-                        Arrays[1].Length = tc2;
-                        l = 2;
-                    }
-                    canvas.MatCollector.CombinationMaterial(graphics, TriBuffer, Arrays, IDBuffer, l, ref clip);
-                    unsafe
-                    {
-                        HVertex* hv = graphics.vertInfo.Addr;
-                        AddUV1(canvas, IDBuffer, hv, dc, l);
-                    }
-                }
-                else
-                {
-                    AddUV1(canvas, 0, dc);
-                }
+                AddTris(graphics, canvas, vc, dc);
             }
         }
         /// <summary>
@@ -298,87 +267,43 @@ namespace huqiang.Core.HGUI
         /// <param name="canvas"></param>
         /// <param name="tid"></param>
         /// <param name="vertCount"></param>
-        static void AddUV1(HCanvas canvas, int tid, int vertCount)
+        static void AddUV1(HCanvas canvas, int tid, ref BlockInfo<HVertex> dat)
         {
-
             Vector2 v = Vector2.zero;
-            switch (tid)
+            v.x = tid;
+            v.x *= 0.1f;
+            var dc = dat.DataCount;
+            unsafe
             {
-                case 1:
-                    v.y = 1;
-                    break;
-                case 2:
-                    v.x = 1;
-                    break;
-                case 3:
-                    v.x = 1;
-                    v.y = 1;
-                    break;
+                var hv = dat.Addr;
+                for (int i = 0; i < dc; i++)
+                {
+                    v.y = hv[i].fillColor;
+                    canvas.uv1.Add(v);
+                }
             }
-            for (int i = 0; i < vertCount; i++)
-                canvas.uv1.Add(v);
         }
         static Vector2[] UV1 = new Vector2[4];
-        static void AddUV1(HCanvas canvas, int[] ids, HVertex[] vertices,int l)
-        {
-            int len = vertices.Length;
-            for (int i = 0; i < l; i++)
-            {
-                switch (ids[i])
-                {
-                    case 0:
-                        UV1[i].x = 0;
-                        UV1[i].y = 0;
-                        break;
-                    case 1:
-                        UV1[i].x = 0;
-                        UV1[i].y = 1;
-                        break;
-                    case 2:
-                        UV1[i].x = 1;
-                        UV1[i].y = 0;
-                        break;
-                    case 3:
-                        UV1[i].x = 1;
-                        UV1[i].y = 1;
-                        break;
-                }
-            }
-            for (int i = 0; i < len; i++)
-                canvas.uv1.Add(UV1[vertices[i].picture]);
-        }
-        unsafe static void AddUV1(HCanvas canvas, int[] ids, HVertex* vertices,  int vc,int l)
+        unsafe static void AddUV1(HCanvas canvas, int[] ids, HVertex* vertices, int vc, int l)
         {
             for (int i = 0; i < l; i++)
             {
-                switch (ids[i])
-                {
-                    case 0:
-                        UV1[i].x = 0;
-                        UV1[i].y = 0;
-                        break;
-                    case 1:
-                        UV1[i].x = 0;
-                        UV1[i].y = 1;
-                        break;
-                    case 2:
-                        UV1[i].x = 1;
-                        UV1[i].y = 0;
-                        break;
-                    case 3:
-                        UV1[i].x = 1;
-                        UV1[i].y = 1;
-                        break;
-                }
+                float x = ids[i];
+                UV1[i].x = x * 0.1f;
+                UV1[i].y = 0;
             }
             for (int i = 0; i < vc; i++)
             {
                 int p = vertices[i].picture;
                 if (p < 0 | p > 3)
                     Debug.LogError("out of index");
-                else canvas.uv1.Add(UV1[p]);
+                else
+                {
+                    UV1[p].y = vertices[i].fillColor;
+                    canvas.uv1.Add(UV1[p]);
+                }
             }
-                
+
         }
         /// <summary>
         /// 矩形遮罩
@@ -386,7 +311,7 @@ namespace huqiang.Core.HGUI
         /// <param name="v0"></param>
         /// <param name="v1"></param>
         /// <returns></returns>
-        static Vector4 CutRect(Vector4 v0,Vector4 v1)
+        static Vector4 CutRect(Vector4 v0, Vector4 v1)
         {
             if (v0.x < v1.x)
                 v0.x = v1.x;

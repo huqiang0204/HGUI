@@ -1,10 +1,15 @@
 ﻿using huqiang.Core.HGUI;
 using huqiang.Core.Line;
+using huqiang.Core.UIData;
+using huqiang.Data;
 using huqiang.UIComposite;
 using huqiang.UIEvent;
 using huqiang.UIModel;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using UnityEngine;
@@ -21,9 +26,10 @@ namespace Assets.Scripts
             public UserEvent last;
             public UserEvent next;
             public HLine Line;
-            public GameObject TipA;
-            public GameObject TipB;
-            public InputBox inputBox;
+            public UIElement TipA;
+            public UIElement TipB;
+            public InputBox InputBox;
+            public HText www;
         }
         View view;
         class ItemView
@@ -32,19 +38,39 @@ namespace Assets.Scripts
             public HText t1;
         }
         int Index = 0;
-        public override void Initial(Transform parent, object dat = null)
+        public override void Initial(UIElement parent, object dat = null)
         {
             base.Initial(parent, dat);
             view = LoadUI<View>("baseUI", "start");
             InitialEvent();
             InitialData();
-            view.inputBox.ReadOnly = true;
-            view.inputBox.InputString = "dfgkldfkglkdf;lkffgl;dkfl;gkdl;fkgl;dkfgdfjgjhkjhgjkhskjdlhfskjdhflksjdhjfkljsjdjjhfkjjshdkfjjhsdkjfhhkjsjdhfkjhsjdkjjhfksjjdhfkjjshdkjfhjskdhfkshdkfhsdkhfkjhsdjkfhkjshdfjkjhsdjhfjjksjdhfkhsdkfjjjhjsdkjhfksjhjdfkjhsdjkfhksjdhjfkjljhsdfhgsdgh";
+            //view.InputBox.ReadOnly = true;
+            view.InputBox.InputString = "dfgkldjsjdgh";
+            CustomFont font = new CustomFont(ElementAsset.FindTexture(null, "icons"));
+            var sp = ElementAsset.FindSprites(null, "icons", new string[] { "Badge1", "Badge2", "Badge3l", });
+            string str = "123";
+            for (int i = 0; i < 3; i++)
+                font.AddCharMap(str[i], sp[i], 66);
+            view.www.customFont = font;
+            view.www.Text = "0123456789大随风😝AA";
+            view.scrolly.ItemDockCenter = true;
+            //var tb = new SerializedData.TestB();
+            //tb.a = 56;
+            //tb.v.x = 100;
+            //tb.v.y = 66;
+            //tb.h = new SerializedData.TestA();
+            //tb.h.v2 = new Vector2[] { new Vector2(11, 22) };
+            //tb.h.b = new string[] { "a", "b" };
+            //tb.h.e = new List<string>(new string[] { "c", "d" });
+            //str = tb.Save().ToString();
+            //var jo = JObject.Parse(str);
+            //var tc = new SerializedData.TestB();
+            //tc.Load(jo);
         }
         void InitialEvent()
         {
-            view.TipA.SetActive(false);
-            view.TipB.SetActive(false);
+            view.TipA.activeSelf = false;
+            view.TipB.activeSelf = false;
             List<string> data = new List<string>();
             for (int i = 1000; i < 1200; i++)
                 data.Add(i.ToString() + "😄");
@@ -55,18 +81,18 @@ namespace Assets.Scripts
                 {
                     if(view.scrolly.Point<-100)
                     {
-                        view.TipA.SetActive(true);
-                        view.TipB.SetActive(false);
+                        view.TipA.activeSelf = true;
+                        view.TipB.activeSelf = false;
                     }
-                    else if (view.scrolly.Point+view.scrolly.Enity.SizeDelta.y>view.scrolly.ActualSize.y+100)
+                    else if (view.scrolly.Point+view.scrolly.Enity.SizeDelta.y>view.scrolly.ContentSize.y+100)
                     {
-                        view.TipA.SetActive(false);
-                        view.TipB.SetActive(true);
+                        view.TipA.activeSelf = false;
+                        view.TipB.activeSelf = true;
                     }
                     else
                     {
-                        view.TipA.SetActive(false);
-                        view.TipB.SetActive(false);
+                        view.TipA.activeSelf = false;
+                        view.TipB.activeSelf = true;
                     }
                 }
             };
@@ -76,13 +102,13 @@ namespace Assets.Scripts
                     Index -= 20;
                     RefeshScrollY();
                 }
-                else if (view.scrolly.Point + view.scrolly.Enity.SizeDelta.y > view.scrolly.ActualSize.y + 100)
+                else if (view.scrolly.Point + view.scrolly.Enity.SizeDelta.y > view.scrolly.ContentSize.y + 100)
                 {
                     Index += 20;
                     RefeshScrollY();
                 }
-                view.TipA.SetActive(false);
-                view.TipB.SetActive(false);
+                view.TipA.activeSelf = false;
+                view.TipB.activeSelf = false;
             };
             var scrollx = view.scrollx;
             scrollx.BindingData = data;
@@ -134,7 +160,6 @@ namespace Assets.Scripts
             item.t1.Text = dat;
             item.img.DataContext = index;
             item.img.Click = ItemClick;
-
         }
         void ItemClick(UserEvent user, UserAction action)
         {

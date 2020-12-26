@@ -1,4 +1,5 @@
-﻿using System;
+﻿using huqiang.Core.HGUI;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,7 +16,7 @@ namespace huqiang
         /// 构造函数
         /// </summary>
         /// <param name="t">目标对象实例</param>
-        public MoveAnimat(Transform t)
+        public MoveAnimat(UIElement t)
         {
             Target = t;
             AnimationManage.Manage.AddAnimat(this);
@@ -23,7 +24,7 @@ namespace huqiang
         /// <summary>
         /// 目标对象实例
         /// </summary>
-        public Transform Target;
+        public UIElement Target;
         /// <summary>
         /// 开始位置
         /// </summary>
@@ -87,7 +88,7 @@ namespace huqiang
         public void Dispose()
         {
             if (AutoHide)
-                Target.gameObject.SetActive(false);
+                Target.activeSelf = false;
             AnimationManage.Manage.ReleaseAnimat(this);
         }
     }

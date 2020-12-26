@@ -1,55 +1,16 @@
-﻿using UnityEngine;
+﻿using huqiang.Core.UIData;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using UnityEngine;
 
 namespace huqiang.Core.HGUI
 {
-    public enum Origin180
+    public class HImage : HGraphics
     {
-        Bottom = 0,
-        Left = 1,
-        Top = 2,
-        Right = 3
-    }
-    public enum SpriteType
-    {
-        Simple = 0,
-        Sliced = 1,
-        Tiled = 2,
-        Filled = 3
-    }
-    public enum FillMethod
-    {
-        Horizontal = 0,
-        Vertical = 1,
-        Radial90 = 2,
-        Radial180 = 3,
-        Radial360 = 4
-    }
-    public enum OriginHorizontal
-    {
-        Left = 0,
-        Right = 1
-    }
-    public enum OriginVertical
-    {
-        Bottom = 0,
-        Top = 1
-    }
-    public enum Origin90
-    {
-        BottomLeft = 0,
-        TopLeft = 1,
-        TopRight = 2,
-        BottomRight = 3
-    }
-    public enum Origin360
-    {
-        Bottom = 0,
-        Right = 1,
-        Top = 2,
-        Left = 3
-    }
-    public class HImage:HGraphics
-    {
+        public override string TypeName { get => "HImage"; }
         [SerializeField]
         internal Sprite m_sprite = null;
         internal Rect m_rect;
@@ -97,19 +58,28 @@ namespace huqiang.Core.HGUI
             m_vertexChange = true;
         }
         [SerializeField]
+        //[HideInInspector]
         internal SpriteType m_spriteType;
-        public SpriteType SprType { get => m_spriteType; set {
+        public SpriteType SprType
+        {
+            get => m_spriteType; set
+            {
                 m_spriteType = value;
                 m_vertexChange = true;
-            } }
+            }
+        }
         [SerializeField]
         [HideInInspector]
         internal FillMethod m_fillMethod;
-        public FillMethod FillMethod { get => m_fillMethod;
-            set {
+        public FillMethod FillMethod
+        {
+            get => m_fillMethod;
+            set
+            {
                 m_fillMethod = value;
                 m_vertexChange = true;
-            } }
+            }
+        }
         /// <summary>
         /// 逆时针填充
         /// </summary>
@@ -118,27 +88,34 @@ namespace huqiang.Core.HGUI
         [SerializeField]
         [HideInInspector]
         internal int m_fillOrigin;
-        public int FillOrigin { get => m_fillOrigin; set {
+        public int FillOrigin
+        {
+            get => m_fillOrigin; set
+            {
                 m_fillOrigin = value;
                 m_vertexChange = true;
-            } }
-  
+            }
+        }
+
         [SerializeField]
         [HideInInspector]
         internal float m_fillAmount = 1;
         /// <summary>
         /// 填充比例
         /// </summary>
-        public float FillAmount {
+        public float FillAmount
+        {
             get => m_fillAmount;
-            set {
+            set
+            {
                 if (value < 0)
                     value = 0;
                 else if (value > 1)
                     value = 1;
                 m_fillAmount = value;
                 m_vertexChange = true;
-            } }
+            }
+        }
         [SerializeField]
         [HideInInspector]
         internal bool m_preserveAspect;
@@ -148,24 +125,32 @@ namespace huqiang.Core.HGUI
         public bool PreserveAspect { get => m_preserveAspect; set => m_preserveAspect = value; }
         internal float m_pixelsPerUnit = 1;
         internal bool m_fillCenter = true;
-        public bool FillCenter {
+        public bool FillCenter
+        {
             get { return m_fillCenter; }
-            set { if (m_fillCenter != value)
+            set
+            {
+                if (m_fillCenter != value)
                     m_vertexChange = true;
-                m_fillCenter = value; }
+                m_fillCenter = value;
+            }
         }
-        public float PixelsPerUnitMultiplier { get => m_pixelsPerUnit;
-            set {
+        public float PixelsPerUnitMultiplier
+        {
+            get => m_pixelsPerUnit;
+            set
+            {
                 if (m_pixelsPerUnit != value)
                     m_vertexChange = true;
                 m_pixelsPerUnit = value;
-            } }
+            }
+        }
         /// <summary>
         /// 使用纹理尺寸
         /// </summary>
         public void SetNativeSize()
         {
-            if(m_sprite!=null)
+            if (m_sprite != null)
             {
                 m_sizeDelta.x = m_sprite.rect.width;
                 m_sizeDelta.y = m_sprite.rect.height;
@@ -194,7 +179,7 @@ namespace huqiang.Core.HGUI
         public override void MainUpdate()
         {
             base.MainUpdate();
-            if(m_dirty)
+            if (m_dirty)
             {
                 ApplySpriteInfo();
                 m_dirty = false;
@@ -205,14 +190,16 @@ namespace huqiang.Core.HGUI
         /// </summary>
         public override void UpdateMesh()
         {
-            if(m_vertexChange)
+            if (m_vertexChange)
             {
                 HGUIMesh.CreateMesh(this);
                 m_vertexChange = false;
                 m_colorChanged = false;
-            }else if(m_colorChanged)
+            }
+            else if (m_colorChanged)
             {
-                var c =vertInfo.DataCount;
+                m_colorChanged = false;
+                var c = vertInfo.DataCount;
                 if (c > 0)
                 {
                     unsafe

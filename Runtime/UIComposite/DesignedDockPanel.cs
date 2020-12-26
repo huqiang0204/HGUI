@@ -30,16 +30,15 @@ namespace huqiang.UIComposite
         /// </summary>
         /// <param name="fake">数据模型</param>
         /// <param name="element">UI主体元素</param>
-        public override void Initial(FakeStruct fake,UIElement element,Initializer initializer)
+        public override void Initial(FakeStruct fake,UIElement element,UIInitializer initializer)
         {
             contents.Clear();
             base.Initial(fake,element,initializer);
             Auxiliary = HGUIManager.FindChild(fake, "Auxiliary");
-            var trans = element.transform;
-            Drag = trans.Find("Drag").GetComponent<UIElement>();
-            Drag.gameObject.SetActive(false);
+            Drag = element.Find("Drag");
+            Drag.activeSelf = false;
             MainContent = new DesignedDockAuxiliary(this);
-            MainContent.Initial(MainArea, trans.Find("Auxiliary").GetComponent<UIElement>());
+            MainContent.Initial(MainArea, element.Find("Auxiliary"));
             contents.Add(MainContent);
             MainContent.SetParent(MainArea);
         }
@@ -58,7 +57,7 @@ namespace huqiang.UIComposite
         {
             for (int i = 0; i < contents.Count; i++)
                 contents[i].HideDocker();
-            Drag.gameObject.SetActive(false);
+            Drag.activeSelf = false;
         }
         /// <summary>
         /// 拖放中
@@ -66,8 +65,8 @@ namespace huqiang.UIComposite
         /// <param name="action"></param>
         public void Draging(UserAction action)
         {
-            Drag.transform.localPosition = UIElement.ScreenToLocal(Drag.transform.parent, action.CanPosition);
-            Drag.gameObject.SetActive(true);
+            Drag.localPosition = UIElement.ScreenToLocal(Drag.parent, action.CanPosition);
+            Drag.activeSelf = true;
         }
         /// <summary>
         /// 拖放完毕
@@ -75,7 +74,7 @@ namespace huqiang.UIComposite
         /// <param name="action"></param>
         public void DragEnd(UserAction action)
         {
-            Drag.gameObject.SetActive(false);
+            Drag.activeSelf = false;
         }
         /// <summary>
         /// 当前拖放的内容
@@ -117,7 +116,7 @@ namespace huqiang.UIComposite
                 if (window != null)
                     window.Dispose();
                 var t = new T();
-                t.Initial(Content.transform, null);
+                t.Initial(Content, null);
                 t.ReSize();
                 window = t;
             }
@@ -133,7 +132,7 @@ namespace huqiang.UIComposite
         /// <summary>
         /// 停靠的坐标变换
         /// </summary>
-        public Transform docker;
+        public UIElement docker;
         /// <summary>
         /// 表主体元素
         /// </summary>
@@ -164,13 +163,12 @@ namespace huqiang.UIComposite
         {
             dockArea = area;
             model = mod;
-            var trans = mod.transform;
-            docker = trans.Find("Docker");
-            tab = trans.Find("TabControl").GetComponent<UIElement>();
-            Cover = trans.Find("Cover").GetComponent<UIElement>();
+            docker = mod.Find("Docker");
+            tab = mod.Find("TabControl");
+            Cover = mod.Find("Cover");
             control = tab.composite as TabControl;
-            Cover.gameObject.SetActive(false);
-            docker.gameObject.SetActive(false);
+            Cover.activeSelf = false;
+            docker.activeSelf = false;
             InitialDocker();
         }
         /// <summary>
@@ -180,40 +178,39 @@ namespace huqiang.UIComposite
         public void SetParent(DockpanelArea area)
         {
             dockArea = area;
-            model.transform.SetParent(area.model.transform);
+            model.SetParent(area.model);
         }
         void InitialDocker()
         {
-            var trans = docker.transform;
-            var mod = trans.Find("Center");
-            var eve = mod.GetComponent<UIElement>().RegEvent<UserEvent>();
+            var mod = docker.Find("Center");
+            var eve = mod.RegEvent<UserEvent>();
             eve.PointerUp = CenterPointUp;
             eve.PointerEntry = CenterPointEntry;
             eve.PointerLeave = PointLeave;
 
-            mod = trans.Find("Left");
-            eve = mod.GetComponent<UIElement>().RegEvent<UserEvent>();
+            mod = docker.Find("Left");
+            eve = mod.RegEvent<UserEvent>();
             eve.PointerUp = PointUp;
             eve.PointerEntry = LeftPointEntry;
             eve.PointerLeave = PointLeave;
             eve.DataContext = DockpanelArea.Dock.Left;
 
-            mod = trans.Find("Top");
-            eve = mod.GetComponent<UIElement>().RegEvent<UserEvent>();
+            mod = docker.Find("Top");
+            eve = mod.RegEvent<UserEvent>();
             eve.PointerUp = PointUp;
             eve.PointerEntry = TopPointEntry;
             eve.PointerLeave = PointLeave;
             eve.DataContext = DockpanelArea.Dock.Top;
 
-            mod = trans.Find("Right");
-            eve = mod.GetComponent<UIElement>().RegEvent<UserEvent>();
+            mod = docker.Find("Right");
+            eve = mod.RegEvent<UserEvent>();
             eve.PointerUp = PointUp;
             eve.PointerEntry = RightPointEntry;
             eve.PointerLeave = PointLeave;
             eve.DataContext = DockpanelArea.Dock.Right;
 
-            mod = trans.Find("Down");
-            eve = mod.GetComponent<UIElement>().RegEvent<UserEvent>();
+            mod = docker.Find("Down");
+            eve = mod.RegEvent<UserEvent>();
             eve.PointerUp = PointUp;
             eve.PointerEntry = DownPointEntry;
             eve.PointerLeave = PointLeave;
@@ -221,13 +218,13 @@ namespace huqiang.UIComposite
         }
         void CenterPointEntry(UserEvent callBack, UserAction action)
         {
-            Cover.transform.localPosition = Vector3.zero;
+            Cover.localPosition = Vector3.zero;
             Cover.SizeDelta = model.SizeDelta;
-            Cover.gameObject.SetActive(true);
+            Cover.activeSelf = true;
         }
         void CenterPointUp(UserEvent callBack, UserAction action)
         {
-            Cover.gameObject.SetActive(false);
+            Cover.activeSelf = false;
             if (control.ExistContent(layout.DragContent))
                 return;
             layout.DragAuxiliary.RemoveContent(layout.DragContent);
@@ -238,11 +235,11 @@ namespace huqiang.UIComposite
         }
         void PointLeave(UserEvent callBack, UserAction action)
         {
-            Cover.gameObject.SetActive(false);
+            Cover.activeSelf = false;
         }
         void PointUp(UserEvent callBack, UserAction action)
         {
-            Cover.gameObject.SetActive(false);
+            Cover.activeSelf = false;
             if (layout.DragAuxiliary == this)
             {
                 if (control.contents.Count < 2)
@@ -261,30 +258,30 @@ namespace huqiang.UIComposite
         void LeftPointEntry(UserEvent callBack, UserAction action)
         {
             var size = model.SizeDelta;
-            Cover.transform.localPosition = new Vector3(size.x * -0.25f, 0, 0);
+            Cover.localPosition = new Vector3(size.x * -0.25f, 0, 0);
             Cover.SizeDelta = new Vector2(size.x * 0.5f, size.y);
-            Cover.gameObject.SetActive(true);
+            Cover.activeSelf = true;
         }
         void TopPointEntry(UserEvent callBack, UserAction action)
         {
             var size = model.SizeDelta;
-            Cover.transform.localPosition = new Vector3(0, size.y * 0.25f, 0);
+            Cover.localPosition = new Vector3(0, size.y * 0.25f, 0);
             Cover.SizeDelta = new Vector2(size.x, size.y * 0.5f);
-            Cover.gameObject.SetActive(true);
+            Cover.activeSelf = true;
         }
         void RightPointEntry(UserEvent callBack, UserAction action)
         {
             var size = model.SizeDelta;
-            Cover.transform.localPosition = new Vector3(size.x * 0.25f, 0, 0);
+            Cover.localPosition = new Vector3(size.x * 0.25f, 0, 0);
             Cover.SizeDelta = new Vector2(size.x * 0.5f, size.y);
-            Cover.gameObject.SetActive(true);
+            Cover.activeSelf = true;
         }
         void DownPointEntry(UserEvent callBack, UserAction action)
         {
             var size = model.SizeDelta;
-            Cover.transform.localPosition = new Vector3(0, size.y * -0.25f, 0);
+            Cover.localPosition = new Vector3(0, size.y * -0.25f, 0);
             Cover.SizeDelta = new Vector2(size.x, size.y * 0.5f);
-            Cover.gameObject.SetActive(true);
+            Cover.activeSelf = true;
         }
         int ac;
         void HeadPointDown(UserEvent eventCall, UserAction action)
@@ -343,7 +340,7 @@ namespace huqiang.UIComposite
         /// <returns></returns>
         public ItemContent AddContent(string name)
         {
-            var item = HGUIManager.GameBuffer.Clone(control.Item).GetComponent<UIElement>();
+            var item = HGUIManager.Clone(control.Item);
             ItemContent con = new ItemContent();
             con.Parent = control;
             con.Item = item;
@@ -353,23 +350,23 @@ namespace huqiang.UIComposite
             item.userEvent.DragEnd = HeadDragEnd;
             item.userEvent.DataContext = con;
 
-            var content = UICreator.CreateElement(Vector3.zero,Vector2.zero,"Content",control.Content.transform);
+            var content = UICreator.CreateElement(Vector3.zero,Vector2.zero,"Content",control.Content);
             content.marginType = MarginType.Margin;
 
             con.Content = content;
-            con.Back = item.transform.Find("Image").GetComponent<HImage>();
+            con.Back = item.Find("Image")as HImage;
 
-            con.Label = item.transform.Find("Text").GetComponent<HText>();
-            var txt = con.Label.GetComponent<HText>();
+            con.Label = item.Find("Text") as HText;
+            var txt = con.Label;
             txt.Text = name;
             Vector2 v = txt.SizeDelta;
             txt.GetPreferredWidth(ref v, name);
             con.Back.SizeDelta = item.SizeDelta = new Vector2(v.x + 40, v.y);
             
-            var clo = item.transform.Find("Close");
+            var clo = item.Find("Close");
             if (clo != null)
             {
-                con.Close = clo.GetComponent<UIElement>();
+                con.Close = clo;
                 con.Close.RegEvent<UserEvent>();
                 con.Close.userEvent.Click = CloseClick;
                 con.Close.userEvent.DataContext = con;
@@ -397,8 +394,8 @@ namespace huqiang.UIComposite
         public void RemoveContent(TabControl.TableContent con)
         {
             control.RemoveContent(con);
-            con.Item.transform.SetParent(null);
-            con.Content.transform.SetParent(null);
+            con.Item.SetParent(null);
+            con.Content.SetParent(null);
             if (control.contents.Count == 0)
             {
                 dockArea.Dispose();
@@ -419,14 +416,14 @@ namespace huqiang.UIComposite
         /// </summary>
         public void ShowDocker()
         {
-            docker.gameObject.SetActive(true);
+            docker.activeSelf = true;
         }
         /// <summary>
         /// 隐藏可停靠区域
         /// </summary>
         public void HideDocker()
         {
-            docker.gameObject.SetActive(false);
+            docker.activeSelf = false;
         }
         /// <summary>
         /// 添加可停靠区域
@@ -437,14 +434,12 @@ namespace huqiang.UIComposite
         public DesignedDockAuxiliary AddArea(DockpanelArea.Dock dock, float r = 0.5f)
         {
             var area = dockArea.AddAreaR(dock,r);
-            var go = HGUIManager.GameBuffer.Clone(layout.Auxiliary);
-            var trans = go.transform;
-            trans.SetParent(area.model.transform);
-            trans.localScale = Vector3.one;
-            trans.localRotation = Quaternion.identity;
-            var au =go.GetComponent<UIElement>();
+            var go = HGUIManager.Clone(layout.Auxiliary);
+            go.SetParent(area.model);
+            go.localScale = Vector3.one;
+            go.localRotation = Quaternion.identity;
             var con = new DesignedDockAuxiliary(layout);
-            con.Initial(area, au);
+            con.Initial(area, go);
             layout.contents.Add(con);
             return con;
         }

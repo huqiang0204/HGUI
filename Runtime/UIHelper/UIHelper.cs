@@ -1,5 +1,5 @@
-﻿using huqiang.Core.HGUI;
-using huqiang.Data;
+﻿using huqiang.Data;
+using huqiang.Helper.HGUI;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,6 +15,22 @@ public class UIHelper : MonoBehaviour
     /// <param name="data">数据缓存</param>
     /// <returns>FakeStruct数据</returns>
     public unsafe virtual void ToBufferData(DataBuffer db, UITransfromData* data)
+    {
+    }
+    /// <summary>
+    /// 将数据存储到FakeStrcut中
+    /// </summary>
+    /// <param name="data">数据缓存</param>
+    /// <returns>FakeStruct数据</returns>
+    public unsafe virtual void ToBufferData(DataBuffer db, huqiang.Core.UIData.UIElementData* data)
+    {
+    }
+    /// <summary>
+    /// 将数据存储到FakeStrcut中
+    /// </summary>
+    /// <param name="data">数据缓存</param>
+    /// <returns>FakeStruct数据</returns>
+    public unsafe virtual void LoadFromBuffer(FakeStruct fake,UIInitializer initializer)
     {
     }
     /// <summary>

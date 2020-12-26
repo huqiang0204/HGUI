@@ -24,7 +24,10 @@ namespace Assets.Scripts
             public HImage send;
             public UserEvent last;
             public UserEvent next;
-            
+            public HText ItemText;
+            public UIElement other;
+            public UIElement self;
+            public UIElement tip;
         }
   
         class ChatItem
@@ -56,7 +59,8 @@ namespace Assets.Scripts
         UILinker<ChatItem, ChatData> other;
         UILinker<ChatItem, ChatData> self;
         UILinker<TipItem, TipData> tip;
-        public override void Initial(Transform parent, object dat = null)
+        TextGenerationSettings settings;
+        public override void Initial(UIElement parent, object dat = null)
         {
             base.Initial(parent, dat);
             view = LoadUI<View>("baseUI", "chat");
@@ -77,22 +81,26 @@ namespace Assets.Scripts
            
             view.input.OnSubmit = OnSubmit;
             container = view.chatbox.composite as UIContainer;
-            other = new UILinker<ChatItem, ChatData>(container, "other");
-            //other.CalculItemHigh = GetContentSize;
+            //other = new UILinker<ChatItem, ChatData>(container,view.other);
+            other = new UILinker<ChatItem, ChatData>(container, view.other);
+            other.LayoutCallback = GetContentSize;
             other.ItemUpdate = ItemUpdate;
-            self = new UILinker<ChatItem, ChatData>(container, "self");
-            //self.CalculItemHigh = GetContentSize;
+            self = new UILinker<ChatItem, ChatData>(container, view.self);
+            self.LayoutCallback = GetContentSize;
             self.ItemUpdate = ItemUpdate;
-            tip = new UILinker<TipItem, TipData>(container ,"tip");
+            tip = new UILinker<TipItem, TipData>(container ,view.tip);
             //tip.ItemUpdate = TipItemUpdate;
             view.send.userEvent.Click = (o, e) => {OnSubmit(view.input); };
+            view.ItemText.activeSelf = false;
+            var size = view.ItemText.SizeDelta;
+            view.ItemText.GetGenerationSettings(ref size, ref settings);
         }
         void SelectChanged(OptionGroup option,UserAction action)
         {
             var ue = option.LastSelect;
             if(ue!=null)
             {
-                var trans = ue.Context.transform;
+                var trans = ue.Context;
                 trans.GetComponentInChildren<HImage>().MainColor = 0x5E5E5EFF.ToColor();
                 trans.GetComponentInChildren<HText>().MainColor = Color.white;
             }
@@ -100,7 +108,7 @@ namespace Assets.Scripts
             if(ue!=null)
             {
                 opt = ue.Context.name;
-                var trans = ue.Context.transform;
+                var trans = ue.Context;
                 trans.GetComponentInChildren<HImage>().MainColor = Color.blue;
                 trans.GetComponentInChildren<HText>().MainColor = Color.red;
             }
@@ -116,7 +124,9 @@ namespace Assets.Scripts
                     ChatData chat = new ChatData();
                     chat.name = "江海胡";
                     chat.content = str;
-                    other.AddAndMove(chat,30);
+                    settings.textAnchor = TextAnchor.UpperLeft;
+                    chat.conSize = HTextGenerator.GetPreferredSize(new StringEx(str,settings.richText),ref settings);
+                    other.AddAndMove(chat,chat.conSize.y+10);
                     break;
                 case "center":
                     TipData t = new TipData();
@@ -128,32 +138,26 @@ namespace Assets.Scripts
                     chat = new ChatData();
                     chat.name = "胡强";
                     chat.content = str;
-                    self.AddAndMove(chat,30);
+                    settings.textAnchor = TextAnchor.UpperRight;
+                    chat.conSize = HTextGenerator.GetPreferredSize(new StringEx(str, settings.richText), ref settings);
+                    self.AddAndMove(chat, chat.conSize.y + 10);
                     break;
             }
             input.InputString = "";
         }
-        float GetContentSize(ChatItem chat, ChatData data)
+        float GetContentSize(UIElement mod, ChatData data)
         {
-            if (data.conSize == Vector2.zero)
-            {
-                Vector2 size = new Vector2(360, 60);
-                chat.content.GetPreferredSize(ref size, data.content);
-                size.x += 8;
-                size.y += 8;
-                data.conSize = size;
-            }
-            chat.content.SizeDelta = data.conSize;
-            var s = data.conSize;
-            s.x += 10;
-            s.y += 10;
-            chat.box.SizeDelta = s;
-            var ui = chat.box.transform.parent.GetComponent<UIElement>();
-            s.y += 60;
-            s.x = 600;
-            ui.SizeDelta = s;
-            UIElement.ResizeChild(ui);
-            return s.y;
+            data.conSize = HTextGenerator.GetPreferredSize(new StringEx(data.content, settings.richText), ref settings);
+            float y = data.conSize.y;
+            y += 60;
+            if (y < 120)
+                y = 120;
+            mod.SizeDelta = new Vector2(600, y);
+            var box = mod.Find("box");
+            box.SizeDelta = new Vector2(data.conSize.x + 10, data.conSize.y + 10);
+            box.GetChild(0).SizeDelta = data.conSize;
+            UIElement.ResizeChild(mod);
+            return y;
         }
         void ItemUpdate(ChatItem chat,ChatData data,int index)
         {

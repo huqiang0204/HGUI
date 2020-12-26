@@ -203,6 +203,12 @@ namespace huqiang.Data
             }
             len = block * blockSize;
             usage += block;
+            byte* tp = bp + pe + index * blockSize * eSize;
+            for (int i = 0; i < len * eSize; i++)
+            {
+                *tp = 0;
+                tp++;
+            }
             return new BlockInfo<T>(ID, index, len, blockSize * eSize);
         }
         /// <summary>

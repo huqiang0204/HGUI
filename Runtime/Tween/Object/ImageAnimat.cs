@@ -215,7 +215,7 @@ namespace huqiang
         public void Dispose()
         {
             if (autoHide)
-                image.gameObject.SetActive(false);
+                image.activeSelf = false;
             AnimationManage.Manage.ReleaseAnimat(this);
         }
     }

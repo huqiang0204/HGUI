@@ -1,4 +1,4 @@
-﻿using huqiang;
+﻿using huqiang.Core.UIData;
 using huqiang.Data;
 using huqiang.UIComposite;
 using huqiang.UIEvent;
@@ -8,54 +8,178 @@ using UnityEngine;
 
 namespace huqiang.Core.HGUI
 {
-    public enum HEventType
+    public class UIElement
     {
-        None,
-        UserEvent,
-        TextInput,
-        GestureEvent
-    }
-    public enum CompositeType
-    {
-        None,
-        Slider,
-        ScrollX,
-        ScrollY,
-        GridScroll,
-        Paint,
-        Rocker,
-        UIContainer,
-        TreeView,
-        UIDate,
-        UIPalette,
-        ScrollYExtand,
-        DropDown,
-        StackPanel,
-        TabControl,
-        DockPanel,
-        DesignedDockPanel, 
-        DragContent,
-        DataGrid,
-        InputBox
-    }
-    [DisallowMultipleComponent]
-    /// <summary>
-    /// UI基本元素组件
-    /// </summary>
-    public class UIElement:MonoBehaviour
-    {
+#if UNITY_EDITOR
+        bool _expand;
+        public bool expand { get => _expand;
+            set {
+                _expand = value;
+                if (Target != null)
+                    Target.expand = value;
+            } }
+        [HideInInspector]
+        public huqiang.Helper.HGUI.UIElement Target;
+#endif
+        protected static List<UIElement> Buffer = new List<UIElement>();
+        public static void DisposeAll()
+        {
+            int c = Buffer.Count - 1;
+            var arr = Buffer.ToArray();
+            for (int i = c; i >= 0; i--)
+            {
+                var ui = arr[i];
+                if(ui==null)
+                {
+                    Debug.LogError("UI is null");
+                }else
+                arr[i].Dispose(); 
+            }
+            Buffer.Clear();
+        }
+        public static UIElement FindInstance(int insID)
+        {
+            for (int i = 0; i < Buffer.Count; i++)
+                if (Buffer[i].id == insID)
+                    return Buffer[i];
+            return null;
+        }
+        static int ID = 10000;
+        /// <summary>
+        /// 请勿更改,用于回收时的标记
+        /// </summary>
+        public virtual string TypeName { get => "UIElement"; }
+        [SerializeField]
+        [HideInInspector]
+        internal int id;
+        public int GetInstanceID()
+        {
+            return id;
+        }
+        public UIElement()
+        {
+            id = ID;
+            ID++;
+            Buffer.Add(this);
+        }
+        public virtual void Dispose()
+        {
+            Buffer.Remove(this);
+            parent = null;
+            for (int i = 0; i < child.Count; i++)
+                child[i].Dispose();
+            child.Clear();
+        }
+        /// <summary>
+        /// 清除资源
+        /// </summary>
+        public virtual void Clear()
+        {
+        }
+        public bool activeSelf = true;
+        public string name;
+        public Vector3 localPosition;
+        public Vector3 localScale = Vector3.one;
+        public Quaternion localRotation = Quaternion.identity;
+        [SerializeField]
+        [HideInInspector]
+        UIElement _parent;
+        public List<UIElement> child = new List<UIElement>();
+        public int childCount { get => child.Count; }
+        public UIElement GetChild(int index)
+        {
+            return child[index];
+        }
+        public UIElement parent
+        {
+            get { return _parent; }
+            set
+            {
+                if (_parent != null)
+                    _parent.child.Remove(this);
+                _parent = value;
+                if (_parent != null)
+                    _parent.child.Add(this);
+            }
+        }
+        public UIElement root { get {
+                if (_parent != null)
+                {
+                    var p = _parent;
+                    for(int i=0;i<1024;i++)
+                    {
+                        if (p._parent == null)
+                            break;
+                        p = p._parent;
+                    }
+                    return p;
+                }
+                return this;
+            }
+        }
+        public void SetParent(UIElement ele)
+        {
+            if (_parent != null)
+                _parent.child.Remove(this);
+            _parent = ele;
+            if (_parent != null)
+                _parent.child.Add(this);
+        }
+        public void SetAsFirstSibling()
+        {
+            if(_parent!=null)
+            {
+                _parent.child.Remove(this);
+                _parent.child.Insert(0,this);
+            }
+        }
+        public int GetSiblingIndex()
+        {
+            if (parent == null)
+                return 0;
+            return parent.child.IndexOf(this);
+        }
+        public void SetSiblingIndex(int index)
+        {
+            if (parent == null)
+                return;
+            var c = parent.child;
+            c.Remove(this);
+            if (index >= c.Count)
+                c.Add(this);
+            else c.Insert(index, this);
+        }
+        public UIElement Find(string name)
+        {
+            for (int i = 0; i < child.Count; i++)
+                if (child[i].name == name)
+                    return child[i];
+            return null;
+        }
+        public T GetComponentInChildren<T>()where T:UIElement
+        {
+            for (int i = 0; i < child.Count; i++)
+            {
+                T t = child[i] as T;
+                if (t != null)
+                    return t;
+            }
+            return null;
+        }
+
         /// <summary>
         /// 最后更新的帧数,防止同一帧内重复更新
         /// </summary>
         internal int LateFrame;
         #region static method
-        static Transform[] buff = new Transform[64];
-        public static Coordinates GetGlobaInfo(Transform trans, bool Includeroot = true)
+        static UIElement[] buff = new UIElement[64];
+        public static Coordinates GetGlobaInfo(UIElement trans, bool Includeroot = true)
         {
             buff[0] = trans;
             var parent = trans.parent;
             int max = 1;
             if (parent != null)
+            {
                 for (; max < 64; max++)
                 {
                     buff[max] = parent;
@@ -63,6 +187,9 @@ namespace huqiang.Core.HGUI
                     if (parent == null)
                         break;
                 }
+            }
+            else max = 0;
+           
             Vector3 pos, scale;
             Quaternion quate;
             if (Includeroot)
@@ -100,9 +227,9 @@ namespace huqiang.Core.HGUI
             coord.Scale = scale;
             return coord;
         }
-        public static Vector3 ScreenToLocal(Transform trans, Vector3 v)
+        public static Vector3 ScreenToLocal(UIElement trans, Vector3 v)
         {
-            var g = GetGlobaInfo(trans,false);
+            var g = GetGlobaInfo(trans, false);
             v -= g.Postion;
             if (g.Scale.x != 0)
                 v.x /= g.Scale.x;
@@ -119,9 +246,8 @@ namespace huqiang.Core.HGUI
         }
         public static Vector2[] Anchors = new[] { new Vector2(0.5f, 0.5f), new Vector2(0, 0.5f),new Vector2(1, 0.5f),
         new Vector2(0.5f, 1),new Vector2(0.5f, 0), new Vector2(0, 0), new Vector2(0, 1), new Vector2(1, 0), new Vector2(1, 1)};
-        public static void Scaling(UIElement script, ScaleType type, Vector2 pSize, Vector2 ds)
+        public static void Scaling(UIElement rect, ScaleType type, Vector2 pSize, Vector2 ds)
         {
-            var rect = script.transform;
             switch (type)
             {
                 case ScaleType.None:
@@ -165,7 +291,7 @@ namespace huqiang.Core.HGUI
             float ty = dy + pivot.y * psize.y;//锚点y
             offset.x += tx;//偏移点x
             offset.y += ty;//偏移点y
-            script.transform.localPosition = new Vector3(offset.x, offset.y, 0);
+            script.localPosition = new Vector3(offset.x, offset.y, 0);
         }
         public static void AlignmentEx(UIElement script, AnchorPointType type, Vector2 offset, Vector2 p, Vector2 psize)
         {
@@ -230,67 +356,59 @@ namespace huqiang.Core.HGUI
             }
             x += offset.x;
             y += offset.y;
-            script.transform.localPosition = new Vector3(x, y, 0);
+            script.localPosition = new Vector3(x, y, 0);
         }
         public static void MarginEx(UIElement script, Margin margin, Vector2 parentPivot, Vector2 parentSize)
         {
-            var rect = script.transform;
             float w = parentSize.x - margin.left - margin.right;
             float h = parentSize.y - margin.top - margin.down;
             var m_pivot = script.Pivot;
             float ox = w * m_pivot.x - parentPivot.x * parentSize.x + margin.left;
             float oy = h * m_pivot.y - parentPivot.y * parentSize.y + margin.down;
-            float sx = rect.localScale.x;
-            float sy = rect.localScale.y;
+            float sx = script.localScale.x;
+            float sy = script.localScale.y;
             script.SizeDelta = new Vector2(w / sx, h / sy);
-            rect.localPosition = new Vector3(ox, oy, 0);
+            script.localPosition = new Vector3(ox, oy, 0);
         }
         public static void MarginX(UIElement script, Margin margin, Vector2 parentPivot, Vector2 parentSize)
         {
-            var rect = script.transform;
             float w = parentSize.x - margin.left - margin.right;
             var m_pivot = script.Pivot;
             float ox = w * m_pivot.x - parentPivot.x * parentSize.x + margin.left;
-            float sx = rect.localScale.x;
+            float sx = script.localScale.x;
             float y = script.SizeDelta.y;
             script.SizeDelta = new Vector2(w / sx, y);
-            float py = rect.localPosition.y;
-            rect.localPosition = new Vector3(ox, py, 0);
+            float py = script.localPosition.y;
+            script.localPosition = new Vector3(ox, py, 0);
         }
         public static void MarginY(UIElement script, Margin margin, Vector2 parentPivot, Vector2 parentSize)
         {
-            var rect = script.transform;
             float h = parentSize.y - margin.top - margin.down;
             var m_pivot = script.Pivot;
             float oy = h * m_pivot.y - parentPivot.y * parentSize.y + margin.down;
-            float sy = rect.localScale.y;
+            float sy = script.localScale.y;
             float x = script.SizeDelta.x;
             script.SizeDelta = new Vector2(x, h / sy);
-            float px = rect.localPosition.x;
-            rect.localPosition = new Vector3(px, oy, 0);
+            float px = script.localPosition.x;
+            script.localPosition = new Vector3(px, oy, 0);
         }
-        public static void Resize(UIElement script,bool child = true)
+        public static void Resize(UIElement script, bool child = true)
         {
-            Transform rect = script.transform;
             Vector2 psize = Vector2.zero;
             Vector2 v = script.m_sizeDelta;
             var pp = Anchors[0];
             if (script.parentType == ParentType.Tranfrom)
             {
-                var p = rect.parent;
-                if(p!=null)
+                var p = script._parent;
+                if (p != null)
                 {
-                    var t = p.GetComponent<UIElement>();
-                    if (t != null)
-                    {
-                        psize = t.SizeDelta;
-                        pp = t.Pivot;
-                    }
+                    psize = p.SizeDelta;
+                    pp = p.Pivot;
                 }
             }
             else
             {
-                var t = rect.root.GetComponent<UIElement>();
+                var t = script.root;
                 if (t != null)
                     psize = t.SizeDelta;
             }
@@ -362,59 +480,46 @@ namespace huqiang.Core.HGUI
             if (script.scaleType != ScaleType.None)
                 Scaling(script, script.scaleType, psize, script.m_sizeDelta);
             if (child)
-                ResizeChild(rect, child);
+                ResizeChild(script, child);
             if (script.scaleType != ScaleType.None | script.anchorType != AnchorType.None | script.marginType != MarginType.None)
             {
-                ResizeChild(rect, false);
+                ResizeChild(script, false);
                 if (v != script.m_sizeDelta)
                     script.ReSized();
             }
         }
-        public static void ResizeChild(Transform trans, bool child = true)
+        public static void ResizeChild(UIElement trans, bool child = true)
         {
-            for (int i = 0; i < trans.childCount; i++)
+            if (trans == null)
+                return;
+            var chi = trans.child;
+            for (int i = 0; i < chi.Count; i++)
             {
-                var son = trans.GetChild(i);
-                var ss =son.GetComponent<UIElement>();
-                if (ss != null)
-                    Resize(ss, child);
+                var son = chi[i];
+                if (son != null)
+                    Resize(son, child);
                 else if (child)
-                    ResizeChild(son,child);
-            }
-        }
-        public static void ResizeChild(UIElement script, bool child = true)
-        {
-            var rect = script.transform;
-            for (int i = 0; i < rect.childCount; i++)
-            {
-                var ss = rect.GetChild(i).GetComponent<UIElement>();
-                if (ss != null)
-                    Resize(ss, child);
+                    ResizeChild(son, child);
             }
         }
         public static void Margin(UIElement script)
         {
-            Transform rect = script.transform;
-            Vector3 loclpos = rect.localPosition;
+            Vector3 loclpos = script.localPosition;
             Vector2 psize = Vector2.zero;
             Vector2 v = script.m_sizeDelta;
             var pp = Anchors[0];
             if (script.parentType == ParentType.Tranfrom)
             {
-                var p = rect.parent;
+                var p = script._parent;
                 if (p != null)
                 {
-                    var t = p.GetComponent<UIElement>();
-                    if (t != null)
-                    {
-                        psize = t.SizeDelta;
-                        pp = t.Pivot;
-                    }
+                    psize = p.SizeDelta;
+                    pp = p.Pivot;
                 }
             }
             else
             {
-                var t = rect.root.GetComponent<UIElement>();
+                var t = script.root;
                 if (t != null)
                     psize = t.SizeDelta;
             }
@@ -478,27 +583,22 @@ namespace huqiang.Core.HGUI
         }
         public static void Dock(UIElement script)
         {
-            Transform rect = script.transform;
-            Vector3 loclpos = rect.localPosition;
+            Vector3 loclpos = script.localPosition;
             Vector2 psize = Vector2.zero;
             Vector2 v = script.m_sizeDelta;
             var pp = Anchors[0];
             if (script.parentType == ParentType.Tranfrom)
             {
-                var p = rect.parent;
+                var p = script._parent;
                 if (p != null)
                 {
-                    var t = p.GetComponent<UIElement>();
-                    if (t != null)
-                    {
-                        psize = t.SizeDelta;
-                        pp = t.Pivot;
-                    }
+                    psize = p.SizeDelta;
+                    pp = p.Pivot;
                 }
             }
             else
             {
-                var t = rect.root.GetComponent<UIElement>();
+                var t = script.root;
                 if (t != null)
                     psize = t.SizeDelta;
             }
@@ -514,23 +614,23 @@ namespace huqiang.Core.HGUI
                     break;
             }
         }
-        public static Vector2 GetSize(UIElement parent,FakeStruct ele)
+        public static Vector2 GetSize(UIElement parent, FakeStruct ele)
         {
             unsafe
             {
                 Vector2 psize = Vector2.zero;
                 UIElementData* up = (UIElementData*)ele.ip;
-                switch(up->parentType)
+                switch (up->parentType)
                 {
                     case ParentType.Screen:
-                        psize = HCanvas.MainCanvas.m_sizeDelta;
+                        psize = HCanvas.CurrentCanvas.m_sizeDelta;
                         break;
                     case ParentType.Tranfrom:
-                        if(parent!=null)
+                        if (parent != null)
                             psize = parent.m_sizeDelta;
                         break;
                 }
-                switch(up->marginType)
+                switch (up->marginType)
                 {
                     case MarginType.None:
                         return up->m_sizeDelta;
@@ -539,8 +639,8 @@ namespace huqiang.Core.HGUI
                         psize.y -= up->margin.top + up->margin.down;
                         return psize;
                     case MarginType.MarginRatio:
-                        psize.x *=(1- up->margin.left - up->margin.right);
-                        psize.y *=(1-up->margin.top - up->margin.down);
+                        psize.x *= (1 - up->margin.left - up->margin.right);
+                        psize.y *= (1 - up->margin.top - up->margin.down);
                         return psize;
                     case MarginType.MarginX:
                         psize.x -= up->margin.left + up->margin.right;
@@ -588,7 +688,7 @@ namespace huqiang.Core.HGUI
         }
         #endregion
         [SerializeField]
-        internal Vector2 m_sizeDelta = new Vector2(100,100);
+        internal Vector2 m_sizeDelta = new Vector2(100, 100);
         public virtual Vector2 SizeDelta { get => m_sizeDelta; set => m_sizeDelta = value; }
         /// <summary>
         /// 轴心
@@ -650,7 +750,7 @@ namespace huqiang.Core.HGUI
             }
             if (composite != null)
             {
-                if(composite.Frame!=LateFrame)
+                if (composite.Frame != LateFrame)
                 {
                     composite.Frame = LateFrame;
                     composite.Update(UserAction.TimeSlice);
@@ -680,18 +780,22 @@ namespace huqiang.Core.HGUI
         /// 是否开启遮罩
         /// </summary>
         public bool Mask;
+        [HideInInspector]
         /// <summary>
         /// 用户事件
         /// </summary>
         public UserEvent userEvent;
+        [HideInInspector]
         /// <summary>
         /// 复合ui组件实体
         /// </summary>
         public Composite composite;
+        [HideInInspector]
         /// <summary>
         /// 数据模型
         /// </summary>
         public FakeStruct mod;
+        [HideInInspector]
         /// <summary>
         /// 联系上下文
         /// </summary>
@@ -700,6 +804,8 @@ namespace huqiang.Core.HGUI
         /// 在流水线中的位置
         /// </summary>
         internal int PipelineIndex;
+        [SerializeField]
+        internal Color32 m_color = Color.white;
         /// <summary>
         /// 主颜色
         /// </summary>
@@ -750,116 +856,88 @@ namespace huqiang.Core.HGUI
         /// 初始化数据
         /// </summary>
         /// <param name="ex">数据模型</param>
-        public void Initial(FakeStruct ex,Initializer initializer)
+        public void Initial(FakeStruct ex, UIInitializer initializer)
         {
-            switch(eventType)
+            switch (eventType)
             {
                 case HEventType.None: break;
-                case HEventType.UserEvent:RegEvent<UserEvent>(ex); break;
+                case HEventType.UserEvent: RegEvent<UserEvent>(ex); break;
                 case HEventType.TextInput: RegEvent<InputBoxEvent>(ex); break;
                 case HEventType.GestureEvent: RegEvent<GestureEvent>(ex); break;
             }
-            CreateUIComposite(this,ex, initializer);
+            CreateUIComposite(this, ex, initializer);
         }
         /// <summary>
         /// 创建复合型UI实体
         /// </summary>
         /// <param name="script">ui元素实体</param>
         /// <param name="ex">数据模型</param>
-        public static void CreateUIComposite(UIElement script,FakeStruct ex,Initializer initializer)
+        public static void CreateUIComposite(UIElement script, FakeStruct ex, UIInitializer initializer)
         {
-            switch(script.compositeType)
+            switch (script.compositeType)
             {
                 case CompositeType.None:
                     break;
                 case CompositeType.ScrollY:
-                    new ScrollY().Initial(ex,script,initializer);
+                    new ScrollY().Initial(ex, script, initializer);
                     break;
                 case CompositeType.ScrollX:
-                    new ScrollX().Initial(ex, script,initializer);
+                    new ScrollX().Initial(ex, script, initializer);
                     break;
                 case CompositeType.Slider:
-                    new UISlider().Initial(ex, script,initializer);
+                    new UISlider().Initial(ex, script, initializer);
                     break;
                 case CompositeType.GridScroll:
-                    new GridScroll().Initial(ex,script,initializer);
+                    new GridScroll().Initial(ex, script, initializer);
                     break;
                 case CompositeType.Paint:
-                    new Paint().Initial(ex,script,initializer);
+                    new Paint().Initial(ex, script, initializer);
                     break;
                 case CompositeType.Rocker:
-                    new UIRocker().Initial(ex,script,initializer);
+                    new UIRocker().Initial(ex, script, initializer);
                     break;
                 case CompositeType.UIContainer:
-                    new UIContainer().Initial(ex,script,initializer);
+                    new UIContainer().Initial(ex, script, initializer);
                     break;
                 case CompositeType.TreeView:
-                    new TreeView().Initial(ex,script,initializer);
+                    new TreeView().Initial(ex, script, initializer);
                     break;
                 case CompositeType.UIDate:
-                    new UIDate().Initial(ex,script,initializer);
+                    new UIDate().Initial(ex, script, initializer);
                     break;
                 case CompositeType.UIPalette:
-                    new UIPalette().Initial(ex,script,initializer);
+                    new UIPalette().Initial(ex, script, initializer);
                     break;
                 case CompositeType.ScrollYExtand:
-                    new ScrollYExtand().Initial(ex,script,initializer);
+                    new ScrollYExtand().Initial(ex, script, initializer);
                     break;
                 case CompositeType.DropDown:
-                    new DropdownEx().Initial(ex,script,initializer);
+                    new DropdownEx().Initial(ex, script, initializer);
                     break;
                 case CompositeType.StackPanel:
-                    new StackPanel().Initial(ex,script,initializer);
+                    new StackPanel().Initial(ex, script, initializer);
                     break;
                 case CompositeType.DragContent:
-                    new DragContent().Initial(ex,script,initializer);
+                    new DragContent().Initial(ex, script, initializer);
                     break;
                 case CompositeType.TabControl:
-                    new TabControl().Initial(ex,script,initializer);
+                    new TabControl().Initial(ex, script, initializer);
                     break;
                 case CompositeType.DockPanel:
-                    new DockPanel().Initial(ex,script,initializer);
+                    new DockPanel().Initial(ex, script, initializer);
                     break;
                 case CompositeType.DesignedDockPanel:
-                    new DesignedDockPanel().Initial(ex,script,initializer);
+                    new DesignedDockPanel().Initial(ex, script, initializer);
                     break;
                 case CompositeType.DataGrid:
-                    new DataGrid().Initial(ex,script,initializer);
+                    new DataGrid().Initial(ex, script, initializer);
                     break;
                 case CompositeType.InputBox:
-                    new InputBox().Initial(ex,script,initializer);
+                    new InputBox().Initial(ex, script, initializer);
                     break;
-            }
-        }
-        /// <summary>
-        /// 清除资源
-        /// </summary>
-        public virtual void Clear()
-        {
-        }
-        protected virtual void Start()
-        {
-            if (eventType != HEventType.None)
-            {
-                if (userEvent == null)
-                    switch (eventType)
-                    {
-                        case HEventType.UserEvent:
-                            RegEvent<UserEvent>(mod);
-                            break;
-                        case HEventType.GestureEvent:
-                            RegEvent<GestureEvent>(mod);
-                            break;
-                    }
-            }
-            if (compositeType != CompositeType.None)
-            {
-                if (composite == null)
-                {
-                    if (mod == null)
-                        mod = HGUIManager.GetFakeData(this.transform);
-                    CreateUIComposite(this, mod, null);
-                }
+                case CompositeType.PopMenu:
+                    new PopMenu().Initial(ex, script, initializer);
+                    break;
             }
         }
     }

@@ -84,7 +84,7 @@ public static class CompositeMenu
         }
         AssetDatabase.Refresh();
     }
-    [MenuItem("HGUI/Add/Empty", false, 2)]
+    [MenuItem("HGUI/Add/UIElement", false, 2)]
     static public UIElement AddEmpty(UIElement parent)
     {
         var go = new UIElement();
@@ -92,7 +92,7 @@ public static class CompositeMenu
         go.localPosition = Vector3.zero;
         go.localScale = Vector3.one;
         go.localRotation = Quaternion.identity;
-        go.name = "Empty";
+        go.name = "UIElement";
         return go;
     }
     [MenuItem("HGUI/Add/Image", false, 3)]

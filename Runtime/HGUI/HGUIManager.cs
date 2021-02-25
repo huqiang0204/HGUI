@@ -80,7 +80,7 @@ namespace huqiang.Core.HGUI
         /// <returns></returns>
         public static DataBuffer GetPrefab(Transform uiRoot)
         {
-            var ui = uiRoot.GetComponent<Helper.HGUI.UIElement>();
+            var ui = uiRoot.GetComponent<Helper.HGUI.UIContext>();
             if (ui != null)
             {
                 DataBuffer db = new DataBuffer(1024);

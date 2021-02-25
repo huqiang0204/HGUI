@@ -100,8 +100,9 @@ namespace huqiang.Core.UIData
             tar.m_pixelsPerUnit = tmp.pixelsPerUnit;
             tar.m_preserveAspect = tmp.preserveAspect;
         }
-        protected unsafe void SaveHImage(Helper.HGUI.HImage src, FakeStruct fake)
+        protected unsafe void SaveHImage(Helper.HGUI.HImage hi, FakeStruct fake)
         {
+            var src = hi.Content;
             HImageData* tar = (HImageData*)fake.ip;
             tar->spriteType = src.m_spriteType;
             tar->fillAmount = src.m_fillAmount;
@@ -139,27 +140,16 @@ namespace huqiang.Core.UIData
             LoadHImage(fake, image);
             LoadUIElement(image,fake, initializer);
         }
-        public unsafe override FakeStruct SaveUI(UIElement com, DataBuffer buffer)
-        {
-            var src = com as HGUI.HImage;
-            if (src == null)
-                return null;
-            FakeStruct fake = new FakeStruct(buffer, HImageData.ElementSize);
-            
-            SaveHGraphics(src,fake);
-            SaveHImage(src,fake);
-            SaveUIElement(src, fake);
-            return fake;
-        }
         public unsafe override FakeStruct SaveUI(Component com, DataBuffer buffer)
         {
             var src = com.GetComponent<Helper.HGUI.HImage>();
             if (src == null)
                 return null;
             FakeStruct fake = new FakeStruct(buffer, HImageData.ElementSize);
-            SaveUIElement(src, fake);
-            SaveHGraphics(src, fake);
-            SaveHImage(src,fake);
+            var img = src.GetUIData() as HImage;
+            SaveUIElement(com.transform, fake);
+            SaveHGraphics(img, fake);
+            SaveHImage(src, fake);
             return fake;
         }
     }

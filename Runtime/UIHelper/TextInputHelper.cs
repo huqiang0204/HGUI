@@ -37,7 +37,7 @@ public class TextInputHelper:UIHelper
         int index = db.AddData(fake);
         data->eve = type << 16 | index;
     }
-    public unsafe override void LoadFromBuffer(FakeStruct fake,UIInitializer initializer)
+    public unsafe override void LoadFromBuffer(FakeStruct fake,Initializer initializer)
     {
         TextInputData* sp = (TextInputData*)fake.ip;
         inputColor = sp->inputColor;
@@ -53,9 +53,10 @@ public class TextInputHelper:UIHelper
     }
     public override void Refresh()
     {
-        var txt = GetComponentInChildren<HText>();
-        if (txt == null)
+        var ui = GetComponentInChildren<HText>();
+        if (ui == null)
             return;
+        var txt = ui.Content;
         if (InputString==null|InputString=="")
         {
             txt.Text = TipString;

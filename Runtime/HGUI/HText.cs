@@ -16,9 +16,10 @@ namespace huqiang.Core.HGUI
         public Vector2 uv;
         public int Index;
     }
+    [Serializable]
     public class HText : HGraphics
     {
-        public override string TypeName { get => "HText"; }
+        public override string TypeName { get => UIType.HText; }
         public static List<HText> TextBuffer = new List<HText>();
         /// <summary>
         /// 顶点缓存
@@ -106,6 +107,19 @@ namespace huqiang.Core.HGUI
 
             text.vertInfo.Release();
             text.vertInfo = tmp;
+            if (text.trisInfo.DataCount > 0)
+            {
+                int l = text.trisInfo.DataCount;
+                var tris = trisBuffer.RegNew(l * 5);
+                tris.DataCount = l * 5;
+                OutLineTris(ref tris, 0, ref text.trisInfo, 0);
+                OutLineTris(ref tris, l, ref text.trisInfo, c);
+                OutLineTris(ref tris, l * 2, ref text.trisInfo, c * 2);
+                OutLineTris(ref tris, l * 3, ref text.trisInfo, c * 3);
+                OutLineTris(ref tris, l * 4, ref text.trisInfo, c * 4);
+                text.trisInfo.Release();
+                text.trisInfo = tris;
+            }
             if (text.trisInfo1.DataCount > 0)
             {
                 int l = text.trisInfo1.DataCount;
@@ -133,27 +147,6 @@ namespace huqiang.Core.HGUI
                 text.trisInfo2 = tris;
             }
         }
-        /// <summary>
-        /// 默认字体
-        /// </summary>
-        public static Font DefaultFont
-        {
-            get
-            {
-                if (defFont == null)
-                {
-                    defFont = HTextLoader.FindFont("Arial"); //Font.CreateDynamicFontFromOSFont("Arial", 16);
-                    //var t2d = defFont.material.mainTexture as Texture2D;
-                    //t2d.Resize(1024, 1024);
-                }
-                return defFont;
-            }
-            set
-            {
-                defFont = value;
-            }
-        }
-
         [TextArea(3, 10)]
         [SerializeField]
         internal string m_text;
@@ -166,7 +159,6 @@ namespace huqiang.Core.HGUI
                 m_dirty = true;
             }
         }
-
         [SerializeField]
         internal Font _font;
         public Font Font
@@ -174,7 +166,7 @@ namespace huqiang.Core.HGUI
             get
             {
                 if (_font == null)
-                    return DefaultFont;
+                    return HTextLoader.FindFont("Arial");
                 return _font;
             }
             set
@@ -182,7 +174,7 @@ namespace huqiang.Core.HGUI
                 _font = value;
             }
         }
-        [HideInInspector]
+        [NonSerialized]
         public CustomFont customFont;
         internal Vector2 m_pivot = new Vector2(0.5f, 0.5f);
         public Vector2 TextPivot

@@ -2,27 +2,25 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
+using System.Threading;
 
-namespace huqiang
+namespace huqiang.Communication
 {
-    /// <summary>
-    /// kcp服务,kcp一个单独的线程用于接收消息
-    /// 一个单独得定线程发送消息
-    /// 一个单独的线程解析kcp数据包,然后推到每个连接的缓存中
-    /// 连接更新线程有多个,检查和处理每个连接中的缓存数据
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
+    public struct KcpServerStats
+    {
+        public int UsageMemory;
+        public int AllMemory;
+        public int PEMemory;
+        public int LinkCount;
+    }
     public class KcpServer<T> : KcpListener where T : KcpLink, new()
     {
-        /// <summary>
-        /// 用于广播服务的最小消息id
-        /// </summary>
+        NetworkContent[] ncs=new NetworkContent[32];
+        List<BroadcastMsg> datas = new List<BroadcastMsg>();
         public static UInt16 MinID = 60000;
-        /// <summary>
-        /// 用于广播服务的最大消息id
-        /// </summary>
         public static UInt16 MaxID = 64000;
         static Random random = new Random();
+        public static int SingleCount = 2048;
         public KcpThread<T>[] linkBuff;
         int tCount = 0;
         /// <summary>
@@ -30,20 +28,11 @@ namespace huqiang
         /// </summary>
         public bool RejectAutoConnections = false;
         Kcp kcp;
-        /// <summary>
-        /// kcp服务器
-        /// </summary>
-        /// <param name="port">服务端口,默认为自动端口</param>
         public KcpServer(int port = 0) : base(port)
         {
             Instance = this;
             kcp = new Kcp();
         }
-        /// <summary>
-        /// 运行服务
-        /// </summary>
-        /// <param name="threadCount">线程数量</param>
-        /// <param name="threadbuff">每个线程的缓存数</param>
         public void Run(int threadCount = 8, int threadbuff = 2048)
         {
             tCount = threadCount;
@@ -64,18 +53,11 @@ namespace huqiang
             kcp.Run(this, tCount);
             Start();
         }
-        /// <summary>
-        /// 关闭Socket
-        /// </summary>
         public void Close()
         {
             soc.Close();
         }
-        /// <summary>
-        /// 查找或创建一个该地址的用户连接
-        /// </summary>
-        /// <param name="ep"></param>
-        /// <returns></returns>
+        //设置用户的udp对象用于发送消息
         public T FindOrCreateLink(IPEndPoint ep)
         {
             var b = ep.Address.GetAddressBytes();
@@ -114,14 +96,9 @@ namespace huqiang
                 linkBuff[s].Add(link);
                 link.Awake();
             }
+            link.RecvTime = DateTime.Now.Ticks;
             return link;
         }
-        /// <summary>
-        /// 处理监听到的消息
-        /// </summary>
-        /// <param name="dat">缓存</param>
-        /// <param name="len">数据长度</param>
-        /// <param name="ep">远程地址</param>
         public override void Dispatch(byte[] dat, int len, IPEndPoint ep)
         {
             T link;
@@ -147,17 +124,10 @@ namespace huqiang
                 kcp.ReciveMsg(dat, len, link);
             }
         }
-        /// <summary>
-        /// 移除某个连接
-        /// </summary>
-        /// <param name="link"></param>
         public override void RemoveLink(NetworkLink link)
         {
             linkBuff[link.buffIndex].Delete(link);
         }
-        /// <summary>
-        /// 释放资源
-        /// </summary>
         public override void Dispose()
         {
             base.Dispose();
@@ -165,11 +135,6 @@ namespace huqiang
             for (int i = 0; i < tCount; i++)
                 linkBuff[i].running = false;
         }
-        /// <summary>
-        /// 使用id查询某个用户
-        /// </summary>
-        /// <param name="id">id</param>
-        /// <returns></returns>
         public T FindLink(Int64 id)
         {
             for (int i = 0; i < tCount; i++)
@@ -180,12 +145,6 @@ namespace huqiang
             }
             return null;
         }
-        /// <summary>
-        /// 使用ip地址查询某个用户
-        /// </summary>
-        /// <param name="ip">ip地址</param>
-        /// <param name="port">端口</param>
-        /// <returns></returns>
         public T FindLink(int ip, int port)
         {
             for (int i = 0; i < tCount; i++)
@@ -211,50 +170,106 @@ namespace huqiang
             heart = false;
         }
         UInt16 bid = 60000;
-        /// <summary>
-        /// 广播消息
-        /// </summary>
-        /// <param name="dat">数据</param>
-        /// <param name="type">数据类型</param>
-        public override void Broadcast(byte[] dat, byte type)
+        public override bool PostBroadcast(byte[] dat, byte type, int spin)
         {
+            int id = Thread.CurrentThread.ManagedThreadId;
+            for (int i = 0; i < 32; i++)
+            {
+                if (ncs[i].State == 0)
+                {
+                    ncs[i].State = 1;
+                    ncs[i].ThreadID = id;
+                    for (int j = 0; j < spin; j++)
+                        if (ncs[i].ThreadID != id)
+                            goto label;
+                    ncs[i].MsgID = type;
+                    ncs[i].dat = dat;
+                    ncs[i].State = 2;
+                    return true;
+                }
+            label:;
+            }
+            return false;
+        }
+        bool GetBroadcast(ref NetworkContent content)
+        {
+            for (int i = 0; i < 32; i++)
+            {
+                if (ncs[i].State == 2)
+                {
+                    content = ncs[i];
+                    ncs[i].dat = null;
+                    ncs[i].MsgID = 0;
+                    ncs[i].State = 0;
+                    return true;
+                }
+            }
+            return false;
+        }
+        protected override void ProBroadcast()
+        {
+            NetworkContent nc = new NetworkContent();
+            int id = sendThread.ManagedThreadId;
             long now = DateTime.Now.Ticks / 10000;
-            long r = now % 10000;
+            long r = now % 30000;
             Int16 time = (Int16)r;
-            var tmp = Kcp.Pack(dat, type, bid, time);
-            MsgInfo2[] msg = new MsgInfo2[tmp.Length];
-            for(int i=0;i<msg.Length;i++)
+            while (GetBroadcast(ref nc))
             {
-                msg[i].CurPart =(ushort) i;
-                msg[i].data = tmp[i];
-                msg[i].CreateTime = time;
-                msg[i].MsgID = bid;
+                var dat = kcp.Pack(nc.dat, (byte)nc.MsgID, bid, time);
+                BroadcastMsg msg = new BroadcastMsg();
+                msg.MsgID = bid;
+                msg.data = dat;
+                datas.Add(msg);
+                for (int i = 0; i < tCount; i++)
+                {
+                    linkBuff[i].Broadcast(id,bid);
+                }
+                bid++;
+                if (bid >= MaxID)
+                    bid = MinID;
             }
-            for (int i = 0; i < tCount; i++)
+        }
+        public override BroadcastMsg FindBroadcastMsg(int msgID)
+        {
+            for(int i=0;i<datas.Count;i++)
             {
-                linkBuff[i].AddMsg(msg);
+                if(datas[i].MsgID==msgID)
+                {
+                    return datas[i];
+                }
             }
-            bid++;
-            if (bid >= MaxID)
-                bid = MinID;
+            return null;
+        }
+        public override void UpdateBroadcastMsg(int msgID)
+        {
+            for (int i = 0; i < datas.Count; i++)
+            {
+                if (datas[i].MsgID == msgID)
+                {
+                    datas[i].SendTime = now;
+                    datas[i].SendCount++;
+                    return;
+                }
+            }
         }
         bool heart;
   
-        long last;
-        /// <summary>
-        /// 发送缓存中的消息
-        /// </summary>
+        long now,last;
         public override void SendAll()
         {
-            long now = DateTime.Now.Ticks / 10000;
-            long r = now % 10000;
+            now = DateTime.Now.Ticks;
+            for (int i=0;i<datas.Count;i++)
+            {
+                datas[i].SendCount = 0;
+            }
+            long t = now / 10000;//将单位时间设为毫秒
+            long r = t % 30000;//设置循环时间为30000/1000=30秒
             Int16 time = (Int16)r;
             kcp.UnPack(time);
             if(heart)
             {
-                long c = now / 1000;
-                bool n = c > last ? true : false;
-                if (n)
+                long c = t / 1000;//当前时间，单位秒
+                if (c > last)//需要给当前没有消息的用户发送心跳包
                 {
                     last = c;
                     for (int i = 0; i < tCount; i++)
@@ -262,7 +277,7 @@ namespace huqiang
                         linkBuff[i].SendAll(soc, kcp, time, Heart);
                     }
                 }
-                else
+                else//发送用户的消息
                 {
                     for (int i = 0; i < tCount; i++)
                     {
@@ -270,17 +285,26 @@ namespace huqiang
                     }
                 }
             }
-            else
+            else//发送用户的消息
             {
                 for (int i = 0; i < tCount; i++)
                 {
                     linkBuff[i].SendAll(kcp, time);
                 }
             }
+            for (int c = datas.Count - 1; c >= 0; c--)
+            {
+                if (datas[c].SendCount == 0)
+                {
+                    if (now - datas[c].SendTime > 10*1000*10000)//清除超过10秒未被使用的广播消息
+                    {
+                        var bm = datas[c];
+                        bm.Dispose();
+                        datas.RemoveAt(c);
+                    }
+                }
+            }
         }
-        /// <summary>
-        /// 管理当前的用户连接
-        /// </summary>
         protected override void ManageLinks()
         {
             long now = DateTime.Now.Ticks;
@@ -288,6 +312,21 @@ namespace huqiang
             {
                 linkBuff[i].DeleteTimeOutLink(this, now);
             }
+        }
+        /// <summary>
+        /// 获取统计数据
+        /// </summary>
+        public KcpServerStats GetStats()
+        {
+            KcpServerStats kss = new KcpServerStats();
+            kss.AllMemory = kcp.AllMemory;
+            kss.PEMemory = kcp.PEMemory;
+            kss.UsageMemory = kcp.UsageMemory;
+            for (int i = 0; i < tCount; i++)
+            {
+                kss.LinkCount += linkBuff[i].Count;
+            }
+            return kss;
         }
     }
 }

@@ -1,14 +1,14 @@
 {
   "name": "com.huqiang.hguiframework",
   "displayName": "HGUIFramework",
-  "version": "1.1.17",
+  "version": "1.1.32",
   "unity": "2018.1",
-  "description": "https://gitee.com/huqiang0204/HGUI",
+  "description": "https://gitee.com/huqiang0204/hgui2",
   "keywords": ["UI"],
   "author": {
     "name": "huqiang",
     "email": "huqing1990@outlook.com",
-    "url": "https://gitee.com/huqiang0204/HGUI"
+    "url": "https://gitee.com/huqiang0204/hgui2"
   },
   "category": "UI"
 }

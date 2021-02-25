@@ -1,10 +1,6 @@
 ﻿using huqiang.Core.HGUI;
 using huqiang.Data;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace huqiang.Core.UIData
@@ -124,18 +120,9 @@ namespace huqiang.Core.UIData
             LoadHGraphics(hg, fake);
             LoadUIElement(hg, fake, initializer);
         }
-        public unsafe override FakeStruct SaveUI(UIElement com, DataBuffer buffer)
+        protected unsafe void SaveHGraphics(Helper.HGUI.HGraphics hg, FakeStruct fake)
         {
-            var src = com as HGraphics;
-            if (src == null)
-                return null;
-            FakeStruct fake = new FakeStruct(buffer, HGraphicsData.ElementSize);
-            SaveHGraphics(src, fake);
-            SaveUIElement(src, fake);
-            return fake;
-        }
-        protected unsafe void SaveHGraphics(Helper.HGUI.HGraphics src, FakeStruct fake)
-        {
+            var src = hg.Content;
             HGraphicsData* tar = (HGraphicsData*)fake.ip;
             var buffer = fake.buffer;
             var tex = src.MainTexture;
@@ -180,12 +167,13 @@ namespace huqiang.Core.UIData
         }
         public unsafe override FakeStruct SaveUI(Component com, DataBuffer buffer)
         {
-            var src = com.GetComponent<Helper.HGUI.HGraphics>();
+            var src = com.GetComponent<Helper.HGUI.UIContext>();
             if (src == null)
                 return null;
             FakeStruct fake = new FakeStruct(buffer, HGraphicsData.ElementSize);
-            SaveUIElement(src, fake);
-            SaveHGraphics(src, fake);
+            var con = src.GetUIData() as HGraphics;
+            SaveUIElement(com.transform, fake);
+            SaveHGraphics(con, fake);
             return fake;
         }
     }

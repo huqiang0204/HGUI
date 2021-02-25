@@ -24,7 +24,7 @@ public class CircleEventHelper : UIHelper
         int index= db.AddData(fs);
         data->eve = type << 16 | index;
     }
-    public override unsafe void LoadFromBuffer(FakeStruct fake,UIInitializer initializer)
+    public override unsafe void LoadFromBuffer(FakeStruct fake,Initializer initializer)
     {
         Radius = fake.GetFloat(1);
         Ratio = fake.GetFloat(2);

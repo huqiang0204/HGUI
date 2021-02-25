@@ -8,9 +8,10 @@ using UnityEngine;
 
 namespace huqiang.Core.HGUI
 {
+    [Serializable]
     public class HImage : HGraphics
     {
-        public override string TypeName { get => "HImage"; }
+        public override string TypeName { get =>UIType.HImage; }
         [SerializeField]
         internal Sprite m_sprite = null;
         internal Rect m_rect;

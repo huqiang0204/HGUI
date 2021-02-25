@@ -302,6 +302,10 @@ namespace huqiang.UIEvent
         /// </summary>
         public Action<UserEvent, UserAction> PointerHover;
         /// <summary>
+        /// 长按事件
+        /// </summary>
+        public Action<UserEvent, UserAction> HoldPress;
+        /// <summary>
         /// 滚轮滚动
         /// </summary>
         public Action<UserEvent, UserAction> MouseWheel;
@@ -359,6 +363,7 @@ namespace huqiang.UIEvent
             Focus = true;
             Pressed = true;
             PressTime = action.EventTicks;
+            HoverTime = 0;
             RawPosition = action.CanPosition;
             if (AutoColor)
             {
@@ -421,10 +426,27 @@ namespace huqiang.UIEvent
                 StayTime = action.EventTicks - EntryTime;
                 if (action.CanPosition == LastPosition)
                 {
-                    HoverTime += UserAction.TimeSlice * 10000;
-                    if (HoverTime > ClickTime)
-                        if (PointerHover != null)
-                            PointerHover(this, action);
+                    if(HoverTime < ClickTime)
+                    {
+                        HoverTime += UserAction.TimeSlice * 10000;
+                        if (HoverTime >= ClickTime)
+                        {
+                            if (Pressed)
+                            {
+                                if (HoldPress != null)
+                                    HoldPress(this, action);
+                            }
+                            else
+                            {
+                                if (PointerHover != null)
+                                    PointerHover(this, action);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        HoverTime += UserAction.TimeSlice * 10000;
+                    }
                 }
                 else
                 {

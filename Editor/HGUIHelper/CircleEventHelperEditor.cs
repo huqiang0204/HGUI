@@ -36,7 +36,7 @@ public class CircleEventHelperEditor:Editor
         var trans = circle.transform;
         float r = circle.Radius* trans.lossyScale.x;
         Vector2 pivot = new Vector2(0.5f,0.5f);
-        var ui = circle.GetComponent<UIElement>();
+        var ui = circle.GetComponent<UIElement>().Content;
         Vector3 os = Vector3.zero;
         if (ui != null)
         {

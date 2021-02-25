@@ -30,7 +30,8 @@ namespace huqiang.UIComposite
         {
             var go = new GameObject(name);
             var img = go.AddComponent<UIElement>();
-            img.SizeDelta = size;
+            img.Content = new Core.HGUI.UIElement();
+            img.Content.SizeDelta = size;
             var trans = go.transform;
             trans.SetParent(parent);
             trans.localPosition = pos;
@@ -50,7 +51,8 @@ namespace huqiang.UIComposite
         {
             var go = new GameObject(name);
             var img = go.AddComponent<UIElement>();
-            img.SizeDelta = size;
+            img.Content = new Core.HGUI.UIElement();
+            img.Content.SizeDelta = size;
             img.SetParent(parent);
             img.localPosition = pos;
             img.localScale = Vector3.one;
@@ -69,7 +71,8 @@ namespace huqiang.UIComposite
         {
             var go = new GameObject(name);
             var img = go.AddComponent<HImage>();
-            img.SizeDelta = size;
+            img.Content = new Core.HGUI.HImage();
+            img.Content.SizeDelta = size;
             var trans = go.transform;
             trans.SetParent(parent);
             trans.localPosition = pos;
@@ -89,7 +92,8 @@ namespace huqiang.UIComposite
         {
             var go = new GameObject(name);
             var img = go.AddComponent<HText>();
-            img.SizeDelta = size;
+            img.Content = new Core.HGUI.HText();
+            img.Content.SizeDelta = size;
             var trans = go.transform;
             trans.SetParent(parent);
             trans.localPosition = pos;
@@ -105,11 +109,12 @@ namespace huqiang.UIComposite
         /// <param name="name">名称</param>
         /// <param name="parent">父坐标变换</param>
         /// <returns></returns>
-        public static HText CreateTextBox(Vector3 pos, Vector2 size, string name, Transform parent)
+        public static TextBox CreateTextBox(Vector3 pos, Vector2 size, string name, Transform parent)
         {
             var go = new GameObject(name);
             var img = go.AddComponent<TextBox>();
-            img.SizeDelta = size;
+            img.Content = new Core.HGUI.TextBox();
+            img.Content.SizeDelta = size;
             var trans = go.transform;
             trans.SetParent(parent);
             trans.localPosition = pos;
@@ -129,7 +134,8 @@ namespace huqiang.UIComposite
         {
             var go = new GameObject(name);
             var img = go.AddComponent<HLine>();
-            img.SizeDelta = size;
+            img.Content = new Core.HGUI.HLine();
+            img.Content.SizeDelta = size;
             var trans = go.transform;
             trans.SetParent(parent);
             trans.localPosition = pos;

@@ -5,7 +5,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
-namespace huqiang
+namespace huqiang.Communication
 {
     public class KcpThread<T> : ThreadBuffer<T> where T : KcpData, new()
     {
@@ -117,7 +117,7 @@ namespace huqiang
         public void DeleteTimeOutLink(KcpListener kcp, long now)
         {
             int c = queue.Count - 1;
-            for (int i = c; i >= 0; i--)
+            for (int i = c ; i >= 0; i--)
             {
                 var link = queue[i];
                 if (now - link.RecvTime > KcpListener.TimeOut)

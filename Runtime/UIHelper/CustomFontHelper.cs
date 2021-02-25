@@ -34,7 +34,7 @@ public class CustomFontHelper : UIHelper
                     font.AddCharMap(chars[i].cha,chars[i].sprite, NormalFontSize);
                 }
             }
-            txt.customFont = font;
+            txt.Content.customFont = font;
         }
     }
 }

@@ -9,12 +9,13 @@ using UnityEngine;
 
 namespace huqiang.Core.HGUI
 {
+    [Serializable]
     /// <summary>
     /// 画线UI,支持直线,弧线,贝塞尔曲线,二阶贝塞尔曲线
     /// </summary>
     public class HLine : HGraphics
     {
-        public override string TypeName { get => "HLine"; }
+        public override string TypeName { get =>UIType.HLine; }
         List<Beeline> beelines;
         List<ArcLine> arcLines;
         List<BzierLine> bzierLines;

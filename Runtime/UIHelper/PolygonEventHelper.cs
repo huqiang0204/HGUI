@@ -22,7 +22,7 @@ public class PolygonEventHelper : UIHelper
             data->eve = type << 16 | index;
         }
     }
-    public override unsafe void LoadFromBuffer(FakeStruct fake,UIInitializer initializer)
+    public override unsafe void LoadFromBuffer(FakeStruct fake,Initializer initializer)
     {
         fake.buffer.GetArray<Vector2>(fake[1]);
     }

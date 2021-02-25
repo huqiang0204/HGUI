@@ -1076,6 +1076,7 @@ namespace huqiang.Core.HGUI
                 RequestTexture(font, texts[i]);
                 var pps = texts[i].populates;
                 var vert = texts[i].vertInfo;
+                if(vert.DataCount>0)
                 for (int j = 0; j < pps.Count; j++)
                 {
                     var pi = pps[j];

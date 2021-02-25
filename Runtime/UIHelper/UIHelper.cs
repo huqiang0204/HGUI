@@ -30,7 +30,7 @@ public class UIHelper : MonoBehaviour
     /// </summary>
     /// <param name="data">数据缓存</param>
     /// <returns>FakeStruct数据</returns>
-    public unsafe virtual void LoadFromBuffer(FakeStruct fake,UIInitializer initializer)
+    public unsafe virtual void LoadFromBuffer(FakeStruct fake,Initializer initializer)
     {
     }
     /// <summary>

@@ -11,7 +11,7 @@ HGUI升级版，UI元素移除MonoBehaviour
 1.  打开工程的下的文件Packages/manifest.json
 2.  添加对应的版本包，例如
     "dependencies": {
-    "com.huqiang.hguiframework": "https://gitee.com/huqiang0204/hgui2.git#1.1.7"
+    "com.huqiang.hguiframework": "https://gitee.com/huqiang0204/hgui2.git#1.1.27"
 	}
 3.  打包时注意事项，请确保ProjectSetting面板 Graphics中添加了Shader HGUI/UIDef，否则移动端会报错
 

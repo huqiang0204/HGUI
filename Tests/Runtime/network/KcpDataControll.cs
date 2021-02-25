@@ -1,4 +1,5 @@
 ﻿using huqiang;
+using huqiang.Communication;
 using huqiang.Data;
 using System;
 using System.Collections.Generic;
@@ -48,7 +49,7 @@ namespace Assets.Net
         {
             datas = new QueueBuffer<KcpData>();
         }
-        public override void Dispatch(BlockInfo<byte> dat, byte tag)
+        public override void Dispatch(BlockInfo dat, byte tag)
         {
             KcpData data = new KcpData();
             data.tag = tag;
@@ -139,7 +140,7 @@ namespace Assets.Net
             log.type = type;
             logs.Add(log);
             var str = JsonUtility.ToJson(log);
-            logLink.Send(EnvelopeType.String, Encoding.UTF8.GetBytes(str));
+            logLink.Post(0, Encoding.UTF8.GetBytes(str), EnvelopeType.String);
         }
         public void CloseLog()
         {
@@ -290,7 +291,7 @@ namespace Assets.Net
             msg.Args = json;
             string str = JsonUtility.ToJson(msg);
             var dat = Encoding.UTF8.GetBytes(str);
-            link.Send(EnvelopeType.Json, dat);
+            link.Post(0, dat, EnvelopeType.Json);
         }
         public void SendAesJson(int cmd,int type,string json)
         {
@@ -316,7 +317,7 @@ namespace Assets.Net
         }
         public void SendStream(DataBuffer db)
         {
-            link.Send(EnvelopeType.DataBuffer, db.ToBytes());
+            link.Post(0, db.ToBytes(), EnvelopeType.DataBuffer);
         }
         public void SendAesStream(DataBuffer db)
         {
@@ -348,7 +349,7 @@ namespace Assets.Net
         }
         public void SendMate(byte[] buf)
         {
-            link.Send(EnvelopeType.Mate, buf);
+            link.Post(0, buf, EnvelopeType.Mate);
         }
         public void Dispose()
         {

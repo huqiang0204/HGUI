@@ -4,146 +4,8 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace huqiang
+namespace huqiang.Communication
 {
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 1)]
-    public struct KcpReturn
-    {
-        /// <summary>
-        /// 数据压缩类型
-        /// </summary>
-        public byte Type;
-        /// <summary>
-        /// 此消息的id
-        /// </summary>
-        public UInt16 MsgID;
-        /// <summary>
-        /// 此消息的某个分卷
-        /// </summary>
-        public UInt16 CurPart;
-        /// <summary>
-        /// 此消息发送的时间戳
-        /// </summary>
-        public Int16 Time;
-        public static unsafe int Size = sizeof(KcpReturn);
-    }
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 1)]
-    public struct KcpHead
-    {
-        /// <summary>
-        /// 数据压缩类型
-        /// </summary>
-        public byte Type;//1
-        /// <summary>
-        /// 此消息的id
-        /// </summary>
-        public UInt16 MsgID;//2
-        /// <summary>
-        /// 此消息的某个分卷
-        /// </summary>
-        public UInt16 CurPart;//2
-        /// <summary>
-        /// 此消息总计分卷
-        /// </summary>
-        public UInt16 AllPart;//2
-        /// <summary>
-        /// 此消息分卷长度
-        /// </summary>
-        public UInt16 PartLen;//2
-        /// <summary>
-        /// 此消息总计长度
-        /// </summary>
-        public UInt32 Lenth;//4
-        /// <summary>
-        /// 此消息发送的时间戳
-        /// </summary>
-        public Int16 Time;//2
-        public static unsafe int Size = sizeof(KcpHead);
-    }
-    public struct BlockData:IDisposable
-    {
-        public byte type;
-        public BlockInfo<byte> dat;
-
-        public void Dispose()
-        {
-            dat.Release();
-        }
-    }
-    internal struct ByteData:IDisposable
-    {
-        public byte type;
-        public byte[] dat;
-
-        public void Dispose()
-        {
-            dat = null;
-        }
-    }
-    internal struct MsgInfo:IDisposable
-    {
-        /// <summary>
-        /// 此消息的id 
-        /// </summary>
-        public UInt16 MsgID;//2
-        /// <summary>
-        /// 此消息的某个分卷
-        /// </summary>
-        public UInt16 CurPart;//2
-        /// <summary>
-        /// 创建的时间
-        /// </summary>
-        public Int16 CreateTime;
-        /// <summary>
-        /// 上一次发送的时间
-        /// </summary>
-        public Int16 SendTime;
-        /// <summary>
-        /// 发送的次数
-        /// </summary>
-        public int SendCount;
-        /// <summary>
-        /// 数据
-        /// </summary>
-        public BlockInfo<byte> data;
-
-        public void Dispose()
-        {
-            data.Release();
-        }
-    }
-    public struct MsgInfo2:IDisposable
-    {
-        /// <summary>
-        /// 此消息的id
-        /// </summary>
-        public UInt16 MsgID;//2
-        /// <summary>
-        /// 此消息的某个分卷
-        /// </summary>
-        public UInt16 CurPart;//2
-        /// <summary>
-        /// 创建的时间
-        /// </summary>
-        public Int16 CreateTime;
-        /// <summary>
-        /// 上一次发送的时间
-        /// </summary>
-        public Int16 SendTime;
-        /// <summary>
-        /// 发送的次数
-        /// </summary>
-        public int SendCount;
-        /// <summary>
-        /// 数据
-        /// </summary>
-        public byte[] data;
-
-        public void Dispose()
-        {
-            data = null;
-        }
-    }
     public class KcpData:NetworkLink
     {
         /// <summary>
@@ -172,9 +34,9 @@ namespace huqiang
             checks[c] = v;
             return true;
         }
-        static void CopyToBuff(ref BlockInfo<byte> buff, ref KcpHead head, byte[] src)
+        static void CopyToBuff(ref BlockInfo buff, ref MsgHead head, byte[] src)
         {
-            int start = KcpHead.Size;
+            int start = MsgHead.Size;
             if (buff.DataCount > 0)
             {
                 int index = head.CurPart * FragmentSize;
@@ -197,14 +59,20 @@ namespace huqiang
         /// <summary>
         /// 接受到的消息缓存信息
         /// </summary>
-        struct MsgCache
+        struct MsgCache:IDisposable
         {
-            public KcpHead head;
+            public MsgHead head;
             public UInt32 part;
             public UInt32 rcvLen;
-            public BlockInfo<byte> buff;
+            public BlockInfo buff;
             public long time;
             public BlockInfo<int> states;
+
+            public void Dispose()
+            {
+                buff.Release();
+                states.Release();
+            }
             //public bool done;//保留一定时效
         }
         /// <summary>
@@ -216,25 +84,13 @@ namespace huqiang
         Int16[] delays = new Int16[128];//时延统计
         int max = 0;
         /// <summary>
-        /// 接收到缓存数据
-        /// </summary>
-        public byte[] RecvBuffer = new byte[32768];
-        /// <summary>
         /// 接收到的解包数据
         /// </summary>
         protected QueueBufferS<BlockData> recvQueue = new QueueBufferS<BlockData>(128);
         /// <summary>
-        /// 需要发送的原始数据
-        /// </summary>
-        internal QueueBufferS<ByteData> sendQueue = new QueueBufferS<ByteData>(128);
-        /// <summary>
         /// 需要发送的封包数据
         /// </summary>
         internal List<MsgInfo> Msgs = new List<MsgInfo>();
-        /// <summary>
-        /// 需要发送的广播数据
-        /// </summary>
-        internal DisorderlyQueueS<MsgInfo2> Msgs2 = new DisorderlyQueueS<MsgInfo2>(256);
         public int Remain = 0;
         public UInt16 MsgId = 34000;
         /// <summary>
@@ -249,21 +105,21 @@ namespace huqiang
             byte type = dat[0];
             if (type == EnvelopeType.Success)
             {
-                KcpReturn head;
+                MsgReturn head;
                 unsafe
                 {
                     fixed (byte* bp = &dat[0])
-                        head = *(KcpReturn*)bp;
+                        head = *(MsgReturn*)bp;
                 }
                 Success(ref head, time);
             }
             else
             {
-                KcpHead head;
+                MsgHead head;
                 unsafe
                 {
                     fixed (byte* bp = &dat[0])
-                        head = *(KcpHead*)bp;
+                        head = *(MsgHead*)bp;
                 }
                 int nul = 0;
                 int fill = 0;
@@ -316,7 +172,7 @@ namespace huqiang
                 kcp.Success(ref head, this);
             }
         }
-        void Success(ref KcpReturn head,Int16 time)
+        void Success(ref MsgReturn head,Int16 time)
         {
             for (int i = Msgs.Count - 1; i >= 0; i--)
             {
@@ -326,32 +182,14 @@ namespace huqiang
                     {
                         Int16 ot = (Int16)(time - Msgs[i].CreateTime);
                         if (ot < 0)
-                            ot += 10000;
+                            ot += 30000;
                         delays[delayEnd] = ot;
                         delayEnd++;
                         if (delayEnd >= 128)
                             delayEnd = 0;
-                        Msgs[i].data.Release();
+                        if (head.MsgID < 60000)//这是一个私有消息，可以释放内存
+                            Msgs[i].data.Release();
                         Msgs.RemoveAt(i);
-                        return;
-                    }
-                }
-            }
-            for (int i = Msgs2.Count - 1; i >= 0; i--)
-            {
-                var t = Msgs2[i];
-                if (head.MsgID == t.MsgID)
-                {
-                    if (head.CurPart == t.CurPart)
-                    {
-                        Int16 ot = (Int16)(time - t.CreateTime);
-                        if (ot < 0)
-                            ot += 10000;
-                        delays[delayEnd] = ot;
-                        delayEnd++;
-                        if (delayEnd >= 128)
-                            delayEnd = 0;
-                        Msgs2.RemoveAt(i);
                         return;
                     }
                 }
@@ -381,7 +219,7 @@ namespace huqiang
                 return a / i;
             }
         }
-        void AddNew(ref KcpHead head, byte[] dat, int index)
+        void AddNew(ref MsgHead head, byte[] dat, int index)
         {
             if (head.AllPart > 1)
             {
@@ -393,7 +231,7 @@ namespace huqiang
             CopyToBuff(ref caches[index].buff, ref head, dat);
             caches[index].rcvLen = 1;
         }
-        void FillMsg(ref KcpHead head,byte[] dat, int index)
+        void FillMsg(ref MsgHead head,byte[] dat, int index)
         {
             bool a;
             unsafe
@@ -410,25 +248,13 @@ namespace huqiang
         /// 处理接收缓存中的消息,如果未被重写,则未释放消息内存
         /// </summary>
         /// <param name="now"></param>
-        public override void Recive(long now)
+        internal override void Recive(long now)
         {
             int c = recvQueue.Count;
-            for(int i=0;i<c;i++)
+            for (int i = 0; i < c; i++)
             {
                 recvQueue.Dequeue().dat.Release();
             }
-        }
-        /// <summary>
-        /// 发送一个消息
-        /// </summary>
-        /// <param name="type">数据类型</param>
-        /// <param name="dat">数据</param>
-        public void Send(byte type, byte[] dat)
-        {
-            ByteData data = new ByteData();
-            data.type = type;
-            data.dat = dat;
-            sendQueue.Enqueue(data);
         }
         /// <summary>
         /// 释放所占用的非托管内存
@@ -449,14 +275,6 @@ namespace huqiang
         {
             _connect = false;
             return true;
-        }
-        /// <summary>
-        /// 添加一个公用消息
-        /// </summary>
-        /// <param name="msgs">消息</param>
-        public override void AddMsg(MsgInfo2[] msgs)
-        {
-            Msgs2.AddRange(msgs);
         }
     }
 }

@@ -5,8 +5,6 @@ using huqiang.Data;
 using huqiang.UIComposite;
 using huqiang.UIEvent;
 using huqiang.UIModel;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -45,7 +43,7 @@ namespace Assets.Scripts
             InitialEvent();
             InitialData();
             //view.InputBox.ReadOnly = true;
-            view.InputBox.InputString = "dfgkldjsjdgh";
+            view.InputBox.InputString = "0123456789大随风😝AA";
             CustomFont font = new CustomFont(ElementAsset.FindTexture(null, "icons"));
             var sp = ElementAsset.FindSprites(null, "icons", new string[] { "Badge1", "Badge2", "Badge3l", });
             string str = "123";

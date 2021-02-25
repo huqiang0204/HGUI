@@ -37,8 +37,8 @@ public class PolygonEventHelperEditor:Editor
         Vector3 os = Vector3.zero;
         if (ui != null)
         {
-            var size = ui.SizeDelta;
-            pivot = ui.Pivot;
+            var size = ui.Content.SizeDelta;
+            pivot = ui.Content.Pivot;
             os.x = (0.5f - pivot.x) * size.x;
             os.y = (0.5f - pivot.y) * size.y;
             os.x *= trans.lossyScale.x;

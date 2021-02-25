@@ -10,29 +10,28 @@ using UnityEngine;
 [CanEditMultipleObjects]
 public class HImageEditor:UIElementEditor
 {
-    //Vector3 pos;
-    //Vector3 scale;
-    //Vector3 angle;
     Sprite sprite;
-    public override void OnEnable()
+    public  override void OnEnable()
     {
         base.OnEnable();
         HImage img = target as HImage;
         if (img != null)
         {
-            pos = img.transform.localPosition;
-            scale = img.transform.localScale;
-            angle = img.transform.localEulerAngles;
-            sprite = img.Sprite;
+            if (img.Content == null)
+                img.Content = new huqiang.Core.HGUI.HImage();
+            //pos = img.transform.localPosition;
+            //scale = img.transform.localScale;
+            //angle = img.transform.localEulerAngles;
+            sprite = img.Content.Sprite;
         }
     }
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
-        HImage img = target as HImage;
-        if(img!=null)
+        HImage hi = target as HImage;
+        if(hi!=null)
         {
-            bool changed = false;
+            var img = hi.Content;
             if(sprite!=img.Sprite)
             {
                 sprite = img.Sprite;
@@ -68,8 +67,6 @@ public class HImageEditor:UIElementEditor
             {
                 bool p = img.PreserveAspect;
                 img.PreserveAspect = EditorGUILayout.Toggle("PreserveAspect", img.PreserveAspect);
-                if (p != img.PreserveAspect)
-                    changed = true;
             }
             else
             {
@@ -87,12 +84,6 @@ public class HImageEditor:UIElementEditor
                 img.SetNativeSize();
             if (GUILayout.Button("Set Circle Mask"))
                 img.SetCircleMask();
-            if (GUI.changed |changed)
-            {
-                var tar = huqiang.Core.HGUI.UIElement.FindInstance(img.ContextID);
-                if (tar != null)
-                    img.ToHGUI2(tar, false);
-            }
         }
     }
 }

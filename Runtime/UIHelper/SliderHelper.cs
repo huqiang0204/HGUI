@@ -25,7 +25,7 @@ public class SliderHelper : UIHelper
         int index = db.AddData(fake);
         data->composite = type << 16 | index;
     }
-    public unsafe override void LoadFromBuffer(FakeStruct fake, UIInitializer initializer)
+    public unsafe override void LoadFromBuffer(FakeStruct fake, Initializer initializer)
     {
         SliderInfo* si = (SliderInfo*)fake.ip;
         StartOffset = si->StartOffset;

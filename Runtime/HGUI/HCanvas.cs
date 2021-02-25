@@ -9,6 +9,7 @@ using UnityEngine;
 
 namespace huqiang.Core.HGUI
 {
+    [Serializable]
     /// <summary>
     /// ui画布
     /// </summary>
@@ -55,8 +56,9 @@ namespace huqiang.Core.HGUI
             base.Dispose();
             AllCanvas.Remove(this);
         }
-        public override string TypeName =>"HCanvas";
+        public override string TypeName =>UIType.HCanvas;
         [HideInInspector]
+        [NonSerialized]
         public HGUIRender render;
 #if UNITY_EDITOR
         public Vector3 WorldPosition;
@@ -84,6 +86,7 @@ namespace huqiang.Core.HGUI
         int point = 0;
         int max;
         int top_txt = 0;
+        [NonSerialized]
         /// <summary>
         /// 用户输入事件
         /// </summary>
@@ -102,7 +105,6 @@ namespace huqiang.Core.HGUI
         {
             CurrentCanvas = this;
         }
-        bool ftr;
         /// <summary>
         /// 信息采集
         /// </summary>
@@ -260,18 +262,48 @@ namespace huqiang.Core.HGUI
             }
         }
 
-#region 鼠标和触屏事件
+        #region 鼠标和触屏事件
+#if UNITY_EDITOR
+        public void DispatchUserAction(Touch[] touches)
+        {
+            DispatchTouch(touches);
+            if (PauseEvent)
+                return;
+            PhysicalScale = UISystem.PhysicalScale;
+            if (render != null)
+                if (render.renderMode == RenderMode.WorldSpace)
+                    PhysicalScale = 1;
+            for (int i = 0; i < inputs.Length; i++)
+            {
+                if (inputs[i] != null)
+                {
+                    try
+                    {
+                        inputs[i].PhysicalScale = PhysicalScale;
+                        if (inputs[i].IsActive)
+                            inputs[i].Dispatch(PipeLine);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogError(ex.StackTrace);
+                    }
+                }
+            }
+            if (inputs.Length > 0)
+                GestureEvent.Dispatch(inputs);
+        }
+#endif
         /// <summary>
         /// 派发用户输入指令信息
         /// </summary>
         public void DispatchUserAction()
         {
 #if UNITY_STANDALONE_WIN
-            DispatchWin();
+            DispatchWin(Input.touches);
 #elif UNITY_EDITOR
             DispatchMouse();
 #elif UNITY_IPHONE || UNITY_ANDROID
-            DispatchTouch();
+            DispatchTouch(Input.touches);
 #else
             DispatchMouse();
 #endif
@@ -320,7 +352,7 @@ namespace huqiang.Core.HGUI
         /// <summary>
         /// 派发Touch事件
         /// </summary>
-        void DispatchTouch()
+        void DispatchTouch(Touch[] touches)
         {
             if (inputs == null)
             {
@@ -328,7 +360,6 @@ namespace huqiang.Core.HGUI
                 for (int i = 0; i < 10; i++)
                     inputs[i] = new UserAction(i);
             }
-            var touches = Input.touches;//此处会产生一次GC
             for (int i = 0; i < 10; i++)
             {
                 if (touches != null)
@@ -355,7 +386,7 @@ namespace huqiang.Core.HGUI
         /// <summary>
         /// 派发鼠标和Touch混合事件
         /// </summary>
-        void DispatchWin()
+        void DispatchWin(Touch[] touches)
         {
             if (inputs == null)
             {
@@ -363,13 +394,11 @@ namespace huqiang.Core.HGUI
                 for (int i = 0; i < 10; i++)
                     inputs[i] = new UserAction(i);
             }
-            var touches = Input.touches;//此处会产生一次GC
             for (int i = 0; i < 10; i++)
             {
                 int id = i;
                 if (touches != null)
                 {
-
                     for (int j = 0; j < touches.Length; j++)
                     {
                         if (touches[j].fingerId == id)
@@ -431,25 +460,33 @@ namespace huqiang.Core.HGUI
             colors.Clear();
             HBatch.Batch(this, PipeLine);
         }
+        [NonSerialized]
         internal List<Vector3> vertex = new List<Vector3>();
+        [NonSerialized]
         internal List<Vector2> uv = new List<Vector2>();
+        [NonSerialized]
         /// <summary>
         /// picture index
         /// </summary>
         internal List<Vector2> uv1 = new List<Vector2>();
+        [NonSerialized]
         /// <summary>
         /// cut rect
         /// </summary>
         internal List<Vector2> uv2 = new List<Vector2>();
+        [NonSerialized]
         /// <summary>
         /// uv tiling
         /// </summary>
         internal List<Vector2> uv3 = new List<Vector2>();
+        [NonSerialized]
         /// <summary>
         /// uv offset
         /// </summary>
         internal List<Vector2> uv4 = new List<Vector2>();
+        [NonSerialized]
         internal List<Color32> colors = new List<Color32>();
+        [NonSerialized]
 
         internal MaterialCollector MatCollector = new MaterialCollector();
         /// <summary>

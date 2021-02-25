@@ -6,15 +6,20 @@ using huqiang;
 using Assets.Scripts;
 using huqiang.UIModel;
 using huqiang.Core.HGUI;
+using huqiang.Core.UIData;
 
 public class UITest : TestPageHelper
 {
     public HGUIRender GUIRender;
+    public Font font;
     public override void LoadTestPage()
     {
         UIElement.DisposeAll();
         HCanvas.RegCanvas(GUIRender);
         UISystem.PhysicalScale =1f;
+        font.RequestCharactersInTexture("ABCDEF", 512);//OPQUVWXYZ
+        HTextLoader.fonts.Clear();
+        HTextLoader.fonts.Add(font);
         //HCanvas can = new HCanvas();
         //can.DesignSize = GUIRender.DesignSize;
         //can.SizeDelta = GUIRender.DesignSize;
@@ -22,7 +27,6 @@ public class UITest : TestPageHelper
         //GUIRender.canvas = can;
         HCanvas.CurrentCanvas = GUIRender.canvas;
         App.Initial(GUIRender.canvas);
-        //RemoteLog.Instance.Connection("192.168.0.144",8899);
         Application.targetFrameRate = 1000;
 #if UNITY_IPHONE || UNITY_ANDROID
         //Scale.DpiScale = true;

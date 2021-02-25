@@ -50,19 +50,13 @@ namespace huqiang.Core.UIData
         public FakeStructHelper ElementHelper;
         public override unsafe FakeStruct SaveUI(Component com, DataBuffer buffer)
         {
-            var src = com.GetComponent<Helper.HGUI.UIElement>();
+            var src = com.GetComponent<Helper.HGUI.UIContext>();
             FakeStruct fake = new FakeStruct(buffer, UIElementData.ElementSize);
-            if (src == null)
-            {
-                SaveUIElement(com as Transform, fake);
-                return fake; 
-            }
-            SaveUIElement(src, fake);
+            SaveUIElement(com.transform, fake);
             return fake;
         }
-        protected unsafe void SaveUIElement(Component src, FakeStruct fake)
+        protected unsafe void SaveUIElement(Transform trans, FakeStruct fake)
         {
-            var trans = src.transform;
             var buffer = fake.buffer;
             UIElementData* tar = (UIElementData*)fake.ip;
             tar->type = fake.buffer.AddData("UIElement");
@@ -72,6 +66,32 @@ namespace huqiang.Core.UIData
             tar->localPosition = trans.localPosition;
             tar->localScale = trans.localScale;
             tar->localRotation = trans.localRotation;
+            var con = trans.GetComponent<huqiang.Helper.HGUI.UIContext>();
+            if(con!=null)
+            {
+                var src = con.GetUIData();
+                tar->m_sizeDelta = src.m_sizeDelta;
+                tar->Pivot = src.Pivot;
+                tar->scaleType = src.scaleType;
+                tar->anchorType = src.anchorType;
+                tar->anchorPointType = src.anchorPointType;
+                tar->anchorOffset = src.anchorOffset;
+                tar->marginType = src.marginType;
+                tar->parentType = src.parentType;
+                tar->margin = src.margin;
+                tar->Mask = src.Mask;
+                tar->eventType = src.eventType;
+                tar->compositeType = src.compositeType;
+                tar->type = fake.buffer.AddData(src.TypeName);
+                tar->insID = src.GetInstanceID();
+                tar->activeSelf = src.activeSelf;
+            }
+            var hleps = con.GetComponents<UIHelper>();
+            if(hleps!=null)
+            {
+                for(int i=0;i<hleps.Length;i++)
+                    hleps[i].ToBufferData(buffer, tar);
+            }
             int c = trans.childCount;
             if (c > 0)
             {
@@ -79,7 +99,7 @@ namespace huqiang.Core.UIData
                 for (int i = 0; i < c; i++)
                 {
                     var son = trans.GetChild(i);
-                    var ui = son.GetComponent<Helper.HGUI.UIElement>();
+                    var ui = son.GetComponent<Helper.HGUI.UIContext>();
                     string tn = "UIElement";
                     if (ui == null)
                     {
@@ -95,114 +115,7 @@ namespace huqiang.Core.UIData
                             Debug.LogError("Save Error:" + son.name);
                         buf[i] = (Int16)buffer.AddData(fs);
                     }
-                    else Debug.LogError(tn +" type is null");
-                }
-                tar->child = buffer.AddData(buf);
-            }
-        }
-        protected unsafe void SaveUIElement(Helper.HGUI.UIElement src, FakeStruct fake)
-        {
-            var buffer = fake.buffer;
-            UIElementData* tar = (UIElementData*)fake.ip;
-            tar->m_sizeDelta = src.m_sizeDelta;
-            tar->Pivot = src.Pivot;
-            tar->scaleType = src.scaleType;
-            tar->anchorType = src.anchorType;
-            tar->anchorPointType = src.anchorPointType;
-            tar->anchorOffset = src.anchorOffset;
-            tar->marginType = src.marginType;
-            tar->parentType = src.parentType;
-            tar->margin = src.margin;
-            tar->Mask = src.Mask;
-            tar->eventType = src.eventType;
-            tar->compositeType = src.compositeType;
-            var trans = src.transform;
-            tar->type = fake.buffer.AddData(src.GetType().Name);
-            tar->insID = trans.GetInstanceID();
-            tar->activeSelf = trans.gameObject.activeSelf;
-            tar->name = buffer.AddData(trans.name);
-            tar->localPosition = trans.localPosition;
-            tar->localScale = trans.localScale;
-            tar->localRotation = trans.localRotation;
-            var hs = src.GetComponents<UIHelper>();
-            if (hs != null)
-            {
-                for (int i = 0; i < hs.Length; i++)
-                {
-                    hs[i].ToBufferData(buffer, tar);
-                }
-            }
-            int c = trans.childCount;
-            if (c > 0)
-            {
-                Int16[] buf = new short[c];
-                for (int i = 0; i < c; i++)
-                {
-                    var son = trans.GetChild(i);
-                    var ui = son.GetComponent<Helper.HGUI.UIElement>();
-                    string tn = "UIElement";
-                    if (ui == null)
-                    {
-                        //Debug.Log("没有UI元素:" + son.name);
-                    }
-                    else
-                        tn = ui.GetType().Name;
-                    var load = uiBuffer.FindDataLoader(tn);
-                    if(load!=null)
-                    {
-                        var fs = load.SaveUI(son, buffer);
-                        if (fs == null)
-                            Debug.LogError("Save Error:" + son.name);
-                        buf[i] = (Int16)buffer.AddData(fs);
-                    }
                     else Debug.LogError(tn + " type is null");
-                }
-                tar->child = buffer.AddData(buf);
-            }
-        }
-        public override FakeStruct SaveUI(HGUI.UIElement com, DataBuffer buffer)
-        {
-            FakeStruct fake = new FakeStruct(buffer, UIElementData.ElementSize);
-            SaveUIElement(com,fake);
-            return fake;
-        }
-        protected unsafe void SaveUIElement(HGUI.UIElement src, FakeStruct fake)
-        {
-            var buffer = fake.buffer;
-            UIElementData* tar = (UIElementData*)fake.ip;
-            tar->m_sizeDelta = src.m_sizeDelta;
-            tar->Pivot = src.Pivot;
-            tar->scaleType = src.scaleType;
-            tar->anchorType = src.anchorType;
-            tar->anchorPointType = src.anchorPointType;
-            tar->anchorOffset = src.anchorOffset;
-            tar->marginType = src.marginType;
-            tar->parentType = src.parentType;
-            tar->margin = src.margin;
-            tar->Mask = src.Mask;
-            tar->eventType = src.eventType;
-            tar->compositeType = src.compositeType;
-            tar->type = fake.buffer.AddData(src.TypeName);
-            tar->insID = src.GetInstanceID();
-            tar->activeSelf = src.activeSelf;
-            tar->name = buffer.AddData(src.name);
-            tar->localPosition = src.localPosition;
-            tar->localScale = src.localScale;
-            tar->localRotation = src.localRotation;
-            int c = src.child.Count;
-            if (c > 0)
-            {
-                Int16[] buf = new short[c];
-                for (int i = 0; i < c; i++)
-                {
-                    var son = src.child[i];
-                    string tn = son.TypeName;
-                    var load = uiBuffer.FindDataLoader(tn);
-                    if (load != null)
-                    {
-                        var fs = load.SaveUI(son, buffer);
-                        buf[i] = (Int16)buffer.AddData(fs);
-                    }
                 }
                 tar->child = buffer.AddData(buf);
             }
@@ -254,7 +167,10 @@ namespace huqiang.Core.UIData
                     }
                     else Debug.LogError("child is null");
                 }
-            tar.Initial(fake,initializer);
+#if UNITY_EDITOR
+            if(Application.isPlaying)
+#endif
+                tar.Initial(fake, initializer);
             if (initializer != null)
             {
                 initializer.Initialiezd(fake, tar);

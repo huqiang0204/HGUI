@@ -8,18 +8,36 @@ using UnityEngine;
 
 namespace huqiang.Core.HGUI
 {
+    public class UIType
+    {
+        public const string UIElement = "UIElement";
+        public const string HCanvas = "HCanvas";
+        public const string HGraphics = "HGraphics";
+        public const string HImage = "HImage";
+        public const string HText = "HText";
+        public const string TextBox = "TextBox";
+        public const string HLine = "HLine";
+    }
+    [Serializable]
     public class UIElement
     {
 #if UNITY_EDITOR
+        [NonSerialized]
+        [HideInInspector]
+        public Transform Context;
+        [SerializeField]
+        [HideInInspector]
         bool _expand;
         public bool expand { get => _expand;
             set {
                 _expand = value;
-                if (Target != null)
-                    Target.expand = value;
             } }
-        [HideInInspector]
-        public huqiang.Helper.HGUI.UIElement Target;
+        public virtual void InitialData()
+        { 
+        }
+        public virtual void SaveData()
+        {
+        }
 #endif
         protected static List<UIElement> Buffer = new List<UIElement>();
         public static void DisposeAll()
@@ -48,7 +66,7 @@ namespace huqiang.Core.HGUI
         /// <summary>
         /// 请勿更改,用于回收时的标记
         /// </summary>
-        public virtual string TypeName { get => "UIElement"; }
+        public virtual string TypeName { get => UIType.UIElement; }
         [SerializeField]
         [HideInInspector]
         internal int id;
@@ -81,9 +99,9 @@ namespace huqiang.Core.HGUI
         public Vector3 localPosition;
         public Vector3 localScale = Vector3.one;
         public Quaternion localRotation = Quaternion.identity;
-        [SerializeField]
-        [HideInInspector]
         UIElement _parent;
+        [NonSerialized]
+        [HideInInspector]
         public List<UIElement> child = new List<UIElement>();
         public int childCount { get => child.Count; }
         public UIElement GetChild(int index)
@@ -780,21 +798,25 @@ namespace huqiang.Core.HGUI
         /// 是否开启遮罩
         /// </summary>
         public bool Mask;
+        [NonSerialized]
         [HideInInspector]
         /// <summary>
         /// 用户事件
         /// </summary>
         public UserEvent userEvent;
+        [NonSerialized]
         [HideInInspector]
         /// <summary>
         /// 复合ui组件实体
         /// </summary>
         public Composite composite;
+        [NonSerialized]
         [HideInInspector]
         /// <summary>
         /// 数据模型
         /// </summary>
         public FakeStruct mod;
+        [NonSerialized]
         [HideInInspector]
         /// <summary>
         /// 联系上下文
@@ -848,6 +870,7 @@ namespace huqiang.Core.HGUI
             t.g_color = MainColor;
             return t;
         }
+        [NonSerialized]
         /// <summary>
         /// 当UI尺寸被改变时,执行此委托
         /// </summary>

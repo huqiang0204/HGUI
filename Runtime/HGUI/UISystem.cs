@@ -60,6 +60,10 @@ namespace huqiang.Core.HGUI
         List<float> distance = new List<float>();
         void DispatchUserAction()
         {
+#if UNITY_EDITOR
+            if (GestureSimulation)
+                UpdateTouch();
+#endif
             var cvs = HGUIRender.AllCanvas;
             if (cvs.Count > 1)
             {
@@ -106,14 +110,26 @@ namespace huqiang.Core.HGUI
                 for (int i = 0; i < c; i++)//派发用户事件，距离最近的优先派发
                 {
                     HCanvas.CurrentCanvas = cvs[i].canvas;
-                    cvs[i].canvas.DispatchUserAction();
+#if UNITY_EDITOR
+                    if (GestureSimulation)
+                        cvs[i].canvas.DispatchUserAction(touches);
+                    else
+#endif
+                        cvs[i].canvas.DispatchUserAction();
                 }
             }
             else if (cvs.Count > 0)
             {
                 HCanvas.CurrentCanvas = cvs[0].canvas;
                 if (cvs[0].canvas != null)
-                    cvs[0].canvas.DispatchUserAction();
+                {
+#if UNITY_EDITOR
+                    if (GestureSimulation)
+                        cvs[0].canvas.DispatchUserAction(touches); 
+                    else
+#endif
+                        cvs[0].canvas.DispatchUserAction();
+                }
             }
         }
         int ScreenWidth = 0;
@@ -256,5 +272,132 @@ namespace huqiang.Core.HGUI
             if (focus)
                 HText.DirtyAll();
         }
+#if UNITY_EDITOR
+        /// <summary>
+        /// 手势模拟，用于没有触控屏的电脑，进行调试
+        /// </summary>
+        public bool GestureSimulation;
+        int pressIndex = -1;
+        Touch[] touches;
+        private void OnGUI()
+        {
+            if (touches != null)
+                for (int i = 0; i < 10; i++)
+                {
+                    if (touches[i].fingerId >= 0)
+                        DrawButton(ref touches[i]);
+                }
+        }
+        void UpdateTouch()
+        {
+            if (touches == null)
+            {
+                touches = new Touch[10];
+                for (int i = 0; i < 10; i++)
+                    touches[i].fingerId = -1;
+            }
+            for (int i = 0; i < 10; i++)
+            {
+                if (touches[i].fingerId >= 0)
+                    if (touches[i].phase == TouchPhase.Ended)
+                        touches[i].fingerId = -1;
+            }
+            if (Input.GetMouseButton(0))
+            {
+                MoveTouch();
+            }
+            if (Input.GetMouseButtonDown(0))
+            {
+                PressTouch();
+            }
+            if (Input.GetMouseButtonUp(0))
+            {
+                pressIndex = -1;
+            }
+            if (Input.GetMouseButtonDown(1))
+            {
+                UpTouch();
+            }
+        }
+        void PressTouch()
+        {
+            Vector2 pos = Input.mousePosition;
+            for (int i = 0; i < 10; i++)
+            {
+                if (touches[i].fingerId >= 0)
+                {
+                    float x = pos.x - touches[i].position.x;
+                    float y = pos.y - touches[i].position.y;
+                    if (x * x + y * y < 900)//在圆内
+                    {
+                        pressIndex = i;
+                        touches[i].phase = TouchPhase.Began;
+                        return;
+                    }
+                }
+            }
+            for (int i = 0; i < 10; i++)
+            {
+                if (touches[i].fingerId < 0) 
+                {
+                    touches[i].fingerId = i;
+                    pressIndex = i;
+                    touches[i].phase = TouchPhase.Began;
+                    touches[i].position = Input.mousePosition;
+                    return;
+                }
+            }
+        }
+        void UpTouch()
+        {
+            Vector2 pos = Input.mousePosition;
+            for (int i = 0; i < 10; i++)
+            {
+                if (touches[i].fingerId >= 0)
+                {
+                    float x = pos.x - touches[i].position.x;
+                    float y = pos.y - touches[i].position.y;
+                    if (x * x + y * y < 900)//在圆内
+                    {
+                        touches[i].phase = TouchPhase.Ended;
+                        return;
+                    }
+                }
+            }
+        }
+        void MoveTouch()
+        {
+            Vector2 pos = Input.mousePosition;
+            for(int i=0;i<10;i++)
+            {
+                if(i==pressIndex)
+                {
+                    if(touches[i].position==pos)
+                    {
+                        touches[i].phase = TouchPhase.Stationary;
+                    }
+                    else
+                    {
+                        touches[i].position = pos;
+                        touches[i].phase = TouchPhase.Moved;
+                    }
+                }
+                else
+                {
+                    touches[i].phase = TouchPhase.Stationary;
+                }
+            }
+        }
+        void DrawButton(ref Touch touch)
+        {
+            Rect rect = new Rect();
+            var pos = touch.position;
+            pos.y = Screen.height - pos.y-30;
+            pos.x -= 30;
+            rect.position = pos;
+            rect.size = new Vector2(60,60);
+            GUI.Button(rect,touch.fingerId.ToString());
+        }
+#endif
     }
 }

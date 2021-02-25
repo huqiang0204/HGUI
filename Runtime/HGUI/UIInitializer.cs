@@ -27,6 +27,9 @@ namespace huqiang.Core.HGUI
         TempReflection reflections;
         object target;
         int feildLenth;
+        public UIInitializer()
+        {
+        }
         /// <summary>
         /// 构造函数
         /// </summary>

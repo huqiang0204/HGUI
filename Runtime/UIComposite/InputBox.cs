@@ -359,6 +359,7 @@ namespace huqiang.UIComposite
             if (OnValueChanged != null)
                 OnValueChanged(this);
         }
+        string CompositionString;
         /// <summary>
         /// 应用当前可显示文本内容
         /// </summary>
@@ -369,15 +370,15 @@ namespace huqiang.UIComposite
             {
                 if (TextCom == null)
                     return;
-                string cs = Keyboard.CompositionString;
+                CompositionString = Keyboard.CompositionString;
                 TextCom.MainColor = textColor;
                 if (contentType == ContentType.Password)
                 {
                     int l = 0;
                     if (str != null & str != "")
                         l = str.Length;
-                    if (cs != null & cs != "")
-                        l += cs.Length;
+                    if (CompositionString != null & CompositionString != "")
+                        l += CompositionString.Length;
                     if (l > 0)
                         TextCom.m_text = new string(PasswordCharacter, l);
                     else TextCom.m_text = "";
@@ -388,10 +389,10 @@ namespace huqiang.UIComposite
                     if (stringEx == null)
                         stringEx = TextCom.stringEx = new StringEx(str, false);
                     else stringEx.Reset(str, false);
-                    if (cs != null & cs != "")
+                    if (CompositionString != null & CompositionString != "")
                     {
                         int index = TextCom.GetIndex(ref startPress);
-                        stringEx.InsertTextElements(index, cs);//str.Insert(ss, cs);
+                        stringEx.InsertTextElements(index, CompositionString);//str.Insert(ss, cs);
                     }
                     TextCom.m_text = stringEx.FullString;
                 }
@@ -579,7 +580,7 @@ namespace huqiang.UIComposite
                     {
                         OnInputChanged(Keyboard.InputString);
                     }
-                    else if (Keyboard.TempStringChanged)
+                    else if (CompositionString!=Keyboard.CompositionString)
                     {
                         SetShowText();
                     }
@@ -648,7 +649,11 @@ namespace huqiang.UIComposite
                         else
                         {
                             Caret.activeSelf = true;
-                            TextCom.GetPointer(tris, hs, ref PointColor, ref startPress);
+                            PressInfo press = startPress;
+                            string cs = Keyboard.CompositionString;
+                            if (cs != null)
+                                press.Offset += cs.Length;
+                            TextCom.GetPointer(tris, hs, ref PointColor, ref press);
                             Caret.LoadFromMesh(hs, tris);
                             TextCom.SetCursorPos(ref endPress);
                         }

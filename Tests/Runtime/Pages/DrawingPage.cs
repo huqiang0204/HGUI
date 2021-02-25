@@ -20,8 +20,12 @@ public class DrawingPage:UIPage
         public HImage color;
         public UserEvent last;
         public UserEvent next;
+        public UserEvent mode;
+        public HText modeTip;
     }
     View view;
+    int drawMode;
+    string[] tips = new string[] { "画笔","缩放","旋转"};
     public override void Initial(UIElement parent, object dat = null)
     {
         base.Initial(parent, dat);
@@ -46,5 +50,13 @@ public class DrawingPage:UIPage
             view.size.Text = v.ToString();
             view.paint.BrushSize = v;
         };
+        view.mode.Click = (o, e) => {
+            drawMode++;
+            if (drawMode > 2)
+                drawMode = 0;
+            view.paint.drawModel = (Paint.DrawModel)drawMode;
+            view.modeTip.Text = tips[drawMode];
+        };
+        view.modeTip.Text = tips[0];
     }
 }

@@ -25,20 +25,25 @@ public class StackPanelHelper:UIHelper
     }
     void OrderHorizontal()
     {
-        var scr = GetComponent<UIElement>();
+        var ui = GetComponent<UIContext>();
+        if (ui == null)
+        {
+            return;
+        }
+        var scr = ui.GetUIData();
         if (scr != null)
         {
             float ps = scr.SizeDelta.x;
             if (FixedSizeRatio > 0)
                 ps *= FixedSizeRatio;
             var sx = scr.SizeDelta.x * (scr.Pivot.x - 1);
-            var trans = scr.transform;
+            var trans = ui.transform;
             var c = trans.childCount;
             float ox = ItemOffset;
             for (int i = 0; i < c; i++)
             {
                 var son = trans.GetChild(i);
-                var ss = son.GetComponent<UIElement>();
+                var ss = son.GetComponent<UIContext>().GetUIData();
                 float w = 0;
                 float p = 0.5f;
                 if (ss != null)
@@ -63,20 +68,25 @@ public class StackPanelHelper:UIHelper
     }
     void OrderVertical()
     {
-        var scr = GetComponent<UIElement>();
+        var ui = GetComponent<UIContext>();
+        if(ui==null)
+        {
+            return;
+        }
+        var scr = ui.GetUIData();
         if (scr != null)
         {
             float ps = scr.SizeDelta.y;
             if (FixedSizeRatio > 0)
                 ps *= FixedSizeRatio;
             var sy = scr.SizeDelta.y * (1 - scr.Pivot.y);
-            var trans = scr.transform;
+            var trans = ui.transform;
             var c = trans.childCount;
             float oy = ItemOffset;
             for (int i = 0; i < c; i++)
             {
                 var son = trans.GetChild(i);
-                var ss = son.GetComponent<UIElement>();
+                var ss = son.GetComponent<UIContext>().GetUIData();
                 float h = 0;
                 float p = 0.5f;
                 if (ss != null)
@@ -115,7 +125,7 @@ public class StackPanelHelper:UIHelper
         int index = db.AddData(fake);
         data->composite = type << 16 | index;
     }
-    public override unsafe void LoadFromBuffer(FakeStruct fake,UIInitializer initializer)
+    public override unsafe void LoadFromBuffer(FakeStruct fake,Initializer initializer)
     {
         direction = (Direction)fake[0];
         spacing = fake.GetFloat(1);

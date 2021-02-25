@@ -28,9 +28,10 @@ namespace huqiang.Core.HGUI
         public int picture;
         public float fillColor;
     }
+    [Serializable]
     public class HGraphics : UIElement
     {
-        public override string TypeName { get => "HGraphics"; }
+        public override string TypeName { get => UIType.HGraphics; }
         /// <summary>
         /// 三角形块级缓存
         /// </summary>
@@ -75,7 +76,7 @@ namespace huqiang.Core.HGUI
         /// 三角形块级内存4
         /// </summary>
         internal BlockInfo<int> trisInfo3;
-        [SerializeField]
+        [NonSerialized]
         internal Material m_material;
         public Material Material
         {

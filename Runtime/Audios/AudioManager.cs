@@ -1,4 +1,5 @@
-﻿using System;
+﻿using huqiang.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -181,6 +182,21 @@ namespace huqiang
                 AudioManager.Play(AudioChannel.UI, clip, false);
         }
         /// <summary>
+        /// 播放声音
+        /// </summary>
+        /// <param name="clip"></param>
+        public static void Play(string bundleName, string assetName)
+        {
+            if (Open)
+            {
+                var ac = ElementAsset.FindResource<AudioClip>(bundleName, assetName);
+                if (ac == null)
+                    return;
+                AudioManager.Stop(AudioChannel.UI);
+                AudioManager.Play(AudioChannel.UI, ac, false);
+            }
+        }
+        /// <summary>
         /// 播放光标进入某个区域的声音
         /// </summary>
         public static void PointerEntry()
@@ -268,6 +284,21 @@ namespace huqiang
             {
                 AudioManager.Stop(AudioChannel.BGM);
                 AudioManager.Play(AudioChannel.BGM, clip, true);
+            }
+        }
+        /// <summary>
+        /// 播放背景音乐
+        /// </summary>
+        /// <param name="clip"></param>
+        public static void Play(string bundleName, string assetName)
+        {
+            if (Open)
+            {
+                var ac = ElementAsset.FindResource<AudioClip>(bundleName, assetName);
+                if (ac == null)
+                    return;
+                AudioManager.Stop(AudioChannel.BGM);
+                AudioManager.Play(AudioChannel.BGM, ac, true);
             }
         }
         /// <summary>

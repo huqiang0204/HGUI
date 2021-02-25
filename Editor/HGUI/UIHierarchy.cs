@@ -1,5 +1,6 @@
 ﻿using huqiang.Core.HGUI;
-using huqiang.UIComposite;
+using huqiang.Data;
+using huqiang.Pool;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,30 +11,21 @@ using UnityEngine;
 
 public class UIHierarchy : EditorWindow
 {
-	class DataContext
-    {
-		public string guid;
-		public UIElement Root;
-    }
-	static List<DataContext> DataCash = new List<DataContext>();
 	public static UIElement SelectNode;
-	public static void ChangeRoot(string guid , UIElement ui)
+	public static void ChangeRoot(string guid, UIElement ui)
     {
-		for(int i=0;i<DataCash.Count;i++)
-			if(DataCash[i].guid==guid)
-            {
-				Root = ui;
-				DataCash[i].Root = Root;
-				SelectNode = null;
-				return;
-            }
+		if (ui == null)
+			return;
 		Root = ui;
-		DataContext dc = new DataContext();
-		dc.guid = guid;
-		dc.Root = Root;
-		DataCash.Add(dc);
 		SelectNode = null;
-
+	}
+	static void Save(string guid, UIElement root)
+    {
+		var di = HistoryManager.GetDataInfo(guid,true,typeof(HCanvas),typeof(HImage),typeof(TextBox),typeof(HText),
+			typeof(HLine),typeof(HGraphics),typeof(UIElement));
+        UnsafeDataWriter dw2 = new UnsafeDataWriter();
+		var db = dw2.Write<HCanvas>(root, di);
+		HistoryManager.AddRecord("ui", guid, db.ToBytes());
 	}
 	static UIElement Root;
 	static string serach = "";

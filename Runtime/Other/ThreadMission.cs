@@ -298,4 +298,102 @@ namespace huqiang
             return new ThreadMission(tag);
         }
     }
+    struct MissionContent
+    {
+        public int State;
+        public int ID;
+        public Action<object> Invoke;
+        public Action<object> CallBack;
+        public object Obj;
+    }
+    class MissionCache
+    {
+        MissionContent[] mcs;
+        int length;
+        public MissionCache(int len = 32)
+        {
+            mcs = new MissionContent[len];
+            length = len;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="invoke"></param>
+        /// <param name="obj"></param>
+        /// <param name="callback"></param>
+        /// <param name="spin">自旋验证次数</param>
+        /// <returns></returns>
+        public bool Post(int id, Action<object> invoke, object obj, Action<object> callback = null, int spin = 16)
+        {
+            for (int i = 0; i < length; i++)
+            {
+                if (mcs[i].State == 0)
+                {
+                    mcs[i].State = 1;
+                    mcs[i].ID = id;
+                    for (int j = 0; j < spin; j++)
+                        if (mcs[i].ID != id)
+                            goto label;
+                    mcs[i].Invoke = invoke;
+                    mcs[i].CallBack = callback;
+                    mcs[i].Obj = obj;
+                    mcs[i].State = 2;
+                    return true;
+                }
+            label:;
+            }
+            return false;
+        }
+        /// <summary>
+        /// 强制行投递委托，如果缓存被沾满
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="invoke"></param>
+        /// <param name="obj"></param>
+        /// <param name="callback"></param>
+        public void ForcePost(int id, Action<object> invoke, object obj, Action<object> callback = null)
+        {
+            var tick = DateTime.Now.Ticks;
+            while (true)
+            {
+                if (Post(id, invoke, obj, callback))
+                    return;
+                if (DateTime.Now.Ticks - tick > 100000)//超过10毫秒都无法添加任务
+                {
+                    Debug.LogError("缓存已满，目标线程超过10毫秒都没有处理缓存中的任务");
+                    return; 
+                }
+            }
+        }
+        public bool Get(ref MissionContent content)
+        {
+            for (int i = 0; i < length; i++)
+            {
+                if (mcs[i].State == 2)
+                {
+                    content = mcs[i];
+                    mcs[i].Invoke = null;
+                    mcs[i].CallBack = null;
+                    mcs[i].Obj = null;
+                    mcs[i].State = 0;
+                    return true;
+                }
+            }
+            return false;
+        }
+        public void Clear()
+        {
+            for (int i = 0; i < length; i++)
+            {
+                if (mcs[i].State == 2)
+                {
+                    mcs[i].Invoke = null;
+                    mcs[i].CallBack = null;
+                    mcs[i].Obj = null;
+                    mcs[i].State = 0;
+                }
+            }
+        }
+    }
 }

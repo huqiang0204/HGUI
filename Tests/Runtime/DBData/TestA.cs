@@ -11,11 +11,11 @@ namespace SerializedData
      {
         public void Load(FakeStruct fake)
         {
-            a = fake.GetData<Int32[]>(0);
-            var b_t = fake.GetData<FakeStringArray>(1);
+            a = fake.GetData<Int32[]>(1);
+            var b_t = fake.GetData<FakeStringArray>(2);
             if (b_t != null)
                 b = b_t.Data;
-            var c_t = fake.GetData<Int16[]>(2);
+            var c_t = fake.GetData<Int16[]>(3);
             if (c_t != null)
             {
                 c = new TestB[c_t.Length];
@@ -28,16 +28,16 @@ namespace SerializedData
                     }
                 }
             }
-            var d_t = fake.GetData<Int32[]>(3);
+            var d_t = fake.GetData<Int32[]>(4);
             if (d_t != null)
             {
                 d = new List<Int32>();
                 d.AddRange(d_t); 
             }
-            var e_t = fake.GetData<FakeStringArray>(4);
+            var e_t = fake.GetData<FakeStringArray>(5);
             if (e_t != null)
                 e.AddRange(e_t.Data);
-            var f_t = fake.GetData<Int16[]>(5);
+            var f_t = fake.GetData<Int16[]>(6);
             if (f_t != null)
             {
                 f = new List<TestB>();
@@ -51,10 +51,10 @@ namespace SerializedData
                     }
                 }
             }
-            scroll = (ScrollType)fake[6];
-            v2 = fake.buffer.GetArray<Vector2>(fake[7]);
-            v3 = fake.buffer.GetArray<Vector3>(fake[8]);
-            var v4_t = fake.buffer.GetArray<Vector4>(fake[9]);
+            scroll = (ScrollType)fake[7];
+            v2 = fake.buffer.GetArray<Vector2>(fake[8]);
+            v3 = fake.buffer.GetArray<Vector3>(fake[9]);
+            var v4_t = fake.buffer.GetArray<Vector4>(fake[10]);
             if (v4 != null)
             {
                 v4 = new List<Vector4>();
@@ -63,10 +63,11 @@ namespace SerializedData
         }
         public FakeStruct Save(DataBuffer db)
         {
-            FakeStruct fake = new FakeStruct(db, 10);
-            fake[0] = db.AddData(a, DataType.Int32Array);
+            FakeStruct fake = new FakeStruct(db, 11);
+            fake[0] = db.AddData(this.GetType().Name, DataType.String);
+            fake[1] = db.AddData(a, DataType.Int32Array);
             if (b != null)
-                fake[1] = db.AddData(new FakeStringArray(b), DataType.FakeStringArray);
+                fake[2] = db.AddData(new FakeStringArray(b), DataType.FakeStringArray);
             if (c != null)
             {
                 if(c.Length>0)
@@ -80,15 +81,15 @@ namespace SerializedData
                             c_b[i] = (Int16)db.AddData(c_t.Save(db));
                         }
                     }
-                    fake[2] = db.AddData(c_b, DataType.Int16Array);
+                    fake[3] = db.AddData(c_b, DataType.Int16Array);
                 }
             }
             if (d != null)
                 if (d.Count > 0)
-                    fake[3] = db.AddData(d.ToArray(), DataType.Int32Array);
+                    fake[4] = db.AddData(d.ToArray(), DataType.Int32Array);
             if (e != null)
                 if (e.Count > 0)
-                    fake[4] = db.AddData(new FakeStringArray(e.ToArray()), DataType.FakeStringArray);
+                    fake[5] = db.AddData(new FakeStringArray(e.ToArray()), DataType.FakeStringArray);
             if (f != null)
             {
                 if(f.Count>0)
@@ -102,16 +103,16 @@ namespace SerializedData
                             f_b[i] = (Int16)db.AddData(f_t.Save(db));
                         }
                     }
-                    fake[5] = db.AddData(f_b, DataType.Int16Array);
+                    fake[6] = db.AddData(f_b, DataType.Int16Array);
                 }
             }
-            fake[6] = (int)scroll;
+            fake[7] = (int)scroll;
             if (v2 != null)
-                fake[7] = db.AddArray<Vector2>(v2);
+                fake[8] = db.AddArray<Vector2>(v2);
             if (v3 != null)
-                fake[8] = db.AddArray<Vector3>(v3);
+                fake[9] = db.AddArray<Vector3>(v3);
             if (v4 != null)
-                fake[9] = db.AddArray<Vector4>(v4.ToArray());
+                fake[10] = db.AddArray<Vector4>(v4.ToArray());
             return fake;
         }
      }

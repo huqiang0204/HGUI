@@ -11,17 +11,23 @@ namespace huqiang.Helper.HGUI
     /// <summary>
     /// 画线UI,支持直线,弧线,贝塞尔曲线,二阶贝塞尔曲线
     /// </summary>
-    public class HLine: HGraphics
+    public class HLine: UIContext
     {
-        public override Core.HGUI.UIElement ToHGUI2(bool activeSelf,bool haveChild=true)
+        public huqiang.Core.HGUI.HLine Content;
+        [SerializeField]
+        [HideInInspector]
+        public int ContextID;
+        public void Awake()
         {
-            Core.HGUI.HLine line = new Core.HGUI.HLine();
-            SaveToHGraphics(line,activeSelf,haveChild);
-            return line;
+            if (Content == null)
+                Content = new Core.HGUI.HLine();
+            ContextID = Content.GetInstanceID();
         }
-        public override void ToHGUI2(Core.HGUI.UIElement ui, bool activeSelf)
+        public override Core.HGUI.UIElement GetUIData()
         {
-            SaveToHGraphics(ui as Core.HGUI.HLine, activeSelf,false);
+            if (Content == null)
+                Content = new Core.HGUI.HLine();
+            return Content;
         }
     }
 }

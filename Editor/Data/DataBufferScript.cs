@@ -7,17 +7,18 @@ using System.Text;
 using UnityEditor;
 using UnityEngine;
 
+[Serializable]
+class Asmdef
+{
+    public string name;
+    public string[] references;
+    public bool allowUnsafeCode;
+}
 public class DataBufferScript : Editor
 {
-    [Serializable]
-    class Asmdef
-    {
-        public string name;
-        public string[] references;
-        public bool allowUnsafeCode;
-    }
+
     [MenuItem("Assets/ExportCS/DataBuffer")]
-    static void ExportJsonScript()
+    static void ExportDBScript()
     {
         var o = Selection.activeObject;
         var ta = o as TextAsset;
@@ -62,14 +63,16 @@ namespace SerializedData
         nps.Add("UnityEngine");
         StringBuilder loader = new StringBuilder();
         StringBuilder writer = new StringBuilder();
-        int offset = 0;
+        int offset = 1;
         if (fs != null)
         {
+            writer.Append("            fake[0] = db.AddData(this.GetType().Name, DataType.String);\r\n");
             for (int j = 0; j < fs.Length; j++)
             {
                 offset += Analysis(fs[j], loader, writer, nps, offset);
             }
         }
+        
         writer.Append("            return fake;\r\n");
         for (int i = 0; i < nps.Count; i++)
         {

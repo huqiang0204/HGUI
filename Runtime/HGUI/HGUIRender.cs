@@ -26,6 +26,7 @@ namespace huqiang.Core.HGUI
         public Transform trans;
         MeshFilter meshFilter;
         MeshRenderer meshRenderer;
+        [NonSerialized]
         [HideInInspector]
         public HCanvas canvas;
 
@@ -164,31 +165,15 @@ namespace huqiang.Core.HGUI
             trans = transform;
             meshFilter = GetComponent<MeshFilter>();
             meshRenderer = GetComponent<MeshRenderer>();
-            var can = UIElement.FindInstance(ContextID) as HCanvas;
-            if (can == null)
+            if (canvas != null)
             {
-                if (OldUI != null)
-                {
-                    var oh = OldUI.GetComponent<huqiang.Helper.HGUI.HCanvas>();
-                    if (oh != null)
-                    {
-                        NearPlane = oh.NearPlane;
-                        UIElement.DisposeAll();
-                        can = oh.ToHGUI2(true) as HCanvas;
-                        ContextID = can.id;
-                    }
-                }
-            }
-            if (can != null)
-            {
-                canvas = can;
                 canvas.localPosition = Vector3.zero;
                 canvas.WorldPosition = transform.position;
-                can.UpdateMesh();
+                canvas.UpdateMesh();
                 HTextGenerator.RebuildUV();
                 HTextGenerator.End();
-                can.Batch();
-                can.ApplyMeshRenderer(meshFilter, meshRenderer);
+                canvas.Batch();
+                canvas.ApplyMeshRenderer(meshFilter, meshRenderer);
                 ApplyToCamera();
             }
         }

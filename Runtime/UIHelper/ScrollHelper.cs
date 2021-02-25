@@ -18,13 +18,17 @@ public class ScrollHelper: UIHelper
         info->minBox = minBox;
         info->scrollType = scrollType;
         if (Slider != null)
-            info->Slider = Slider.GetInstanceID();
+        {
+            var ui = Slider.GetComponent<UIContext>();
+            if (ui != null)
+                info->Slider = ui.GetUIData().GetInstanceID();
+        }
         else info->Slider = 0;
         int type = db.AddData("ScrollHelper");
         int index = db.AddData(fake);
         data->composite = type << 16 | index;
     }
-    public unsafe override void LoadFromBuffer(FakeStruct fake,UIInitializer initializer)
+    public unsafe override void LoadFromBuffer(FakeStruct fake,Initializer initializer)
     {
         ScrollInfo* info = (ScrollInfo*)fake.ip;
         minBox = info->minBox;
@@ -32,11 +36,16 @@ public class ScrollHelper: UIHelper
         int id = info->Slider;
         if (id != 0)
         {
-            initializer.AddContextAction(ContextAction, id);
+            if (initializer != null)
+                initializer.AddContextAction(ContextAction, id);
         }
     }
-    void ContextAction(UIElement element)
+    void ContextAction(Transform element)
     {
-        Slider = element.transform;
+        if(element==null)
+        {
+            Debug.LogError("Context is null: "+ name);
+        }else
+        Slider = element;
     }
 }

@@ -12,9 +12,10 @@ namespace huqiang.Core.HGUI
         public int Row;
         public int Offset;
     }
+    [Serializable]
     public class TextBox:HText
     {
-        public override string TypeName { get => "TextBox"; }
+        public override string TypeName { get => UIType.TextBox; }
         static List<int> TrisA = new List<int>();
         static List<int> TrisB = new List<int>();
         static List<int> TrisC = new List<int>();

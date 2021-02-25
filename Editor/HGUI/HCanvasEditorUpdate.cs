@@ -67,18 +67,30 @@ public class HCanvasEditorUpdate
                     var obj = objs[i] as HGUIRender;
                     if (obj != null)
                     {
-                        UIElement.ResizeChild(obj.canvas);
                         if (obj.OldUI != null)
-                            huqiang.Helper.HGUI.UIElement.Resize(obj.OldUI);
-                        var render = obj.GetComponent<huqiang.Core.HGUI.HGUIRender>();
-                        if (render != null)
                         {
-                            render.Refresh();
+                            obj.OldUI.MakeContext();
+                            obj.canvas = obj.OldUI.Content;
+                            UIElement.ResizeChild(obj.canvas);
+                            MakeContext(obj.canvas);
                         }
+                        obj.Refresh();
                     }
                 }
             }
         }
+    }
+    static void MakeContext(UIElement element)
+    {
+        if(element.Context!=null)
+        {
+            element.Context.localPosition = element.localPosition;
+            element.Context.localRotation = element.localRotation;
+            element.Context.localScale = element.localScale;
+        }
+        var c = element.child.Count;
+        for (int i = 0; i < c; i++)
+            MakeContext(element.child[i]);
     }
     static void OnHierarchyChanged()
     {
